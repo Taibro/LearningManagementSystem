@@ -7,13 +7,15 @@ import lombok.Setter;
 import org.learn.learningmanagementbackend.enums.SchoolType;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
 @NoArgsConstructor
 @Table(name = "School")
-public class School {
+public class School extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +29,7 @@ public class School {
     private String  name;
 
     @Column(name = "short_name", length = 50)
-    private String short_name;
+    private String shortName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
@@ -37,7 +39,7 @@ public class School {
     private String accreditation;
 
     @Column(name = "tax_code", length = 20)
-    private String tax_code;
+    private String taxCode;
 
     @Column(name = "email", length = 150)
     private String email;
@@ -49,16 +51,36 @@ public class School {
     private String website;
 
     @Column(name = "logo_url", length = 500)
-    private String logo_url;
+    private String logoUrl;
 
     @Column(name = "established_date")
-    private LocalDate established_date;
+    private LocalDate establishedDate;
 
     @Column(name = "description")
     private String description;
 
     @Column(name = "is_active")
-    private Boolean is_active;
+    private Boolean isActive;
 
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserSchool> userSchools = new ArrayList<>();
 
+    public void addUserSchool(UserSchool userSchool){
+        this.userSchools.add(userSchool);
+        userSchool.setSchool(this);
+    }
+
+    public void removeUserSchool(UserSchool userSchool){
+        this.userSchools.remove(userSchool);
+        userSchool.setSchool(null);
+    }
+
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SchoolBranch> schoolBranches = new ArrayList<>();
+
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AcademicYear> academicYears = new ArrayList<>();
+
+    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Department> departments = new ArrayList<>();
 }
