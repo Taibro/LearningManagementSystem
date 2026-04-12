@@ -1,121 +1,56 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import React, { useState } from 'react';
+import Topbar from './components/Topbar';
+import Sidebar from './components/Sidebar';
+import * as Pages from './components/Pages';
+import './App.css'; 
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [currentPage, setCurrentPage] = useState('trang-chu');
+  
+  const renderPage = () => {
+    switch (currentPage) {
+      case 'trang-chu': return <Pages.TrangChu setPage={setCurrentPage} />;
+      case 'thong-tin-sv': return <Pages.ThongTinSV />;
+      case 'nhac-nho': return <Pages.NhacNho />;
+      case 'khao-sat': return <Pages.KhaoSat />;
+      case 'ket-qua-ht': return <Pages.KetQuaHT />;
+      case 'lich-tuan': return <Pages.LichTuan />;
+      case 'lich-tien-do': return <Pages.LichTienDo />;
+      case 'diem-danh': return <Pages.DiemDanh />;
+      case 'ren-luyen': return <Pages.RenLuyen />;
+      case 'hoc-bong': return <Pages.HocBong />;
+      case 'ct-khung': return <Pages.CTKhung />;
+      case 'cong-no': return <Pages.CongNo />;
+      case 'tt-truc-tuyen': return <Pages.TTTrucTuyen />;
+      case 'phieu-thu-th': return <Pages.PhieuThuTH />;
+      case 'phieu-thu-tt': return <Pages.PhieuThuTT />;
+      
+      case 'ke-khai': return <Pages.DefaultPage title="Kê khai thông tin sinh viên" />;
+      case 'dich-vu': return <Pages.DefaultPage title="Dịch vụ trực tuyến" />;
+      case 'chung-chi': return <Pages.DefaultPage title="Đề xuất chứng chỉ" />;
+      case 'ho-so-sv': return <Pages.DefaultPage title="Hồ sơ sinh viên" />;
+      case 'xet-chung-chi': return <Pages.DefaultPage title="Đề xuất xét cấp chứng chỉ SV" />;
+      case 'xet-tn': return <Pages.DefaultPage title="Đề xuất xét tốt nghiệp" />;
+      case 'cu-nhan': return <Pages.DefaultPage title="Đăng ký CT Cử nhân/Kỹ sư" />;
+      case 'dk-hp': return <Pages.DefaultPage title="Đăng ký học phần" />;
+      case 'dk-mon-dk': return <Pages.DefaultPage title="Đăng ký môn học điều kiện" />;
+      case 'tt-noi-tru': return <Pages.DefaultPage title="Thanh toán nội trú" />;
+      default: return <Pages.TrangChu setPage={setCurrentPage} />;
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <div>
+      <Topbar setPage={setCurrentPage} />
+      <div className="layout">
+        <Sidebar activePage={currentPage} setPage={setCurrentPage} />
+        <main className="main">
+          {renderPage()}
+        </main>
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
