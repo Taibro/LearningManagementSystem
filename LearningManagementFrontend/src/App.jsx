@@ -1,121 +1,60 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import MainLayout from './components/Layout/MainLayout';
+
+// Import toàn bộ 15 trang từ các thư mục
+import Dashboard from './pages/Dashboard/Dashboard';
+import Profile from './pages/Profile/Profile';
+import Salary from './pages/Salary/Salary';
+import Declaration from './pages/Declaration/Declaration';
+import Documents from './pages/Documents/Documents';
+
+import StudentAttendance from './pages/Attendance/StudentAttendance';
+import QRCodeAttendance from './pages/Attendance/QRCodeAttendance';
+import Assesment from './pages/Attendance/Assesment';
+
+import Results from './pages/Results/Results';
+import ProgressSchedule from './pages/Schedule/ProgressSchedule';
+import WeeklySchedule from './pages/Schedule/WeeklySchedule';
+
+import StopTeaching from './pages/Proposals/StopTeaching';
+import MakeupTeaching from './pages/Proposals/MakeupTeaching';
+import SubstituteTeaching from './pages/Proposals/SubstituteTeaching';
+
+import Statistics from './pages/Statistics/Statistics';
+import Survey from './pages/Survey/Survey';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainLayout />}>
+          {/* Mặc định vào app sẽ nhảy tới trang Lịch tuần */}
+          <Route index element={<Navigate to="/lich-tuan" />} />
 
-      <div className="ticks"></div>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="ho-so" element={<Profile />} />
+          <Route path="luong" element={<Salary />} />
+          <Route path="khai-bao" element={<Declaration />} />
+          <Route path="tai-lieu" element={<Documents />} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+          <Route path="diem-danh" element={<StudentAttendance />} />
+          <Route path="qr-code" element={<QRCodeAttendance />} />
+          <Route path="phieu-danh-gia" element={<Assesment />} />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+          <Route path="ket-qua" element={<Results />} />
+          <Route path="lich-tien-do" element={<ProgressSchedule />} />
+          <Route path="lich-tuan" element={<WeeklySchedule />} />
+
+          <Route path="de-xuat-ngung" element={<StopTeaching />} />
+          <Route path="day-bu" element={<MakeupTeaching />} />
+          <Route path="day-thay" element={<SubstituteTeaching />} />
+
+          <Route path="thong-ke" element={<Statistics />} />
+          <Route path="khao-sat" element={<Survey />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
