@@ -103,4 +103,8 @@ public class Users extends BaseEntity{
         }
         this.student = student;
     }
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications = new ArrayList<>();
+
 }

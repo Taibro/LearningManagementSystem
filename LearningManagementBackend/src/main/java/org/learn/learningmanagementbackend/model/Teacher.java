@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -43,5 +45,15 @@ public class Teacher extends BaseEntity{
     @Column(name = "bio")
     private String bio;
 
+    @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ClassTeacher> classAssignments = new ArrayList<>();
 
+//    public void addClass(Classes courseClass, String role){
+//        ClassTeacher classTeacher = new ClassTeacher();
+//        classTeacher.setTeacher(this);
+//        classTeacher.setCourseClass(courseClass);
+//        classTeacher.setRole(role);
+//
+//        this.classAssignments.add(classTeacher);
+//    }
 }
