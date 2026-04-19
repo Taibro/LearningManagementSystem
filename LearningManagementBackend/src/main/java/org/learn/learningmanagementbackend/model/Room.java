@@ -8,6 +8,7 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import org.learn.learningmanagementbackend.enums.RoomType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -45,4 +46,10 @@ public class Room extends BaseEntity{
 
     @Column(name = "is_active")
     private Boolean isActive;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Schedule> schedules = new ArrayList<>();
+
+    @OneToMany(mappedBy = "replacementRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScheduleException> scheduleExceptions = new ArrayList<>();
 }

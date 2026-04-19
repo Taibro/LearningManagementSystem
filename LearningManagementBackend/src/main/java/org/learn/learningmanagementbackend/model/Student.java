@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -24,7 +27,7 @@ public class Student extends BaseEntity{
     @Column(name = "student_code", length = 20)
     private String studentCode;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", referencedColumnName = "id")
     private Department department;
 
@@ -32,8 +35,40 @@ public class Student extends BaseEntity{
     private Integer enrollmentYear;
 
     @Column(name = "major", length = 100)
-    public String major;
+    private String major;
 
     @Column(name = "class_name", length = 50)
-    public String className;
+    private String className;
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Enrollment> enrollments = new ArrayList<>();
+
+    public void addEnrollment(Enrollment enrollment){
+        this.enrollments.add(enrollment);
+        enrollment.setStudent(this);
+    }
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AttendanceRecord> attendanceRecords = new ArrayList<>();
+
+    public void addAttendanceRecord(AttendanceRecord attendanceRecord){
+        this.attendanceRecords.add(attendanceRecord);
+        attendanceRecord.setStudent(this);
+    }
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TuitionInvoice> tuitionInvoices = new ArrayList<>();
+
+    public void addTuitionInvoice(TuitionInvoice tuitionInvoice){
+        this.tuitionInvoices.add(tuitionInvoice);
+        tuitionInvoice.setStudent(this);
+    }
+
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudentSemesterSummary> studentSemesterSummaries = new ArrayList<>();
+
+    public void addStudentSemesterSummary(StudentSemesterSummary studentSemesterSummary){
+        this.studentSemesterSummaries.add(studentSemesterSummary);
+        studentSemesterSummary.setStudent(this);
+    }
 }

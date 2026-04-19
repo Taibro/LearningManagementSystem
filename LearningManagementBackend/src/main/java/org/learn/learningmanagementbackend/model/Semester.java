@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
@@ -31,4 +33,20 @@ public class Semester extends BaseEntity{
 
     @Column(name = "is_active")
     private Boolean isActive;
+
+    @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TuitionInvoice> tuitionInvoices = new ArrayList<>();
+
+    public void addTuitionInvoice(TuitionInvoice tuitionInvoice){
+        this.tuitionInvoices.add(tuitionInvoice);
+        tuitionInvoice.setSemester(this);
+    }
+
+    @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StudentSemesterSummary> studentSemesterSummaries = new ArrayList<>();
+
+    public void addStudentSemesterSummary(StudentSemesterSummary studentSemesterSummary){
+        this.studentSemesterSummaries.add(studentSemesterSummary);
+        studentSemesterSummary.setSemester(this);
+    }
 }
