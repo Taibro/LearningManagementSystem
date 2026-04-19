@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import MainLayout from './components/Layout/MainLayout';
 
+// Import toàn bộ 15 trang từ các thư mục
 import Dashboard from './pages/Dashboard/Dashboard';
 import Profile from './pages/Profile/Profile';
 import Salary from './pages/Salary/Salary';
@@ -22,7 +23,8 @@ import SubstituteTeaching from './pages/Proposals/SubstituteTeaching';
 import Statistics from './pages/Statistics/Statistics';
 import Survey from './pages/Survey/Survey';
 
-function App() {
+// ĐÃ SỬA: Đổi tên function App thành AppLecturer
+function AppLecturer() {
   return (
     <Router>
       <Routes>
@@ -56,4 +58,5 @@ function App() {
   );
 }
 
-export default App;
+// ĐÃ SỬA: Đổi tên export thành AppLecturer
+export default AppLecturer;
