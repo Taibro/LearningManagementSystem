@@ -81,6 +81,6 @@ public class School extends BaseEntity {
     @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AcademicYear> academicYears = new ArrayList<>();
 
-    @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "school", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Department> departments = new ArrayList<>();
 }

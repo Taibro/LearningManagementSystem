@@ -31,7 +31,7 @@ public class SchoolBranch extends BaseEntity{
     private String address;
 
     @Column(name = "City", length = 100)
-    private String City;
+    private String city;
 
     @Column(name = "district", length = 100)
     private String district;
