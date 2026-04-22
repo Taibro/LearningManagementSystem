@@ -50,4 +50,13 @@ public class Course extends BaseEntity{
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Classes> classes = new ArrayList<>();
+
+    public void addClass(Classes clazz) {
+        this.classes.add(clazz);
+        clazz.setCourse(this);
+    }
+    public void removeClass(Classes clazz) {
+        this.classes.remove(clazz);
+        clazz.setCourse(null);
+    }
 }

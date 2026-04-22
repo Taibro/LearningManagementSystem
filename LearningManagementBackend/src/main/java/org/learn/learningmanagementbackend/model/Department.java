@@ -33,14 +33,39 @@ public class Department extends BaseEntity{
     @Column(name = "description")
     private String description;
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "department", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Teacher> teachers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "department", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private List<Student> students = new ArrayList<>();
 
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Course> courses = new ArrayList<>();
 
+    public void addTeacher(Teacher teacher) {
+        this.teachers.add(teacher);
+        teacher.setDepartment(this);
+    }
+    public void removeTeacher(Teacher teacher) {
+        this.teachers.remove(teacher);
+        teacher.setDepartment(null);
+    }
 
+    public void addStudent(Student student) {
+        this.students.add(student);
+        student.setDepartment(this);
+    }
+    public void removeStudent(Student student) {
+        this.students.remove(student);
+        student.setDepartment(null);
+    }
+
+    public void addCourse(Course course) {
+        this.courses.add(course);
+        course.setDepartment(this);
+    }
+    public void removeCourse(Course course) {
+        this.courses.remove(course);
+        course.setDepartment(null);
+    }
 }

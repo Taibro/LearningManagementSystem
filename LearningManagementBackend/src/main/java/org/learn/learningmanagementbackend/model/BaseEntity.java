@@ -21,11 +21,9 @@ public class BaseEntity {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created_by", referencedColumnName = "id")
-    private Users createdBy;
+    @Column(name = "created_by", updatable = false)
+    private Integer createdBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated_by", referencedColumnName = "id")
-    private Users updatedBy;
+    @Column(name = "updated_by")
+    private Integer updatedBy;
 }

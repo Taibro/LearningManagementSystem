@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.learn.learningmanagementbackend.enums.ClassStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,16 @@ public class Classes extends BaseEntity{
     @Column(name = "code", length = 30)
     private String code;
 
+    @Column(name = "max_students")
+    private Integer maxStudents = 40;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private ClassStatus status;
+
+    @Column(name = "notes")
+    private String notes;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     private Course course;
@@ -36,6 +47,9 @@ public class Classes extends BaseEntity{
 
     public void addTeacher(Teacher teacher, String role){
         ClassTeacher classTeacher = new ClassTeacher();
+
+        ClassTeacherId id = new ClassTeacherId(this.id, teacher.getId());
+        classTeacher.setId(id);
         classTeacher.setCourseClass(this);
         classTeacher.setTeacher(teacher);
         classTeacher.setRole(role);
