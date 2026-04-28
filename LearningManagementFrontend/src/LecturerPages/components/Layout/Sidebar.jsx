@@ -1,63 +1,86 @@
-// src/components/Layout/Sidebar.jsx
+import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useState } from 'react';
+import SimpleBar from 'simplebar-react';
 
 const Sidebar = () => {
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(true);
 
-  // Helper function để xử lý class Active của menu
   const navClass = ({ isActive }) =>
-    `sidebar-item px-4 py-2.5 text-white text-sm flex items-center gap-2 transition-all ${isActive ? 'active' : ''}`;
+    `px-4 py-2.5 text-white text-[13px] flex items-center gap-3 transition-all no-underline font-medium mx-2 my-0 rounded-lg outline-none ${
+      isActive ? 'bg-white/20 border-l-[3px] border-[#F5A623] shadow-md' : 'hover:bg-white/10 text-gray-100'
+    }`;
+
+  const subNavClass = ({ isActive }) =>
+    `block px-12 py-2 text-[13px] no-underline transition-all duration-200 ${
+      isActive ? 'text-[#F5A623] font-bold bg-white/5' : 'text-purple-100 hover:text-white hover:bg-white/5'
+    }`;
 
   return (
-    <aside className="sidebar w-64 flex-shrink-0 h-screen flex flex-col">
-      <div className="logo-area p-5 border-b border-white/10">
+    <aside
+      className="w-64 flex-shrink-0 h-screen flex flex-col z-10 text-white shadow-2xl overflow-hidden"
+      style={{ background: 'linear-gradient(180deg, #4A3570 0%, #6B4FA0 60%, #8B6BBF 100%)' }}
+    >
+      <div className="p-4 pb-2 border-b border-white/15 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center font-bold text-purple-700">HUIT</div>
-          <div className="text-white">
-            <div className="font-bold text-sm">HCMC UNIVERSITY</div>
-            <div className="text-[10px] opacity-70">Industry and Trade</div>
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center font-bold text-[#6B4FA0] text-lg shadow-inner">HUIT</div>
+          <div>
+            <div className="font-bold text-[13px] leading-tight text-white uppercase tracking-tighter">HO CHI MINH CITY</div>
+            <div className="text-[10px] text-purple-200 opacity-80 mt-0.5 font-medium">University of Industry and Trade</div>
           </div>
         </div>
       </div>
 
-      <div className="sidebar-scroll overflow-y-auto flex-1 py-4">
-        <div className="section-title">CÔNG TÁC GIẢNG DẠY</div>
+      <SimpleBar className="flex-1 min-h-0 pb-4 sidebar-scroll">
+        <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">E-OFFICE</div>
 
-        <NavLink to="/ho-so" className={navClass}>Hồ sơ cá nhân</NavLink>
-        <NavLink to="/luong" className={navClass}>Thông tin lương</NavLink>
-        <NavLink to="/khai-bao" className={navClass}>Khai báo thông tin</NavLink>
-        <NavLink to="/tai-lieu" className={navClass}>Quản lý tài liệu</NavLink>
+        <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-2 pb-1 font-black">CÔNG TÁC GIẢNG DẠY</div>
 
-        {/* Menu con Chuyên cần */}
-        <div>
+        <NavLink to="/profile" className={navClass}>👤 Hồ sơ cá nhân</NavLink>
+        <NavLink to="/salary" className={navClass}>💰 Thông tin lương</NavLink>
+        <NavLink to="/declaration" className={navClass}>📝 Khai báo thông tin</NavLink>
+        <NavLink to="/documents" className={navClass}>📁 Quản lý tài liệu</NavLink>
+
+        <div className="mt-0">
           <div
-            className="sidebar-item px-4 py-2.5 text-white text-sm flex items-center justify-between cursor-pointer"
+            className="px-6 py-2.5 text-white text-[13px] flex items-center justify-between cursor-pointer font-medium hover:bg-white/10 transition-colors mx-2 rounded-lg"
             onClick={() => setIsAttendanceOpen(!isAttendanceOpen)}
           >
-            <span className="flex items-center gap-2">Chuyên cần - Rèn luyện</span>
-            <span className={`transition-transform ${isAttendanceOpen ? 'rotate-180' : ''}`}>▼</span>
+            <div className="flex items-center gap-3">
+              <span className="text-gray-100 opacity-80">✓</span>
+              <span>Chuyên cần - Rèn luyện</span>
+            </div>
+            <span className={`transition-transform duration-300 text-[10px] ${isAttendanceOpen ? 'rotate-180' : ''}`}>▼</span>
           </div>
-          <div className={`collapse-content ${isAttendanceOpen ? 'open' : ''}`}>
-            <NavLink to="/diem-danh" className={navClass + " pl-8"}>Điểm danh sinh viên</NavLink>
-            <NavLink to="/qr-code" className={navClass + " pl-8"}>Điểm danh QR Code</NavLink>
-            <NavLink to="/phieu-danh-gia" className={navClass + " pl-8"}>Phiếu đánh giá</NavLink>
+
+          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isAttendanceOpen ? 'max-h-64 bg-black/10' : 'max-h-0'}`}>
+            <NavLink to="/attendance" className={subNavClass}>Điểm danh sinh viên</NavLink>
+            <NavLink to="/qr-code" className={subNavClass}>Điểm danh QR Code</NavLink>
+            <NavLink to="/assessment" className={subNavClass}>Phiếu đánh giá</NavLink>
           </div>
         </div>
 
-        <NavLink to="/ket-qua" className={navClass}>Quản lý kết quả</NavLink>
-        <NavLink to="/lich-tien-do" className={navClass}>Lịch theo tiến độ</NavLink>
-        <NavLink to="/lich-tuan" className={navClass}>Lịch theo tuần</NavLink>
+        <NavLink to="/results" className={navClass}>📊 Quản lý kết quả</NavLink>
+        <NavLink to="/progress-schedule" className={navClass}>📈 Lịch theo tiến độ</NavLink>
+        <NavLink to="/weekly-schedule" className={navClass}>📅 Lịch theo tuần</NavLink>
 
-        <div className="section-title">ĐỀ XUẤT</div>
-        <NavLink to="/de-xuat-ngung" className={navClass}>Tạm ngừng dạy</NavLink>
-        <NavLink to="/day-bu" className={navClass}>Dạy bù</NavLink>
-        <NavLink to="/day-thay" className={navClass}>Dạy thay</NavLink>
+        <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">ĐỀ XUẤT</div>
+        <NavLink to="/stop-teaching" className={navClass}>🛑 Tạm ngừng dạy</NavLink>
+        <NavLink to="/makeup-teaching" className={navClass}>🔄 Dạy bù</NavLink>
+        <NavLink to="/substitute-teaching" className={navClass}>👥 Dạy thay</NavLink>
 
-        <div className="section-title">BÁO CÁO</div>
-        <NavLink to="/thong-ke" className={navClass}>Thống kê thực giảng</NavLink>
-        <NavLink to="/khao-sat" className={navClass}>Khảo sát</NavLink>
-      </div>
+        <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">BÁO CÁO</div>
+        <NavLink to="/statistics" className={navClass}>📉 Thống kê thực giảng</NavLink>
+        <NavLink to="/survey" className={navClass}>📋 Khảo sát</NavLink>
+
+        <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">HỆ THỐNG</div>
+        <NavLink to="/settings" className={navClass}>⚙️ Cài đặt hệ thống</NavLink>
+
+        <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">THỜI KHÓA BIỂU</div>
+        <NavLink to="/view-schedule" className={navClass}>🗓️ Xem thời khóa biểu</NavLink>
+
+        <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">HRM</div>
+        <NavLink to="/hr-management" className={navClass}>👤 Quản lý nhân sự</NavLink>
+      </SimpleBar>
     </aside>
   );
 };
