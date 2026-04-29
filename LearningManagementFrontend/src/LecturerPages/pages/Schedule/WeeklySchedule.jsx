@@ -1,17 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
+import Input from '../../components/Layout/Input';
 
 const WeeklySchedule = () => {
+  // Tạo state để lưu trữ ngày được chọn (Mặc định để tạm ngày 20/04/2026)
+  const [selectedDate, setSelectedDate] = useState('2026-04-20');
+
+  // Hàm xử lý khi chọn ngày mới
+  const handleDateChange = (e) => {
+    setSelectedDate(e.target.value);
+    console.log("Ngày muốn xem lịch:", e.target.value);
+    // Sau này bạn sẽ gọi API fetch data lịch học ở đây dựa theo selectedDate
+  };
+
   return (
+    
     <div className="animate-fadeIn">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Lịch theo tuần</h1>
           <p className="text-gray-400 text-sm mt-1">Tuần 20/04/2026 – 26/04/2026</p>
         </div>
-        <div className="flex gap-2">
-          <button className="btn-outline text-sm flex items-center gap-1">Tuần trước</button>
-          <button className="btn-primary text-sm">Hôm nay</button>
-          <button className="btn-outline text-sm flex items-center gap-1">Tuần sau</button>
+        
+        {/* ĐÃ SỬA: Thêm khu vực chứa Input Date và các nút điều hướng */}
+        <div className="flex items-center gap-4">
+          <Input 
+            type="date" 
+            value={selectedDate} 
+            onChange={handleDateChange}
+            className="w-40" // Giới hạn chiều rộng cho đẹp
+          />
+          
+          <div className="flex gap-2">
+            <button className="btn-outline text-sm flex items-center gap-1">Tuần trước</button>
+            <button className="btn-primary text-sm">Hôm nay</button>
+            <button className="btn-outline text-sm flex items-center gap-1">Tuần sau</button>
+          </div>
         </div>
       </div>
 

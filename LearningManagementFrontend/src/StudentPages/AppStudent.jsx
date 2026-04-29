@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-// Import CSS riêng của sinh viên, KHÔNG dùng chung App.css hay index.css bên ngoài
 import './student.css'; 
 
 import Topbar from './components/Topbar';
 import Sidebar from './components/Sidebar';
-import * as Pages from './pages/Pages'; // Đã sửa đường dẫn trỏ vào thư mục pages
+import * as Pages from './pages/Pages'; 
 
 export default function AppStudent() {
   const [currentPage, setCurrentPage] = useState('trang-chu');
