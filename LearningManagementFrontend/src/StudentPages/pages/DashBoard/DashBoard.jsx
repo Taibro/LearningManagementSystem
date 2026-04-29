@@ -1,14 +1,14 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; 
 import { notifData } from '../../data';
 
-export default function Dashboard({ setPage }) {
+export default function Dashboard() {
   return (
     <div className="page active">
       <div className="grid" style={{display:'grid', gridTemplateColumns:'1fr 320px', gap:'16px'}}>
         
         
         <div>
-          {/* 1. Thẻ Thông tin sinh viên */}
           <div className="card mb-4" style={{marginBottom:'16px'}}>
             <div className="card-body">
               <h2 style={{fontSize:'16px', fontWeight:700, marginBottom:'12px', color:'var(--text)'}}>Thông tin sinh viên</h2>
@@ -16,7 +16,7 @@ export default function Dashboard({ setPage }) {
                 <div style={{textAlign:'center'}}>
                   <div style={{width:'80px', height:'80px', borderRadius:'50%', background:'linear-gradient(135deg,#1a6fb5,#60a5fa)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontSize:'24px', fontWeight:700, margin:'0 auto 8px'}}>NT</div>
                   
-                  <a className="link" style={{cursor:'pointer'}} onClick={() => setPage('student-info')}>Xem chi tiết</a>
+                  <Link to="/student-info" className="link">Xem chi tiết</Link>
                 </div>
                 <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'4px 24px', flex:1}}>
                   <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>MSSV: </span><strong>2001230773</strong></div>
@@ -34,26 +34,49 @@ export default function Dashboard({ setPage }) {
             </div>
           </div>
 
-          {/* 2. Menu truy cập nhanh (Quick Links) */}
+          
           <div className="card mb-4" style={{marginBottom:'16px'}}>
             <div className="card-body">
               <div className="quick-grid">
-                <div className="quick-item" onClick={() => setPage('notifications')}><div className="qi-icon">📋</div><div className="qi-label">Nhắc nhở</div></div>
-                <div className="quick-item" onClick={() => setPage('grades')}><div className="qi-icon">📊</div><div className="qi-label">Kết quả học tập</div></div>
-                <div className="quick-item" onClick={() => setPage('weekly-schedule')}><div className="qi-icon">📅</div><div className="qi-label">Lịch theo tuần</div></div>
-                <div className="quick-item" onClick={() => setPage('progress-schedule')}><div className="qi-icon">📈</div><div className="qi-label">Lịch theo tiến độ</div></div>
-                <div className="quick-item" onClick={() => setPage('curriculum')}><div className="qi-icon">📚</div><div className="qi-label">Chương trình khung</div></div>
-                <div className="quick-item" onClick={() => setPage('course-registration')}><div className="qi-icon">✏️</div><div className="qi-label">Đăng ký học phần</div></div>
-                <div className="quick-item" onClick={() => setPage('tuition-fee')}><div className="qi-icon">💰</div><div className="qi-label">Tra cứu công nợ</div></div>
-                <div className="quick-item" onClick={() => setPage('online-payment')}><div className="qi-icon">💳</div><div className="qi-label">Thanh toán trực tuyến</div></div>
-                <div className="quick-item" onClick={() => setPage('dormitory-payment')}><div className="qi-icon">🏢</div><div className="qi-label">Thanh toán nội trú</div></div>
-                <div className="quick-item" onClick={() => setPage('general-receipts')}><div className="qi-icon">🧾</div><div className="qi-label">Phiếu thu tổng hợp</div></div>
-                <div className="quick-item" onClick={() => setPage('student-profile')}><div className="qi-icon">📁</div><div className="qi-label">Hộp thư SV</div></div>
+                
+                <Link to="/notifications" className="quick-item">
+                  <div className="qi-icon">📋</div><div className="qi-label">Nhắc nhở</div>
+                </Link>
+                <Link to="/grades" className="quick-item">
+                  <div className="qi-icon">📊</div><div className="qi-label">Kết quả học tập</div>
+                </Link>
+                <Link to="/weekly-schedule" className="quick-item">
+                  <div className="qi-icon">📅</div><div className="qi-label">Lịch theo tuần</div>
+                </Link>
+                <Link to="/progress-schedule" className="quick-item">
+                  <div className="qi-icon">📈</div><div className="qi-label">Lịch theo tiến độ</div>
+                </Link>
+                <Link to="/curriculum" className="quick-item">
+                  <div className="qi-icon">📚</div><div className="qi-label">Chương trình khung</div>
+                </Link>
+                <Link to="/course-registration" className="quick-item">
+                  <div className="qi-icon">✏️</div><div className="qi-label">Đăng ký học phần</div>
+                </Link>
+                <Link to="/tuition-fee" className="quick-item">
+                  <div className="qi-icon">💰</div><div className="qi-label">Tra cứu công nợ</div>
+                </Link>
+                <Link to="/online-payment" className="quick-item">
+                  <div className="qi-icon">💳</div><div className="qi-label">Thanh toán trực tuyến</div>
+                </Link>
+                <Link to="/dormitory-payment" className="quick-item">
+                  <div className="qi-icon">🏢</div><div className="qi-label">Thanh toán nội trú</div>
+                </Link>
+                <Link to="/general-receipts" className="quick-item">
+                  <div className="qi-icon">🧾</div><div className="qi-label">Phiếu thu tổng hợp</div>
+                </Link>
+                <Link to="/student-profile" className="quick-item">
+                  <div className="qi-icon">📁</div><div className="qi-label">Hộp thư SV</div>
+                </Link>
               </div>
             </div>
           </div>
 
-          {/* 3. Bảng điểm và Tiến độ */}
+          
           <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'16px'}}>
             <div className="card">
               <div className="card-body">
@@ -100,10 +123,9 @@ export default function Dashboard({ setPage }) {
                 <table className="tbl" style={{fontSize:'12px'}}>
                   <tbody>
                     <tr><th>Môn học/học phần</th><th style={{width:'60px', textAlign:'center'}}>Số TC</th></tr>
-                    <tr><td><a className="link" style={{fontSize:'12px'}}>0110110197602</a><br/>Phân tích thiết kế hệ thống</td><td style={{textAlign:'center'}}>2</td></tr>
-                    <tr><td><a className="link" style={{fontSize:'12px'}}>0110110195604</a><br/>Deep learning</td><td style={{textAlign:'center'}}>3</td></tr>
-                    <tr><td><a className="link" style={{fontSize:'12px'}}>0101100000204</a><br/>Công Nghệ Java</td><td style={{textAlign:'center'}}>3</td></tr>
-                    <tr><td><a className="link" style={{fontSize:'12px'}}>0110110196910</a><br/>Lập trình di động</td><td style={{textAlign:'center'}}>3</td></tr>
+                    <tr><td><Link to="/grades" className="link" style={{fontSize:'12px'}}>0110110197602</Link><br/>Phân tích thiết kế hệ thống</td><td style={{textAlign:'center'}}>2</td></tr>
+                    <tr><td><Link to="/grades" className="link" style={{fontSize:'12px'}}>0110110195604</Link><br/>Deep learning</td><td style={{textAlign:'center'}}>3</td></tr>
+                    <tr><td><Link to="/grades" className="link" style={{fontSize:'12px'}}>0101100000204</Link><br/>Công Nghệ Java</td><td style={{textAlign:'center'}}>3</td></tr>
                   </tbody>
                 </table>
               </div>
@@ -121,7 +143,7 @@ export default function Dashboard({ setPage }) {
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
               </svg>
-              <br/><a className="link" style={{cursor:'pointer'}} onClick={() => setPage('notifications')}>Xem chi tiết</a>
+              <br/><Link to="/notifications" className="link">Xem chi tiết</Link>
             </div>
           </div>
 
@@ -130,14 +152,14 @@ export default function Dashboard({ setPage }) {
               <div className="card-body" style={{padding:'14px'}}>
                 <div style={{fontSize:'12px', color:'var(--blue)', fontWeight:600}}>Lịch học trong tuần</div>
                 <div style={{fontSize:'32px', fontWeight:800, color:'var(--blue)', margin:'6px 0'}}>10</div>
-                <a className="link" style={{cursor:'pointer'}} onClick={() => setPage('weekly-schedule')}>Xem chi tiết</a>
+                <Link to="/weekly-schedule" className="link">Xem chi tiết</Link>
               </div>
             </div>
             <div className="card" style={{border:'1px solid #fed7aa'}}>
               <div className="card-body" style={{padding:'14px'}}>
                 <div style={{fontSize:'12px', color:'var(--orange)', fontWeight:600}}>Lịch thi trong tuần</div>
                 <div style={{fontSize:'32px', fontWeight:800, color:'var(--orange)', margin:'6px 0'}}>0</div>
-                <a className="link" style={{color:'var(--orange)', cursor:'pointer'}} onClick={() => setPage('weekly-schedule')}>Xem chi tiết</a>
+                <Link to="/weekly-schedule" className="link" style={{color:'var(--orange)'}}>Xem chi tiết</Link>
               </div>
             </div>
           </div>

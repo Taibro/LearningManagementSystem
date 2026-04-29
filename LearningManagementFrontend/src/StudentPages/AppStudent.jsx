@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './student.css'; 
-import Topbar from './components/Topbar';
-import Sidebar from './components/Sidebar';
 
+import MainLayout from './components/Layout/MainLayout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import StudentInfo from './pages/StudentInfo/StudentInfo';
 import Notifications from './pages/Notifications/Notifications';
@@ -21,53 +21,44 @@ import OnlineReceipts from './pages/OnlineReceipts/OnlineReceipts';
 import DefaultPage from './pages/DefaultPage/DefaultPage';
 
 export default function AppStudent() {
-  const [currentPage, setCurrentPage] = useState('dashboard');
-  
-  const renderPage = () => {
-    
-    switch (currentPage) {
-      case 'dashboard': return <Dashboard setPage={setCurrentPage} />;
-      case 'student-info': return <StudentInfo />;
-      case 'notifications': return <Notifications />;
-      case 'surveys': return <Surveys />;
-      case 'grades': return <Grades />;
-      case 'weekly-schedule': return <WeeklySchedule />;
-      case 'progress-schedule': return <ProgressSchedule />;
-      case 'attendance': return <Attendance />;
-      case 'conduct-score': return <ConductScore />;
-      case 'scholarships': return <Scholarships />;
-      case 'curriculum': return <Curriculum />;
-      case 'tuition-fee': return <TuitionFee />;
-      case 'online-payment': return <OnlinePayment />;
-      case 'general-receipts': return <GeneralReceipts />;
-      case 'online-receipts': return <OnlineReceipts />;
-      
-      
-      case 'declaration': return <DefaultPage title="Kê khai thông tin sinh viên" />;
-      case 'services': return <DefaultPage title="Dịch vụ trực tuyến" />;
-      case 'certificates': return <DefaultPage title="Đề xuất chứng chỉ" />;
-      case 'student-profile': return <DefaultPage title="Hồ sơ sinh viên" />;
-      case 'certificate-approval': return <DefaultPage title="Đề xuất xét cấp chứng chỉ SV" />;
-      case 'graduation-approval': return <DefaultPage title="Đề xuất xét tốt nghiệp" />;
-      case 'bachelor-registration': return <DefaultPage title="Đăng ký CT Cử nhân/Kỹ sư" />;
-      case 'course-registration': return <DefaultPage title="Đăng ký học phần" />;
-      case 'prerequisite-registration': return <DefaultPage title="Đăng ký môn học điều kiện" />;
-      case 'dormitory-payment': return <DefaultPage title="Thanh toán nội trú" />;
-      case 'change-password': return <DefaultPage title="Đổi mật khẩu" />;
-      case 'student-mailbox': return <DefaultPage title="Hộp thư sinh viên" />;
-      default: return <Dashboard setPage={setCurrentPage} />;
-    }
-  };
-
   return (
-    <div className="student-portal-wrapper">
-      <Topbar setPage={setCurrentPage} />
-      <div className="layout">
-        <Sidebar activePage={currentPage} setPage={setCurrentPage} />
-        <main className="main">
-          {renderPage()}
-        </main>
-      </div>
-    </div>
+    <Router>
+      <Routes>
+        
+        <Route path="/" element={<MainLayout />}>
+          
+          
+          <Route index element={<Navigate to="/dashboard" />} />
+
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="student-info" element={<StudentInfo />} />
+          <Route path="notifications" element={<Notifications />} />
+          <Route path="surveys" element={<Surveys />} />
+          <Route path="grades" element={<Grades />} />
+          <Route path="weekly-schedule" element={<WeeklySchedule />} />
+          <Route path="progress-schedule" element={<ProgressSchedule />} />
+          <Route path="attendance" element={<Attendance />} />
+          <Route path="conduct-score" element={<ConductScore />} />
+          <Route path="scholarships" element={<Scholarships />} />
+          <Route path="curriculum" element={<Curriculum />} />
+          <Route path="tuition-fee" element={<TuitionFee />} />
+          <Route path="online-payment" element={<OnlinePayment />} />
+          <Route path="general-receipts" element={<GeneralReceipts />} />
+          <Route path="online-receipts" element={<OnlineReceipts />} />
+
+          
+          <Route path="declaration" element={<DefaultPage title="Kê khai thông tin sinh viên" />} />
+          <Route path="services" element={<DefaultPage title="Dịch vụ trực tuyến" />} />
+          <Route path="certificates" element={<DefaultPage title="Đề xuất chứng chỉ" />} />
+          <Route path="student-profile" element={<DefaultPage title="Hồ sơ sinh viên" />} />
+          <Route path="certificate-approval" element={<DefaultPage title="Đề xuất xét cấp chứng chỉ SV" />} />
+          <Route path="graduation-approval" element={<DefaultPage title="Đề xuất xét tốt nghiệp" />} />
+          <Route path="bachelor-registration" element={<DefaultPage title="Đăng ký CT Cử nhân/Kỹ sư" />} />
+          <Route path="course-registration" element={<DefaultPage title="Đăng ký học phần" />} />
+          <Route path="prerequisite-registration" element={<DefaultPage title="Đăng ký môn học điều kiện" />} />
+          <Route path="dormitory-payment" element={<DefaultPage title="Thanh toán nội trú" />} />
+        </Route>
+      </Routes>
+    </Router>
   );
 }
