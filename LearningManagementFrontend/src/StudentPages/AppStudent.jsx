@@ -1,48 +1,63 @@
 import React, { useState } from 'react';
-// Import CSS riêng của sinh viên, KHÔNG dùng chung App.css hay index.css bên ngoài
 import './student.css'; 
-
 import Topbar from './components/Topbar';
 import Sidebar from './components/Sidebar';
-import * as Pages from './pages/Pages'; // Đã sửa đường dẫn trỏ vào thư mục pages
+
+
+import TrangChu from './pages/TrangChu/TrangChu';
+import ThongTinSV from './pages/ThongTinSV/ThongTinSV';
+import NhacNho from './pages/NhacNho/NhacNho';
+import KhaoSat from './pages/KhaoSat/KhaoSat';
+import KetQuaHT from './pages/KetQuaHT/KetQuaHT';
+import LichTuan from './pages/LichTuan/LichTuan';
+import LichTienDo from './pages/LichTienDo/LichTienDo';
+import DiemDanh from './pages/DiemDanh/DiemDanh';
+import RenLuyen from './pages/RenLuyen/RenLuyen';
+import HocBong from './pages/HocBong/HocBong';
+import CTKhung from './pages/CTKhung/CTKhung';
+import CongNo from './pages/CongNo/CongNo';
+import TTTrucTuyen from './pages/TTTrucTuyen/TTTrucTuyen';
+import PhieuThuTH from './pages/PhieuThuTH/PhieuThuTH';
+import PhieuThuTT from './pages/PhieuThuTT/PhieuThuTT';
+import DefaultPage from './pages/DefaultPage/DefaultPage';
 
 export default function AppStudent() {
   const [currentPage, setCurrentPage] = useState('trang-chu');
   
   const renderPage = () => {
     switch (currentPage) {
-      case 'trang-chu': return <Pages.TrangChu setPage={setCurrentPage} />;
-      case 'thong-tin-sv': return <Pages.ThongTinSV />;
-      case 'nhac-nho': return <Pages.NhacNho />;
-      case 'khao-sat': return <Pages.KhaoSat />;
-      case 'ket-qua-ht': return <Pages.KetQuaHT />;
-      case 'lich-tuan': return <Pages.LichTuan />;
-      case 'lich-tien-do': return <Pages.LichTienDo />;
-      case 'diem-danh': return <Pages.DiemDanh />;
-      case 'ren-luyen': return <Pages.RenLuyen />;
-      case 'hoc-bong': return <Pages.HocBong />;
-      case 'ct-khung': return <Pages.CTKhung />;
-      case 'cong-no': return <Pages.CongNo />;
-      case 'tt-truc-tuyen': return <Pages.TTTrucTuyen />;
-      case 'phieu-thu-th': return <Pages.PhieuThuTH />;
-      case 'phieu-thu-tt': return <Pages.PhieuThuTT />;
-      // Mapping các trang dự phòng
-      case 'ke-khai': return <Pages.DefaultPage title="Kê khai thông tin sinh viên" />;
-      case 'dich-vu': return <Pages.DefaultPage title="Dịch vụ trực tuyến" />;
-      case 'chung-chi': return <Pages.DefaultPage title="Đề xuất chứng chỉ" />;
-      case 'ho-so-sv': return <Pages.DefaultPage title="Hồ sơ sinh viên" />;
-      case 'xet-chung-chi': return <Pages.DefaultPage title="Đề xuất xét cấp chứng chỉ SV" />;
-      case 'xet-tn': return <Pages.DefaultPage title="Đề xuất xét tốt nghiệp" />;
-      case 'cu-nhan': return <Pages.DefaultPage title="Đăng ký CT Cử nhân/Kỹ sư" />;
-      case 'dk-hp': return <Pages.DefaultPage title="Đăng ký học phần" />;
-      case 'dk-mon-dk': return <Pages.DefaultPage title="Đăng ký môn học điều kiện" />;
-      case 'tt-noi-tru': return <Pages.DefaultPage title="Thanh toán nội trú" />;
-      default: return <Pages.TrangChu setPage={setCurrentPage} />;
+      case 'trang-chu': return <TrangChu setPage={setCurrentPage} />;
+      case 'thong-tin-sv': return <ThongTinSV />;
+      case 'nhac-nho': return <NhacNho />;
+      case 'khao-sat': return <KhaoSat />;
+      case 'ket-qua-ht': return <KetQuaHT />;
+      case 'lich-tuan': return <LichTuan />;
+      case 'lich-tien-do': return <LichTienDo />;
+      case 'diem-danh': return <DiemDanh />;
+      case 'ren-luyen': return <RenLuyen />;
+      case 'hoc-bong': return <HocBong />;
+      case 'ct-khung': return <CTKhung />;
+      case 'cong-no': return <CongNo />;
+      case 'tt-truc-tuyen': return <TTTrucTuyen />;
+      case 'phieu-thu-th': return <PhieuThuTH />;
+      case 'phieu-thu-tt': return <PhieuThuTT />;
+      
+      // Các trang phụ dùng DefaultPage
+      case 'ke-khai': return <DefaultPage title="Kê khai thông tin sinh viên" />;
+      case 'dich-vu': return <DefaultPage title="Dịch vụ trực tuyến" />;
+      case 'chung-chi': return <DefaultPage title="Đề xuất chứng chỉ" />;
+      case 'ho-so-sv': return <DefaultPage title="Hồ sơ sinh viên" />;
+      case 'xet-chung-chi': return <DefaultPage title="Đề xuất xét cấp chứng chỉ SV" />;
+      case 'xet-tn': return <DefaultPage title="Đề xuất xét tốt nghiệp" />;
+      case 'cu-nhan': return <DefaultPage title="Đăng ký CT Cử nhân/Kỹ sư" />;
+      case 'dk-hp': return <DefaultPage title="Đăng ký học phần" />;
+      case 'dk-mon-dk': return <DefaultPage title="Đăng ký môn học điều kiện" />;
+      case 'tt-noi-tru': return <DefaultPage title="Thanh toán nội trú" />;
+      default: return <TrangChu setPage={setCurrentPage} />;
     }
   };
 
   return (
-    // Bọc toàn bộ trong 1 div có class chuyên biệt (tùy chọn) để bọc CSS
     <div className="student-portal-wrapper">
       <Topbar setPage={setCurrentPage} />
       <div className="layout">

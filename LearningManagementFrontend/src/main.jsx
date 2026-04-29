@@ -3,10 +3,10 @@ import ReactDOM from 'react-dom/client'
 import AppLecturer from './LecturerPages/AppLecturer.jsx'
 import './index.css'
 
-import AppStudent from './StudentPages/AppStudent.jsx' // Gọi trang của bạn
+import AppStudent from './StudentPages/AppStudent.jsx' 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AppLecturer />
-    {/*<AppStudent/>*/}
+    {/* <AppLecturer /> */}
+    <AppStudent/>
   </React.StrictMode>,
 )
