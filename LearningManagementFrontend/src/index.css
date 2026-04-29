@@ -1,9 +1,39 @@
+@import 'simplebar-react/dist/simplebar.min.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+.simplebar-track.simplebar-vertical {
+  background-color: transparent !important;
+  width: 10px !important;
+}
 
+.simplebar-scrollbar::before {
+  background-color: rgba(255, 255, 255, 0.4) !important;
+  width: 4px !important;
+  border-radius: 4px !important;
+  right: 3px !important;
+  left: auto !important;
+  opacity: 1 !important;
+  transition: background-color 0.1s linear;
+}
 
+.simplebar-scrollbar:hover::before {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.sidebar-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  display: none;
+}
+*{
+  font-family: 'Be Vietnam Pro', sans-serif !important;
+}
 :root {
   --hui-purple: #6B4FA0;
   --hui-purple-light: #8B6BBF;
@@ -22,7 +52,6 @@ body {
   @apply bg-[#F4F1F8] text-gray-800;
 }
 
-/* Sidebar & Navigation */
 .sidebar {
   background: linear-gradient(180deg, #4A3570 0%, #6B4FA0 60%, #8B6BBF 100%);
 }
@@ -57,7 +86,6 @@ body {
   @apply text-[10px] tracking-[1.5px] uppercase text-white/50 px-4 pt-4 pb-1.5 font-semibold;
 }
 
-/* UI Elements */
 .card {
   @apply bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden;
   box-shadow: 0 2px 12px rgba(107, 79, 160, 0.08);
@@ -67,7 +95,6 @@ body {
   @apply bg-white border-b border-[#E8E0F5] px-6 h-[60px] flex items-center justify-between sticky top-0 z-50;
 }
 
-/* Buttons */
 .btn-primary {
   background: linear-gradient(135deg, #6B4FA0, #8B6BBF);
   @apply text-white rounded-lg px-5 py-2 transition-all duration-200 border-none cursor-pointer font-medium;
@@ -95,7 +122,6 @@ body {
   @apply bg-[#6B4FA0] text-white;
 }
 
-/* Form Inputs */
 .input-field {
   @apply border-[1.5px] border-[#E0D8F0] rounded-lg px-3.5 py-2.5 w-full outline-none transition-all duration-200 bg-white text-sm;
 }
@@ -104,7 +130,6 @@ body {
   @apply border-[#6B4FA0] ring-4 ring-purple-600/10;
 }
 
-/* Badges & Stats */
 .badge-present { @apply bg-green-50 text-green-700 rounded-full px-2.5 py-0.5 text-xs font-semibold; }
 .badge-absent { @apply bg-red-50 text-red-700 rounded-full px-2.5 py-0.5 text-xs font-semibold; }
 
@@ -117,7 +142,6 @@ body {
   @apply absolute -top-5 -right-5 w-20 h-20 rounded-full bg-white/10;
 }
 
-/* Schedule Table Grid */
 .week-grid {
   @apply grid;
   grid-template-columns: 80px repeat(7, 1fr);
@@ -135,7 +159,6 @@ body {
   @apply bg-[#F4F1F8] text-xs text-gray-400 font-semibold flex items-center justify-center;
 }
 
-/* Schedule Cards */
 .schedule-card {
   @apply rounded-lg p-2.5 text-[11px] transition-all duration-200 cursor-pointer mb-2;
 }
@@ -159,7 +182,6 @@ body {
   border-left: 3px solid #FFC107;
 }
 
-/* Components */
 .collapse-content {
   @apply max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-black/5;
 }
@@ -189,7 +211,6 @@ body {
   @apply translate-x-0;
 }
 
-/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }

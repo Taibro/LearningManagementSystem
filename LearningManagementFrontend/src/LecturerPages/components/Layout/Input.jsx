@@ -1,5 +1,4 @@
 import React from 'react';
-
 const Input = ({ label, type = "text", value, onChange, placeholder, options, readOnly, className = "", min, max, rows, defaultValue }) => {
   return (
     <div className={className}>
@@ -37,5 +36,4 @@ const Input = ({ label, type = "text", value, onChange, placeholder, options, re
     </div>
   );
 };
-
 export default Input;

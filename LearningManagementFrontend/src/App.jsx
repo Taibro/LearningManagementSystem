@@ -27,29 +27,30 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<MainLayout />}>
-          {/* Mặc định vào app sẽ nhảy tới trang Lịch tuần */}
-          <Route index element={<Navigate to="/lich-tuan" />} />
+
+
+          <Route index element={<Navigate to="/weekly-schedule" />} />
 
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="ho-so" element={<Profile />} />
-          <Route path="luong" element={<Salary />} />
-          <Route path="khai-bao" element={<Declaration />} />
-          <Route path="tai-lieu" element={<Documents />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="salary" element={<Salary />} />
+          <Route path="declaration" element={<Declaration />} />
+          <Route path="documents" element={<Documents />} />
 
-          <Route path="diem-danh" element={<StudentAttendance />} />
+          <Route path="attendance" element={<StudentAttendance />} />
           <Route path="qr-code" element={<QRCodeAttendance />} />
-          <Route path="phieu-danh-gia" element={<Assesment />} />
+          <Route path="assessment" element={<Assesment />} />
 
-          <Route path="ket-qua" element={<Results />} />
-          <Route path="lich-tien-do" element={<ProgressSchedule />} />
-          <Route path="lich-tuan" element={<WeeklySchedule />} />
+          <Route path="results" element={<Results />} />
+          <Route path="progress-schedule" element={<ProgressSchedule />} />
+          <Route path="weekly-schedule" element={<WeeklySchedule />} />
 
-          <Route path="de-xuat-ngung" element={<StopTeaching />} />
-          <Route path="day-bu" element={<MakeupTeaching />} />
-          <Route path="day-thay" element={<SubstituteTeaching />} />
+          <Route path="stop-teaching" element={<StopTeaching />} />
+          <Route path="makeup-teaching" element={<MakeupTeaching />} />
+          <Route path="substitute-teaching" element={<SubstituteTeaching />} />
 
-          <Route path="thong-ke" element={<Statistics />} />
-          <Route path="khao-sat" element={<Survey />} />
+          <Route path="statistics" element={<Statistics />} />
+          <Route path="survey" element={<Survey />} />
         </Route>
       </Routes>
     </Router>

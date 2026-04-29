@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Input from '../../components/Layout/Input';
+import Input from '../../components/Layout/Input'; // Lưu ý: Sửa lại đường dẫn import này cho khớp với thư mục dự án của bạn
 
 const WeeklySchedule = () => {
   // Tạo state để lưu trữ ngày được chọn (Mặc định để tạm ngày 20/04/2026)
@@ -13,7 +13,6 @@ const WeeklySchedule = () => {
   };
 
   return (
-    
     <div className="animate-fadeIn">
       <div className="flex items-center justify-between mb-6">
         <div>
