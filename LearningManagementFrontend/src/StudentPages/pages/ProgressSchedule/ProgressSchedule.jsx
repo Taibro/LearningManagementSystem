@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function LichTienDo() { 
+export default function ProgressSchedule() { 
   return (
     <div className="page active">
       <div className="page-title-bar">

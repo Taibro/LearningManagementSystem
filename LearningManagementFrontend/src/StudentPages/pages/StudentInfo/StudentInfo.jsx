@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function ThongTinSV() {
+export default function StudentInfo() {
   return (
     <div className="page active">
       <div className="page-title">Thông tin sinh viên</div>

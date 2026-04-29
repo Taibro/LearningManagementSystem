@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function KetQuaHT() {
+export default function Grades() {
   return (
     <div className="page active">
       <div className="page-title-bar">

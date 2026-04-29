@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function LichTuan() { 
+export default function WeeklySchedule() { 
   return (
     <div className="page active">
       <div className="page-title-bar">

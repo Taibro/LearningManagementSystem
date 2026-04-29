@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function DiemDanh() { 
+export default function Attendance() { 
   return (
     <div className="page active">
       <div className="page-title-bar">

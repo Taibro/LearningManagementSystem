@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function HocBong() { 
+export default function Scholarships() { 
   return (
     <div className="page active">
       <div className="page-title-bar">

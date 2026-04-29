@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function CTKhung() { 
+export default function Curriculum() { 
   return (
     <div className="page active">
       <div className="page-title">Chương trình khung</div>

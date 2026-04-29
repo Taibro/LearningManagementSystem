@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { surveyData } from '../../data';
 
-export default function KhaoSat() {
+export default function Surveys() {
   const [tab, setTab] = useState('da');
   return (
     <div className="page active">

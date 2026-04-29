@@ -1,7 +1,7 @@
 import React from 'react';
 import { notifData } from '../../data';
 
-export default function NhacNho() {
+export default function Notifications() {
   return (
     <div className="page active">
       <div className="page-title-bar">

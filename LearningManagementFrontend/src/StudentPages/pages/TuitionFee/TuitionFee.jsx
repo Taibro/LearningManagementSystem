@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function CongNo() {
+export default function TuitionFee() {
   const [tab, setTab] = useState('hp');
   return (
     <div className="page active">

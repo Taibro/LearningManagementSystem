@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function RenLuyen() { 
+export default function ConductScore() { 
   return (
     <div className="page active">
       <div className="page-title">Kết quả rèn luyện</div>

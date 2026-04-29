@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function PhieuThuTT() { 
+export default function OnlineReceipts() { 
   return (
     <div className="page active">
       <div className="page-title-bar">

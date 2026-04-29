@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function TTTrucTuyen() { 
+export default function OnlinePayment() { 
   return (
     <div className="page active">
       <div className="page-title-bar">
