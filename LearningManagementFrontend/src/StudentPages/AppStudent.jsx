@@ -1,48 +1,65 @@
 import React, { useState } from 'react';
-// Import CSS riêng của sinh viên, KHÔNG dùng chung App.css hay index.css bên ngoài
 import './student.css'; 
-
 import Topbar from './components/Topbar';
 import Sidebar from './components/Sidebar';
-import * as Pages from './pages/Pages'; // Đã sửa đường dẫn trỏ vào thư mục pages
+
+import Dashboard from './pages/Dashboard/Dashboard';
+import StudentInfo from './pages/StudentInfo/StudentInfo';
+import Notifications from './pages/Notifications/Notifications';
+import Surveys from './pages/Surveys/Surveys';
+import Grades from './pages/Grades/Grades';
+import WeeklySchedule from './pages/WeeklySchedule/WeeklySchedule';
+import ProgressSchedule from './pages/ProgressSchedule/ProgressSchedule';
+import Attendance from './pages/Attendance/Attendance';
+import ConductScore from './pages/ConductScore/ConductScore';
+import Scholarships from './pages/Scholarships/Scholarships';
+import Curriculum from './pages/Curriculum/Curriculum';
+import TuitionFee from './pages/TuitionFee/TuitionFee';
+import OnlinePayment from './pages/OnlinePayment/OnlinePayment';
+import GeneralReceipts from './pages/GeneralReceipts/GeneralReceipts';
+import OnlineReceipts from './pages/OnlineReceipts/OnlineReceipts';
+import DefaultPage from './pages/DefaultPage/DefaultPage';
 
 export default function AppStudent() {
-  const [currentPage, setCurrentPage] = useState('trang-chu');
+  const [currentPage, setCurrentPage] = useState('dashboard');
   
   const renderPage = () => {
+    
     switch (currentPage) {
-      case 'trang-chu': return <Pages.TrangChu setPage={setCurrentPage} />;
-      case 'thong-tin-sv': return <Pages.ThongTinSV />;
-      case 'nhac-nho': return <Pages.NhacNho />;
-      case 'khao-sat': return <Pages.KhaoSat />;
-      case 'ket-qua-ht': return <Pages.KetQuaHT />;
-      case 'lich-tuan': return <Pages.LichTuan />;
-      case 'lich-tien-do': return <Pages.LichTienDo />;
-      case 'diem-danh': return <Pages.DiemDanh />;
-      case 'ren-luyen': return <Pages.RenLuyen />;
-      case 'hoc-bong': return <Pages.HocBong />;
-      case 'ct-khung': return <Pages.CTKhung />;
-      case 'cong-no': return <Pages.CongNo />;
-      case 'tt-truc-tuyen': return <Pages.TTTrucTuyen />;
-      case 'phieu-thu-th': return <Pages.PhieuThuTH />;
-      case 'phieu-thu-tt': return <Pages.PhieuThuTT />;
-      // Mapping các trang dự phòng
-      case 'ke-khai': return <Pages.DefaultPage title="Kê khai thông tin sinh viên" />;
-      case 'dich-vu': return <Pages.DefaultPage title="Dịch vụ trực tuyến" />;
-      case 'chung-chi': return <Pages.DefaultPage title="Đề xuất chứng chỉ" />;
-      case 'ho-so-sv': return <Pages.DefaultPage title="Hồ sơ sinh viên" />;
-      case 'xet-chung-chi': return <Pages.DefaultPage title="Đề xuất xét cấp chứng chỉ SV" />;
-      case 'xet-tn': return <Pages.DefaultPage title="Đề xuất xét tốt nghiệp" />;
-      case 'cu-nhan': return <Pages.DefaultPage title="Đăng ký CT Cử nhân/Kỹ sư" />;
-      case 'dk-hp': return <Pages.DefaultPage title="Đăng ký học phần" />;
-      case 'dk-mon-dk': return <Pages.DefaultPage title="Đăng ký môn học điều kiện" />;
-      case 'tt-noi-tru': return <Pages.DefaultPage title="Thanh toán nội trú" />;
-      default: return <Pages.TrangChu setPage={setCurrentPage} />;
+      case 'dashboard': return <Dashboard setPage={setCurrentPage} />;
+      case 'student-info': return <StudentInfo />;
+      case 'notifications': return <Notifications />;
+      case 'surveys': return <Surveys />;
+      case 'grades': return <Grades />;
+      case 'weekly-schedule': return <WeeklySchedule />;
+      case 'progress-schedule': return <ProgressSchedule />;
+      case 'attendance': return <Attendance />;
+      case 'conduct-score': return <ConductScore />;
+      case 'scholarships': return <Scholarships />;
+      case 'curriculum': return <Curriculum />;
+      case 'tuition-fee': return <TuitionFee />;
+      case 'online-payment': return <OnlinePayment />;
+      case 'general-receipts': return <GeneralReceipts />;
+      case 'online-receipts': return <OnlineReceipts />;
+      
+      
+      case 'declaration': return <DefaultPage title="Kê khai thông tin sinh viên" />;
+      case 'services': return <DefaultPage title="Dịch vụ trực tuyến" />;
+      case 'certificates': return <DefaultPage title="Đề xuất chứng chỉ" />;
+      case 'student-profile': return <DefaultPage title="Hồ sơ sinh viên" />;
+      case 'certificate-approval': return <DefaultPage title="Đề xuất xét cấp chứng chỉ SV" />;
+      case 'graduation-approval': return <DefaultPage title="Đề xuất xét tốt nghiệp" />;
+      case 'bachelor-registration': return <DefaultPage title="Đăng ký CT Cử nhân/Kỹ sư" />;
+      case 'course-registration': return <DefaultPage title="Đăng ký học phần" />;
+      case 'prerequisite-registration': return <DefaultPage title="Đăng ký môn học điều kiện" />;
+      case 'dormitory-payment': return <DefaultPage title="Thanh toán nội trú" />;
+      case 'change-password': return <DefaultPage title="Đổi mật khẩu" />;
+      case 'student-mailbox': return <DefaultPage title="Hộp thư sinh viên" />;
+      default: return <Dashboard setPage={setCurrentPage} />;
     }
   };
 
   return (
-    // Bọc toàn bộ trong 1 div có class chuyên biệt (tùy chọn) để bọc CSS
     <div className="student-portal-wrapper">
       <Topbar setPage={setCurrentPage} />
       <div className="layout">
