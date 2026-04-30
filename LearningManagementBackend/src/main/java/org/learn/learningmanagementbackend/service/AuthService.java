@@ -1,5 +1,6 @@
 package org.learn.learningmanagementbackend.service;
 
+import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.dto.request.AuthRequest;
 import org.learn.learningmanagementbackend.dto.response.UserProfileResponse;
 import org.learn.learningmanagementbackend.model.Student;
@@ -16,22 +17,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JWTService jwtService;
+    private final JWTService jwtService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private StudentRepository studentRepository;
+    private final StudentRepository studentRepository;
 
-    @Autowired
-    private TeacherRepository teacherRepository;
+    private final TeacherRepository teacherRepository;
 
     public UserProfileResponse login(AuthRequest request){
         String combinedUsername = request.getUserType().toUpperCase() + ":" + request.getLoginCode();

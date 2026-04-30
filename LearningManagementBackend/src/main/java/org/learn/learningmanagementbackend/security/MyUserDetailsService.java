@@ -1,14 +1,14 @@
 package org.learn.learningmanagementbackend.security;
 
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.model.Student;
 import org.learn.learningmanagementbackend.model.Teacher;
 import org.learn.learningmanagementbackend.model.Users;
 import org.learn.learningmanagementbackend.repository.StudentRepository;
 import org.learn.learningmanagementbackend.repository.TeacherRepository;
 import org.learn.learningmanagementbackend.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,18 +18,17 @@ import java.util.Collection;
 import java.util.Collections;
 
 @Service
+@RequiredArgsConstructor
 public class MyUserDetailsService implements UserDetailsService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private StudentRepository studentRepository;
+    private final StudentRepository studentRepository;
 
-    @Autowired
-    private TeacherRepository teacherRepository;
+    private final TeacherRepository teacherRepository;
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String combinedUsername) throws UsernameNotFoundException {
         String[] parts = combinedUsername.split(":");
         if (parts.length != 2) throw new UsernameNotFoundException("Dữ liệu đăng nhập không hợp lệ");
@@ -53,10 +52,14 @@ public class MyUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Loại tài khoản không hợp lệ");
         }
 
-        return new org.springframework.security.core.userdetails.User(
+        return new CustomUserDetails(
+                user.getId(),
+                user.getFullName(),
+                user.getEmail(),
+                loginCode,
                 combinedUsername,
                 user.getPasswordHash(),
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + userType))
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + userType))
         );
     }
 }

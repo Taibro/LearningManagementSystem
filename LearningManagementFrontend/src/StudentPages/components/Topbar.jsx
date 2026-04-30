@@ -12,11 +12,11 @@ export default function Topbar({ setPage }) {
         <input placeholder="Tìm kiếm..." />
       </div>
       <div className="topbar-right">
-        <a className="topbar-link" onClick={() => setPage('trang-chu')}>🏠 Trang chủ</a>
-        <a className="topbar-link" onClick={() => setPage('nhac-nho')}>
+        <a className="topbar-link" style={{cursor:'pointer'}} onClick={() => setPage('dashboard')}>🏠 Trang chủ</a>
+        <a className="topbar-link" style={{cursor:'pointer'}} onClick={() => setPage('notifications')}>
           🔔 Tin tức <span className="notif-badge">812</span>
         </a>
-        <div className="user-chip" onClick={() => setPage('thong-tin-sv')}>
+        <div className="user-chip" onClick={() => setPage('student-info')}>
           <div style={{width:'32px',height:'32px',borderRadius:'50%',background:'linear-gradient(135deg,#1a6fb5,#60a5fa)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:'13px',fontWeight:700}}>NT</div>
           <span style={{fontSize:'13px',fontWeight:500}}>Nguyễn Thành Tài ▾</span>
         </div>

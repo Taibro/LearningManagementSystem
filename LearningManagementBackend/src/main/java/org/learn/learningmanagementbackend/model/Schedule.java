@@ -52,6 +52,12 @@ public class Schedule extends BaseEntity {
     @Column(name = "notes")
     private String notes;
 
+    @Column(name = "start_period") // tiết học 1 - 5
+    private Integer startPeriod;
+
+    @Column(name = "end_period")
+    private Integer endPeriod;
+
     @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ScheduleException> scheduleException = new ArrayList<>();
 

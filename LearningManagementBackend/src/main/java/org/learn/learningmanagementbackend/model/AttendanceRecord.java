@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.learn.learningmanagementbackend.enums.AttendanceStatus;
 
 import java.time.LocalDate;
@@ -32,6 +33,7 @@ public class AttendanceRecord {
     @Column(name = "attendance_date", nullable = false)
     private LocalDate attendanceDate;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private AttendanceStatus status;
 
@@ -42,7 +44,8 @@ public class AttendanceRecord {
     @JoinColumn(name = "checked_by")
     private Users checkedBy;
 
-    @Column(name = "checked_at", nullable = false)
+    @CreationTimestamp
+    @Column(name = "checked_at", nullable = false, updatable = false)
     private LocalDateTime checkedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
