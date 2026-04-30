@@ -2,7 +2,23 @@ import React, { useState } from 'react';
 import './student.css'; 
 import Topbar from './components/Topbar';
 import Sidebar from './components/Sidebar';
-import * as Pages from './pages/Pages'; // Đã sửa đường dẫn trỏ vào thư mục pages
+
+import Dashboard from './pages/Dashboard/Dashboard';
+import StudentInfo from './pages/StudentInfo/StudentInfo';
+import Notifications from './pages/Notifications/Notifications';
+import Surveys from './pages/Surveys/Surveys';
+import Grades from './pages/Grades/Grades';
+import WeeklySchedule from './pages/WeeklySchedule/WeeklySchedule';
+import ProgressSchedule from './pages/ProgressSchedule/ProgressSchedule';
+import Attendance from './pages/Attendance/Attendance';
+import ConductScore from './pages/ConductScore/ConductScore';
+import Scholarships from './pages/Scholarships/Scholarships';
+import Curriculum from './pages/Curriculum/Curriculum';
+import TuitionFee from './pages/TuitionFee/TuitionFee';
+import OnlinePayment from './pages/OnlinePayment/OnlinePayment';
+import GeneralReceipts from './pages/GeneralReceipts/GeneralReceipts';
+import OnlineReceipts from './pages/OnlineReceipts/OnlineReceipts';
+import DefaultPage from './pages/DefaultPage/DefaultPage';
 
 export default function AppStudent() {
   const [currentPage, setCurrentPage] = useState('dashboard');

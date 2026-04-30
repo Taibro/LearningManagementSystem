@@ -7,6 +7,6 @@ import AppStudent from './StudentPages/AppStudent.jsx'
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <AppLecturer />
-    {/*<AppStudent/>*/}
+    {/* <AppStudent/> */}
   </React.StrictMode>,
 )
