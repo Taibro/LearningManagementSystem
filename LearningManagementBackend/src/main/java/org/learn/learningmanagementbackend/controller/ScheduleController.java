@@ -1,6 +1,7 @@
 package org.learn.learningmanagementbackend.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.learn.learningmanagementbackend.dto.projection.ClassProgressDto;
 import org.learn.learningmanagementbackend.dto.projection.WeeklyScheduleDto;
 import org.learn.learningmanagementbackend.security.CustomUserDetails;
 import org.learn.learningmanagementbackend.service.ScheduleService;
@@ -35,4 +36,16 @@ public class ScheduleController {
         return ResponseEntity.ok(schedules);
     }
 
+    @GetMapping("/progress-schedule")
+    public ResponseEntity<List<ClassProgressDto>> getClassProgressSchedule(
+        @AuthenticationPrincipal CustomUserDetails currentUser,
+        @RequestParam(required = false) Integer semesterId,
+        @RequestParam(required = false) Integer courseId,
+        @RequestParam(required = false) Integer academicYearId
+    ){
+        String teacherCode = currentUser.getSpecificCode();
+
+        List<ClassProgressDto> schedules = scheduleService.getTeacherProgressSchedule(teacherCode, semesterId, courseId, academicYearId);
+        return ResponseEntity.ok(schedules);
+    }
 }
