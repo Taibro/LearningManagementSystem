@@ -1,0 +1,4 @@
+import React from 'react';
+export default function Departments() {
+  return (<div className="page"><div className="ph"><div className="ph-title">Khoa / Bộ môn</div></div><div className="card"><table className="tbl"><thead><tr><th>#</th><th>Mã khoa</th><th>Tên khoa</th><th>Số GV</th><th>Số SV</th><th>Số môn</th><th>Thao tác</th></tr></thead><tbody><tr><td>1</td><td style={{fontWeight:700, color:'var(--blue)'}}>CNTT</td><td>Công nghệ Thông tin</td><td>2</td><td>2</td><td>2</td><td><button className="btn btn-ghost btn-xs">Sửa</button></td></tr><tr><td>2</td><td style={{fontWeight:700, color:'var(--blue)'}}>KTKT</td><td>Kỹ thuật Kinh tế</td><td>0</td><td>0</td><td>0</td><td><button className="btn btn-ghost btn-xs">Sửa</button></td></tr><tr><td>3</td><td style={{fontWeight:700, color:'var(--blue)'}}>IELTS</td><td>Bộ môn IELTS</td><td>1</td><td>1</td><td>1</td><td><button className="btn btn-ghost btn-xs">Sửa</button></td></tr></tbody></table></div></div>);
+}
