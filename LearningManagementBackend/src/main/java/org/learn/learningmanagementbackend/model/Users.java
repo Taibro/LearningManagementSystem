@@ -28,7 +28,10 @@ public class Users extends BaseEntity{
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "full_name", length = 100)
+    @Column(name = "citizen_id_number", length = 12, nullable = false)
+    private String citizenIdNumber;
+
+    @Column(name = "full_name", length = 100, nullable = false)
     private String fullName;
 
     @NotBlank(message = "Email không được để trống")
@@ -44,6 +47,9 @@ public class Users extends BaseEntity{
 
     @Column(name = "phone", length = 20)
     private String phone;
+
+    @Column(name = "address", length = 500)
+    private String address;
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
