@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './admin.css';
 
+// import AdminLogin from './pages/Login/AdminLogin';
+import SaaSAdminLogin from '../SaaSAdminSystem/pages/Login/SaaSAdminLogin';
 import MainLayout from './components/Layout/MainLayout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import BranchesRooms from './pages/BranchesRooms/BranchesRooms';
@@ -26,8 +28,10 @@ export default function AppAdmin() {
   return (
     <Router>
       <Routes>
+        <Route path="/login" element={<SaaSAdminLogin />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/" element={<MainLayout />}>
-          <Route index element={<Navigate to="dashboard" />} />
+          
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="branches" element={<BranchesRooms />} />
           <Route path="departments" element={<Departments />} />
@@ -47,6 +51,8 @@ export default function AppAdmin() {
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings" element={<Settings />} />
         </Route>
+
+        <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
