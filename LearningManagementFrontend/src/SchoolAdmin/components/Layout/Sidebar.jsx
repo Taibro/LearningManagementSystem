@@ -4,11 +4,11 @@ import { NavLink } from 'react-router-dom';
 export default function Sidebar() {
   const navClass = ({ isActive }) => `nav-item ${isActive ? 'active' : ''}`;
   return (
-    <aside className="sidebar">
+    <aside className="admin-sidebar">
       <div className="logo-zone">
         <div className="logo-badge">HUIT</div>
         <div>
-          <div className="logo-text">ĐH Bách Khoa HCM</div>
+          <div className="admin-logo-text">ĐH Bách Khoa HCM</div>
           <div className="logo-sub">Quản trị cơ sở đào tạo</div>
         </div>
       </div>
