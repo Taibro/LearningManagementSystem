@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-// Lưu ý: Nếu thư mục Layout nằm trong components thì để nguyên dòng này
+
 import MainLayout from './components/Layout/MainLayout';
 
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -24,7 +24,7 @@ import SubstituteTeaching from './pages/Proposals/SubstituteTeaching';
 
 import Statistics from './pages/Statistics/Statistics';
 import Survey from './pages/Survey/Survey';
-
+import Settings from './pages/Settings/settings';
 function AppLecturer() {
   return (
     <Router>
@@ -50,7 +50,7 @@ function AppLecturer() {
           <Route path="stop-teaching" element={<StopTeaching />} />
           <Route path="makeup-teaching" element={<MakeupTeaching />} />
           <Route path="substitute-teaching" element={<SubstituteTeaching />} />
-
+          <Route path="settings" element={<Settings />} />
           <Route path="statistics" element={<Statistics />} />
           <Route path="survey" element={<Survey />} />
           <Route path="/view-schedule" element={<WeeklySchedule />} />

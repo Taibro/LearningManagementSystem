@@ -78,8 +78,6 @@ const Sidebar = () => {
         <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">THỜI KHÓA BIỂU</div>
         <NavLink to="/view-schedule" className={navClass}>🗓️ Xem thời khóa biểu</NavLink>
 
-        <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">HRM</div>
-        <NavLink to="/hr-management" className={navClass}>👤 Quản lý nhân sự</NavLink>
       </SimpleBar>
     </aside>
   );
