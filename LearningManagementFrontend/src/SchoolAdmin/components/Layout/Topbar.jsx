@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Topbar() {
   return (
-    <header className="topbar">
+    <header className="admin-topbar">
       <div className="breadcrumb">
         <span className="bc-root">🏫 HCMUT</span>
         <span class="bc-sep">/</span>

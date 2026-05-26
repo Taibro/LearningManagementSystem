@@ -45,6 +45,9 @@ public class Semester extends BaseEntity{
     @OneToMany(mappedBy = "semester", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<StudentSemesterSummary> studentSemesterSummaries = new ArrayList<>();
 
+    @OneToMany(mappedBy = "semester")
+    private List<TeacherSalarySheet> teacherSalarySheets = new ArrayList<>();
+
     public void addStudentSemesterSummary(StudentSemesterSummary studentSemesterSummary){
         this.studentSemesterSummaries.add(studentSemesterSummary);
         studentSemesterSummary.setSemester(this);

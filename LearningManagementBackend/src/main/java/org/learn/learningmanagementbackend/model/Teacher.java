@@ -48,6 +48,16 @@ public class Teacher extends BaseEntity{
     @OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClassTeacher> classAssignments = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "primary_teaching_course_id", referencedColumnName = "id")
+    private Course primaryTeachingCourse;
+
+    @OneToMany(mappedBy = "teacher")
+    private List<TeacherSalarySheet> teacherSalarySheets = new ArrayList<>();
+
+    @OneToMany(mappedBy = "teacher")
+    private List<TeacherSalaryDetail> teacherSalaryDetails = new ArrayList<>();
+
 //    public void addClass(Classes courseClass, String role){
 //        ClassTeacher classTeacher = new ClassTeacher();
 //        classTeacher.setTeacher(this);

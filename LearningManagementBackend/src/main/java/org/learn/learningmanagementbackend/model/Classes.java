@@ -62,4 +62,7 @@ public class Classes extends BaseEntity{
 
     @OneToMany(mappedBy = "classes", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Enrollment> enrollments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "classes")
+    private List<TeacherSalaryDetail> teacherSalaryDetails = new ArrayList<>();
 }

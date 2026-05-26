@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -28,12 +29,17 @@ public interface TeacherRepository extends JpaRepository<Teacher, Integer> {
             t.specialization AS specialization,
             d.name AS departmentName,
             u.citizenIdNumber AS citizenIdNumber,
-            u.address AS address
+            u.address AS address,
+            course.name AS primaryTeachingCourse
         FROM Teacher t
         JOIN t.user u
-        JOIN t.department d
+        LEFT JOIN t.department d
+        LEFT JOIN t.primaryTeachingCourse course
         WHERE t.teacherCode = :code
 """
     )
-    Optional<TeacherProfileDto> getTeacherProfileByCode(@Param("code") String code);
+    TeacherProfileDto getTeacherProfileByCode(@Param("code") String code);
+
+    @Query("SELECT t FROM Teacher t JOIN FETCH t.user")
+    List<Teacher> findAllTeachersWithUser();
 }

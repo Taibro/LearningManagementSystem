@@ -16,5 +16,5 @@ public interface TeacherProfileDto {
     String getDepartmentName();
     String getCitizenIdNumber();
     String getAddress();
-
+    String getPrimaryTeachingCourse();
 }

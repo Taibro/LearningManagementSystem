@@ -8,7 +8,7 @@ export default function MainLayout() {
     <div>
       <Sidebar />
       <Topbar />
-      <main className="main">
+      <main className="admin-main">
         <Outlet />
       </main>
     </div>

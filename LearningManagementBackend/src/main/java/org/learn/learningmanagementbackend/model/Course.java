@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -32,9 +33,11 @@ public class Course extends BaseEntity{
     private Integer credits;
 
     @Column(name = "theory_sessions", nullable = false)
+    @ColumnDefault("30")
     private Integer theorySessions = 30;
 
     @Column(name = "practical_sessions", nullable = false)
+    @ColumnDefault("0")
     private Integer practicalSessions = 0;
 
     @Column(name = "total_sessions")
@@ -56,6 +59,9 @@ public class Course extends BaseEntity{
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Classes> classes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "primaryTeachingCourse", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Teacher> teachers = new ArrayList<>();
 
     public void addClass(Classes clazz) {
         this.classes.add(clazz);
