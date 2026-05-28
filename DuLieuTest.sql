@@ -1,238 +1,432 @@
-INSERT INTO School (code, name, short_name, type, email, phone, website, established_date, created_by, updated_by) VALUES
-  ('HCMUT',     'Trường Đại học Bách Khoa TP.HCM', 'BK-HCM',   'university',      'info@hcmut.edu.vn',   '028-3865-4086', 'https://hcmut.edu.vn',  '1957-10-27', NULL, NULL),
-  ('IELTS_PRO', 'Trung tâm Tiếng Anh IELTS Pro',   'IELTS Pro', 'language_center', 'hi@ieltspro.vn',      '028-9999-0001', 'https://ieltspro.vn',   '2015-06-01', NULL, NULL);
+-- ============================================================
+-- PHẦN 1: LỆNH XÓA SẠCH DỮ LIỆU CŨ VÀ RESET AUTO_INCREMENT
+-- ============================================================
+SET FOREIGN_KEY_CHECKS = 0;
 
-INSERT INTO School (code, name)
-VALUES ('HUIT', 'Đại học Công Thương TP.HCM'); -- 3
+TRUNCATE TABLE Teacher_salary_detail;
+TRUNCATE TABLE Teacher_salary_sheet;
+TRUNCATE TABLE Salary_config;
+TRUNCATE TABLE Salary_grade;
+TRUNCATE TABLE Student_semester_summary;
+TRUNCATE TABLE Tuition_payment;
+TRUNCATE TABLE Tuition_invoice;
+TRUNCATE TABLE Notification;
+TRUNCATE TABLE Attendance_record;
+TRUNCATE TABLE Enrollment;
+TRUNCATE TABLE Schedule_exception;
+TRUNCATE TABLE Schedule;
+TRUNCATE TABLE Class_Teacher;
+TRUNCATE TABLE Class;
+TRUNCATE TABLE Room;
+TRUNCATE TABLE Course;
+TRUNCATE TABLE Student;
+TRUNCATE TABLE Teacher;
+TRUNCATE TABLE User_School;
+TRUNCATE TABLE Users;
+TRUNCATE TABLE Department;
+TRUNCATE TABLE Semester;
+TRUNCATE TABLE Academic_year;
+TRUNCATE TABLE School_branches;
+TRUNCATE TABLE School;
+TRUNCATE TABLE Role;
 
-INSERT INTO School_branches (school_id, code, name, address, city, district, phone, is_main, created_by, updated_by) VALUES
-  (1, 'CS1', 'Cơ sở 1 - Lý Thường Kiệt', '268 Lý Thường Kiệt, P.14', 'TP.HCM',    'Quận 10',  '028-3864-7256', 1, NULL, NULL),
-  (1, 'CS2', 'Cơ sở 2 - Dĩ An',          'Khu phố 6, Dĩ An',         'Bình Dương','Dĩ An',    '0274-372-5540', 0, NULL, NULL),
-  (2, 'Q1',  'Chi nhánh Quận 1',          '123 Nguyễn Huệ, P.BN',     'TP.HCM',    'Quận 1',   '028-9999-0002', 1, NULL, NULL),
-  (2, 'TD',  'Chi nhánh Thủ Đức',         '456 Võ Văn Ngân, P.BT',    'TP.HCM',    'Thủ Đức',  '028-9999-0003', 0, NULL, NULL);
+SET FOREIGN_KEY_CHECKS = 1;
 
-INSERT INTO Academic_year (school_id, name, start_date, end_date, created_by, updated_by) VALUES
-  (1, '2024-2025', '2024-09-01', '2025-08-31', NULL, NULL),
-  (2, '2024-2025', '2024-09-01', '2025-08-31', NULL, NULL);
+-- ============================================================
+-- PHẦN 2: LỆNH INSERT DỮ LIỆU MẪU (MOCK DATA)
+-- ============================================================
 
-INSERT INTO Semester (academic_year_id, name, start_date, end_date, created_by, updated_by) VALUES
-  (1, 'Học kỳ 1',    '2024-09-09', '2025-01-10', NULL, NULL),
-  (1, 'Học kỳ 2',    '2025-02-10', '2025-06-13', NULL, NULL),
-  (2, 'Khóa tháng 9','2024-09-02', '2024-11-30', NULL, NULL);
+-- 1. BẢNG ROLE (Đúng 3 dòng theo yêu cầu)
+INSERT INTO Role (id, name, description) VALUES
+(1, 'admin', 'Quản trị viên hệ thống'),
+(2, 'teacher', 'Giảng viên'),
+(3, 'student', 'Sinh viên / Học sinh'),
+(4, 'admin_school', 'Quản trị viên nhà trường');
 
-INSERT INTO Department (school_id, code, name, created_by, updated_by) VALUES
-  (1, 'CNTT',  'Công nghệ Thông tin', NULL, NULL),
-  (1, 'KTKT',  'Kỹ thuật Kinh tế', NULL, NULL),
-  (2, 'IELTS', 'Bộ môn IELTS', NULL, NULL);
+-- 2. BẢNG SCHOOL (12 dòng)
+INSERT INTO School (id, code, name, short_name, type, email) VALUES
+(1, 'HUIT', 'Đại học Công Thương TP.HCM', 'HUIT', 'UNIVERSITY', 'contact@huit.edu.vn'),
+(2, 'HCMUT', 'Đại học Bách Khoa TP.HCM', 'HCMUT', 'UNIVERSITY', 'info@hcmut.edu.vn'),
+(3, 'KHTN', 'Đại học Khoa Học Tự Nhiên', 'HCMUS', 'UNIVERSITY', 'info@hcmus.edu.vn'),
+(4, 'UEH', 'Đại học Kinh Tế TP.HCM', 'UEH', 'UNIVERSITY', 'info@ueh.edu.vn'),
+(5, 'UEL', 'Đại học Kinh Tế - Luật', 'UEL', 'UNIVERSITY', 'info@uel.edu.vn'),
+(6, 'UIT', 'Đại học Công Nghệ Thông Tin', 'UIT', 'UNIVERSITY', 'info@uit.edu.vn'),
+(7, 'SPKT', 'Đại học Sư Phạm Kỹ Thuật', 'HCMUTE', 'UNIVERSITY', 'info@hcmute.edu.vn'),
+(8, 'SGU', 'Đại học Sài Gòn', 'SGU', 'UNIVERSITY', 'info@sgu.edu.vn'),
+(9, 'TDTU', 'Đại học Tôn Đức Thắng', 'TDTU', 'UNIVERSITY', 'info@tdtu.edu.vn'),
+(10, 'VLU', 'Đại học Văn Lang', 'VLU', 'UNIVERSITY', 'info@vlu.edu.vn'),
+(11, 'HSU', 'Đại học Hoa Sen', 'HSU', 'UNIVERSITY', 'info@hsu.edu.vn'),
+(12, 'IELTS_HCM', 'Trung tâm IELTS HCM', 'IELTS', 'LANGUAGE_CENTER', 'ielts@hcm.com');
 
-INSERT INTO Department (school_id, code, name)
-VALUES (3, 'CNTT', 'Khoa Công nghệ Thông tin');
+-- 3. BẢNG SCHOOL_BRANCHES (12 dòng)
+INSERT INTO School_branches (id, school_id, code, name, address, is_main) VALUES
+(1, 1, 'HUIT_CS1', 'Cơ sở chính HUIT', '140 Lê Trọng Tấn, Tân Phú', 1),
+(2, 2, 'HCMUT_CS1', 'Cơ sở Lý Thường Kiệt', '268 Lý Thường Kiệt, Q10', 1),
+(3, 3, 'KHTN_CS1', 'Cơ sở Nguyễn Văn Cừ', '227 Nguyễn Văn Cừ, Q5', 1),
+(4, 4, 'UEH_CS1', 'Cơ sở A UEH', '59C Nguyễn Đình Chiểu, Q3', 1),
+(5, 5, 'UEL_CS1', 'Cơ sở chính UEL', 'Khu đô thị ĐHQG, Thủ Đức', 1),
+(6, 6, 'UIT_CS1', 'Cơ sở chính UIT', 'Khu đô thị ĐHQG, Thủ Đức', 1),
+(7, 7, 'SPKT_CS1', 'Cơ sở chính SPKT', '1 Võ Văn Ngân, Thủ Đức', 1),
+(8, 8, 'SGU_CS1', 'Cơ sở chính SGU', '273 An Dương Vương, Q5', 1),
+(9, 9, 'TDTU_CS1', 'Cơ sở chính TDTU', '19 Nguyễn Hữu Thọ, Q7', 1),
+(10, 10, 'VLU_CS1', 'Cơ sở chính VLU', '69/68 Đặng Thùy Trâm, Bình Thạnh', 1),
+(11, 11, 'HSU_CS1', 'Cơ sở Nguyễn Văn Tráng', '8 Nguyễn Văn Tráng, Q1', 1),
+(12, 12, 'IELTS_CS1', 'Chi nhánh IELTS Q1', '100 Trần Hưng Đạo, Q1', 1);
 
-INSERT INTO Room (branch_id, building, room_number, capacity, type, equipment, created_by, updated_by) VALUES
-  (1, 'A', '101', 50, 'classroom',    '["projector","ac","whiteboard"]', NULL, NULL),
-  (1, 'B', '102', 30, 'lab',          '["computers","projector","ac"]', NULL, NULL),
-  (1, 'B', '301', 80, 'lecture_hall', '["projector","ac","mic_system"]', NULL, NULL),
-  (2, 'C', '201', 40, 'classroom',    '["projector","ac","smartboard"]', NULL, NULL),
-  (3, 'A', '001', 20, 'seminar',      '["tv_screen","ac"]', NULL, NULL);
+-- 4. BẢNG ACADEMIC_YEAR (12 dòng - Tập trung cho trường 1 - HUIT)
+INSERT INTO Academic_year (id, school_id, name, start_date, end_date) VALUES
+(1, 1, '2024-2025', '2024-08-01', '2025-07-31'),
+(2, 1, '2025-2026', '2025-08-01', '2026-07-31'),
+(3, 1, '2026-2027', '2026-08-01', '2027-07-31'),
+(4, 2, '2025-2026', '2025-08-01', '2026-07-31'),
+(5, 3, '2025-2026', '2025-08-01', '2026-07-31'),
+(6, 4, '2025-2026', '2025-08-01', '2026-07-31'),
+(7, 5, '2025-2026', '2025-08-01', '2026-07-31'),
+(8, 6, '2025-2026', '2025-08-01', '2026-07-31'),
+(9, 7, '2025-2026', '2025-08-01', '2026-07-31'),
+(10, 8, '2025-2026', '2025-08-01', '2026-07-31'),
+(11, 9, '2025-2026', '2025-08-01', '2026-07-31'),
+(12, 10, '2025-2026', '2025-08-01', '2026-07-31');
 
-INSERT INTO Users (full_name, email, password_hash, phone, gender, created_by, updated_by) VALUES
-  ('Nguyễn Văn An', 'an.nguyen@hcmut.edu.vn',        '$2b$10$h1','0901234561','male',   NULL, NULL),
-  ('Trần Thị Bích', 'bich.tran@hcmut.edu.vn',        '$2b$10$h2','0901234562','female', NULL, NULL),
-  ('Lê Minh Cường', 'cuong.le@ieltspro.vn',          '$2b$10$h3','0901234563','male',   NULL, NULL),
-  ('Phạm Văn Đức',  'duc.pham@student.hcmut.edu.vn', '$2b$10$h4','0912345671','male',   NULL, NULL),
-  ('Hoàng Thị Lan', 'lan.hoang@student.hcmut.edu.vn','$2b$10$h5','0912345672','female', NULL, NULL),
-  ('Vũ Quốc Hùng',  'hung.vu@ieltspro.vn',           '$2b$10$h6','0912345673','male',   NULL, NULL);
+-- 5. BẢNG SEMESTER (12 dòng)
+INSERT INTO Semester (id, academic_year_id, name, start_date, end_date) VALUES
+(1, 2, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
+(2, 2, 'Học kỳ 2', '2026-01-15', '2026-05-31'),
+(3, 2, 'Học kỳ hè', '2026-06-01', '2026-07-30'),
+(4, 1, 'Học kỳ 1', '2024-08-15', '2024-12-31'),
+(5, 1, 'Học kỳ 2', '2025-01-15', '2025-05-31'),
+(6, 4, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
+(7, 5, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
+(8, 6, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
+(9, 7, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
+(10, 8, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
+(11, 9, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
+(12, 10, 'Học kỳ 1', '2025-08-15', '2025-12-31');
+
+-- 6. BẢNG DEPARTMENT (12 dòng)
+INSERT INTO Department (id, school_id, code, name) VALUES
+(1, 1, 'CNTT', 'Khoa Công Nghệ Thông Tin'),
+(2, 1, 'KTDN', 'Khoa Kế toán - Tài chính'),
+(3, 1, 'NN', 'Khoa Ngoại Ngữ'),
+(4, 1, 'QTKD', 'Khoa Quản trị Kinh doanh'),
+(5, 1, 'ĐDT', 'Khoa Điện - Điện tử'),
+(6, 2, 'KHMT', 'Khoa Khoa Học Máy Tính'),
+(7, 3, 'TOAN', 'Khoa Toán - Tin'),
+(8, 4, 'TC', 'Khoa Tài chính'),
+(9, 5, 'LTM', 'Khoa Luật Thương Mại'),
+(10, 6, 'HTTT', 'Hệ thống thông tin'),
+(11, 7, 'CK', 'Khoa Cơ Khí'),
+(12, 12, 'IELTS_ENG', 'Bộ môn IELTS');
+
+-- 7. BẢNG USERS (24 dòng: 12 GV, 12 SV để map cho thoải mái)
+INSERT INTO Users (id, citizen_id_number, full_name, email, password_hash, gender) VALUES
+(1, '079001000001', 'Nguyễn Văn Admin', 'admin@huit.edu.vn', 'hash123', 'MALE'),
+(2, '079001000002', 'Trần Lập Trình', 'gv1@huit.edu.vn', 'hash123', 'MALE'),
+(3, '079001000003', 'Lê Bách Khoa', 'gv2@hcmut.edu.vn', 'hash123', 'MALE'),
+(4, '079001000004', 'Phạm Ngoại Ngữ', 'gv3@huit.edu.vn', 'hash123', 'FEMALE'),
+(5, '079001000005', 'Hoàng Kinh Tế', 'gv4@ueh.edu.vn', 'hash123', 'MALE'),
+(6, '079001000006', 'Vũ Luật Sư', 'gv5@uel.edu.vn', 'hash123', 'MALE'),
+(7, '079001000007', 'Đặng Máy Tính', 'gv6@uit.edu.vn', 'hash123', 'MALE'),
+(8, '079001000008', 'Bùi Cơ Khí', 'gv7@hcmute.edu.vn', 'hash123', 'MALE'),
+(9, '079001000009', 'Đỗ Tài Chính', 'gv8@huit.edu.vn', 'hash123', 'FEMALE'),
+(10, '079001000010', 'Hồ Điện Tử', 'gv9@huit.edu.vn', 'hash123', 'MALE'),
+(11, '079001000011', 'Ngô Quản Trị', 'gv10@huit.edu.vn', 'hash123', 'FEMALE'),
+(12, '079001000012', 'Dương Kế Toán', 'gv11@huit.edu.vn', 'hash123', 'FEMALE'),
+(13, '079001000013', 'Nguyễn Thanh Tài', 'tai.sv@huit.edu.vn', 'hash123', 'MALE'),
+(14, '079001000014', 'Nguyễn Minh Dũng', 'dung.sv@huit.edu.vn', 'hash123', 'MALE'),
+(15, '079001000015', 'Lê Hoàng Anh', 'anh.sv@huit.edu.vn', 'hash123', 'MALE'),
+(16, '079001000016', 'Phạm Thị Cúc', 'cuc.sv@huit.edu.vn', 'hash123', 'FEMALE'),
+(17, '079001000017', 'Vũ Đăng Khoa', 'khoa.sv@huit.edu.vn', 'hash123', 'MALE'),
+(18, '079001000018', 'Mai Hà Thu', 'thu.sv@huit.edu.vn', 'hash123', 'FEMALE'),
+(19, '079001000019', 'Lý Hải Băng', 'bang.sv@huit.edu.vn', 'hash123', 'FEMALE'),
+(20, '079001000020', 'Trịnh Hữu Thọ', 'tho.sv@huit.edu.vn', 'hash123', 'MALE'),
+(21, '079001000021', 'Vương Ngọc Yến', 'yen.sv@huit.edu.vn', 'hash123', 'FEMALE'),
+(22, '079001000022', 'Châu Phát Đạt', 'dat.sv@huit.edu.vn', 'hash123', 'MALE'),
+(23, '079001000023', 'Tào Tháo', 'thao.sv@huit.edu.vn', 'hash123', 'MALE'),
+(24, '079001000024', 'Lưu Bị', 'bi.sv@huit.edu.vn', 'hash123', 'MALE');
+
+Update users
+set password_hash = '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG';
+SELECT * FROM users;
+
+-- 8. BẢNG USER_SCHOOL (24 dòng tương ứng)
+INSERT INTO User_School (user_id, school_id, role_id) VALUES
+(1, 1, 1),  (2, 1, 2),  (3, 2, 2),  (4, 1, 2),
+(5, 4, 2),  (6, 5, 2),  (7, 6, 2),  (8, 7, 2),
+(9, 1, 2),  (10, 1, 2), (11, 1, 2), (12, 1, 2),
+(13, 1, 3), (14, 1, 3), (15, 1, 3), (16, 1, 3),
+(17, 1, 3), (18, 1, 3), (19, 1, 3), (20, 1, 3),
+(21, 1, 3), (22, 1, 3), (23, 1, 3), (24, 1, 3);
+
+-- 9. BẢNG TEACHER (11 dòng)
+INSERT INTO Teacher (id, user_id, teacher_code, department_id, degree) VALUES
+(1, 2, 'GV001', 1, 'Tiến sĩ'),
+(2, 3, 'GV002', 6, 'Thạc sĩ'),
+(3, 4, 'GV003', 3, 'Cử nhân'),
+(4, 5, 'GV004', 8, 'Tiến sĩ'),
+(5, 6, 'GV005', 9, 'Thạc sĩ'),
+(6, 7, 'GV006', 10, 'PGS.TS'),
+(7, 8, 'GV007', 11, 'Thạc sĩ'),
+(8, 9, 'GV008', 2, 'Cử nhân'),
+(9, 10, 'GV009', 5, 'Tiến sĩ'),
+(10, 11, 'GV010', 4, 'Thạc sĩ'),
+(11, 12, 'GV011', 2, 'Thạc sĩ');
+
+-- 10. BẢNG STUDENT (12 dòng)
+INSERT INTO Student (id, user_id, student_code, department_id, enrollment_year, class_name) VALUES
+(1, 13, '2001216301', 1, 2023, '12DHTH01'),
+(2, 14, '2001216302', 1, 2023, '12DHTH01'),
+(3, 15, '2001216303', 1, 2023, '12DHTH02'),
+(4, 16, '2001216304', 2, 2023, '12DHKT01'),
+(5, 17, '2001216305', 2, 2023, '12DHKT01'),
+(6, 18, '2001216306', 3, 2024, '13DHNN01'),
+(7, 19, '2001216307', 3, 2024, '13DHNN01'),
+(8, 20, '2001216308', 4, 2022, '11DHQT01'),
+(9, 21, '2001216309', 4, 2022, '11DHQT02'),
+(10, 22, '2001216310', 5, 2025, '14DHDT01'),
+(11, 23, '2001216311', 5, 2025, '14DHDT01'),
+(12, 24, '2001216312', 1, 2023, '12DHTH01');
 
 
+-- 11. BẢNG COURSE (12 dòng)
+INSERT INTO Course (id, code, name, credits, department_id) VALUES
+(1, 'INT101', 'Lập trình Java', 3, 1),
+(2, 'INT102', 'Lập trình Web (Spring Boot)', 3, 1),
+(3, 'INT103', 'Cơ sở dữ liệu', 3, 1),
+(4, 'ENG101', 'Tiếng Anh giao tiếp 1', 2, 3),
+(5, 'ENG102', 'Tiếng Anh chuyên ngành', 2, 3),
+(6, 'ACC101', 'Nguyên lý kế toán', 3, 2),
+(7, 'ACC102', 'Kế toán tài chính', 3, 2),
+(8, 'BUS101', 'Quản trị học', 3, 4),
+(9, 'BUS102', 'Marketing căn bản', 3, 4),
+(10, 'ELE101', 'Mạch điện tử', 3, 5),
+(11, 'ELE102', 'Vi xử lý', 3, 5),
+(12, 'INT104', 'Trí tuệ nhân tạo (AI)', 4, 1);
 
-INSERT INTO Users (full_name, email, password_hash, is_active)
-VALUES ('Nguyễn Thành Tài', '2001230773@gmail.huit.edu.vn', '$2a$10$MnzRADiXkTUsRFoc84OvsOG56b1ZUEebl5GWDzcQ/hU06Ka.G8eJ2', 1); -- 7
+-- 12. BẢNG ROOM (12 dòng)
+INSERT INTO Room (id, branch_id, building, room_number, capacity, type) VALUES
+(1, 1, 'C', 'C101', 50, 'CLASSROOM'),
+(2, 1, 'C', 'C102', 50, 'CLASSROOM'),
+(3, 1, 'F', 'F201', 40, 'LAB'),
+(4, 1, 'F', 'F202', 40, 'LAB'),
+(5, 1, 'E', 'E101', 100, 'LECTURE_HALL'),
+(6, 2, 'A', 'A101', 60, 'CLASSROOM'),
+(7, 3, 'B', 'B201', 50, 'CLASSROOM'),
+(8, 4, 'C', 'C301', 70, 'CLASSROOM'),
+(9, 5, 'D', 'D401', 50, 'CLASSROOM'),
+(10, 6, 'E', 'E501', 40, 'LAB'),
+(11, 7, 'F', 'F601', 100, 'LECTURE_HALL'),
+(12, 1, 'A', 'A205', 40, 'SEMINAR');
 
-INSERT INTO User_School (user_id, school_id, role_id, joined_date) VALUES
-  (1, 1, 2, '2018-08-01'),
-  (2, 1, 2, '2020-01-15'),
-  (3, 2, 2, '2019-06-01'),
-  (4, 1, 3, '2021-09-01'),
-  (5, 1, 3, '2021-09-01'),
-  (6, 2, 3, '2024-03-01');
+-- 13. BẢNG CLASS (12 dòng)
+INSERT INTO Class (id, code, course_id, semester_id, max_students, status) VALUES
+(1, 'INT101-HK2-01', 1, 2, 40, 'OPEN'),
+(2, 'INT102-HK2-01', 2, 2, 40, 'OPEN'),
+(3, 'INT103-HK2-01', 3, 2, 40, 'OPEN'),
+(4, 'ENG101-HK2-01', 4, 2, 40, 'IN_PROGRESS'),
+(5, 'ENG102-HK2-01', 5, 2, 40, 'OPEN'),
+(6, 'ACC101-HK2-01', 6, 2, 50, 'OPEN'),
+(7, 'ACC102-HK2-01', 7, 2, 50, 'COMPLETED'),
+(8, 'BUS101-HK2-01', 8, 2, 60, 'OPEN'),
+(9, 'BUS102-HK2-01', 9, 2, 60, 'CLOSED'),
+(10, 'ELE101-HK2-01', 10, 2, 40, 'OPEN'),
+(11, 'ELE102-HK2-01', 11, 2, 40, 'OPEN'),
+(12, 'INT104-HK2-01', 12, 2, 40, 'OPEN');
 
-INSERT INTO User_School (user_id, school_id, role_id, joined_date) VALUES
-  (7, 3, 3, '2018-08-01');
-
-INSERT INTO Teacher (user_id, teacher_code, department_id, degree, specialization, join_date, created_by, updated_by) VALUES
-  (1, 'GV001', 1, 'Tiến sĩ', 'Trí tuệ nhân tạo',  '2018-08-01', NULL, NULL),
-  (2, 'GV002', 1, 'Thạc sĩ', 'Kỹ thuật phần mềm', '2020-01-15', NULL, NULL),
-  (3, 'GV003', 3, 'Thạc sĩ', 'Ngôn ngữ học',      '2019-06-01', NULL, NULL);
-
-INSERT INTO Student (user_id, student_code, department_id, enrollment_year, major, class_name, created_by, updated_by) VALUES
-  (4, '21IT001',  1, 2021, 'Kỹ thuật phần mềm', 'CNTT21A', NULL, NULL),
-  (5, '21IT002',  1, 2021, 'Kỹ thuật phần mềm', 'CNTT21A', NULL, NULL),
-  (6, 'IE240301', 3, 2024, 'IELTS General',     NULL,      NULL, NULL);
-
-INSERT INTO Student (user_id, student_code, department_id, enrollment_year)
-VALUES (7, '2001230773', 4, 2023);
-select * from Student;
-INSERT INTO Course (code, name, credits, total_sessions, department_id, created_by, updated_by) VALUES
-  ('INT101', 'Nhập môn Lập trình',            3, 30, 1, NULL, NULL),
-  ('INT201', 'Cấu trúc dữ liệu & Giải thuật', 3, 30, 1, NULL, NULL),
-  ('IEL101', 'IELTS Foundation',              0, 40, 3, NULL, NULL);
-
-
-INSERT INTO Class (code, course_id, semester_id, max_students, status, created_by, updated_by) VALUES
-  ('INT101-01-HK1-2425', 1, 1,  40, 'in_progress', NULL, NULL),
-  ('INT201-01-HK1-2425', 2, 1,  35, 'in_progress', NULL, NULL),
-  ('IEL101-Q1-T9-2024',  3, 3,  20, 'open',        NULL, NULL);
-
-
+-- 14. BẢNG CLASS_TEACHER (12 dòng)
 INSERT INTO Class_Teacher (class_id, teacher_id, role) VALUES
-  (1, 1, 'main'),      -- Thầy An dạy chính lớp INT101
-  (2, 2, 'main'),      -- Cô Bích dạy chính lớp INT201
-  (3, 3, 'main'),      -- Thầy Cường dạy chính lớp IELTS
-  (3, 1, 'assistant'); -- Thầy An làm trợ giảng cho lớp IELTS (Ví dụ cho N-N)
+(1, 1, 'main'),
+(2, 1, 'main'),
+(3, 2, 'main'),
+(4, 3, 'main'),
+(5, 3, 'main'),
+(6, 8, 'main'),
+(7, 11, 'main'),
+(8, 10, 'main'),
+(9, 10, 'main'),
+(10, 9, 'main'),
+(11, 9, 'assistant'),
+(12, 1, 'main');
 
-INSERT INTO Schedule (class_id, room_id, day_of_week, start_time, end_time, start_date, end_date, type, created_by, updated_by) VALUES
-  (1, 1, 2, '07:30:00', '09:30:00', '2024-09-09', '2024-12-20', 'regular', NULL, NULL),
-  (1, 1, 4, '13:30:00', '15:30:00', '2024-09-09', '2024-12-20', 'regular', NULL, NULL),
-  (2, 2, 3, '09:45:00', '11:45:00', '2024-09-10', '2024-12-21', 'regular', NULL, NULL),
-  (3, 5, 6, '08:00:00', '10:00:00', '2024-09-07', '2024-11-30', 'regular', NULL, NULL);
+-- 15. BẢNG SCHEDULE (12 dòng)
+INSERT INTO Schedule (id, class_id, room_id, day_of_week, start_time, end_time, start_date, end_date, start_period, end_period, type) VALUES
+(1, 1, 3, 2, '07:00:00', '09:30:00', '2026-01-15', '2026-05-15', 1, 3, 'REGULAR'),
+(2, 2, 4, 3, '09:40:00', '12:10:00', '2026-01-15', '2026-05-15', 4, 6, 'REGULAR'),
+(3, 3, 1, 4, '13:00:00', '15:30:00', '2026-01-15', '2026-05-15', 7, 9, 'REGULAR'),
+(4, 4, 2, 5, '07:00:00', '08:40:00', '2026-01-15', '2026-05-15', 1, 2, 'REGULAR'),
+(5, 5, 2, 6, '15:40:00', '17:20:00', '2026-01-15', '2026-05-15', 10, 11, 'REGULAR'),
+(6, 6, 5, 2, '13:00:00', '15:30:00', '2026-01-15', '2026-05-15', 7, 9, 'REGULAR'),
+(7, 7, 1, 3, '07:00:00', '09:30:00', '2026-01-15', '2026-05-15', 1, 3, 'REGULAR'),
+(8, 8, 5, 4, '09:40:00', '12:10:00', '2026-01-15', '2026-05-15', 4, 6, 'REGULAR'),
+(9, 9, 1, 5, '13:00:00', '15:30:00', '2026-01-15', '2026-05-15', 7, 9, 'REGULAR'),
+(10, 10, 4, 6, '07:00:00', '09:30:00', '2026-01-15', '2026-05-15', 1, 3, 'REGULAR'),
+(11, 11, 3, 7, '09:40:00', '12:10:00', '2026-01-15', '2026-05-15', 4, 6, 'REGULAR'),
+(12, 12, 4, 2, '15:40:00', '18:10:00', '2026-01-15', '2026-05-15', 10, 12, 'REGULAR');
 
+-- 16. BẢNG SCHEDULE_EXCEPTION (12 dòng)
+INSERT INTO Schedule_exception (id, schedule_id, exception_date, reason, exception_type) VALUES
+(1, 1, '2026-03-02', 'Giảng viên bệnh', 'cancelled'),
+(2, 2, '2026-03-03', 'Họp khoa', 'cancelled'),
+(3, 3, '2026-03-04', 'Cúp điện', 'cancelled'),
+(4, 4, '2026-03-05', 'Lễ', 'cancelled'),
+(5, 5, '2026-03-06', 'Thi giữa kỳ', 'rescheduled'),
+(6, 6, '2026-03-09', 'Nghỉ bù', 'cancelled'),
+(7, 7, '2026-03-10', 'Bảo trì phòng máy', 'room_change'),
+(8, 8, '2026-03-11', 'Lịch công tác', 'cancelled'),
+(9, 9, '2026-03-12', 'Bận đột xuất', 'cancelled'),
+(10, 10, '2026-03-13', 'Thi Olimpic', 'cancelled'),
+(11, 11, '2026-03-14', 'Nghỉ hè', 'cancelled'),
+(12, 12, '2026-03-16', 'Họp Bộ môn', 'cancelled');
 
-INSERT INTO Enrollment (student_id, class_id, status, created_by, updated_by) VALUES
-  (1, 1, 'enrolled', NULL, NULL),
-  (2, 1, 'enrolled', NULL, NULL),
-  (1, 2, 'enrolled', NULL, NULL),
-  (2, 2, 'enrolled', NULL, NULL),
-  (3, 3, 'enrolled', NULL, NULL);
+-- 17. BẢNG ENROLLMENT (12 dòng)
+INSERT INTO Enrollment (id, student_id, class_id, status, grade_total) VALUES
+(1, 1, 1, 'ENROLLED', NULL),
+(2, 2, 1, 'ENROLLED', NULL),
+(3, 3, 1, 'ENROLLED', NULL),
+(4, 1, 2, 'ENROLLED', NULL),
+(5, 2, 2, 'ENROLLED', NULL),
+(6, 4, 6, 'ENROLLED', NULL),
+(7, 5, 6, 'ENROLLED', NULL),
+(8, 6, 4, 'ENROLLED', NULL),
+(9, 7, 4, 'ENROLLED', NULL),
+(10, 8, 8, 'ENROLLED', NULL),
+(11, 9, 8, 'ENROLLED', NULL),
+(12, 12, 1, 'ENROLLED', NULL);
 
-INSERT INTO Attendance_record (schedule_id, student_id, attendance_date, status, checked_by, updated_by, checked_at) VALUES
-    (1, 1, '2024-09-09', 'PRESENT', 1, NULL, NOW()),
-    (1, 2, '2024-09-09', 'PRESENT', 1, NULL, NOW()),
-    (1, 1, '2024-09-11', 'LATE',    1, NULL, NOW()),
-    (1, 2, '2024-09-11', 'ABSENT',  1, NULL, NOW());
+-- 18. BẢNG ATTENDANCE_RECORD (12 dòng)
+INSERT INTO attendance_record (id, schedule_id, student_id, attendance_date, status, checked_by, checked_at) VALUES
+(1, 1, 1, '2026-02-16', 'PRESENT', 2, '2026-02-16 08:00:00'),
+(2, 1, 2, '2026-02-16', 'LATE', 2, '2026-02-16 08:15:00'),
+(3, 1, 3, '2026-02-16', 'ABSENT', 2, '2026-02-16 08:00:00'),
+(4, 2, 1, '2026-02-17', 'PRESENT', 2, '2026-02-17 08:00:00'),
+(5, 2, 2, '2026-02-17', 'PRESENT', 2, '2026-02-17 08:00:00'),
+(6, 6, 4, '2026-02-16', 'PRESENT', 9, '2026-02-16 13:00:00'),
+(7, 6, 5, '2026-02-16', 'EXCUSED', 9, '2026-02-16 13:00:00'),
+(8, 4, 6, '2026-02-19', 'PRESENT', 4, '2026-02-19 08:00:00'),
+(9, 4, 7, '2026-02-19', 'PRESENT', 4, '2026-02-19 08:00:00'),
+(10, 8, 8, '2026-02-18', 'PRESENT', 11, '2026-02-18 09:40:00'),
+(11, 8, 9, '2026-02-18', 'LATE', 11, '2026-02-18 09:55:00'),
+(12, 1, 12, '2026-02-16', 'PRESENT', 2, '2026-02-16 08:00:00');
 
-INSERT INTO Schedule_exception (schedule_id, exception_date, reason, exception_type, replacement_date, created_by, updated_by) VALUES
-  (1, '2024-09-02', 'Nghỉ Quốc khánh 2/9', 'rescheduled', '2024-09-07', NULL, NULL);
+-- 19. BẢNG NOTIFICATION (12 dòng)
+INSERT INTO Notification (id, user_id, title, body, type) VALUES
+(1, 13, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE'),
+(2, 14, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE'),
+(3, 15, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE'),
+(4, 13, 'Nhắc nộp học phí', 'Vui lòng nộp học phí HK2', 'REMINDER'),
+(5, 14, 'Nhắc nộp học phí', 'Vui lòng nộp học phí HK2', 'REMINDER'),
+(6, 15, 'Nhắc nộp học phí', 'Vui lòng nộp học phí HK2', 'REMINDER'),
+(7, 2, 'Có lịch dạy bù', 'Vui lòng sắp xếp lịch dạy bù lớp INT101', 'SYSTEM'),
+(8, 16, 'Có điểm thi', 'Đã có điểm môn Nguyên lý kế toán', 'GRADE'),
+(9, 17, 'Có điểm thi', 'Đã có điểm môn Nguyên lý kế toán', 'GRADE'),
+(10, 18, 'Thông báo', 'Đăng ký học phần HK hè', 'ENROLLMENT'),
+(11, 19, 'Thông báo', 'Đăng ký học phần HK hè', 'ENROLLMENT'),
+(12, 13, 'Cập nhật điểm', 'Điểm QT đã được update', 'GRADE');
 
+-- 20. BẢNG TUITION_INVOICE (12 dòng)
+INSERT INTO Tuition_invoice (id, student_id, semester_id, total_amount, paid_amount, due_date, status) VALUES
+(1, 1, 2, 15000000.00, 15000000.00, '2026-03-30', 'PAID'),
+(2, 2, 2, 15000000.00, 5000000.00, '2026-03-30', 'PARTIAL'),
+(3, 3, 2, 15000000.00, 0.00, '2026-03-30', 'UNPAID'),
+(4, 4, 2, 14000000.00, 14000000.00, '2026-03-30', 'PAID'),
+(5, 5, 2, 14000000.00, 0.00, '2026-03-30', 'UNPAID'),
+(6, 6, 2, 12000000.00, 12000000.00, '2026-03-30', 'PAID'),
+(7, 7, 2, 12000000.00, 12000000.00, '2026-03-30', 'PAID'),
+(8, 8, 2, 13000000.00, 0.00, '2026-03-30', 'UNPAID'),
+(9, 9, 2, 13000000.00, 0.00, '2026-03-30', 'UNPAID'),
+(10, 10, 2, 16000000.00, 8000000.00, '2026-03-30', 'PARTIAL'),
+(11, 11, 2, 16000000.00, 16000000.00, '2026-03-30', 'PAID'),
+(12, 12, 2, 15000000.00, 15000000.00, '2026-03-30', 'PAID');
 
--- Du lieu test
-INSERT INTO Users (full_name, email, password_hash, is_active, phone)
-VALUES ('Trần Lập Trình', 'tranlaptrinh@huit.edu.vn', '$2a$10$MnzRADiXkTUsRFoc84OvsOG56b1ZUEebl5GWDzcQ/hU06Ka.G8eJ2', 1, '0999888777');
+-- 21. BẢNG TUITION_PAYMENT (12 dòng)
+INSERT INTO Tuition_payment (id, invoice_id, amount, payment_method, transaction_code, status) VALUES
+(1, 1, 15000000.00, 'BANK_TRANSFER', 'VN123456', 'SUCCESS'),
+(2, 2, 5000000.00, 'MOMO', 'MM98765', 'SUCCESS'),
+(3, 4, 14000000.00, 'VNPAY', 'VNP1122', 'SUCCESS'),
+(4, 6, 12000000.00, 'CASH', 'CASH001', 'SUCCESS'),
+(5, 7, 12000000.00, 'BANK_TRANSFER', 'VN223344', 'SUCCESS'),
+(6, 10, 8000000.00, 'VISA', 'VS9988', 'SUCCESS'),
+(7, 11, 16000000.00, 'MOMO', 'MM7766', 'SUCCESS'),
+(8, 12, 15000000.00, 'BANK_TRANSFER', 'VN445566', 'SUCCESS'),
+(9, 1, 0.00, 'BANK_TRANSFER', 'FAIL01', 'FAILED'),
+(10, 2, 0.00, 'MOMO', 'FAIL02', 'FAILED'),
+(11, 4, 0.00, 'VNPAY', 'FAIL03', 'FAILED'),
+(12, 6, 0.00, 'VISA', 'FAIL04', 'FAILED');
 
+-- 22. BẢNG STUDENT_SEMESTER_SUMMARY (12 dòng)
+INSERT INTO Student_semester_summary (id, student_id, semester_id, gpa, credits_earned, conduct_score, conduct_grade) VALUES
+(1, 1, 1, 3.50, 15, 90, 'Xuất sắc'),
+(2, 2, 1, 3.20, 15, 85, 'Tốt'),
+(3, 3, 1, 2.80, 15, 75, 'Khá'),
+(4, 4, 1, 3.80, 18, 95, 'Xuất sắc'),
+(5, 5, 1, 2.50, 12, 65, 'Trung bình'),
+(6, 6, 1, 3.10, 16, 80, 'Tốt'),
+(7, 7, 1, 3.90, 20, 98, 'Xuất sắc'),
+(8, 8, 1, 2.90, 15, 78, 'Khá'),
+(9, 9, 1, 3.00, 15, 82, 'Tốt'),
+(10, 10, 1, 3.60, 18, 88, 'Tốt'),
+(11, 11, 1, 2.20, 10, 60, 'Trung bình'),
+(12, 12, 1, 3.51, 15, 92, 'Xuất sắc');
 
-INSERT INTO Teacher (user_id, teacher_code, department_id, degree, specialization, join_date)
-VALUES (
-    (SELECT id FROM Users WHERE email = 'tranlaptrinh@huit.edu.vn'),
-    'GV_PRO_2026',
-    1,
-    'Tiến sĩ',
-    'Công nghệ phần mềm',
-    '2020-01-01'
-);
+-- 23. BẢNG SALARY_GRADE (12 dòng)
+INSERT INTO Salary_grade (id, school_id, degree, coefficient, rate_per_session, effective_from) VALUES
+(1, 1, 'Tiến sĩ', 1.60, 250000.00, '2026-01-01'),
+(2, 1, 'Thạc sĩ', 1.30, 180000.00, '2026-01-01'),
+(3, 1, 'Cử nhân', 1.00, 120000.00, '2026-01-01'),
+(4, 1, 'PGS.TS', 1.90, 350000.00, '2026-01-01'),
+(5, 1, 'GS.TS', 2.20, 500000.00, '2026-01-01'),
+(6, 2, 'Tiến sĩ', 1.60, 300000.00, '2026-01-01'),
+(7, 3, 'Thạc sĩ', 1.30, 200000.00, '2026-01-01'),
+(8, 4, 'Tiến sĩ', 1.60, 280000.00, '2026-01-01'),
+(9, 5, 'Thạc sĩ', 1.30, 190000.00, '2026-01-01'),
+(10, 6, 'PGS.TS', 1.90, 400000.00, '2026-01-01'),
+(11, 7, 'Thạc sĩ', 1.30, 170000.00, '2026-01-01'),
+(12, 8, 'Cử nhân', 1.00, 110000.00, '2026-01-01');
 
-INSERT INTO Course (code, name, credits, total_sessions, department_id) VALUES
-('SPRING26', 'Xây dựng API với Spring Boot 3', 3, 45, 1),
-('REACT26', 'Lập trình Frontend với ReactJS', 3, 45, 1);
+-- 24. BẢNG SALARY_CONFIG (12 dòng)
+INSERT INTO Salary_config (id, school_id, salary_grade_id, name, base_salary, effective_from) VALUES
+(1, 1, 1, 'Lương TS 2026', 2340000.00, '2026-01-01'),
+(2, 1, 2, 'Lương ThS 2026', 2340000.00, '2026-01-01'),
+(3, 1, 3, 'Lương CN 2026', 2340000.00, '2026-01-01'),
+(4, 1, 4, 'Lương PGS 2026', 2340000.00, '2026-01-01'),
+(5, 1, 5, 'Lương GS 2026', 2340000.00, '2026-01-01'),
+(6, 2, 6, 'Lương TS HCMUT', 2500000.00, '2026-01-01'),
+(7, 3, 7, 'Lương ThS KHTN', 2340000.00, '2026-01-01'),
+(8, 4, 8, 'Lương TS UEH', 2600000.00, '2026-01-01'),
+(9, 5, 9, 'Lương ThS UEL', 2340000.00, '2026-01-01'),
+(10, 6, 10, 'Lương PGS UIT', 2800000.00, '2026-01-01'),
+(11, 7, 11, 'Lương ThS SPKT', 2340000.00, '2026-01-01'),
+(12, 8, 12, 'Lương CN SGU', 2340000.00, '2026-01-01');
 
+-- 25. BẢNG TEACHER_SALARY_SHEET (12 dòng)
+-- 25. BẢNG TEACHER_SALARY_SHEET (12 dòng)
+INSERT INTO Teacher_salary_sheet (id, teacher_id, salary_config_id, semester_id, period_month, period_year, degree_snapshot, coefficient_snapshot, base_salary_snapshot, rate_snapshot, planned_sessions, actual_sessions, base_amount, session_amount, bonus_amount, deduction_amount, net_amount, status) VALUES
+(1, 1, 1, 2, 3, 2026, 'Tiến sĩ', 1.60, 2340000.00, 250000.00, 20, 20, 3744000.00, 5000000.00, 1000000.00, 500000.00, 9244000.00, 'CONFIRMED'),
+(2, 2, 2, 2, 3, 2026, 'Thạc sĩ', 1.30, 2340000.00, 180000.00, 16, 15, 3042000.00, 2700000.00, 500000.00, 300000.00, 5942000.00, 'CONFIRMED'),
+(3, 3, 3, 2, 3, 2026, 'Cử nhân', 1.00, 2340000.00, 120000.00, 10, 10, 2340000.00, 1200000.00, 0.00, 200000.00, 3340000.00, 'DRAFT'),
+(4, 4, 8, 2, 3, 2026, 'Tiến sĩ', 1.60, 2600000.00, 280000.00, 25, 25, 4160000.00, 7000000.00, 2000000.00, 800000.00, 12360000.00, 'PAID'),
+(5, 5, 9, 2, 3, 2026, 'Thạc sĩ', 1.30, 2340000.00, 190000.00, 12, 12, 3042000.00, 2280000.00, 0.00, 250000.00, 5072000.00, 'DRAFT'),
+(6, 6, 10, 2, 3, 2026, 'PGS.TS', 1.90, 2800000.00, 400000.00, 30, 30, 5320000.00, 12000000.00, 5000000.00, 1500000.00, 20820000.00, 'PAID'),
+(7, 7, 11, 2, 3, 2026, 'Thạc sĩ', 1.30, 2340000.00, 170000.00, 20, 18, 3042000.00, 3060000.00, 500000.00, 350000.00, 6252000.00, 'CONFIRMED'),
+(8, 8, 3, 2, 3, 2026, 'Cử nhân', 1.00, 2340000.00, 120000.00, 15, 14, 2340000.00, 1680000.00, 0.00, 200000.00, 3820000.00, 'DRAFT'),
+(9, 9, 1, 2, 3, 2026, 'Tiến sĩ', 1.60, 2340000.00, 250000.00, 22, 22, 3744000.00, 5500000.00, 1200000.00, 600000.00, 9844000.00, 'CONFIRMED'),
+(10, 10, 2, 2, 3, 2026, 'Thạc sĩ', 1.30, 2340000.00, 180000.00, 16, 16, 3042000.00, 2880000.00, 800000.00, 400000.00, 6322000.00, 'PAID'),
+(11, 11, 2, 2, 3, 2026, 'Thạc sĩ', 1.30, 2340000.00, 180000.00, 20, 20, 3042000.00, 3600000.00, 1000000.00, 500000.00, 7142000.00, 'CONFIRMED'),
+(12, 1, 1, 2, 4, 2026, 'Tiến sĩ', 1.60, 2340000.00, 250000.00, 24, 24, 3744000.00, 6000000.00, 1000000.00, 600000.00, 10144000.00, 'DRAFT');
 
-INSERT INTO Class (code, course_id, semester_id, max_students, status) VALUES
-('SPRING-01-2026', (SELECT id FROM Course WHERE code = 'SPRING26'), 1, 40, 'IN_PROGRESS'),
-('REACT-02-2026',  (SELECT id FROM Course WHERE code = 'REACT26'),  1, 35, 'IN_PROGRESS');
+-- 26. BẢNG TEACHER_SALARY_DETAIL (12 dòng)
+INSERT INTO Teacher_salary_detail (id, sheet_id, teacher_id, class_id, schedule_id, session_date, session_count, teacher_role, rate_snapshot, amount) VALUES
+(1, 1, 1, 1, 1, '2026-03-02', 3, 'MAIN', 250000.00, 750000.00),
+(2, 1, 1, 1, 1, '2026-03-09', 3, 'MAIN', 250000.00, 750000.00),
+(3, 1, 1, 2, 2, '2026-03-03', 3, 'MAIN', 250000.00, 750000.00),
+(4, 2, 2, 3, 3, '2026-03-04', 3, 'MAIN', 180000.00, 540000.00),
+(5, 2, 2, 3, 3, '2026-03-11', 3, 'MAIN', 180000.00, 540000.00),
+(6, 3, 3, 4, 4, '2026-03-05', 2, 'MAIN', 120000.00, 240000.00),
+(7, 3, 3, 5, 5, '2026-03-06', 2, 'MAIN', 120000.00, 240000.00),
+(8, 8, 8, 6, 6, '2026-03-10', 3, 'MAIN', 120000.00, 360000.00),
+(9, 11, 11, 7, 7, '2026-03-11', 3, 'MAIN', 180000.00, 540000.00),
+(10, 10, 10, 8, 8, '2026-03-12', 3, 'MAIN', 180000.00, 540000.00),
+(11, 9, 9, 10, 10, '2026-03-14', 3, 'MAIN', 250000.00, 750000.00),
+(12, 12, 1, 12, 12, '2026-04-01', 3, 'MAIN', 250000.00, 750000.00);
 
-
-INSERT INTO Class_Teacher (class_id, teacher_id, role) VALUES
-(
-    (SELECT id FROM Class WHERE code = 'SPRING-01-2026'),
-    (SELECT id FROM Teacher WHERE teacher_code = 'GV_PRO_2026'),
-    'main'
-),
-(
-    (SELECT id FROM Class WHERE code = 'REACT-02-2026'),
-    (SELECT id FROM Teacher WHERE teacher_code = 'GV_PRO_2026'),
-    'main'
-);
-
-
-INSERT INTO Schedule (class_id, room_id, day_of_week, start_time, end_time, start_period, end_period, start_date, end_date, type) VALUES
-(
-    (SELECT id FROM Class WHERE code = 'SPRING-01-2026'),
-    1, -- room_id = 1 (Phòng 101)
-    2, -- Thứ 2
-    '07:30:00', '09:30:00',
-    1, 3, -- start_period, end_period (Sáng)
-    '2026-01-01', '2026-12-31',
-    'REGULAR'
-),
-(
-    (SELECT id FROM Class WHERE code = 'SPRING-01-2026'),
-    1,
-    4, -- Thứ 4
-    '13:00:00', '15:30:00',
-    7, 9, -- start_period, end_period (Chiều)
-    '2026-01-01', '2026-12-31',
-    'REGULAR'
-);
-
-
-INSERT INTO Schedule (class_id, room_id, day_of_week, start_time, end_time, start_period, end_period, start_date, end_date, type) VALUES
-(
-    (SELECT id FROM Class WHERE code = 'REACT-02-2026'),
-    2, -- room_id = 2 (Phòng Lab 102)
-    7, -- Thứ 7
-    '08:00:00', '16:00:00',
-    1, 10, -- start_period, end_period (Cả ngày)
-    '2026-01-01', '2026-12-31',
-    'LAB'
-);
-
--- ========================================================================
--- SCRIPT TEST: TẠO DỮ LIỆU ĐIỂM DANH (TÍNH TIẾN ĐỘ LỚP HỌC)
--- ========================================================================
-
--- 1. Tìm ID của Sinh viên Tài (2001230773) và Thầy Lập Trình
-SET @student_id = (SELECT id FROM Student WHERE student_code = '2001230773' LIMIT 1);
-SET @teacher_user_id = (SELECT id FROM Users WHERE email = 'tranlaptrinh@huit.edu.vn' LIMIT 1);
-
--- 2. Tìm ID của các Lịch học (Schedule) vừa được tạo
--- Lớp Spring Boot (Mỗi ca 3 tiết)
-SET @sched_spring_t2 = (SELECT s.id
-                        FROM Schedule s
-                                 JOIN Class c ON s.class_id = c.id
-                        WHERE c.code = 'SPRING-01-2026'
-                          AND s.day_of_week = 2
-                        LIMIT 1);
-SET @sched_spring_t4 = (SELECT s.id
-                        FROM Schedule s
-                                 JOIN Class c ON s.class_id = c.id
-                        WHERE c.code = 'SPRING-01-2026'
-                          AND s.day_of_week = 4
-                        LIMIT 1);
-
--- Lớp ReactJS (Mỗi ca 10 tiết)
-SET @sched_react_t7 = (SELECT s.id
-                       FROM Schedule s
-                                JOIN Class c ON s.class_id = c.id
-                       WHERE c.code = 'REACT-02-2026'
-                         AND s.day_of_week = 7
-                       LIMIT 1);
-
-
--- ========================================================================
--- 3. INSERT DỮ LIỆU ĐIỂM DANH ĐỂ TÍNH TIẾN ĐỘ
--- ========================================================================
-
-INSERT INTO Attendance_record (schedule_id, student_id, attendance_date, status, checked_by, checked_at) VALUES
-(@sched_spring_t2, @student_id, '2026-01-05', 'PRESENT', @teacher_user_id, NOW()),
-(@sched_spring_t2, @student_id, '2026-01-12', 'PRESENT', @teacher_user_id, NOW());
-
--- Điểm danh 2 buổi Thứ 4 (Có 1 buổi sinh viên vắng, nhưng vẫn tính là Giảng viên đã dạy)
-INSERT INTO Attendance_record (schedule_id, student_id, attendance_date, status, checked_by, checked_at) VALUES
-(@sched_spring_t4, @student_id, '2026-01-07', 'PRESENT', @teacher_user_id, NOW()),
-(@sched_spring_t4, @student_id, '2026-01-14', 'ABSENT', @teacher_user_id, NOW());
-
-
--- B. Lớp ReactJS (Mục tiêu test: Dạy 3 buổi = 30 tiết)
--- Điểm danh 3 buổi Thứ 7
-INSERT INTO Attendance_record (schedule_id, student_id, attendance_date, status, checked_by, checked_at) VALUES
-(@sched_react_t7, @student_id, '2026-01-03', 'PRESENT', @teacher_user_id, NOW()),
-(@sched_react_t7, @student_id, '2026-01-10', 'PRESENT', @teacher_user_id, NOW()),
-(@sched_react_t7, @student_id, '2026-01-17', 'PRESENT', @teacher_user_id, NOW());
+SELECT * FROM teacher_declarations;

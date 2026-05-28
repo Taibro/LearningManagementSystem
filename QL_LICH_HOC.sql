@@ -605,6 +605,45 @@ CREATE TABLE student_semester_summaries (
   CONSTRAINT chk_conduct     CHECK (conduct_score <= 100)
 ) ENGINE=InnoDB COMMENT='Tổng kết học kỳ của sinh viên (GPA, Rèn luyện, Học bổng)';
 
+CREATE TABLE teacher_declarations (
+  id                INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  teacher_id        INT UNSIGNED  NOT NULL,
+  semester_id       INT UNSIGNED  NOT NULL,
+  expected_sessions INT           NOT NULL DEFAULT 0 COMMENT 'Số tiết dạy dự kiến',
+  expected_classes  INT           NOT NULL DEFAULT 0 COMMENT 'Số lớp phụ trách',
+  notes             TEXT,
+
+  created_at        TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at        TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_declaration (teacher_id, semester_id), -- Mỗi kỳ chỉ khai báo 1 lần
+  CONSTRAINT fk_td_teacher  FOREIGN KEY (teacher_id)  REFERENCES teachers(id)  ON DELETE CASCADE,
+  CONSTRAINT fk_td_semester FOREIGN KEY (semester_id) REFERENCES semesters(id) ON DELETE RESTRICT
+) ENGINE=InnoDB COMMENT='Khai báo thông tin giảng dạy dự kiến của Giảng viên';
+
+CREATE TABLE class_materials (
+  id           INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  class_id     INT UNSIGNED  NOT NULL COMMENT 'Tài liệu thuộc lớp học phần nào',
+  title        VARCHAR(200)  NOT NULL COMMENT 'Tên hiển thị: Slide Chương 1...',
+  file_name    VARCHAR(255)  NOT NULL COMMENT 'Tên file gốc giảng viên tải lên',
+  file_url     VARCHAR(500)  NOT NULL COMMENT 'Đường dẫn HTTPS công khai từ Cloudinary',
+  file_size    BIGINT        NOT NULL COMMENT 'Dung lượng file (tính bằng Byte)',
+  content_type VARCHAR(100)  COMMENT 'Định dạng file (MIME type)',
+  doc_type     ENUM('slide', 'exercise', 'syllabus', 'reference', 'other') NOT NULL DEFAULT 'other',
+  uploaded_by  INT UNSIGNED  NOT NULL COMMENT 'ID của giảng viên tải lên',
+
+  created_at   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  INDEX idx_mat_class (class_id),
+  INDEX idx_mat_type  (doc_type),
+  CONSTRAINT fk_mat_class   FOREIGN KEY (class_id)    REFERENCES classes(id)  ON DELETE CASCADE,
+  CONSTRAINT fk_mat_teacher FOREIGN KEY (uploaded_by) REFERENCES teachers(id) ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='Tài liệu giảng dạy của lớp học phần';
+
+SELECT * FROM class_materials;
 
 -- Bật lại kiểm tra khóa ngoại sau khi đã tạo xong các bảng
 SET FOREIGN_KEY_CHECKS = 1;
@@ -642,89 +681,3 @@ JOIN academic_years ay ON ay.id  = sem.academic_year_id
 WHERE c.status NOT IN ('cancelled') AND s.end_date >= CURDATE();
 
 
-
--- ============================================================
--- DỮ LIỆU MẪU
--- ============================================================
-
-INSERT INTO schools (code, name, short_name, type, email, phone, website, established_date, created_by, updated_by) VALUES
-  ('HCMUT',     'Trường Đại học Bách Khoa TP.HCM', 'BK-HCM',   'university',      'info@hcmut.edu.vn',   '028-3865-4086', 'https://hcmut.edu.vn',  '1957-10-27', NULL, NULL),
-  ('IELTS_PRO', 'Trung tâm Tiếng Anh IELTS Pro',   'IELTS Pro', 'language_center', 'hi@ieltspro.vn',      '028-9999-0001', 'https://ieltspro.vn',   '2015-06-01', NULL, NULL);
-
-INSERT INTO school_branches (school_id, code, name, address, city, district, phone, is_main, created_by, updated_by) VALUES
-  (1, 'CS1', 'Cơ sở 1 - Lý Thường Kiệt', '268 Lý Thường Kiệt, P.14', 'TP.HCM',    'Quận 10',  '028-3864-7256', 1, NULL, NULL),
-  (1, 'CS2', 'Cơ sở 2 - Dĩ An',          'Khu phố 6, Dĩ An',         'Bình Dương','Dĩ An',    '0274-372-5540', 0, NULL, NULL),
-  (2, 'Q1',  'Chi nhánh Quận 1',          '123 Nguyễn Huệ, P.BN',     'TP.HCM',    'Quận 1',   '028-9999-0002', 1, NULL, NULL),
-  (2, 'TD',  'Chi nhánh Thủ Đức',         '456 Võ Văn Ngân, P.BT',    'TP.HCM',    'Thủ Đức',  '028-9999-0003', 0, NULL, NULL);
-
-INSERT INTO academic_years (school_id, name, start_date, end_date, created_by, updated_by) VALUES
-  (1, '2024-2025', '2024-09-01', '2025-08-31', NULL, NULL),
-  (2, '2024-2025', '2024-09-01', '2025-08-31', NULL, NULL);
-
-INSERT INTO semesters (academic_year_id, name, start_date, end_date, created_by, updated_by) VALUES
-  (1, 'Học kỳ 1',    '2024-09-09', '2025-01-10', NULL, NULL),
-  (1, 'Học kỳ 2',    '2025-02-10', '2025-06-13', NULL, NULL),
-  (2, 'Khóa tháng 9','2024-09-02', '2024-11-30', NULL, NULL);
-
-INSERT INTO departments (school_id, code, name, created_by, updated_by) VALUES
-  (1, 'CNTT',  'Công nghệ Thông tin', NULL, NULL),
-  (1, 'KTKT',  'Kỹ thuật Kinh tế', NULL, NULL),
-  (2, 'IELTS', 'Bộ môn IELTS', NULL, NULL);
-
-INSERT INTO rooms (branch_id, building, room_number, capacity, room_type, equipment, created_by, updated_by) VALUES
-  (1, 'A', '101', 50, 'classroom',    '["projector","ac","whiteboard"]', NULL, NULL),
-  (1, 'B', '102', 30, 'lab',          '["computers","projector","ac"]', NULL, NULL),
-  (1, 'B', '301', 80, 'lecture_hall', '["projector","ac","mic_system"]', NULL, NULL),
-  (2, 'C', '201', 40, 'classroom',    '["projector","ac","smartboard"]', NULL, NULL),
-  (3, 'A', '001', 20, 'seminar',      '["tv_screen","ac"]', NULL, NULL);
-
-INSERT INTO users (school_id, code, full_name, email, password_hash, phone, gender, created_by, updated_by) VALUES
-  (1,'GV001','Nguyễn Văn An', 'an.nguyen@hcmut.edu.vn',        '$2b$10$h1','0901234561','male', NULL, NULL),
-  (1,'GV002','Trần Thị Bích', 'bich.tran@hcmut.edu.vn',        '$2b$10$h2','0901234562','female', NULL, NULL),
-  (2,'GV003','Lê Minh Cường', 'cuong.le@ieltspro.vn',           '$2b$10$h3','0901234563','male', NULL, NULL),
-  (1,'SV001','Phạm Văn Đức',  'duc.pham@student.hcmut.edu.vn',  '$2b$10$h4','0912345671','male', NULL, NULL),
-  (1,'SV002','Hoàng Thị Lan', 'lan.hoang@student.hcmut.edu.vn', '$2b$10$h5','0912345672','female', NULL, NULL),
-  (2,'SV003','Vũ Quốc Hùng',  'hung.vu@ieltspro.vn',            '$2b$10$h6','0912345673','male', NULL, NULL);
-
-INSERT INTO user_roles (user_id, role_id, granted_by) VALUES
-  (1,2,NULL),(2,2,NULL),(3,2,NULL),(4,3,NULL),(5,3,NULL),(6,3,NULL);
-
-INSERT INTO teachers (user_id, department_id, degree, specialization, join_date, created_by, updated_by) VALUES
-  (1,1,'Tiến sĩ','Trí tuệ nhân tạo',  '2018-08-01', NULL, NULL),
-  (2,1,'Thạc sĩ','Kỹ thuật phần mềm', '2020-01-15', NULL, NULL),
-  (3,3,'Thạc sĩ','Ngôn ngữ học',       '2019-06-01', NULL, NULL);
-
-INSERT INTO students (user_id, student_code, department_id, enrollment_year, major, class_name, created_by, updated_by) VALUES
-  (4,'21IT001',1,2021,'Kỹ thuật phần mềm','CNTT21A', NULL, NULL),
-  (5,'21IT002',1,2021,'Kỹ thuật phần mềm','CNTT21A', NULL, NULL),
-  (6,'IE240301',3,2024,'IELTS General',NULL, NULL, NULL);
-
-INSERT INTO courses (code, name, credits, total_sessions, department_id, created_by, updated_by) VALUES
-  ('INT101','Nhập môn Lập trình',              3,30,1, NULL, NULL),
-  ('INT201','Cấu trúc dữ liệu & Giải thuật',   3,30,1, NULL, NULL),
-  ('IEL101','IELTS Foundation',                 0,40,3, NULL, NULL);
-
-INSERT INTO classes (code, course_id, semester_id, teacher_id, branch_id, max_students, status, created_by, updated_by) VALUES
-  ('INT101-01-HK1-2425',1,1,1,1,40,'in_progress', NULL, NULL),
-  ('INT201-01-HK1-2425',2,1,2,1,35,'in_progress', NULL, NULL),
-  ('IEL101-Q1-T9-2024', 3,3,3,3,20,'open', NULL, NULL);
-
-INSERT INTO schedules (class_id, room_id, day_of_week, start_time, end_time, start_date, end_date, type, created_by, updated_by) VALUES
-  (1,1,2,'07:30:00','09:30:00','2024-09-09','2024-12-20','regular', NULL, NULL),
-  (1,1,4,'13:30:00','15:30:00','2024-09-09','2024-12-20','regular', NULL, NULL),
-  (2,2,3,'09:45:00','11:45:00','2024-09-10','2024-12-21','regular', NULL, NULL),
-  (3,5,6,'08:00:00','10:00:00','2024-09-07','2024-11-30','regular', NULL, NULL);
-
-INSERT INTO enrollments (student_id, class_id, status, created_by, updated_by) VALUES
-  (1,1,'enrolled', NULL, NULL),(2,1,'enrolled', NULL, NULL),
-  (1,2,'enrolled', NULL, NULL),(2,2,'enrolled', NULL, NULL),
-  (3,3,'enrolled', NULL, NULL);
-
-INSERT INTO attendance_records (schedule_id, student_id, attendance_date, status, checked_by, updated_by) VALUES
-  (1,1,'2024-09-09','present',1, NULL),
-  (1,2,'2024-09-09','present',1, NULL),
-  (1,1,'2024-09-11','late',   1, NULL),
-  (1,2,'2024-09-11','absent', 1, NULL);
-
-INSERT INTO schedule_exceptions (schedule_id, exception_date, reason, exception_type, replacement_date, created_by, updated_by) VALUES
-  (1,'2024-09-02','Nghỉ Quốc khánh 2/9','rescheduled','2024-09-07', NULL, NULL);
