@@ -2,54 +2,97 @@ import React from 'react';
 
 export default function Plans() {
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-extrabold text-white tracking-tight">Thiết lập cấu hình SaaS Gói dịch vụ</h1>
-        <p className="text-sm text-[var(--saas-muted2)] mt-0.5">Phân định hạn ngạch (Quotas) tài nguyên phần cứng cho các cấp độ tài khoản</p>
+    <div>
+      <div className="grid grid-cols-3 gap-5">
+        <div className="card p-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 rounded-full -translate-y-8 translate-x-8" style={{ background: 'rgba(250,201,109,.06)' }}></div>
+          <p className="font-mono text-xs mb-1" style={{ color: 'var(--accent4)' }}>STARTER</p>
+          <p className="font-syne font-bold text-2xl mb-1">₫1.5M<span className="text-sm font-sans font-normal" style={{ color: 'var(--muted)' }}>/tháng</span></p>
+          <p className="text-xs mb-4" style={{ color: 'var(--muted)' }}>₫15M/năm (tiết kiệm 17%)</p>
+          <div className="space-y-2 text-xs mb-5">
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Tối đa <strong>500 sinh viên</strong></div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> 1 cơ sở</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> 10GB lưu trữ</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Quản lý lớp + Lịch học</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Điểm danh + Đăng ký</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--muted)' }}>✕</span> <span style={{ color: 'var(--muted)' }}>Học phí & Lương GV</span></div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--muted)' }}>✕</span> <span style={{ color: 'var(--muted)' }}>Báo cáo nâng cao</span></div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--muted)' }}>✕</span> <span style={{ color: 'var(--muted)' }}>API & SSO</span></div>
+          </div>
+          <div className="flex items-center justify-between"><span className="badge badge-yellow">12 trường đang dùng</span><button className="btn btn-ghost btn-sm">Sửa</button></div>
+        </div>
+
+        <div className="card p-5 relative overflow-hidden" style={{ borderColor: 'var(--accent)', boxShadow: '0 0 30px rgba(124,109,250,.12)' }}>
+          <div className="absolute -top-px left-0 right-0 h-0.5 rounded-t-xl" style={{ background: 'var(--accent)' }}></div>
+          <div className="absolute top-0 right-0 w-32 h-32 rounded-full -translate-y-10 translate-x-10" style={{ background: 'rgba(124,109,250,.06)' }}></div>
+          <div className="flex items-center justify-between mb-1"><p className="font-mono text-xs" style={{ color: 'var(--accent)' }}>PRO</p><span className="badge badge-purple">PHỔ BIẾN NHẤT</span></div>
+          <p className="font-syne font-bold text-2xl mb-1">₫5.8M<span className="text-sm font-sans font-normal" style={{ color: 'var(--muted)' }}>/tháng</span></p>
+          <p className="text-xs mb-4" style={{ color: 'var(--muted)' }}>₫58M/năm (tiết kiệm 17%)</p>
+          <div className="space-y-2 text-xs mb-5">
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Tối đa <strong>5,000 sinh viên</strong></div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> 5 cơ sở</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> 100GB lưu trữ</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Tất cả tính năng Starter</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Học phí & Lương GV</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Báo cáo nâng cao</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> QR Code điểm danh</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--muted)' }}>✕</span> <span style={{ color: 'var(--muted)' }}>API & SSO / Azure AD</span></div>
+          </div>
+          <div className="flex items-center justify-between"><span className="badge badge-purple">18 trường đang dùng</span><button className="btn btn-ghost btn-sm">Sửa</button></div>
+        </div>
+
+        <div className="card p-5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 rounded-full -translate-y-10 translate-x-10" style={{ background: 'rgba(109,250,194,.05)' }}></div>
+          <p className="font-mono text-xs mb-1" style={{ color: 'var(--accent3)' }}>ENTERPRISE</p>
+          <p className="font-syne font-bold text-2xl mb-1">Liên hệ<span className="text-sm font-sans font-normal ml-1" style={{ color: 'var(--muted)' }}>/ custom</span></p>
+          <p className="text-xs mb-4" style={{ color: 'var(--muted)' }}>Hợp đồng theo năm · SLA riêng</p>
+          <div className="space-y-2 text-xs mb-5">
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> <strong>Không giới hạn</strong> sinh viên</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Không giới hạn cơ sở</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Storage theo yêu cầu</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Tất cả tính năng Pro</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> API tích hợp ERP</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> SSO / Azure AD / Google</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Backup riêng · SLA 99.9%</div>
+            <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Audit Log đầy đủ</div>
+          </div>
+          <div className="flex items-center justify-between"><span className="badge badge-green">8 trường đang dùng</span><button className="btn btn-ghost btn-sm">Sửa</button></div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="saas-card border-[var(--saas-border2)] flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="text-xs font-mono text-[var(--saas-cyan)] uppercase tracking-widest font-bold">BASIC PLAN</div>
-            <div className="text-3xl font-black text-white">49$ <span className="text-xs font-normal text-[var(--saas-muted2)]">/ tháng</span></div>
-            <hr className="border-[var(--saas-border)]" />
-            <ul className="text-sm space-y-2 text-[var(--saas-text)] opacity-80">
-              <li>• Giới hạn 500 Học viên</li>
-              <li>• Storage: 20 GB Cloud SSD</li>
-              <li>• DB độc lập chuẩn SQLite/MySQL isolated</li>
-            </ul>
-          </div>
-          <button className="saas-btn w-full mt-6 bg-[var(--saas-surface2)] border border-[var(--saas-border)] hover:bg-[var(--saas-border)]">Cấu hình lại hạn mức</button>
+      {/* ĐÃ BỔ SUNG BẢNG MA TRẬN TÍNH NĂNG */}
+      <div className="card mt-5 overflow-hidden">
+        <div className="p-4 border-b" style={{ borderColor: 'var(--border)' }}>
+          <p className="font-syne font-bold text-sm">Ma trận tính năng</p>
         </div>
-
-        <div className="saas-card border-[var(--saas-blue)] bg-gradient-to-b from-[var(--saas-surface)] to-[var(--saas-blue-dim)]/20 flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="text-xs font-mono text-[var(--saas-blue)] uppercase tracking-widest font-bold">GROWTH ADVANCED</div>
-            <div className="text-3xl font-black text-white">199$ <span className="text-xs font-normal text-[var(--saas-muted2)]">/ tháng</span></div>
-            <hr className="border-[var(--saas-border)]" />
-            <ul className="text-sm space-y-2 text-[var(--saas-text)]">
-              <li>• Giới hạn 5.000 Học viên</li>
-              <li>• Storage: 200 GB NVMe Cloud</li>
-              <li>• Hỗ trợ Backup tự động hàng ngày</li>
-            </ul>
-          </div>
-          <button className="saas-btn w-full mt-6">Cấu hình lại hạn mức</button>
-        </div>
-
-        <div className="saas-card border-[var(--saas-purple)] flex flex-col justify-between">
-          <div className="space-y-4">
-            <div className="text-xs font-mono text-[var(--saas-purple)] uppercase tracking-widest font-bold">ENTERPRISE SCALE</div>
-            <div className="text-3xl font-black text-white">Custom <span className="text-xs font-normal text-[var(--saas-muted2)]">/ Overage</span></div>
-            <hr className="border-[var(--saas-border)]" />
-            <ul className="text-sm space-y-2 text-[var(--saas-text)] opacity-80">
-              <li>• Không giới hạn Học viên</li>
-              <li>• Dedicated Server &amp; Database cluster</li>
-              <li>• SLA Cam kết uptime 99.99%</li>
-            </ul>
-          </div>
-          <button className="saas-btn w-full mt-6 bg-[var(--saas-surface2)] border border-[var(--saas-border)] hover:bg-[var(--saas-border)]">Cấu hình lại hạn mức</button>
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style={{ width: '40%' }}>TÍNH NĂNG</th>
+              <th className="text-center">STARTER</th>
+              <th className="text-center">PRO</th>
+              <th className="text-center">ENTERPRISE</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td className="text-xs font-semibold py-2.5" style={{ color: 'var(--muted)' }}>HỌC VỤ CƠ BẢN</td><td></td><td></td><td></td></tr>
+            <tr><td className="text-sm">Quản lý lớp học & Lịch học</td><td className="text-center text-green-400">✓</td><td className="text-center text-green-400">✓</td><td className="text-center text-green-400">✓</td></tr>
+            <tr><td className="text-sm">Điểm danh & Đăng ký học phần</td><td className="text-center text-green-400">✓</td><td className="text-center text-green-400">✓</td><td className="text-center text-green-400">✓</td></tr>
+            <tr><td className="text-sm">Thông báo trong app</td><td className="text-center text-green-400">✓</td><td className="text-center text-green-400">✓</td><td className="text-center text-green-400">✓</td></tr>
+            
+            <tr><td className="text-xs font-semibold py-2.5" style={{ color: 'var(--muted)' }}>TÀI CHÍNH & NHÂN SỰ</td><td></td><td></td><td></td></tr>
+            <tr><td className="text-sm">Quản lý học phí</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center text-green-400">✓</td><td className="text-center text-green-400">✓</td></tr>
+            <tr><td className="text-sm">Bảng lương giảng viên theo bậc</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center text-green-400">✓</td><td className="text-center text-green-400">✓</td></tr>
+            
+            <tr><td className="text-xs font-semibold py-2.5" style={{ color: 'var(--muted)' }}>NÂNG CAO</td><td></td><td></td><td></td></tr>
+            <tr><td className="text-sm">Báo cáo & Dashboard Analytics</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center text-green-400">✓</td><td className="text-center text-green-400">✓</td></tr>
+            <tr><td className="text-sm">QR Code điểm danh</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center text-green-400">✓</td><td className="text-center text-green-400">✓</td></tr>
+            <tr><td className="text-sm">SSO / Azure AD / Google Workspace</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center text-green-400">✓</td></tr>
+            <tr><td className="text-sm">Open API tích hợp ERP</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center text-green-400">✓</td></tr>
+            <tr><td className="text-sm">Audit Log đầy đủ + Export</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center text-green-400">✓</td></tr>
+            <tr><td className="text-sm">SLA & Backup riêng</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center" style={{ color: 'var(--muted)' }}>✕</td><td className="text-center text-green-400">✓</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   );
