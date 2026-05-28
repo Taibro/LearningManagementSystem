@@ -649,35 +649,73 @@ SELECT * FROM class_materials;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================================================
--- VIEWS
+-- SAAS
 -- ============================================================
+-- BẢNG 1: GÓI CƯỚC SAAS (Saas Plans)
+CREATE TABLE saas_plans (
+  id             INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  code           VARCHAR(50)   NOT NULL UNIQUE COMMENT 'VD: BASIC, PRO, ENTERPRISE',
+  name           VARCHAR(100)  NOT NULL,
+  monthly_price  DECIMAL(12,2) NOT NULL DEFAULT 0,
+  yearly_price   DECIMAL(12,2) NOT NULL DEFAULT 0,
+  max_students   INT           NOT NULL COMMENT '-1 là không giới hạn (Unlimited)',
+  max_storage_gb INT           NOT NULL COMMENT '-1 là không giới hạn (Unlimited)',
+  features       JSON          COMMENT '["attendance", "materials", "salary"]',
+  is_active      TINYINT(1)    NOT NULL DEFAULT 1,
 
-CREATE OR REPLACE VIEW v_daily_schedule AS
-SELECT
-  sc.name                                        AS school_name,
-  sb.name                                        AS branch_name,
-  s.day_of_week,
-  s.start_time,
-  s.end_time,
-  s.type                                         AS session_type,
-  c.code                                         AS class_code,
-  co.code                                        AS course_code,
-  co.name                                        AS course_name,
-  u.full_name                                    AS teacher_name,
-  CONCAT(r.building,'-',r.room_number)           AS room,
-  r.capacity                                     AS room_capacity,
-  sem.name                                       AS semester,
-  ay.name                                        AS academic_year
-FROM schedules s
-JOIN classes c         ON c.id   = s.class_id
-JOIN courses co        ON co.id  = c.course_id
-JOIN teachers t        ON t.id   = c.teacher_id
-JOIN users u           ON u.id   = t.user_id
-JOIN rooms r           ON r.id   = s.room_id
-JOIN school_branches sb ON sb.id = r.branch_id
-JOIN schools sc        ON sc.id  = sb.school_id
-JOIN semesters sem     ON sem.id = c.semester_id
-JOIN academic_years ay ON ay.id  = sem.academic_year_id
-WHERE c.status NOT IN ('cancelled') AND s.end_date >= CURDATE();
+  created_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB COMMENT='Danh mục gói cước phần mềm EduSpace';
+
+-- BẢNG 2: LỊCH SỬ THUÊ BAO CỦA TRƯỜNG (Saas Subscriptions)
+CREATE TABLE saas_subscriptions (
+  id             INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  school_id      INT UNSIGNED  NOT NULL,
+  plan_id        INT UNSIGNED  NOT NULL,
+  start_date     DATE          NOT NULL,
+  end_date       DATE          NOT NULL COMMENT 'Ngày hết hạn phần mềm',
+  billing_cycle  ENUM('monthly', 'yearly', 'lifetime') NOT NULL,
+  status         ENUM('active', 'expired', 'suspended', 'cancelled') NOT NULL DEFAULT 'active',
+
+  created_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (id),
+  CONSTRAINT fk_sub_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE,
+  CONSTRAINT fk_sub_plan   FOREIGN KEY (plan_id)   REFERENCES saas_plans(id)
+) ENGINE=InnoDB COMMENT='Hợp đồng thuê bao của các trường';
+
+-- BẢNG 3: HÓA ĐƠN THU TIỀN PHẦN MỀM (Saas Invoices)
+-- Bảng này độc lập với tuition_invoices (thu học phí của sinh viên)
+CREATE TABLE saas_invoices (
+  id               INT UNSIGNED  NOT NULL AUTO_INCREMENT,
+  school_id        INT UNSIGNED  NOT NULL,
+  subscription_id  INT UNSIGNED  NOT NULL,
+  amount           DECIMAL(12,2) NOT NULL,
+  payment_status   ENUM('pending', 'paid', 'failed') NOT NULL DEFAULT 'pending',
+  payment_method   VARCHAR(50)   COMMENT 'Momo, VNPay, Bank Transfer',
+  paid_at          TIMESTAMP     NULL,
+
+  created_at       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_sinv_school FOREIGN KEY (school_id)       REFERENCES schools(id),
+  CONSTRAINT fk_sinv_sub    FOREIGN KEY (subscription_id) REFERENCES saas_subscriptions(id)
+) ENGINE=InnoDB COMMENT='Hóa đơn thu tiền thuê phần mềm từ các trường';
+
+-- BẢNG 4: NHẬT KÝ LỖI HỆ THỐNG (System Error Logs)
+CREATE TABLE system_error_logs (
+  id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  school_id     INT UNSIGNED    NULL COMMENT 'Lỗi xảy ra ở trường nào (nếu có)',
+  endpoint      VARCHAR(255)    NOT NULL COMMENT 'API URL bị lỗi',
+  error_message TEXT            NOT NULL COMMENT 'Nội dung lỗi ngắn',
+  stack_trace   LONGTEXT        COMMENT 'Toàn bộ Stack Trace của Java',
+  user_agent    VARCHAR(255)    COMMENT 'Thiết bị/Trình duyệt của khách hàng',
+  is_resolved   TINYINT(1)      NOT NULL DEFAULT 0 COMMENT '0: Chưa fix, 1: Đã fix',
+
+  created_at    TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_err_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE SET NULL
+) ENGINE=InnoDB COMMENT='Nhật ký bắt lỗi toàn hệ thống';
+
 
 
