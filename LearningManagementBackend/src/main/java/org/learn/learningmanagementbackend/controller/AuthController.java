@@ -3,8 +3,7 @@ package org.learn.learningmanagementbackend.controller;
 import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.dto.request.AuthRequest;
 import org.learn.learningmanagementbackend.dto.response.UserProfileResponse;
-import org.learn.learningmanagementbackend.service.AuthService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.learn.learningmanagementbackend.service.LecturerService.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +18,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<UserProfileResponse> login(@RequestBody AuthRequest request){
+    public ResponseEntity<UserProfileResponse> login(@RequestBody AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 }
