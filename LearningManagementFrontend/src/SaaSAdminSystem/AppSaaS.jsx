@@ -52,28 +52,30 @@ export default function AppSaaS() {
           <Route path="departments" element={<Departments />} />
           <Route path="rooms" element={<Rooms />} />
           
-          <Route path="academic_years" element={<AcademicYears />} />
+          {/* BO PHAN NAY */}
+          {/* <Route path="academic_years" element={<AcademicYears />} />
           <Route path="semesters" element={<Semesters />} />
           <Route path="courses" element={<Courses />} />
           <Route path="classes" element={<Classes />} />
-          <Route path="schedules" element={<Schedules />} />
+          <Route path="schedules" element={<Schedules />} /> */}
           
+          {/* BO PHAN NAY */}
           <Route path="users" element={<Users />} />
-          <Route path="teachers" element={<Teachers />} />
-          <Route path="students" element={<Students />} />
+          {/* <Route path="teachers" element={<Teachers />} />
+          <Route path="students" element={<Students />} /> */}
           <Route path="roles" element={<Roles />} />
           
-          <Route path="enrollments" element={<Enrollments />} />
+          {/* <Route path="enrollments" element={<Enrollments />} />
           <Route path="attendance" element={<Attendance />} />
           <Route path="grades" element={<Grades />} />
-          <Route path="conduct" element={<Conduct />} />
+          <Route path="conduct" element={<Conduct />} /> */}
           
-          <Route path="invoices" element={<Invoices />} />
-          <Route path="payments" element={<Payments />} />
+          {/* <Route path="invoices" element={<Invoices />} />
+          <Route path="payments" element={<Payments />} /> */}
           
-          <Route path="notifications" element={<Notifications />} />
+          {/* <Route path="notifications" element={<Notifications />} />
           <Route path="exceptions" element={<Exceptions />} />
-          <Route path="settings" element={<Settings />} />
+          <Route path="settings" element={<Settings />} /> */}
         </Route>
         <Route path="*" element={<Navigate to="/saas/dashboard" replace />} />
       </Routes>
