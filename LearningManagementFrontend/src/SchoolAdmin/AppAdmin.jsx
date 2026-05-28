@@ -49,7 +49,7 @@ export default function AppAdmin() {
           <Route path="tuition" element={<Tuition />} />
           <Route path="payments" element={<Payments />} />
           <Route path="notifications" element={<Notifications />} />
-          <Route path="settings" element={<Settings />} />
+          <Route path="set-tings" element={<Settings />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />

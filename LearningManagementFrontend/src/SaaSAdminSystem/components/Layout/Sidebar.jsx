@@ -5,68 +5,52 @@ export default function Sidebar() {
   const navClass = ({ isActive }) => `nav-item ${isActive ? 'active' : ''}`;
 
   return (
-    <aside className="sidebar">
-      <div className="logo-zone">
-        <div className="logo-badge">ADM</div>
-        <div>
-          <div className="logo-text">HUIT Admin</div>
-          <div className="logo-sub">Quản trị hệ thống</div>
+    <aside className="sidebar flex flex-col">
+      <div className="px-5 py-5 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold" style={{ background: 'var(--accent)' }}>E</div>
+          <span className="font-syne font-bold text-base tracking-tight">EduSpace</span>
         </div>
+        <span className="text-xs font-mono px-2 py-0.5 rounded" style={{ background: 'rgba(250,109,142,.12)', color: 'var(--accent2)' }}>SaaS Command Center</span>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '8px 0' }}>
-        <div className="nav-section">
-          <div className="nav-label">Tổng quan</div>
-          <NavLink to="/saas/dashboard" className={navClass}><span className="icon">⬛</span> Dashboard</NavLink>
-        </div>
-        <div className="nav-section">
-          <div className="nav-label">Cơ sở hạ tầng</div>
-          <NavLink to="/saas/schools" className={navClass}><span className="icon">🏫</span> Trường học <span className="nav-badge">2</span></NavLink>
-          <NavLink to="/saas/branches" className={navClass}><span className="icon">📍</span> Cơ sở / Chi nhánh <span className="nav-badge">4</span></NavLink>
-          <NavLink to="/saas/departments" className={navClass}><span className="icon">🏛</span> Khoa / Bộ môn <span className="nav-badge">3</span></NavLink>
-          <NavLink to="/saas/rooms" className={navClass}><span className="icon">🚪</span> Phòng học <span className="nav-badge">5</span></NavLink>
-        </div>
-        {/* <div className="nav-section">
-          <div className="nav-label">Học vụ</div>
-          <NavLink to="/saas/academic_years" className={navClass}><span className="icon">📆</span> Năm học</NavLink>
-          <NavLink to="/saas/semesters" className={navClass}><span className="icon">📅</span> Học kỳ</NavLink>
-          <NavLink to="/saas/courses" className={navClass}><span className="icon">📚</span> Môn học <span className="nav-badge">3</span></NavLink>
-          <NavLink to="/saas/classes" className={navClass}><span className="icon">🎓</span> Lớp học <span className="nav-badge green">3</span></NavLink>
-          <NavLink to="/saas/schedules" className={navClass}><span className="icon">🗓</span> Lịch học</NavLink>
-        </div> */}
-        <div className="nav-section">
-          <div className="nav-label">Người dùng</div>
-          <NavLink to="/saas/users" className={navClass}><span className="icon">👥</span> Tài khoản <span className="nav-badge">6</span></NavLink>
-          {/* <NavLink to="/saas/teachers" className={navClass}><span className="icon">👨‍🏫</span> Giảng viên <span className="nav-badge">3</span></NavLink>
-          <NavLink to="/saas/students" className={navClass}><span className="icon">👨‍🎓</span> Sinh viên <span className="nav-badge">3</span></NavLink> */}
-          <NavLink to="/saas/roles" className={navClass}><span className="icon">🔑</span> Vai trò & Phân quyền</NavLink>
-        </div>
-        {/* <div className="nav-section">
-          <div className="nav-label">Hoạt động</div>
-          <NavLink to="/saas/enrollments" className={navClass}><span className="icon">✅</span> Đăng ký học phần <span className="nav-badge">5</span></NavLink>
-          <NavLink to="/saas/attendance" className={navClass}><span className="icon">📋</span> Điểm danh <span className="nav-badge red">4</span></NavLink>
-          <NavLink to="/saas/grades" className={navClass}><span className="icon">📊</span> Kết quả học tập</NavLink>
-          <NavLink to="/saas/conduct" className={navClass}><span className="icon">🏅</span> Rèn luyện & Học bổng</NavLink>
-        </div> */}
-        {/* <div className="nav-section">
-          <div className="nav-label">Tài chính</div>
-          <NavLink to="/saas/invoices" className={navClass}><span className="icon">🧾</span> Công nợ học phí</NavLink>
-          <NavLink to="/saas/payments" className={navClass}><span className="icon">💳</span> Giao dịch thanh toán</NavLink>
-        </div> */}
-        <div className="nav-section">
-          {/* <div className="nav-label">Hệ thống</div>
-          <NavLink to="/saas/notifications" className={navClass}><span className="icon">🔔</span> Thông báo <span className="nav-badge red">12</span></NavLink>
-          <NavLink to="/saas/exceptions" className={navClass}><span className="icon">⚠️</span> Ngoại lệ lịch học</NavLink> */}
-          <NavLink to="/saas/settings" className={navClass}><span className="icon">⚙️</span> Cài đặt hệ thống</NavLink>
-        </div>
+
+      <div className="px-3 py-4 flex-1">
+        <p className="text-xs px-2 mb-2 font-mono tracking-widest" style={{ color: 'var(--muted)' }}>OVERVIEW</p>
+        <NavLink to="/saas/dashboard" className={navClass}>
+          <svg className="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h8m-8 6h16"/></svg>
+          Dashboard
+        </NavLink>
+        <NavLink to="/saas/tenants" className={navClass}>
+          <svg className="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m9-7h-4"/></svg>
+          Khách hàng (Tenant)
+        </NavLink>
+        <NavLink to="/saas/subscriptions" className={navClass}>
+          <svg className="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          Gói cước & Billing
+        </NavLink>
+        <NavLink to="/saas/plans" className={navClass}>
+          <svg className="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+          Quản lý Gói cước
+        </NavLink>
+
+        <p className="text-xs px-2 mt-5 mb-2 font-mono tracking-widest" style={{ color: 'var(--muted)' }}>MONITORING</p>
+        <NavLink to="/saas/logs" className={navClass}>
+          <svg className="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Error Logs
+        </NavLink>
+        <NavLink to="/saas/audit" className={navClass}>
+          <svg className="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          Audit Log
+        </NavLink>
       </div>
-      <div className="sidebar-footer">
-        <div className="user-card">
-          <div className="avatar">SA</div>
+
+      <div className="px-4 py-4 border-t" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2))' }}>SA</div>
           <div>
-            <div className="user-name">Super Admin</div>
-            <div className="user-role">Quản trị toàn hệ thống</div>
+            <p className="text-xs font-semibold">Super Admin</p>
+            <p className="text-xs" style={{ color: 'var(--muted)' }}>admin@eduspace.vn</p>
           </div>
-          <span style={{ marginLeft: 'auto', color: 'var(--muted)', fontSize: '14px' }}>⋮</span>
         </div>
       </div>
     </aside>
