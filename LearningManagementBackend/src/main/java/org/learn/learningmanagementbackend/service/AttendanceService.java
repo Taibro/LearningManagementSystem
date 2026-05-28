@@ -27,7 +27,7 @@ public class AttendanceService {
 
     public AttendanceListResponse getAttendanceList(Integer classId, Integer scheduleId, LocalDate date) {
 
-        List<Enrollment> enrollments = enrollmentRepository.findEnrolledStudentsByClassId(classId);
+        List<Enrollment> enrollments = enrollmentRepository.getEnrolledStudentsByClassId(classId);
 
         List<AttendanceRecord> existingRecords = attendanceRepository.findByScheduleIdAndAttendanceDate(scheduleId, date);
 

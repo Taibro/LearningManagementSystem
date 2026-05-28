@@ -37,14 +37,17 @@ public class Enrollment {
     @Column(name = "status")
     private EnrollmentStatus status;
 
+    @Column(name = "grade_attendance")
+    private Double gradeAttendance;
+
     @Column(name = "grade_midterm")
-    private BigDecimal gradeMidterm;
+    private Double gradeMidterm;
 
     @Column(name = "grade_final")
-    private BigDecimal gradeFinal;
+    private Double gradeFinal;
 
     @Column(name = "grade_total")
-    private BigDecimal gradeTotal;
+    private Double gradeTotal;
 
     @Column(name = "grade_letter")
     private String gradeLetter;
@@ -66,4 +69,5 @@ public class Enrollment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated_by", referencedColumnName = "id")
     private Users updatedBy;
+
 }

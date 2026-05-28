@@ -426,6 +426,8 @@ CREATE TABLE schedule_exceptions (
                       NOT NULL DEFAULT 'cancelled',
   replacement_date    DATE,
   replacement_room_id INT UNSIGNED,
+  approval_status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending' COMMENT 'Trạng thái duyệt đơn',
+  proof_file_url VARCHAR(500) COMMENT 'Đường dẫn file minh chứng (Cloudinary/S3...)',
 
   -- Audit Columns
   created_at          TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -453,9 +455,10 @@ CREATE TABLE enrollments (
   enrollment_date TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Đóng vai trò created_at
   status          ENUM('pending','enrolled','dropped','completed','failed')
                   NOT NULL DEFAULT 'pending',
-  grade_midterm   DECIMAL(4,2)    COMMENT 'Điểm giữa kỳ (0-10)',
-  grade_final     DECIMAL(4,2)    COMMENT 'Điểm cuối kỳ (0-10)',
-  grade_total     DECIMAL(4,2)    COMMENT 'Điểm tổng kết (0-10)',
+  grade_attendance FLOAT,
+  grade_midterm   FLOAT    COMMENT 'Điểm giữa kỳ (0-10)',
+  grade_final     FLOAT    COMMENT 'Điểm cuối kỳ (0-10)',
+  grade_total     FLOAT    COMMENT 'Điểm tổng kết (0-10)',
   grade_letter    CHAR(2)         COMMENT 'A+, A, B+, B, C+, C, D+, D, F',
   dropped_at      TIMESTAMP,
   drop_reason     VARCHAR(255),

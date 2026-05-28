@@ -3,8 +3,12 @@ package org.learn.learningmanagementbackend.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.dto.request.AttendanceSaveRequest;
+import org.learn.learningmanagementbackend.dto.request.QrGenerateRequest;
+import org.learn.learningmanagementbackend.dto.request.QrScanRequest;
 import org.learn.learningmanagementbackend.dto.response.AttendanceListResponse;
+import org.learn.learningmanagementbackend.dto.response.QrGenerateResponse;
 import org.learn.learningmanagementbackend.service.AttendanceService;
+import org.learn.learningmanagementbackend.service.QrAttendanceService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +21,7 @@ import java.time.LocalDate;
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
+    private final QrAttendanceService qrService;
 
     @GetMapping
     public ResponseEntity<AttendanceListResponse> getAttendance(
@@ -31,5 +36,17 @@ public class AttendanceController {
     public ResponseEntity<String> saveAttendance(@Valid @RequestBody AttendanceSaveRequest request) {
         attendanceService.saveAttendance(request);
         return ResponseEntity.ok("Đã lưu dữ liệu điểm danh thành công!");
+    }
+
+    @PostMapping("/qr/generate")
+    public ResponseEntity<QrGenerateResponse> generateQr(@Valid @RequestBody QrGenerateRequest request) {
+        QrGenerateResponse response = qrService.generateQrToken(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/qr/scan")
+    public ResponseEntity<String> scanQr(@Valid @RequestBody QrScanRequest request) {
+        qrService.scanAndAttend(request);
+        return ResponseEntity.ok("Điểm danh thành công! Chúc bạn học tốt.");
     }
 }

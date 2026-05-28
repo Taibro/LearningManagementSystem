@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.learn.learningmanagementbackend.enums.ApprovalStatus;
 import org.learn.learningmanagementbackend.enums.ExceptionType;
 
 import java.time.LocalDate;
@@ -36,6 +37,13 @@ public class ScheduleException extends BaseEntity {
 
     @Column(name = "replacement_date")
     private LocalDate replacementDate;
+
+    @Enumerated(value = EnumType.STRING)
+    @Column(name = "approval_status")
+    private ApprovalStatus approvalStatus;
+
+    @Column(name = "proof_file_url")
+    private String ProofFileUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "replacement_room_id", referencedColumnName = "id")

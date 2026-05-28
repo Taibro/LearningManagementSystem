@@ -1,5 +1,7 @@
 package org.learn.learningmanagementbackend.repository;
 
+import jakarta.validation.constraints.NotNull;
+import org.learn.learningmanagementbackend.enums.EnrollmentStatus;
 import org.learn.learningmanagementbackend.model.Enrollment;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,5 +18,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>
             "JOIN FETCH s.user u " +
             "WHERE e.classes.id = :classId AND e.status = 'enrolled' " +
             "ORDER BY s.studentCode ASC")
-    List<Enrollment> findEnrolledStudentsByClassId(@Param("classId") Integer classId);
+    List<Enrollment> getEnrolledStudentsByClassId(@Param("classId") Integer classId);
+
+    boolean existsByStudentIdAndClassesIdAndStatus(@NotNull(message = "Không xác định được sinh viên") Integer studentId, Integer classId, EnrollmentStatus enrolled);
 }

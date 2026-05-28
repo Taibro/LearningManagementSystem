@@ -55,7 +55,7 @@ const Sidebar = () => {
           <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isAttendanceOpen ? 'max-h-64 bg-black/10' : 'max-h-0'}`}>
             <NavLink to="/attendance" className={subNavClass}>Điểm danh sinh viên</NavLink>
             <NavLink to="/qr-code" className={subNavClass}>Điểm danh QR Code</NavLink>
-            <NavLink to="/assessment" className={subNavClass}>Phiếu đánh giá</NavLink>
+            {/* <NavLink to="/assessment" className={subNavClass}>Phiếu đánh giá</NavLink> */}
           </div>
         </div>
 

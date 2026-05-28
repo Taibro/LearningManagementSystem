@@ -1,6 +1,7 @@
 package org.learn.learningmanagementbackend.repository;
 
 import org.learn.learningmanagementbackend.dto.projection.TaughtSessionDto;
+import org.learn.learningmanagementbackend.enums.AttendanceStatus;
 import org.learn.learningmanagementbackend.model.AttendanceRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,4 +38,12 @@ public interface AttendanceRecordRepository extends JpaRepository<AttendanceReco
     List<AttendanceRecord> findByScheduleIdAndAttendanceDate(Integer scheduleId, LocalDate date);
 
     Optional<AttendanceRecord> findByScheduleIdAndStudentIdAndAttendanceDate(Integer scheduleId, Integer studentId, LocalDate date);
+
+    @Query("SELECT a.student.id, COUNT(a) FROM AttendanceRecord a " +
+            "WHERE a.schedule.classes.id = :classId " +
+            "AND a.status = :status " +
+            "GROUP BY a.student.id")
+    List<Object[]> countSessionsByClassIdAndStatus(
+            @Param("classId") Integer classId,
+            @Param("status") AttendanceStatus status);
 }

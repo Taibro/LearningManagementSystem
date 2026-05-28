@@ -41,7 +41,7 @@ function AppLecturer() {
 
           <Route path="attendance" element={<StudentAttendance />} />
           <Route path="qr-code" element={<QRCodeAttendance />} />
-          <Route path="assessment" element={<Assesment />} />
+          {/* <Route path="assessment" element={<Assesment />} /> */}
 
           <Route path="results" element={<Results />} />
           <Route path="progress-schedule" element={<ProgressSchedule />} />
