@@ -1,6 +1,7 @@
 package org.learn.learningmanagementbackend.service.LecturerService;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.tika.Tika;
 import org.learn.learningmanagementbackend.dto.request.ChangePasswordRequest;
 import org.learn.learningmanagementbackend.dto.request.UpdateProfileRequest;
 import org.learn.learningmanagementbackend.dto.response.LecturerProfileResponse;
@@ -8,7 +9,7 @@ import org.learn.learningmanagementbackend.model.Teacher;
 import org.learn.learningmanagementbackend.model.Users;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.TeacherRepository;
 import org.learn.learningmanagementbackend.service.FileStorageService;
-import org.learn.learningmanagementbackend.utils.AppConstants;
+import org.learn.learningmanagementbackend.constant.AppConstants;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,12 +75,30 @@ public class LecturerSettingsService {
     // Đổi ảnh đại diện
     @Transactional(rollbackFor = Exception.class)
     public String updateAvatar(String teacherCode, MultipartFile avatarFile) {
-        Teacher teacher = teacherRepository.findByTeacherCode(teacherCode)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy thông tin giảng viên"));
-        
-        String avatarUrl = fileStorageService.uploadFileToCloud(avatarFile, AppConstants.FOLDER_AVATARS);
-        teacher.getUser().setAvatarUrl(avatarUrl);
-        teacherRepository.save(teacher);
-        return avatarUrl;
+
+        // Check file rỗng
+        if (avatarFile == null || avatarFile.isEmpty()) {
+            throw new RuntimeException("Vui lòng chọn ảnh đại diện!");
+        }
+
+        // Check dung lượng
+        if (avatarFile.getSize() > 2 * 1024 * 1024) {
+            throw new RuntimeException("Dung lượng ảnh quá lớn. Vui lòng chọn ảnh dưới 2MB.");
+        }
+
+        // KIỂM TRA MAGIC BYTES
+        try {
+            Tika tika = new Tika();
+            // Tika sẽ đọc các byte đầu tiên của file để nhận diện, bất chấp tên file hay Header là gì
+            String detectedType = tika.detect(avatarFile.getInputStream());
+
+            if (!(detectedType.equals("image/jpeg") || detectedType.equals("image/png"))) {
+                throw new RuntimeException("Định dạng file không hợp lệ! Vui lòng tải lên ảnh thật (JPG/PNG).");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Không thể phân tích định dạng file: " + e.getMessage());
+        }
+
+        return fileStorageService.uploadFileToCloud(avatarFile, AppConstants.FOLDER_AVATARS);
     }
 }

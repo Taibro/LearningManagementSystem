@@ -1,6 +1,7 @@
 package org.learn.learningmanagementbackend.service.LecturerService;
 
 import lombok.RequiredArgsConstructor;
+import org.learn.learningmanagementbackend.constant.AppConstants;
 import org.learn.learningmanagementbackend.dto.request.SuspensionSubmitRequest;
 import org.learn.learningmanagementbackend.dto.response.SuspensionHistoryResponse;
 import org.learn.learningmanagementbackend.enums.ApprovalStatus;
@@ -36,7 +37,7 @@ public class TeachingSuspensionService {
 
         // Xử lý upload file
         if (proofFile != null && !proofFile.isEmpty()) {
-            fileUrl = fileStorageService.uploadFileToCloud(proofFile, "eduspace_materials/suspension_proofs");
+            fileUrl = fileStorageService.uploadFileToCloud(proofFile, AppConstants.FOLDER_SUSPENSION_PROOFS);
         }
 
         ScheduleException exception = new ScheduleException();

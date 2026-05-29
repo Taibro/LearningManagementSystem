@@ -21,9 +21,7 @@ import java.util.Collections;
 public class MyUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;
-
     private final StudentRepository studentRepository;
-
     private final TeacherRepository teacherRepository;
 
     @Override
@@ -36,21 +34,30 @@ public class MyUserDetailsService implements UserDetailsService {
         String loginCode = parts[1];
         Users user = null;
 
+        // Xử lý nhánh lấy User dựa vào Role
         if ("STUDENT".equals(userType)) {
             Student student = studentRepository.findByStudentCode(loginCode)
                     .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy sinh viên"));
             user = student.getUser();
-        } else if ("TEACHER".equals(userType)) {
+
+        } else if ("LECTURER".equals(userType)) {
             Teacher teacher = teacherRepository.findByTeacherCode(loginCode)
                     .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy giảng viên"));
             user = teacher.getUser();
-        } else if ("ADMIN".equals(userType)) {
+
+        } else if ("SCHOOL_ADMIN".equals(userType)) {
+            // Lấy dữ liệu quản trị viên trường
             user = userRepository.findByEmail(loginCode)
-                    .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy admin"));
+                    .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy quản trị viên trường"));
+
+        } else if ("SAAS_ADMIN".equals(userType)) {
+            // Lấy dữ liệu Super Admin hệ thống
+            user = userRepository.findByEmail(loginCode)
+                    .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy quản trị hệ thống"));
         } else {
             throw new UsernameNotFoundException("Loại tài khoản không hợp lệ");
         }
-
+        
         return new CustomUserDetails(
                 user.getId(),
                 user.getFullName(),
