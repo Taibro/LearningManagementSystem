@@ -1,11 +1,12 @@
-package org.learn.learningmanagementbackend.service;
+package org.learn.learningmanagementbackend.service.SchoolAdminService;
 
 import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.dto.request.DepartmentRequest;
 import org.learn.learningmanagementbackend.dto.response.DepartmentResponse;
 import org.learn.learningmanagementbackend.model.Department;
 import org.learn.learningmanagementbackend.model.School;
-import org.learn.learningmanagementbackend.repository.DepartmentRepository;
+import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.DepartmentRepository;
+import org.learn.learningmanagementbackend.repository.SaasAdminRepository.SchoolRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
