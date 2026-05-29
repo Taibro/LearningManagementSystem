@@ -1,44 +1,66 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; 
-import { notifData } from '../../data';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { getProfile, getWeeklySchedule, getNotifications, getGrades } from '../../studentApi';
 
 export default function Dashboard() {
+  const [profile, setProfile] = useState(null);
+  const [schedule, setSchedule] = useState([]);
+  const [notifications, setNotifications] = useState([]);
+  const [grades, setGrades] = useState([]);
+
+  useEffect(() => {
+    getProfile().then(setProfile).catch(() => {});
+    getWeeklySchedule().then(setSchedule).catch(() => {});
+    getNotifications().then(setNotifications).catch(() => {});
+    getGrades().then(setGrades).catch(() => {});
+  }, []);
+
+  const initials = profile?.fullName
+    ? profile.fullName.split(' ').slice(-2).map(w => w[0]).join('').toUpperCase()
+    : '??';
+
+  const genderLabel = profile?.gender === 'MALE' ? 'Nam' : profile?.gender === 'FEMALE' ? 'Nữ' : '';
+  const unreadCount = notifications.filter(n => !n.isRead).length;
+
+  // Lớp HP đang học tuần này (unique theo classCode)
+  const uniqueClasses = [...new Map(schedule.map(s => [s.classCode, s])).values()];
+
+  // Thống kê điểm
+  const currentSemGrades = grades.slice(0, Math.min(3, grades.length));
+
   return (
     <div className="page active">
       <div className="grid" style={{display:'grid', gridTemplateColumns:'1fr 320px', gap:'16px'}}>
-        
-        
+
         <div>
+          {/* Thông tin sinh viên */}
           <div className="card mb-4" style={{marginBottom:'16px'}}>
             <div className="card-body">
               <h2 style={{fontSize:'16px', fontWeight:700, marginBottom:'12px', color:'var(--text)'}}>Thông tin sinh viên</h2>
               <div style={{display:'flex', gap:'20px', alignItems:'flex-start'}}>
                 <div style={{textAlign:'center'}}>
-                  <div style={{width:'80px', height:'80px', borderRadius:'50%', background:'linear-gradient(135deg,#1a6fb5,#60a5fa)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontSize:'24px', fontWeight:700, margin:'0 auto 8px'}}>NT</div>
-                  
+                  <div style={{width:'80px', height:'80px', borderRadius:'50%', background:'linear-gradient(135deg,#1a6fb5,#60a5fa)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontSize:'24px', fontWeight:700, margin:'0 auto 8px'}}>
+                    {initials}
+                  </div>
                   <Link to="/student-info" className="link">Xem chi tiết</Link>
                 </div>
                 <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:'4px 24px', flex:1}}>
-                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>MSSV: </span><strong>2001230773</strong></div>
-                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Lớp học: </span><strong>14DHTH05</strong></div>
-                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Họ tên: </span><strong>Nguyễn Thành Tài</strong></div>
-                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Khóa học: </span><strong>2023</strong></div>
-                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Giới tính: </span><strong>Nam</strong></div>
-                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Bậc đào tạo: </span><strong>Đại học</strong></div>
-                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Ngày sinh: </span><strong>14/10/2005</strong></div>
-                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Loại hình: </span><strong>Chính quy</strong></div>
-                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Nơi sinh: </span><strong>Cà Mau</strong></div>
-                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Ngành: </span><strong>Công nghệ thông tin</strong></div>
+                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>MSSV: </span><strong>{profile?.studentCode || '—'}</strong></div>
+                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Lớp học: </span><strong>{profile?.className || '—'}</strong></div>
+                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Họ tên: </span><strong>{profile?.fullName || '—'}</strong></div>
+                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Khoa: </span><strong>{profile?.departmentName || '—'}</strong></div>
+                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Giới tính: </span><strong>{genderLabel}</strong></div>
+                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Khóa học: </span><strong>{profile?.enrollmentYear || '—'}</strong></div>
+                  <div style={{fontSize:'13px'}}><span style={{color:'var(--text-light)'}}>Email: </span><strong>{profile?.email || '—'}</strong></div>
                 </div>
               </div>
             </div>
           </div>
 
-          
+          {/* Quick links */}
           <div className="card mb-4" style={{marginBottom:'16px'}}>
             <div className="card-body">
               <div className="quick-grid">
-                
                 <Link to="/notifications" className="quick-item">
                   <div className="qi-icon">📋</div><div className="qi-label">Nhắc nhở</div>
                 </Link>
@@ -51,94 +73,51 @@ export default function Dashboard() {
                 <Link to="/progress-schedule" className="quick-item">
                   <div className="qi-icon">📈</div><div className="qi-label">Lịch theo tiến độ</div>
                 </Link>
-                <Link to="/curriculum" className="quick-item">
-                  <div className="qi-icon">📚</div><div className="qi-label">Chương trình khung</div>
+                <Link to="/attendance" className="quick-item">
+                  <div className="qi-icon">✅</div><div className="qi-label">Điểm danh</div>
                 </Link>
-                <Link to="/course-registration" className="quick-item">
-                  <div className="qi-icon">✏️</div><div className="qi-label">Đăng ký học phần</div>
+                <Link to="/conduct-score" className="quick-item">
+                  <div className="qi-icon">🏅</div><div className="qi-label">Rèn luyện</div>
                 </Link>
                 <Link to="/tuition-fee" className="quick-item">
                   <div className="qi-icon">💰</div><div className="qi-label">Tra cứu công nợ</div>
                 </Link>
-                <Link to="/online-payment" className="quick-item">
-                  <div className="qi-icon">💳</div><div className="qi-label">Thanh toán trực tuyến</div>
-                </Link>
-                <Link to="/dormitory-payment" className="quick-item">
-                  <div className="qi-icon">🏢</div><div className="qi-label">Thanh toán nội trú</div>
-                </Link>
-                <Link to="/general-receipts" className="quick-item">
-                  <div className="qi-icon">🧾</div><div className="qi-label">Phiếu thu tổng hợp</div>
-                </Link>
-                <Link to="/student-profile" className="quick-item">
-                  <div className="qi-icon">📁</div><div className="qi-label">Hộp thư SV</div>
+                <Link to="/scholarships" className="quick-item">
+                  <div className="qi-icon">🎓</div><div className="qi-label">Học bổng</div>
                 </Link>
               </div>
             </div>
           </div>
 
-          
-          <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:'16px'}}>
-            <div className="card">
-              <div className="card-body">
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'10px'}}>
-                  <h3 style={{fontSize:'14px', fontWeight:700}}>Kết quả học tập</h3>
-                  <select className="form-ctrl" style={{width:'auto', fontSize:'12px', padding:'3px 6px'}}>
-                    <option>HK2 (2025 - 2026)</option>
-                  </select>
-                </div>
-                <div style={{textAlign:'center', color:'var(--text-light)', fontSize:'12px', padding:'20px 0'}}>Chưa có dữ liệu hiển thị</div>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-body">
-                <h3 style={{fontSize:'14px', fontWeight:700, marginBottom:'10px'}}>Tiến độ học tập</h3>
-                <div style={{display:'flex', justifyContent:'center', marginBottom:'12px'}}>
-                  <div style={{position:'relative', width:'100px', height:'100px'}}>
-                    <svg viewBox="0 0 100 100" width="100" height="100">
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="#e2e8f0" strokeWidth="12"/>
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="#3b82f6" strokeWidth="12" strokeDasharray="188 64" strokeLinecap="round" transform="rotate(-90 50 50)"/>
-                      <circle cx="50" cy="50" r="40" fill="none" stroke="#22c55e" strokeWidth="12" strokeDasharray="30 222" strokeDashoffset="-188" strokeLinecap="round" transform="rotate(-90 50 50)"/>
-                    </svg>
-                    <div style={{position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', fontSize:'13px', fontWeight:700, textAlign:'center', lineHeight:1.2}}>
-                      119<br/><span style={{fontSize:'10px', color:'var(--text-light)'}}>TC</span>
-                    </div>
-                  </div>
-                </div>
-                <div style={{fontSize:'11px', display:'flex', gap:'8px', justifyContent:'center'}}>
-                  <span style={{display:'flex', alignItems:'center', gap:'3px'}}><span style={{width:'8px', height:'8px', background:'#3b82f6', borderRadius:'2px', display:'inline-block'}}></span>Đã học</span>
-                  <span style={{display:'flex', alignItems:'center', gap:'3px'}}><span style={{width:'8px', height:'8px', background:'#22c55e', borderRadius:'2px', display:'inline-block'}}></span>Đạt</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-body">
-                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'10px'}}>
-                  <h3 style={{fontSize:'14px', fontWeight:700}}>Lớp học phần</h3>
-                  <select className="form-ctrl" style={{width:'auto', fontSize:'12px', padding:'3px 6px'}}>
-                    <option>HK2 (2025 - 2026)</option>
-                  </select>
-                </div>
+          {/* Lớp HP tuần này */}
+          <div className="card">
+            <div className="card-body">
+              <h3 style={{fontSize:'14px', fontWeight:700, marginBottom:'10px'}}>Lớp học phần tuần này</h3>
+              {uniqueClasses.length === 0 ? (
+                <div style={{textAlign:'center', color:'var(--text-light)', fontSize:'12px', padding:'20px 0'}}>Không có lịch học trong tuần này</div>
+              ) : (
                 <table className="tbl" style={{fontSize:'12px'}}>
                   <tbody>
                     <tr><th>Môn học/học phần</th><th style={{width:'60px', textAlign:'center'}}>Số TC</th></tr>
-                    <tr><td><Link to="/grades" className="link" style={{fontSize:'12px'}}>0110110197602</Link><br/>Phân tích thiết kế hệ thống</td><td style={{textAlign:'center'}}>2</td></tr>
-                    <tr><td><Link to="/grades" className="link" style={{fontSize:'12px'}}>0110110195604</Link><br/>Deep learning</td><td style={{textAlign:'center'}}>3</td></tr>
-                    <tr><td><Link to="/grades" className="link" style={{fontSize:'12px'}}>0101100000204</Link><br/>Công Nghệ Java</td><td style={{textAlign:'center'}}>3</td></tr>
+                    {uniqueClasses.map((c, i) => (
+                      <tr key={i}>
+                        <td><Link to="/grades" className="link" style={{fontSize:'12px'}}>{c.classCode}</Link><br/>{c.courseName}</td>
+                        <td style={{textAlign:'center'}}>{c.credits}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
-              </div>
+              )}
             </div>
           </div>
         </div>
 
-        
+        {/* Cột phải */}
         <div>
           <div className="card" style={{marginBottom:'12px'}}>
             <div className="card-body">
               <div style={{fontSize:'14px', fontWeight:600, color:'var(--text-light)', marginBottom:'4px'}}>Nhắc nhở mới, chưa xem</div>
-              <div style={{fontSize:'36px', fontWeight:800, color:'var(--text)'}}>0</div>
+              <div style={{fontSize:'36px', fontWeight:800, color:'var(--text)'}}>{unreadCount}</div>
               <svg style={{float:'right', marginTop:'-40px'}} width="28" height="28" fill="none" stroke="#94a3b8" viewBox="0 0 24 24">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
@@ -151,29 +130,33 @@ export default function Dashboard() {
             <div className="card" style={{border:'1px solid #bfdbfe'}}>
               <div className="card-body" style={{padding:'14px'}}>
                 <div style={{fontSize:'12px', color:'var(--blue)', fontWeight:600}}>Lịch học trong tuần</div>
-                <div style={{fontSize:'32px', fontWeight:800, color:'var(--blue)', margin:'6px 0'}}>10</div>
+                <div style={{fontSize:'32px', fontWeight:800, color:'var(--blue)', margin:'6px 0'}}>{schedule.length}</div>
                 <Link to="/weekly-schedule" className="link">Xem chi tiết</Link>
               </div>
             </div>
-            <div className="card" style={{border:'1px solid #fed7aa'}}>
+            <div className="card" style={{border:'1px solid #d1fae5'}}>
               <div className="card-body" style={{padding:'14px'}}>
-                <div style={{fontSize:'12px', color:'var(--orange)', fontWeight:600}}>Lịch thi trong tuần</div>
-                <div style={{fontSize:'32px', fontWeight:800, color:'var(--orange)', margin:'6px 0'}}>0</div>
-                <Link to="/weekly-schedule" className="link" style={{color:'var(--orange)'}}>Xem chi tiết</Link>
+                <div style={{fontSize:'12px', color:'var(--green)', fontWeight:600}}>Môn đang học</div>
+                <div style={{fontSize:'32px', fontWeight:800, color:'var(--green)', margin:'6px 0'}}>{uniqueClasses.length}</div>
+                <Link to="/progress-schedule" className="link" style={{color:'var(--green)'}}>Xem lịch</Link>
               </div>
             </div>
           </div>
 
+          {/* Thông báo gần đây */}
           <div className="card">
             <div className="card-body">
               <h3 style={{fontSize:'14px', fontWeight:700, marginBottom:'10px'}}>Thông báo gần đây</h3>
               <div style={{display:'flex', flexDirection:'column', gap:'8px'}}>
-                {notifData.slice(0, 3).map((n, i) => (
+                {notifications.slice(0, 4).map((n, i) => (
                   <div key={i} style={{padding:'8px', background:'#fff8f0', borderRadius:'6px', borderLeft:'3px solid var(--orange)'}}>
                     <div style={{fontSize:'12px', fontWeight:600, color:'var(--orange)'}}>{n.title}</div>
-                    <div style={{fontSize:'11px', color:'var(--text-light)', marginTop:'2px'}}>{n.date}</div>
+                    <div style={{fontSize:'11px', color:'var(--text-light)', marginTop:'2px'}}>{n.body}</div>
                   </div>
                 ))}
+                {notifications.length === 0 && (
+                  <div style={{fontSize:'12px', color:'var(--text-light)', textAlign:'center'}}>Không có thông báo</div>
+                )}
               </div>
             </div>
           </div>

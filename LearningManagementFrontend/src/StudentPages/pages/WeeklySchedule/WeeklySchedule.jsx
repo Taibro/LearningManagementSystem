@@ -1,111 +1,128 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getWeeklySchedule } from '../../studentApi';
 
-export default function WeeklySchedule() { 
+const DAY_NAMES = ['', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
+const DAYS = [2, 3, 4, 5, 6, 7, 1]; // Thứ 2 → Chủ nhật
+
+// Tính ngày đầu tuần (Thứ 2) từ một ngày bất kỳ
+function getMondayOf(date) {
+  const d = new Date(date);
+  const day = d.getDay(); // 0=CN
+  const diff = (day === 0) ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+
+function toLocalIso(d) {
+  return d.toISOString().split('T')[0];
+}
+
+export default function WeeklySchedule() {
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(toLocalIso(new Date()));
+
+  const monday = getMondayOf(selectedDate);
+  const weekDates = DAYS.map((_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+
+  const load = (date) => {
+    setLoading(true);
+    getWeeklySchedule(date)
+      .then(data => { setRows(data); setLoading(false); })
+      .catch(() => setLoading(false));
+  };
+
+  useEffect(() => { load(selectedDate); }, [selectedDate]);
+
+  // Map dayOfWeek → danh sách lịch
+  const byDay = {};
+  rows.forEach(r => {
+    const d = r.dayOfWeek;
+    if (!byDay[d]) byDay[d] = [];
+    byDay[d].push(r);
+  });
+
+  const sessionClass = (type) => {
+    if (type === 'REGULAR') return 'sched-green';
+    if (type === 'LAB') return 'sched-blue';
+    return 'sched-gray';
+  };
+
+  const goWeek = (delta) => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() + delta * 7);
+    setSelectedDate(toLocalIso(d));
+  };
+
   return (
     <div className="page active">
       <div className="page-title-bar">
         <div className="page-title" style={{margin:0}}>Lịch học, lịch thi theo tuần</div>
         <div style={{display:'flex',alignItems:'center',gap:'8px',flexWrap:'wrap'}}>
-          <div style={{display:'flex',gap:'12px',fontSize:'12px'}}>
-            <label><input type="radio" name="lt" defaultChecked /> Tất cả</label>
-            <label><input type="radio" name="lt" /> Lịch học</label>
-            <label><input type="radio" name="lt" /> Lịch thi</label>
-          </div>
-          <input type="date" className="form-ctrl" style={{width:'150px'}} defaultValue="2026-03-28" />
-          <button className="btn btn-blue btn-sm">Hiện tại</button>
-          <button className="btn btn-outline btn-sm">In lịch</button>
-          <button className="btn btn-outline btn-sm">‹ Trở về</button>
-          <button className="btn btn-blue btn-sm">Tiếp ›</button>
+          <input type="date" className="form-ctrl" style={{width:'150px'}}
+            value={selectedDate}
+            onChange={e => setSelectedDate(e.target.value)} />
+          <button className="btn btn-blue btn-sm" onClick={() => setSelectedDate(toLocalIso(new Date()))}>Hiện tại</button>
+          <button className="btn btn-outline btn-sm" onClick={() => goWeek(-1)}>‹ Trở về</button>
+          <button className="btn btn-blue btn-sm" onClick={() => goWeek(1)}>Tiếp ›</button>
         </div>
       </div>
+
       <div className="card" style={{overflowX:'auto'}}>
-        <table className="week-tbl">
-          <tbody>
-            <tr>
-              <th style={{width:'70px'}}>Ca học</th>
-              <th><div style={{fontWeight:700}}>Thứ 2</div><div style={{fontSize:'11px',fontWeight:400,color:'#bfdbfe'}}>23/03/2026</div></th>
-              <th><div style={{fontWeight:700}}>Thứ 3</div><div style={{fontSize:'11px',fontWeight:400,color:'#bfdbfe'}}>24/03/2026</div></th>
-              <th><div style={{fontWeight:700}}>Thứ 4</div><div style={{fontSize:'11px',fontWeight:400,color:'#bfdbfe'}}>25/03/2026</div></th>
-              <th><div style={{fontWeight:700}}>Thứ 5</div><div style={{fontSize:'11px',fontWeight:400,color:'#bfdbfe'}}>26/03/2026</div></th>
-              <th><div style={{fontWeight:700}}>Thứ 6</div><div style={{fontSize:'11px',fontWeight:400,color:'#bfdbfe'}}>27/03/2026</div></th>
-              <th><div style={{fontWeight:700}}>Thứ 7</div><div style={{fontSize:'11px',fontWeight:400,color:'#bfdbfe'}}>28/03/2026</div></th>
-              <th><div style={{fontWeight:700}}>Chủ nhật</div><div style={{fontSize:'11px',fontWeight:400,color:'#bfdbfe'}}>29/03/2026</div></th>
-            </tr>
-            <tr>
-              <td className="ca">Sáng</td>
-              <td>
-                <div className="sched-gray">
-                  <strong>Sinh hoạt giữa khóa năm 3</strong><br/>
-                  SINHHOATGIUAKHOA - 010109728801<br/>Tiết: 2 - 3<br/>
-                  Phòng: HT.C (Hội trường C - Tầng 4 dãy nhà C) - 140 Lê Trọng Tấn<br/>
-                  GV: Hồ Thanh Trí
-                </div>
-                <div className="sched-gray" style={{marginTop:'4px'}}>
-                  <strong>Sinh hoạt giữa khóa năm 3</strong><br/>
-                  Tiết: 4 - 6 | GV: Vũ Đức Thịnh
-                </div>
-              </td>
-              <td>
-                <div className="sched-green">
-                  <strong>Công Nghệ Java</strong><br/>
-                  14DHTH12 - 010100000204<br/>Tiết: 2 – 6<br/>
-                  Phòng: A202 - Phòng máy tính - 140 Lê Trọng Tấn<br/>
-                  GV: Nguyễn Thị Thu Hồng
-                </div>
-              </td>
-              <td></td><td></td>
-              <td>
-                <div className="sched-blue">
-                  <strong>Khai phá dữ liệu</strong><br/>
-                  14DHTH14 - 0110110197014<br/>Tiết: 1 – 3<br/>
-                  Phòng: A301 - 140 Lê Trọng Tấn<br/>
-                  GV: Phùng Thế Bảo
-                </div>
-              </td>
-              <td></td><td></td>
-            </tr>
-            <tr>
-              <td className="ca">Chiều</td>
-              <td></td>
-              <td>
-                <div className="sched-green">
-                  <strong>Lập trình di động</strong><br/>
-                  14DHTH10 - 0110110196910<br/>Tiết: 7 – 11<br/>GV: ...
-                </div>
-              </td>
-              <td>
-                <div className="sched-blue">
-                  <strong>Deep learning</strong><br/>
-                  14DHTH04 - 0110110195604<br/>Tiết: 10 – 12<br/>GV: TS. Phùng Thế Bảo
-                </div>
-              </td>
-              <td>
-                <div className="sched-green">
-                  <strong>Thực hành phân tích thiết kế hệ thống</strong><br/>
-                  14DHTH10 - ...<br/>Tiết: 7 – 9
-                </div>
-              </td>
-              <td>
-                <div className="sched-blue">
-                  <strong>Quản trị hệ thống mạng</strong><br/>
-                  14DHTH04 - 0110110197304<br/>Tiết: 7 – 9
-                </div>
-              </td>
-              <td></td><td></td>
-            </tr>
-            <tr>
-              <td className="ca">Tối</td>
-              <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-            </tr>
-          </tbody>
-        </table>
+        {loading && <div style={{padding:'20px',textAlign:'center',color:'var(--text-light)'}}>Đang tải...</div>}
+        {!loading && (
+          <table className="week-tbl">
+            <tbody>
+              <tr>
+                <th style={{width:'70px'}}>Ca học</th>
+                {DAYS.map((dow, i) => (
+                  <th key={dow}>
+                    <div style={{fontWeight:700}}>{DAY_NAMES[dow]}</div>
+                    <div style={{fontSize:'11px',fontWeight:400,color:'#bfdbfe'}}>
+                      {weekDates[i].toLocaleDateString('vi-VN')}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+              {['Sáng', 'Chiều', 'Tối'].map((session, si) => (
+                <tr key={session}>
+                  <td className="ca">{session}</td>
+                  {DAYS.map(dow => {
+                    const items = (byDay[dow] || []).filter(r => {
+                      const p = r.startPeriod || 0;
+                      if (si === 0) return p >= 1 && p <= 5;
+                      if (si === 1) return p >= 6 && p <= 9;
+                      return p >= 10;
+                    });
+                    return (
+                      <td key={dow}>
+                        {items.map((r, i) => (
+                          <div key={i} className={sessionClass(r.sessionType)} style={{marginBottom: i < items.length - 1 ? '4px' : 0}}>
+                            <strong>{r.courseName}</strong><br/>
+                            {r.classCode} – {r.courseCode}<br/>
+                            Tiết: {r.startPeriod} – {r.endPeriod}<br/>
+                            Phòng: {r.roomName || '—'}<br/>
+                            GV: {r.teacherName || '—'}
+                          </div>
+                        ))}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
         <div style={{padding:'10px 12px',display:'flex',gap:'16px',fontSize:'11px',borderTop:'1px solid var(--border)'}}>
-          <span style={{display:'flex',alignItems:'center',gap:'4px'}}><span style={{width:'12px',height:'12px',background:'#d1fae5',borderLeft:'3px solid #22c55e',display:'inline-block'}}></span>Lịch dạy lý thuyết</span>
-          <span style={{display:'flex',alignItems:'center',gap:'4px'}}><span style={{width:'12px',height:'12px',background:'#dbeafe',borderLeft:'3px solid #3b82f6',display:'inline-block'}}></span>Lịch dạy thực hành</span>
-          <span style={{display:'flex',alignItems:'center',gap:'4px'}}><span style={{width:'12px',height:'12px',background:'#fff7ed',borderLeft:'3px solid #f97316',display:'inline-block'}}></span>Lịch trực tuyến</span>
-          <span style={{display:'flex',alignItems:'center',gap:'4px'}}><span style={{width:'12px',height:'12px',background:'#f1f5f9',borderLeft:'3px solid #94a3b8',display:'inline-block'}}></span>Lịch coi thi</span>
+          <span style={{display:'flex',alignItems:'center',gap:'4px'}}><span style={{width:'12px',height:'12px',background:'#d1fae5',borderLeft:'3px solid #22c55e',display:'inline-block'}}></span>Lý thuyết</span>
+          <span style={{display:'flex',alignItems:'center',gap:'4px'}}><span style={{width:'12px',height:'12px',background:'#dbeafe',borderLeft:'3px solid #3b82f6',display:'inline-block'}}></span>Thực hành</span>
+          <span style={{display:'flex',alignItems:'center',gap:'4px'}}><span style={{width:'12px',height:'12px',background:'#f1f5f9',borderLeft:'3px solid #94a3b8',display:'inline-block'}}></span>Khác</span>
         </div>
       </div>
     </div>
-  ); 
+  );
 }

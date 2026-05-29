@@ -1,23 +1,56 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getConduct } from '../../studentApi';
 
-export default function Scholarships() { 
+export default function Scholarships() {
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getConduct()
+      .then(data => {
+        // Chỉ lấy những kỳ có học bổng
+        setRows(data.filter(r => r.scholarshipName));
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const formatMoney = (amount) =>
+    amount != null ? Number(amount).toLocaleString('vi-VN') + ' đ' : '—';
+
   return (
     <div className="page active">
       <div className="page-title-bar">
         <div className="page-title" style={{margin:0}}>Mức học bổng được xét</div>
-        <div style={{display:'flex',gap:'8px'}}>
-          <select className="form-ctrl" style={{width:'160px'}}><option>Tất cả</option></select>
-          <button className="btn-icon">⛶</button>
-        </div>
       </div>
       <div className="card" style={{overflowX:'auto'}}>
         <table className="tbl">
           <tbody>
-            <tr><th>STT</th><th>Loại học bổng</th><th>Tổng số TC học lần đầu</th><th>Điểm hệ 10</th><th>Điểm TB học lần đầu</th><th>Mức học bổng</th><th>Số tiền</th><th>Đã nhận</th></tr>
-            <tr><td colSpan="8" style={{textAlign:'center',color:'var(--text-light)',padding:'30px'}}>Không có dữ liệu hiển thị</td></tr>
+            <tr>
+              <th>STT</th>
+              <th>Học kỳ</th>
+              <th style={{textAlign:'center'}}>GPA</th>
+              <th style={{textAlign:'center'}}>Tín chỉ tích lũy</th>
+              <th>Loại học bổng</th>
+              <th style={{textAlign:'right'}}>Số tiền</th>
+            </tr>
+            {loading && <tr><td colSpan="6" style={{textAlign:'center',padding:'20px',color:'var(--text-light)'}}>Đang tải...</td></tr>}
+            {!loading && rows.length === 0 && (
+              <tr><td colSpan="6" style={{textAlign:'center',padding:'30px',color:'var(--text-light)'}}>Không có dữ liệu hiển thị</td></tr>
+            )}
+            {rows.map((r, i) => (
+              <tr key={i}>
+                <td>{i + 1}</td>
+                <td>{r.semesterName}</td>
+                <td style={{textAlign:'center',fontWeight:700,color:'var(--blue)'}}>{r.gpa != null ? Number(r.gpa).toFixed(2) : '—'}</td>
+                <td style={{textAlign:'center'}}>{r.creditsEarned ?? '—'}</td>
+                <td style={{color:'var(--green)',fontWeight:600}}>{r.scholarshipName}</td>
+                <td style={{textAlign:'right',fontWeight:700,color:'var(--orange)'}}>{formatMoney(r.scholarshipAmount)}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
     </div>
-  ); 
+  );
 }

@@ -42,8 +42,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/lecturer/**").hasRole("LECTURER")
                         .requestMatchers("/api/school-admin/**").hasRole("SCHOOL_ADMIN")
                         .requestMatchers("/api/saas-admin/**").hasRole("SAAS_ADMIN")
-                        .anyRequest().authenticated()
-                )
+                        .anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

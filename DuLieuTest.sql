@@ -1,3 +1,4 @@
+SET SESSION sql_mode = '';
 -- ============================================================
 -- PHẦN 1: LỆNH XÓA SẠCH DỮ LIỆU CŨ VÀ RESET AUTO_INCREMENT
 -- ============================================================
@@ -309,19 +310,19 @@ INSERT INTO attendance_record (id, schedule_id, student_id, attendance_date, sta
 (12, 1, 12, '2026-02-16', 'PRESENT', 2, '2026-02-16 08:00:00');
 
 -- 19. BẢNG NOTIFICATION (12 dòng)
-INSERT INTO Notification (id, user_id, title, body, type) VALUES
-(1, 13, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE'),
-(2, 14, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE'),
-(3, 15, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE'),
-(4, 13, 'Nhắc nộp học phí', 'Vui lòng nộp học phí HK2', 'REMINDER'),
-(5, 14, 'Nhắc nộp học phí', 'Vui lòng nộp học phí HK2', 'REMINDER'),
-(6, 15, 'Nhắc nộp học phí', 'Vui lòng nộp học phí HK2', 'REMINDER'),
-(7, 2, 'Có lịch dạy bù', 'Vui lòng sắp xếp lịch dạy bù lớp INT101', 'SYSTEM'),
-(8, 16, 'Có điểm thi', 'Đã có điểm môn Nguyên lý kế toán', 'GRADE'),
-(9, 17, 'Có điểm thi', 'Đã có điểm môn Nguyên lý kế toán', 'GRADE'),
-(10, 18, 'Thông báo', 'Đăng ký học phần HK hè', 'ENROLLMENT'),
-(11, 19, 'Thông báo', 'Đăng ký học phần HK hè', 'ENROLLMENT'),
-(12, 13, 'Cập nhật điểm', 'Điểm QT đã được update', 'GRADE');
+INSERT INTO Notification (id, user_id, title, body, type, is_read) VALUES
+(1, 13, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE', 0),
+(2, 14, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE', 0),
+(3, 15, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE', 0),
+(4, 13, 'Nhắc nộp học phí', 'Vui lòng nộp học phí HK2', 'REMINDER', 0),
+(5, 14, 'Nhắc nộp học phí', 'Vui lòng nộp học phí HK2', 'REMINDER', 0),
+(6, 15, 'Nhắc nộp học phí', 'Vui lòng nộp học phí HK2', 'REMINDER', 0),
+(7, 2, 'Có lịch dạy bù', 'Vui lòng sắp xếp lịch dạy bù lớp INT101', 'SYSTEM', 0),
+(8, 16, 'Có điểm thi', 'Đã có điểm môn Nguyên lý kế toán', 'GRADE', 0),
+(9, 17, 'Có điểm thi', 'Đã có điểm môn Nguyên lý kế toán', 'GRADE', 0),
+(10, 18, 'Thông báo', 'Đăng ký học phần HK hè', 'ENROLLMENT', 0),
+(11, 19, 'Thông báo', 'Đăng ký học phần HK hè', 'ENROLLMENT', 0),
+(12, 13, 'Cập nhật điểm', 'Điểm QT đã được update', 'GRADE', 0);
 
 -- 20. BẢNG TUITION_INVOICE (12 dòng)
 INSERT INTO Tuition_invoice (id, student_id, semester_id, total_amount, paid_amount, due_date, status) VALUES
@@ -339,19 +340,19 @@ INSERT INTO Tuition_invoice (id, student_id, semester_id, total_amount, paid_amo
 (12, 12, 2, 15000000.00, 15000000.00, '2026-03-30', 'PAID');
 
 -- 21. BẢNG TUITION_PAYMENT (12 dòng)
-INSERT INTO Tuition_payment (id, invoice_id, amount, payment_method, transaction_code, status) VALUES
-(1, 1, 15000000.00, 'BANK_TRANSFER', 'VN123456', 'SUCCESS'),
-(2, 2, 5000000.00, 'MOMO', 'MM98765', 'SUCCESS'),
-(3, 4, 14000000.00, 'VNPAY', 'VNP1122', 'SUCCESS'),
-(4, 6, 12000000.00, 'CASH', 'CASH001', 'SUCCESS'),
-(5, 7, 12000000.00, 'BANK_TRANSFER', 'VN223344', 'SUCCESS'),
-(6, 10, 8000000.00, 'VISA', 'VS9988', 'SUCCESS'),
-(7, 11, 16000000.00, 'MOMO', 'MM7766', 'SUCCESS'),
-(8, 12, 15000000.00, 'BANK_TRANSFER', 'VN445566', 'SUCCESS'),
-(9, 1, 0.00, 'BANK_TRANSFER', 'FAIL01', 'FAILED'),
-(10, 2, 0.00, 'MOMO', 'FAIL02', 'FAILED'),
-(11, 4, 0.00, 'VNPAY', 'FAIL03', 'FAILED'),
-(12, 6, 0.00, 'VISA', 'FAIL04', 'FAILED');
+INSERT INTO Tuition_payment (id, invoice_id, amount, payment_method, transaction_code, status, payment_date) VALUES
+(1, 1, 15000000.00, 'BANK_TRANSFER', 'VN123456', 'SUCCESS', '2026-03-30 12:00:00'),
+(2, 2, 5000000.00, 'MOMO', 'MM98765', 'SUCCESS', '2026-03-30 12:00:00'),
+(3, 4, 14000000.00, 'VNPAY', 'VNP1122', 'SUCCESS', '2026-03-30 12:00:00'),
+(4, 6, 12000000.00, 'CASH', 'CASH001', 'SUCCESS', '2026-03-30 12:00:00'),
+(5, 7, 12000000.00, 'BANK_TRANSFER', 'VN223344', 'SUCCESS', '2026-03-30 12:00:00'),
+(6, 10, 8000000.00, 'VISA', 'VS9988', 'SUCCESS', '2026-03-30 12:00:00'),
+(7, 11, 16000000.00, 'MOMO', 'MM7766', 'SUCCESS', '2026-03-30 12:00:00'),
+(8, 12, 15000000.00, 'BANK_TRANSFER', 'VN445566', 'SUCCESS', '2026-03-30 12:00:00'),
+(9, 1, 0.00, 'BANK_TRANSFER', 'FAIL01', 'FAILED', '2026-03-30 12:00:00'),
+(10, 2, 0.00, 'MOMO', 'FAIL02', 'FAILED', '2026-03-30 12:00:00'),
+(11, 4, 0.00, 'VNPAY', 'FAIL03', 'FAILED', '2026-03-30 12:00:00'),
+(12, 6, 0.00, 'VISA', 'FAIL04', 'FAILED', '2026-03-30 12:00:00');
 
 -- 22. BẢNG STUDENT_SEMESTER_SUMMARY (12 dòng)
 INSERT INTO Student_semester_summary (id, student_id, semester_id, gpa, credits_earned, conduct_score, conduct_grade) VALUES
