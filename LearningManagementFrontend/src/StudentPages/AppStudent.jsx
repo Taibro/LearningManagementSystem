@@ -20,6 +20,7 @@ import GeneralReceipts from './pages/GeneralReceipts/GeneralReceipts';
 import OnlineReceipts from './pages/OnlineReceipts/OnlineReceipts';
 import DefaultPage from './pages/DefaultPage/DefaultPage';
 import CourseRegistration from './pages/CourseRegistration/CourseRegistration';
+import StudentLogin from './pages/Login/StudentLogin';
 
 export default function AppStudent() {
   return (
@@ -27,10 +28,12 @@ export default function AppStudent() {
       <Routes>
         <Route path="/student/course-registration" element={<CourseRegistration />} />
         
+        <Route path="/login" element={<StudentLogin />} />
+        
         <Route path="/" element={<MainLayout />}>
           
           
-          <Route index element={<Navigate to="/dashboard" />} />
+          <Route index element={<Navigate to="/login" />} />
 
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="student-info" element={<StudentInfo />} />
