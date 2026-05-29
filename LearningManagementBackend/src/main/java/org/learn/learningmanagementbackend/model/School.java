@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "School")
+@Table(name = "schools")
 public class School extends BaseEntity {
 
     @Id
@@ -63,16 +63,16 @@ public class School extends BaseEntity {
     private Boolean isActive;
 
     @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserSchool> userSchools = new ArrayList<>();
+    private List<Users> users = new ArrayList<>();
 
-    public void addUserSchool(UserSchool userSchool){
-        this.userSchools.add(userSchool);
-        userSchool.setSchool(this);
+    public void addUser(Users user){
+        this.users.add(user);
+        user.setSchool(this);
     }
 
-    public void removeUserSchool(UserSchool userSchool){
-        this.userSchools.remove(userSchool);
-        userSchool.setSchool(null);
+    public void removeUser(Users user){
+        this.users.remove(user);
+        user.setSchool(null);
     }
 
     @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)

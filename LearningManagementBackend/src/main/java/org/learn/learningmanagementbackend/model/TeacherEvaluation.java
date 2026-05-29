@@ -46,4 +46,7 @@ public class TeacherEvaluation extends BaseEntity {
     @Column(name = "comment", columnDefinition = "TEXT")
     private String comment;
 
+    @Column(name = "student_id")
+    private Integer studentId;
+
 }

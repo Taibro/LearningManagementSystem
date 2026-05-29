@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "Student_semester_summary", uniqueConstraints = {
+@Table(name = "student_semester_summaries", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"student_id", "semester_id"})
 })
 public class StudentSemesterSummary extends BaseEntity{

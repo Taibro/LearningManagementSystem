@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "Course")
+@Table(name = "courses")
 public class Course extends BaseEntity{
 
     @Id

@@ -15,7 +15,7 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "Schedule")
+@Table(name = "schedules")
 public class Schedule extends BaseEntity {
 
     @Id

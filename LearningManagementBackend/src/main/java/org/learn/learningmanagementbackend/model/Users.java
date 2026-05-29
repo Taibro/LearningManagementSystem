@@ -21,13 +21,20 @@ import java.util.Set;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "Users")
+@Table(name = "users")
 public class Users extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "school_id", nullable = false)
+    private School school;
+
+    @Column(name = "code", length = 20, nullable = false)
+    private String code;
 
     @Column(name = "citizen_id_number", length = 12, nullable = false)
     private String citizenIdNumber;
@@ -68,18 +75,7 @@ public class Users extends BaseEntity {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserSchool> userSchools = new ArrayList<>();
 
-    public void addUserSchool(UserSchool userSchool) {
-        this.userSchools.add(userSchool);
-        userSchool.setUser(this);
-    }
-
-    public void removeUserSchool(UserSchool userSchool) {
-        this.userSchools.remove(userSchool);
-        userSchool.setUser(null);
-    }
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Teacher teacher;

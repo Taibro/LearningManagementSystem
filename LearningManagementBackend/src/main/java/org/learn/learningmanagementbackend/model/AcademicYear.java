@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "Academic_year")
+@Table(name = "academic_years")
 @NoArgsConstructor
 @AllArgsConstructor
 public class AcademicYear extends BaseEntity{

@@ -22,7 +22,6 @@ TRUNCATE TABLE Room;
 TRUNCATE TABLE Course;
 TRUNCATE TABLE Student;
 TRUNCATE TABLE Teacher;
-TRUNCATE TABLE User_School;
 TRUNCATE TABLE Users;
 TRUNCATE TABLE Department;
 TRUNCATE TABLE Semester;
@@ -37,12 +36,11 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- PHẦN 2: LỆNH INSERT DỮ LIỆU MẪU (MOCK DATA)
 -- ============================================================
 
--- 1. BẢNG ROLE (Đúng 3 dòng theo yêu cầu)
-INSERT INTO Role (id, name, description) VALUES
-(1, 'admin', 'Quản trị viên hệ thống'),
-(2, 'teacher', 'Giảng viên'),
-(3, 'student', 'Sinh viên / Học sinh'),
-(4, 'admin_school', 'Quản trị viên nhà trường');
+INSERT INTO role (name, description) VALUES
+  ('SAAS_ADMIN',   'Quản trị viên hệ thống'),
+  ('LECTURER', 'Giảng viên'),
+  ('STUDENT', 'Sinh viên / Học sinh'),
+  ('SCHOOL_ADMIN', 'Admin nha truong');
 
 -- 2. BẢNG SCHOOL (12 dòng)
 INSERT INTO School (id, code, name, short_name, type, email) VALUES
@@ -120,44 +118,47 @@ INSERT INTO Department (id, school_id, code, name) VALUES
 (12, 12, 'IELTS_ENG', 'Bộ môn IELTS');
 
 -- 7. BẢNG USERS (24 dòng: 12 GV, 12 SV để map cho thoải mái)
-INSERT INTO Users (id, citizen_id_number, full_name, email, password_hash, gender) VALUES
-(1, '079001000001', 'Nguyễn Văn Admin', 'admin@huit.edu.vn', 'hash123', 'MALE'),
-(2, '079001000002', 'Trần Lập Trình', 'gv1@huit.edu.vn', 'hash123', 'MALE'),
-(3, '079001000003', 'Lê Bách Khoa', 'gv2@hcmut.edu.vn', 'hash123', 'MALE'),
-(4, '079001000004', 'Phạm Ngoại Ngữ', 'gv3@huit.edu.vn', 'hash123', 'FEMALE'),
-(5, '079001000005', 'Hoàng Kinh Tế', 'gv4@ueh.edu.vn', 'hash123', 'MALE'),
-(6, '079001000006', 'Vũ Luật Sư', 'gv5@uel.edu.vn', 'hash123', 'MALE'),
-(7, '079001000007', 'Đặng Máy Tính', 'gv6@uit.edu.vn', 'hash123', 'MALE'),
-(8, '079001000008', 'Bùi Cơ Khí', 'gv7@hcmute.edu.vn', 'hash123', 'MALE'),
-(9, '079001000009', 'Đỗ Tài Chính', 'gv8@huit.edu.vn', 'hash123', 'FEMALE'),
-(10, '079001000010', 'Hồ Điện Tử', 'gv9@huit.edu.vn', 'hash123', 'MALE'),
-(11, '079001000011', 'Ngô Quản Trị', 'gv10@huit.edu.vn', 'hash123', 'FEMALE'),
-(12, '079001000012', 'Dương Kế Toán', 'gv11@huit.edu.vn', 'hash123', 'FEMALE'),
-(13, '079001000013', 'Nguyễn Thanh Tài', 'tai.sv@huit.edu.vn', 'hash123', 'MALE'),
-(14, '079001000014', 'Nguyễn Minh Dũng', 'dung.sv@huit.edu.vn', 'hash123', 'MALE'),
-(15, '079001000015', 'Lê Hoàng Anh', 'anh.sv@huit.edu.vn', 'hash123', 'MALE'),
-(16, '079001000016', 'Phạm Thị Cúc', 'cuc.sv@huit.edu.vn', 'hash123', 'FEMALE'),
-(17, '079001000017', 'Vũ Đăng Khoa', 'khoa.sv@huit.edu.vn', 'hash123', 'MALE'),
-(18, '079001000018', 'Mai Hà Thu', 'thu.sv@huit.edu.vn', 'hash123', 'FEMALE'),
-(19, '079001000019', 'Lý Hải Băng', 'bang.sv@huit.edu.vn', 'hash123', 'FEMALE'),
-(20, '079001000020', 'Trịnh Hữu Thọ', 'tho.sv@huit.edu.vn', 'hash123', 'MALE'),
-(21, '079001000021', 'Vương Ngọc Yến', 'yen.sv@huit.edu.vn', 'hash123', 'FEMALE'),
-(22, '079001000022', 'Châu Phát Đạt', 'dat.sv@huit.edu.vn', 'hash123', 'MALE'),
-(23, '079001000023', 'Tào Tháo', 'thao.sv@huit.edu.vn', 'hash123', 'MALE'),
-(24, '079001000024', 'Lưu Bị', 'bi.sv@huit.edu.vn', 'hash123', 'MALE');
+INSERT INTO users (id, school_id, code, citizen_id_number, full_name, email, password_hash, gender, address) VALUES
+(99, 1, 'SAAS999', '079001000099', 'SaaS Super Admin', 'superadmin@edusaas.io', 'hash123', 'MALE', 'System'),
+(1, 1, 'USR001', '079001000001', 'Nguyễn Văn Admin', 'admin@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(2, 1, 'USR002', '079001000002', 'Trần Lập Trình', 'gv1@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(3, 1, 'USR003', '079001000003', 'Lê Bách Khoa', 'gv2@hcmut.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(4, 1, 'USR004', '079001000004', 'Phạm Ngoại Ngữ', 'gv3@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
+(5, 1, 'USR005', '079001000005', 'Hoàng Kinh Tế', 'gv4@ueh.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(6, 1, 'USR006', '079001000006', 'Vũ Luật Sư', 'gv5@uel.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(7, 1, 'USR007', '079001000007', 'Đặng Máy Tính', 'gv6@uit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(8, 1, 'USR008', '079001000008', 'Bùi Cơ Khí', 'gv7@hcmute.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(9, 1, 'USR009', '079001000009', 'Đỗ Tài Chính', 'gv8@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
+(10, 1, 'USR010', '079001000010', 'Hồ Điện Tử', 'gv9@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(11, 1, 'USR011', '079001000011', 'Ngô Quản Trị', 'gv10@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
+(12, 1, 'USR012', '079001000012', 'Dương Kế Toán', 'gv11@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
+(13, 1, 'USR013', '079001000013', 'Nguyễn Thanh Tài', 'tai.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(14, 1, 'USR014', '079001000014', 'Nguyễn Minh Dũng', 'dung.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(15, 1, 'USR015', '079001000015', 'Lê Hoàng Anh', 'anh.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(16, 1, 'USR016', '079001000016', 'Phạm Thị Cúc', 'cuc.sv@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
+(17, 1, 'USR017', '079001000017', 'Vũ Đăng Khoa', 'khoa.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(18, 1, 'USR018', '079001000018', 'Mai Hà Thu', 'thu.sv@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
+(19, 1, 'USR019', '079001000019', 'Lý Hải Băng', 'bang.sv@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
+(20, 1, 'USR020', '079001000020', 'Trịnh Hữu Thọ', 'tho.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(21, 1, 'USR021', '079001000021', 'Vương Ngọc Yến', 'yen.sv@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
+(22, 1, 'USR022', '079001000022', 'Châu Phát Đạt', 'dat.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(23, 1, 'USR023', '079001000023', 'Tào Tháo', 'thao.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(24, 1, 'USR024', '079001000024', 'Lưu Bị', 'bi.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC')
+;
 
 Update users
 set password_hash = '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG';
 SELECT * FROM users;
 
 -- 8. BẢNG USER_SCHOOL (24 dòng tương ứng)
-INSERT INTO User_School (user_id, school_id, role_id) VALUES
-(1, 1, 1),  (2, 1, 2),  (3, 2, 2),  (4, 1, 2),
-(5, 4, 2),  (6, 5, 2),  (7, 6, 2),  (8, 7, 2),
-(9, 1, 2),  (10, 1, 2), (11, 1, 2), (12, 1, 2),
-(13, 1, 3), (14, 1, 3), (15, 1, 3), (16, 1, 3),
-(17, 1, 3), (18, 1, 3), (19, 1, 3), (20, 1, 3),
-(21, 1, 3), (22, 1, 3), (23, 1, 3), (24, 1, 3);
+INSERT INTO user_roles (user_id, role_id) VALUES
+(99, 1),
+(1, 1), (2, 2), (3, 2), (4, 2),
+(5, 2), (6, 2), (7, 2), (8, 2),
+(9, 2), (10, 2), (11, 2), (12, 2),
+(13, 3), (14, 3), (15, 3), (16, 3),
+(17, 3), (18, 3), (19, 3), (20, 3),
+(21, 3), (22, 3), (23, 3), (24, 3);
 
 -- 9. BẢNG TEACHER (11 dòng)
 INSERT INTO Teacher (id, user_id, teacher_code, department_id, degree) VALUES

@@ -183,6 +183,9 @@ CREATE TABLE users (
   email         VARCHAR(150)  NOT NULL,
   password_hash VARCHAR(255)  NOT NULL,
   phone         VARCHAR(20),
+  citizen_id_number VARCHAR(12) NOT NULL,
+  address VARCHAR(500),
+
   date_of_birth DATE,
   gender        ENUM('MALE','FEMALE','OTHER'),
   avatar_url    VARCHAR(500),
@@ -217,7 +220,7 @@ CREATE TABLE user_roles (
 
   PRIMARY KEY (user_id, role_id),
   CONSTRAINT fk_ur_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-  CONSTRAINT fk_ur_role FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_ur_role FOREIGN KEY (role_id) REFERENCES role(id) ON DELETE RESTRICT,
   CONSTRAINT fk_ur_gby  FOREIGN KEY (granted_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB COMMENT='Phân quyền người dùng';
 
@@ -758,3 +761,64 @@ CREATE TABLE teacher_evaluations (
   CONSTRAINT fk_eval_semester FOREIGN KEY (semester_id) REFERENCES semesters(id) ON DELETE CASCADE,
   CONSTRAINT fk_eval_class FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='Bảng lưu kết quả khảo sát giảng viên';
+
+
+-- ============================================================
+-- BẢNG MỞ RỘNG (Giáo viên, Lương, Phân công)
+-- ============================================================
+
+CREATE TABLE class_teacher (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  class_id INT UNSIGNED NOT NULL,
+  teacher_id INT UNSIGNED NOT NULL,
+  role ENUM('MAIN', 'ASSISTANT', 'SUBSTITUTE') NOT NULL DEFAULT 'MAIN',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_class_teacher (class_id, teacher_id),
+  CONSTRAINT fk_ct_class FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+  CONSTRAINT fk_ct_teacher FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='Phân công giảng viên vào lớp';
+
+CREATE TABLE salary_config (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  role_name VARCHAR(50) NOT NULL,
+  base_salary DECIMAL(12,2) NOT NULL,
+  allowance DECIMAL(12,2) DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB COMMENT='Cấu hình lương cơ bản';
+
+CREATE TABLE salary_grade (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  grade_name VARCHAR(50) NOT NULL,
+  multiplier DECIMAL(4,2) NOT NULL DEFAULT 1.0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB COMMENT='Bậc lương';
+
+CREATE TABLE teacher_salary_sheet (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  teacher_id INT UNSIGNED NOT NULL,
+  semester_id INT UNSIGNED NOT NULL,
+  total_hours INT NOT NULL DEFAULT 0,
+  total_salary DECIMAL(12,2) NOT NULL DEFAULT 0,
+  status ENUM('PENDING', 'PAID', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_tss_teacher FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE,
+  CONSTRAINT fk_tss_semester FOREIGN KEY (semester_id) REFERENCES semesters(id) ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='Bảng lương tổng của giảng viên theo kỳ';
+
+CREATE TABLE teacher_salary_detail (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  sheet_id INT UNSIGNED NOT NULL,
+  class_id INT UNSIGNED NOT NULL,
+  hours INT NOT NULL DEFAULT 0,
+  amount DECIMAL(12,2) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_tsd_sheet FOREIGN KEY (sheet_id) REFERENCES teacher_salary_sheet(id) ON DELETE CASCADE,
+  CONSTRAINT fk_tsd_class FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE RESTRICT
+) ENGINE=InnoDB COMMENT='Chi tiết lương theo từng lớp';

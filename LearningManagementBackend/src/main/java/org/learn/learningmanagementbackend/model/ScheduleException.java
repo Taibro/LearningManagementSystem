@@ -14,7 +14,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "Schedule_exception")
+@Table(name = "schedule_exceptions")
 public class ScheduleException extends BaseEntity {
 
     @Id

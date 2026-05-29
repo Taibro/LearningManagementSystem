@@ -71,28 +71,50 @@ export default function SaaSAdminLogin() {
   /* ==========================================
      XỬ LÝ ĐĂNG NHẬP & OTP CHO SAAS ENGINE
   ========================================== */
-  const handleSaasLogin = () => {
+  const handleSaasLogin = async () => {
     setSaError('');
     if (!saEmail) return setSaError('Vui lòng nhập email Super Admin.');
     if (!saPass) return setSaError('Vui lòng nhập mật khẩu.');
 
     setSaLoading(true);
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userType: 'SAAS_ADMIN',
+          loginCode: saEmail,
+          password: saPass
+        })
+      });
+
+      const data = await response.json();
       setSaLoading(false);
-      if (saEmail === 'superadmin@edusaas.io' && saPass === 'SuperAdmin@2024') {
-        if (use2fa) {
-          setSaasView('otp'); 
-          showToast('Mã OTP đã gửi đến thiết bị xác thực bảo mật', 'blue');
-        } else {
-          showToast('Đăng nhập thành công!', 'green');
-          setTimeout(() => window.location.href = '/saas/dashboard', 800);
-        }
-      } else {
-        setSaError('Tài khoản hệ thống hoặc mật khẩu không chính xác.');
+
+      if (!response.ok) {
+        setSaError(data.message || 'Tài khoản hệ thống hoặc mật khẩu không chính xác.');
         setSaShake(true);
         setTimeout(() => setSaShake(false), 400);
+        return;
       }
-    }, 1400);
+
+      // Lưu Token vào localStorage
+      localStorage.setItem('saas_token', data.token);
+      localStorage.setItem('saas_user', JSON.stringify(data));
+
+      if (use2fa) {
+        setSaasView('otp'); 
+        showToast('Mã OTP đã gửi đến thiết bị xác thực bảo mật', 'blue');
+      } else {
+        showToast('Đăng nhập thành công!', 'green');
+        setTimeout(() => window.location.href = '/saas/dashboard', 800);
+      }
+    } catch (err) {
+      setSaLoading(false);
+      setSaError('Không thể kết nối đến Backend Server. Vui lòng thử lại sau.');
+      setSaShake(true);
+      setTimeout(() => setSaShake(false), 400);
+    }
   };
 
   // NHẢY VỀ SAAS DASHBOARD
