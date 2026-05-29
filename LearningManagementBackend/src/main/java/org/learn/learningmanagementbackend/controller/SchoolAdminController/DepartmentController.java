@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/schooladmin")
+@RequestMapping("/api/school-admin")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*") // Cho phép frontend React/Vite gọi
 public class DepartmentController {

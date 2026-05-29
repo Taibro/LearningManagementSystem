@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const API_BASE = 'http://localhost:8080/api/schooladmin';
+const API_BASE = 'http://localhost:8080/api/school-admin';
 
 export default function Departments() {
   const [departments, setDepartments] = useState([]);
