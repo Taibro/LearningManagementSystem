@@ -47,7 +47,7 @@ export default function AdminLogin() {
       const res = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: sEmail, password: sPass })
+        body: JSON.stringify({ loginCode: sEmail, password: sPass, userType: 'SCHOOL_ADMIN' })
       });
       setSLoading(false);
       
