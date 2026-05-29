@@ -4,6 +4,7 @@ public enum ExceptionType {
 
     CANCELLED,
     RESCHEDULED,
-    ROOM_CHANGE
+    ROOM_CHANGE,
+    SUBSTITUTED
 
 }

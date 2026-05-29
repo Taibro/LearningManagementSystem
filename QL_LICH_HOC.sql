@@ -18,9 +18,9 @@ CREATE TABLE schools (
   code             VARCHAR(30)   NOT NULL COMMENT 'Mã trường: HCMUT, IELTS_CENTER…',
   name             VARCHAR(200)  NOT NULL,
   short_name       VARCHAR(50)   COMMENT 'Tên viết tắt',
-  type             ENUM('university','college','high_school',
-                        'vocational','language_center','tutoring_center','other')
-                   NOT NULL DEFAULT 'university',
+  type             ENUM('UNIVERSITY','COLLEGE','HIGH_SCHOOL',
+                        'VOCATIONAL','LANGUAGE_CENTER','TUTORING_CENTER','OTHER')
+                   NOT NULL DEFAULT 'UNIVERSITY',
   accreditation    VARCHAR(100)  COMMENT 'Cơ quan kiểm định / cấp phép',
   tax_code         VARCHAR(20)   COMMENT 'Mã số thuế',
   email            VARCHAR(150),
@@ -184,7 +184,7 @@ CREATE TABLE users (
   password_hash VARCHAR(255)  NOT NULL,
   phone         VARCHAR(20),
   date_of_birth DATE,
-  gender        ENUM('male','female','other'),
+  gender        ENUM('MALE','FEMALE','OTHER'),
   avatar_url    VARCHAR(500),
   is_active     TINYINT(1)    NOT NULL DEFAULT 1,
   last_login_at TIMESTAMP,
@@ -319,8 +319,8 @@ CREATE TABLE rooms (
   building    VARCHAR(50)   NOT NULL,
   room_number VARCHAR(20)   NOT NULL,
   capacity    SMALLINT      NOT NULL,
-  room_type   ENUM('classroom','lab','seminar','lecture_hall','online')
-              NOT NULL DEFAULT 'classroom',
+  room_type   ENUM('CLASSROOM','LAB','SEMINAR','LECTURE_HALL','ONLINE')
+              NOT NULL DEFAULT 'CLASSROOM',
   equipment   JSON,
   is_active   TINYINT(1)    NOT NULL DEFAULT 1,
 
@@ -352,8 +352,8 @@ CREATE TABLE classes (
   teacher_id   INT UNSIGNED  NOT NULL,
   branch_id    INT UNSIGNED  NOT NULL COMMENT 'Lớp học tại cơ sở nào',
   max_students TINYINT       NOT NULL DEFAULT 40,
-  status       ENUM('open','closed','in_progress','completed','cancelled')
-               NOT NULL DEFAULT 'open',
+  status       ENUM('OPEN','CLOSED','IN_PROGRESS','COMPLETED','CANCELLED')
+               NOT NULL DEFAULT 'OPEN',
   notes        TEXT,
 
   -- Audit Columns
@@ -390,8 +390,8 @@ CREATE TABLE schedules (
   end_time    TIME          NOT NULL,
   start_date  DATE          NOT NULL,
   end_date    DATE          NOT NULL,
-  type        ENUM('regular','makeup','exam','lab','seminar')
-              NOT NULL DEFAULT 'regular',
+  type        ENUM('REGULAR','MAKEUP','EXAM','LAB','SEMINAR')
+              NOT NULL DEFAULT 'REGULAR',
   notes       TEXT,
 
   -- Audit Columns
@@ -422,16 +422,21 @@ CREATE TABLE schedule_exceptions (
   schedule_id         INT UNSIGNED  NOT NULL,
   exception_date      DATE          NOT NULL,
   reason              VARCHAR(255)  NOT NULL,
-  exception_type      ENUM('cancelled','rescheduled','room_change')
-                      NOT NULL DEFAULT 'cancelled',
+  exception_type      ENUM('CANCELLED','RESCHEDULED','ROOM_CHANGE', 'SUBSTITUTED')
+                      NOT NULL DEFAULT 'CANCELLED',
   replacement_date    DATE,
   replacement_room_id INT UNSIGNED,
-  approval_status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending' COMMENT 'Trạng thái duyệt đơn',
+  approval_status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING' COMMENT 'Trạng thái duyệt đơn',
   proof_file_url VARCHAR(500) COMMENT 'Đường dẫn file minh chứng (Cloudinary/S3...)',
    replacement_start_period INT COMMENT 'Tiết bắt đầu ca dạy bù (VD: 1)',
     replacement_end_period INT COMMENT 'Tiết kết thúc ca dạy bù (VD: 3)',
+    suggested_room VARCHAR(50) COMMENT 'Phòng học đề xuất (VD: A401)',
     makeup_notes TEXT COMMENT 'Ghi chú cho đơn dạy bù',
-    makeup_status ENUM('pending', 'approved', 'rejected', 'completed') DEFAULT NULL COMMENT 'Trạng thái duyệt đơn dạy bù',
+    makeup_status ENUM('PENDING', 'APPROVED', 'REJECTED', 'COMPLETED') DEFAULT NULL COMMENT 'Trạng thái duyệt đơn dạy bù',
+    substitute_teacher_id INT UNSIGNED COMMENT 'GV được nhờ dạy thay',
+    substitute_content TEXT COMMENT 'Nội dung bài dạy thay',
+    substitute_status ENUM('PENDING', 'APPROVED', 'REJECTED') COMMENT 'Trạng thái duyệt dạy thay',
+
 
   -- Audit Columns
   created_at          TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -445,7 +450,8 @@ CREATE TABLE schedule_exceptions (
   CONSTRAINT fk_exc_schedule FOREIGN KEY (schedule_id)         REFERENCES schedules(id) ON DELETE CASCADE,
   CONSTRAINT fk_exc_room     FOREIGN KEY (replacement_room_id) REFERENCES rooms(id)     ON DELETE SET NULL,
   CONSTRAINT fk_se_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_se_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+  CONSTRAINT fk_se_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT fk_se_sub_teacher FOREIGN KEY (substitute_teacher_id) REFERENCES teachers(id) ON DELETE SET NULL
 ) ENGINE=InnoDB COMMENT='Ngoại lệ lịch học';
 
 
@@ -457,8 +463,8 @@ CREATE TABLE enrollments (
   student_id      INT UNSIGNED    NOT NULL,
   class_id        INT UNSIGNED    NOT NULL,
   enrollment_date TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Đóng vai trò created_at
-  status          ENUM('pending','enrolled','dropped','completed','failed')
-                  NOT NULL DEFAULT 'pending',
+  status          ENUM('PENDING','ENROLLED','DROPPED','COMPLETED','FAILED')
+                  NOT NULL DEFAULT 'PENDING',
   grade_attendance FLOAT,
   grade_midterm   FLOAT    COMMENT 'Điểm giữa kỳ (0-10)',
   grade_final     FLOAT    COMMENT 'Điểm cuối kỳ (0-10)',
@@ -494,8 +500,8 @@ CREATE TABLE attendance_records (
   schedule_id     INT UNSIGNED  NOT NULL,
   student_id      INT UNSIGNED  NOT NULL,
   attendance_date DATE          NOT NULL,
-  status          ENUM('present','absent','late','excused')
-                  NOT NULL DEFAULT 'absent',
+  status          ENUM('PRESENT','ABSENT','LATE','EXCUSED')
+                  NOT NULL DEFAULT 'ABSENT',
   note            TEXT,
   checked_by      INT UNSIGNED  COMMENT 'user_id người điểm danh (CreatedBy)',
   checked_at      TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP, -- (CreatedAt)
@@ -523,8 +529,8 @@ CREATE TABLE notifications (
   user_id    INT UNSIGNED  NOT NULL,
   title      VARCHAR(200)  NOT NULL,
   body       TEXT          NOT NULL,
-  type       ENUM('schedule_change','grade','enrollment','system','reminder')
-             NOT NULL DEFAULT 'system',
+  type       ENUM('SCHEDULE_CHANGE','GRADE','ENROLLMENT','SYSTEM','REMINDER')
+             NOT NULL DEFAULT 'SYSTEM',
   is_read    TINYINT(1)    NOT NULL DEFAULT 0,
   ref_type   VARCHAR(50),
   ref_id     INT UNSIGNED,
@@ -547,7 +553,7 @@ CREATE TABLE tuition_invoices (
   total_amount     DECIMAL(12,2) NOT NULL COMMENT 'Tổng tiền học phí học kỳ',
   paid_amount      DECIMAL(12,2) NOT NULL DEFAULT 0 COMMENT 'Số tiền đã đóng',
   due_date         DATE          NOT NULL COMMENT 'Hạn chót nộp học phí',
-  status           ENUM('unpaid','partial','paid','overdue','cancelled') NOT NULL DEFAULT 'unpaid',
+  status           ENUM('UNPAID','PARTIAL','PAID','OVERDUE','CANCELLED') NOT NULL DEFAULT 'UNPAID',
   created_at       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at       TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -564,10 +570,10 @@ CREATE TABLE tuition_payments (
   id               INT UNSIGNED  NOT NULL AUTO_INCREMENT,
   invoice_id       INT UNSIGNED  NOT NULL COMMENT 'Thanh toán cho hóa đơn nào',
   amount           DECIMAL(12,2) NOT NULL COMMENT 'Số tiền giao dịch',
-  payment_method   ENUM('cash','bank_transfer','momo','vnpay','visa') NOT NULL,
+  payment_method   ENUM('CASH','BANK_TRANSFER','MOMO','VNPAY','VISA') NOT NULL,
   transaction_code VARCHAR(100)  COMMENT 'Mã giao dịch từ ngân hàng/ví điện tử',
   payment_date     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  status           ENUM('pending','success','failed','refunded') NOT NULL DEFAULT 'pending',
+  status           ENUM('PENDING','SUCCESS','FAILED','REFUNDED') NOT NULL DEFAULT 'PENDING',
   note             TEXT,
 
   PRIMARY KEY (id),
@@ -637,7 +643,7 @@ CREATE TABLE class_materials (
   file_url     VARCHAR(500)  NOT NULL COMMENT 'Đường dẫn HTTPS công khai từ Cloudinary',
   file_size    BIGINT        NOT NULL COMMENT 'Dung lượng file (tính bằng Byte)',
   content_type VARCHAR(100)  COMMENT 'Định dạng file (MIME type)',
-  doc_type     ENUM('slide', 'exercise', 'syllabus', 'reference', 'other') NOT NULL DEFAULT 'other',
+  doc_type     ENUM('SLIDE', 'EXERCISE', 'SYLLABUS', 'REFERENCE', 'OTHER') NOT NULL DEFAULT 'OTHER',
   uploaded_by  INT UNSIGNED  NOT NULL COMMENT 'ID của giảng viên tải lên',
 
   created_at   TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -681,8 +687,8 @@ CREATE TABLE saas_subscriptions (
   plan_id        INT UNSIGNED  NOT NULL,
   start_date     DATE          NOT NULL,
   end_date       DATE          NOT NULL COMMENT 'Ngày hết hạn phần mềm',
-  billing_cycle  ENUM('monthly', 'yearly', 'lifetime') NOT NULL,
-  status         ENUM('active', 'expired', 'suspended', 'cancelled') NOT NULL DEFAULT 'active',
+  billing_cycle  ENUM('MONTHLY', 'YEARLY', 'LIFETIME') NOT NULL,
+  status         ENUM('ACTIVE', 'EXPIRED', 'SUSPENDED', 'CANCELLED') NOT NULL DEFAULT 'ACTIVE',
 
   created_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -699,7 +705,7 @@ CREATE TABLE saas_invoices (
   school_id        INT UNSIGNED  NOT NULL,
   subscription_id  INT UNSIGNED  NOT NULL,
   amount           DECIMAL(12,2) NOT NULL,
-  payment_status   ENUM('pending', 'paid', 'failed') NOT NULL DEFAULT 'pending',
+  payment_status   ENUM('PENDING', 'PAID', 'FAILED') NOT NULL DEFAULT 'PENDING',
   payment_method   VARCHAR(50)   COMMENT 'Momo, VNPay, Bank Transfer',
   paid_at          TIMESTAMP     NULL,
 
@@ -723,6 +729,3 @@ CREATE TABLE system_error_logs (
   PRIMARY KEY (id),
   CONSTRAINT fk_err_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE SET NULL
 ) ENGINE=InnoDB COMMENT='Nhật ký bắt lỗi toàn hệ thống';
-
-
-
