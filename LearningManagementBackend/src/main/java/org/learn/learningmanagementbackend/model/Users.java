@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,7 +22,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "Users")
-public class Users extends BaseEntity{
+public class Users extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -70,12 +71,12 @@ public class Users extends BaseEntity{
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserSchool> userSchools = new ArrayList<>();
 
-    public void addUserSchool(UserSchool userSchool){
+    public void addUserSchool(UserSchool userSchool) {
         this.userSchools.add(userSchool);
         userSchool.setUser(this);
     }
 
-    public void removeUserSchool(UserSchool userSchool){
+    public void removeUserSchool(UserSchool userSchool) {
         this.userSchools.remove(userSchool);
         userSchool.setUser(null);
     }
@@ -113,4 +114,11 @@ public class Users extends BaseEntity{
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications = new ArrayList<>();
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles;
 }

@@ -157,7 +157,7 @@ CREATE TABLE departments (
 -- ============================================================
 -- 6. VAI TRÒ (ROLE)
 -- ============================================================
-CREATE TABLE roles (
+CREATE TABLE role (
   id          INT UNSIGNED  NOT NULL AUTO_INCREMENT,
   name        VARCHAR(30)   NOT NULL COMMENT 'admin | teacher | student',
   description TEXT,
@@ -166,10 +166,11 @@ CREATE TABLE roles (
   UNIQUE KEY uq_role_name (name)
 ) ENGINE=InnoDB COMMENT='Vai trò hệ thống';
 
-INSERT INTO roles (name, description) VALUES
-  ('admin',   'Quản trị viên hệ thống'),
-  ('lecturer', 'Giảng viên'),
-  ('student', 'Sinh viên / Học sinh');
+INSERT INTO role (name, description) VALUES
+  ('SAAS_ADMIN',   'Quản trị viên hệ thống'),
+  ('LECTURER', 'Giảng viên'),
+  ('STUDENT', 'Sinh viên / Học sinh'),
+  ('SCHOOL_ADMIN', 'Admin nha truong');
 
 -- ============================================================
 -- 7. NGƯỜI DÙNG
