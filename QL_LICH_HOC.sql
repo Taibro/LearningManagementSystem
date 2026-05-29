@@ -749,9 +749,12 @@ CREATE TABLE teacher_evaluations (
 
   -- Lưu ý: Có thể có cột student_id để hệ thống check trùng, nhưng TUYỆT ĐỐI KHÔNG JOIN để lấy tên.
   student_id INT UNSIGNED NULL,
+  
+  
+  
 
   PRIMARY KEY (id),
-  CONSTRAINT fk_eval_teacher FOREIGN KEY (teacher_id) REFERENCES teacher(id) ON DELETE CASCADE,
-  CONSTRAINT fk_eval_semester FOREIGN KEY (semester_id) REFERENCES semester(id) ON DELETE CASCADE,
-  CONSTRAINT fk_eval_class FOREIGN KEY (class_id) REFERENCES class(id) ON DELETE CASCADE
+  CONSTRAINT fk_eval_teacher FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE,
+  CONSTRAINT fk_eval_semester FOREIGN KEY (semester_id) REFERENCES semesters(id) ON DELETE CASCADE,
+  CONSTRAINT fk_eval_class FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='Bảng lưu kết quả khảo sát giảng viên';

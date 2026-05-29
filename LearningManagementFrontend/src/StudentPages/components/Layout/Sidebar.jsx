@@ -28,14 +28,8 @@ export default function Sidebar() {
         <div className={`sub-menu ${open.ttc ? 'open' : ''}`}>
           <NavLink to="/student-info" className={navClass}>Thông tin sinh viên</NavLink>
           <NavLink to="/declaration" className={navClass}>Kê khai thông tin sinh viên</NavLink>
-          <NavLink to="/services" className={navClass}>Dịch vụ trực tuyến</NavLink>
           <NavLink to="/notifications" className={navClass}>Ghi chú nhắc nhở</NavLink>
-          <NavLink to="/certificates" className={navClass}>Đề xuất chứng chỉ</NavLink>
-          <NavLink to="/student-profile" className={navClass}>Hồ sơ sinh viên</NavLink>
-          <NavLink to="/certificate-approval" className={navClass}>Đề xuất xét cấp chứng chỉ SV</NavLink>
           <NavLink to="/surveys" className={navClass}>Khảo sát sự kiện</NavLink>
-          <NavLink to="/graduation-approval" className={navClass}>Đề xuất xét tốt nghiệp</NavLink>
-          <NavLink to="/bachelor-registration" className={navClass}>Đăng ký CT Cử nhân/Kỹ sư</NavLink>
         </div>
       </div>
 
@@ -60,7 +54,6 @@ export default function Sidebar() {
         <div className={`sub-menu ${open.dkhp ? 'open' : ''}`}>
           <NavLink to="/curriculum" className={navClass}>Chương trình khung</NavLink>
           <NavLink to="/student/course-registration" className={navClass}>Đăng ký học phần</NavLink>
-          <NavLink to="/prerequisite-registration" className={navClass}>Đăng ký môn học ĐK</NavLink>
         </div>
       </div>
 
@@ -84,7 +77,6 @@ export default function Sidebar() {
         </div>
         <div className={`sub-menu ${open.khac ? 'open' : ''}`}>
           <NavLink to="/change-password" className={navClass}>Đổi mật khẩu</NavLink>
-          <NavLink to="/student-mailbox" className={navClass}>Hộp thư sinh viên</NavLink>
         </div>
       </div>
       
