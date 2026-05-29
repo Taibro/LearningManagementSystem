@@ -168,7 +168,7 @@ CREATE TABLE roles (
 
 INSERT INTO roles (name, description) VALUES
   ('admin',   'Quản trị viên hệ thống'),
-  ('teacher', 'Giảng viên'),
+  ('lecturer', 'Giảng viên'),
   ('student', 'Sinh viên / Học sinh');
 
 

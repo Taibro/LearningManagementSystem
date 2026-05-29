@@ -8,6 +8,7 @@ import org.learn.learningmanagementbackend.dto.response.LecturerProfileResponse;
 import org.learn.learningmanagementbackend.security.CustomUserDetails;
 import org.learn.learningmanagementbackend.service.LecturerService.LecturerSettingsService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;

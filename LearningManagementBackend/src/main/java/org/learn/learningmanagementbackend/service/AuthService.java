@@ -42,19 +42,19 @@ public class AuthService {
         response.setRole(request.getUserType().toUpperCase());
 
         if ("STUDENT".equals(response.getRole())) {
-            Student student = studentRepository.findByStudentCode(request.getLoginCode()).get();
+            Student student = studentRepository.findByStudentCode(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Sinh viên này trong Database!"));
             response.setId(student.getUser().getId());
             response.setFullName(student.getUser().getFullName());
             response.setEmail(student.getUser().getEmail());
             response.setSpecificCode(student.getStudentCode());
-        } else if ("TEACHER".equals(response.getRole())) {
-            Teacher teacher = teacherRepository.findByTeacherCode(request.getLoginCode()).get();
+        } else if ("LECTURER".equals(response.getRole())) {
+            Teacher teacher = teacherRepository.findByTeacherCode(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Giảng viên này trong Database!"));
             response.setId(teacher.getUser().getId());
             response.setFullName(teacher.getUser().getFullName());
             response.setEmail(teacher.getUser().getEmail());
             response.setSpecificCode(teacher.getTeacherCode());
         } else {
-            Users admin = userRepository.findByEmail(request.getLoginCode()).get();
+            Users admin = userRepository.findByEmail(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Admin này trong Database!"));
             response.setId(admin.getId());
             response.setFullName(admin.getFullName());
             response.setEmail(admin.getEmail());

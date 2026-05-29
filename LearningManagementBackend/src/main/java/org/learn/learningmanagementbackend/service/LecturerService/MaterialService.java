@@ -1,6 +1,7 @@
 package org.learn.learningmanagementbackend.service.LecturerService;
 
 import lombok.RequiredArgsConstructor;
+import org.learn.learningmanagementbackend.constant.AppConstants;
 import org.learn.learningmanagementbackend.dto.response.MaterialResponse;
 import org.learn.learningmanagementbackend.model.ClassMaterial;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.ClassMaterialRepository;
@@ -27,7 +28,7 @@ public class MaterialService {
     @Transactional(rollbackFor = Exception.class)
     public void uploadMaterial(Integer classId, Integer teacherId, String title, String docType, MultipartFile file) {
 
-        String cloudFileUrl = fileStorageService.uploadFileToCloud(file, "eduspace_materials");
+        String cloudFileUrl = fileStorageService.uploadFileToCloud(file, AppConstants.CLOUD_ROOT_FOLDER);
 
         ClassMaterial material = new ClassMaterial();
 

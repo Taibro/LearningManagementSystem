@@ -1,4 +1,4 @@
-package org.learn.learningmanagementbackend.utils;
+package org.learn.learningmanagementbackend.constant;
 
 public class AppConstants {
 
