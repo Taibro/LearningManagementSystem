@@ -14,6 +14,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     {/* <AppStudent/> */}
     {/* <AppAdmin/> */}
     {/* <AppSaaS/>  */}
-    {/* {isSaaS ? <AppSaaS /> : <AppAdmin />} */}
+    {isSaaS ? <AppSaaS /> : <AppAdmin />}
   </React.StrictMode>,
 )
