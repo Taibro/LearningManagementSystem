@@ -206,5 +206,33 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             ORDER BY n.createdAt DESC
             """)
     List<StudentNotificationDto> getNotificationsForUser(@Param("userId") Integer userId);
+
+    // ── SURVEYS: danh sách lớp học phần mà sinh viên đã đăng ký ─────────────
+    @Query(value = """
+            SELECT
+                c.id                          AS classId,
+                c.code                        AS classCode,
+                co.name                       AS courseName,
+                co.code                       AS courseCode,
+                sem.name                      AS semesterName,
+                u.full_name                   AS teacherName,
+                CASE WHEN EXISTS (
+                    SELECT 1 FROM teacher_evaluations te
+                    WHERE te.class_id = c.id
+                ) THEN 1 ELSE 0 END           AS isCompleted
+            FROM Enrollment e
+            JOIN Class c        ON e.class_id = c.id
+            JOIN Course co      ON c.course_id = co.id
+            JOIN Semester sem   ON c.semester_id = sem.id
+            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN Teacher t   ON t.id = ct.teacher_id
+            LEFT JOIN Users u     ON u.id = t.user_id
+            WHERE e.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+              AND e.status = 'ENROLLED'
+            ORDER BY sem.start_date DESC, co.name
+            """, nativeQuery = true)
+    List<StudentSurveyListDto> getSurveyListForStudent(@Param("studentCode") String studentCode);
 }
+
+
 

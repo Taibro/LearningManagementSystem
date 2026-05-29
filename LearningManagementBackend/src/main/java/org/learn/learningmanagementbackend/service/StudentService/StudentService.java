@@ -2,8 +2,12 @@ package org.learn.learningmanagementbackend.service.StudentService;
 
 import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.dto.projection.*;
-import org.learn.learningmanagementbackend.repository.LecturerRepository.StudentRepository;
+import org.learn.learningmanagementbackend.dto.request.SurveySubmitRequest;
+import org.learn.learningmanagementbackend.model.*;
+import org.learn.learningmanagementbackend.repository.LecturerRepository.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -14,6 +18,8 @@ import java.util.List;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final TeacherEvaluationRepository evaluationRepository;
+    private final ClassRepository classRepository;
 
     // ── PROFILE ──────────────────────────────────────────────────────────────
     public StudentProfileDto getStudentProfile(String studentCode) {
@@ -62,4 +68,42 @@ public class StudentService {
     public List<StudentNotificationDto> getNotifications(Integer userId) {
         return studentRepository.getNotificationsForUser(userId);
     }
+
+    // ── SURVEYS ───────────────────────────────────────────────────────────────
+    public List<StudentSurveyListDto> getSurveyList(String studentCode) {
+        return studentRepository.getSurveyListForStudent(studentCode);
+    }
+
+    public void submitSurvey(String studentCode, SurveySubmitRequest req) {
+        // Kiểm tra đã khảo sát lớp này chưa
+        evaluationRepository.findByClassId(req.getClassId()).ifPresent(e -> {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bạn đã khảo sát lớp học phần này rồi.");
+        });
+
+        // Lấy thông tin lớp
+        Classes cls = classRepository.findById(req.getClassId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy lớp học phần."));
+
+        // Lấy giảng viên chính của lớp
+        Teacher mainTeacher = cls.getTeacherLecturings().stream()
+                .filter(ct -> "main".equals(ct.getRole()))
+                .map(ClassTeacher::getTeacher)
+                .findFirst()
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy giảng viên của lớp."));
+
+        // Tạo đánh giá mới
+        TeacherEvaluation ev = new TeacherEvaluation();
+        ev.setTeacher(mainTeacher);
+        ev.setSemester(cls.getSemester());
+        ev.setClasses(cls);
+        ev.setScoreKnowledge(req.getScoreKnowledge());
+        ev.setScoreMethod(req.getScoreMethod());
+        ev.setScoreInteraction(req.getScoreInteraction());
+        ev.setScoreMaterials(req.getScoreMaterials());
+        ev.setScorePunctuality(req.getScorePunctuality());
+        ev.setComment(req.getComment());
+
+        evaluationRepository.save(ev);
+    }
 }
+

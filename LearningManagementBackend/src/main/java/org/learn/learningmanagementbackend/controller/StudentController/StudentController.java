@@ -2,6 +2,7 @@ package org.learn.learningmanagementbackend.controller.StudentController;
 
 import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.dto.projection.*;
+import org.learn.learningmanagementbackend.dto.request.SurveySubmitRequest;
 import org.learn.learningmanagementbackend.security.CustomUserDetails;
 import org.learn.learningmanagementbackend.service.StudentService.StudentService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -85,4 +86,23 @@ public class StudentController {
         Integer userId = userDetails.getUserId();
         return ResponseEntity.ok(studentService.getNotifications(userId));
     }
+
+    // GET /api/student/surveys
+    @GetMapping("/surveys")
+    public ResponseEntity<List<StudentSurveyListDto>> getSurveys(
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        String studentCode = userDetails.getSpecificCode();
+        return ResponseEntity.ok(studentService.getSurveyList(studentCode));
+    }
+
+    // POST /api/student/surveys
+    @PostMapping("/surveys")
+    public ResponseEntity<Void> submitSurvey(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody SurveySubmitRequest req) {
+        String studentCode = userDetails.getSpecificCode();
+        studentService.submitSurvey(studentCode, req);
+        return ResponseEntity.ok().build();
+    }
 }
+

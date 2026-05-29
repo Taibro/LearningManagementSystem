@@ -46,3 +46,11 @@ export const getTuition = () =>
 // ── NOTIFICATIONS ────────────────────────────────────────────────────────────
 export const getNotifications = () =>
   axios.get(`${BASE_URL}/notifications`, getHeaders()).then(res => res.data);
+
+// ── SURVEYS ──────────────────────────────────────────────────────────────────
+export const getSurveys = () =>
+  axios.get(`${BASE_URL}/surveys`, getHeaders()).then(res => res.data);
+
+export const submitSurvey = (payload) =>
+  axios.post(`${BASE_URL}/surveys`, payload, getHeaders()).then(res => res.data);
+
