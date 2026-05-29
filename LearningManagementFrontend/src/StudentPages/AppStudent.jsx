@@ -19,11 +19,13 @@ import OnlinePayment from './pages/OnlinePayment/OnlinePayment';
 import GeneralReceipts from './pages/GeneralReceipts/GeneralReceipts';
 import OnlineReceipts from './pages/OnlineReceipts/OnlineReceipts';
 import DefaultPage from './pages/DefaultPage/DefaultPage';
+import CourseRegistration from './pages/CourseRegistration/CourseRegistration';
 
 export default function AppStudent() {
   return (
     <Router>
       <Routes>
+        <Route path="/student/course-registration" element={<CourseRegistration />} />
         
         <Route path="/" element={<MainLayout />}>
           
@@ -54,7 +56,7 @@ export default function AppStudent() {
           <Route path="certificate-approval" element={<DefaultPage title="Đề xuất xét cấp chứng chỉ SV" />} />
           <Route path="graduation-approval" element={<DefaultPage title="Đề xuất xét tốt nghiệp" />} />
           <Route path="bachelor-registration" element={<DefaultPage title="Đăng ký CT Cử nhân/Kỹ sư" />} />
-          <Route path="course-registration" element={<DefaultPage title="Đăng ký học phần" />} />
+          
           <Route path="prerequisite-registration" element={<DefaultPage title="Đăng ký môn học điều kiện" />} />
           <Route path="dormitory-payment" element={<DefaultPage title="Thanh toán nội trú" />} />
         </Route>
