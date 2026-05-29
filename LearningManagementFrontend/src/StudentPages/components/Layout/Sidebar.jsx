@@ -59,7 +59,7 @@ export default function Sidebar() {
         </div>
         <div className={`sub-menu ${open.dkhp ? 'open' : ''}`}>
           <NavLink to="/curriculum" className={navClass}>Chương trình khung</NavLink>
-          <NavLink to="/course-registration" className={navClass}>Đăng ký học phần</NavLink>
+          <NavLink to="/student/course-registration" className={navClass}>Đăng ký học phần</NavLink>
           <NavLink to="/prerequisite-registration" className={navClass}>Đăng ký môn học ĐK</NavLink>
         </div>
       </div>
