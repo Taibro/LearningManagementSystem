@@ -35,8 +35,8 @@ public class Notification {
     @Column(name = "type")
     private NotificationType type;
 
-    @Column(name = "is_read", nullable = false)
-    private Boolean isRead;
+    @Column(name = "is_read", nullable = false, columnDefinition = "boolean default false")
+    private Boolean isRead = false;
 
     @Column(name = "ref_type")
     private String refType;
