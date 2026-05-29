@@ -9,6 +9,7 @@ import org.learn.learningmanagementbackend.service.LecturerService.TeachingSuspe
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,13 +25,18 @@ public class TeachingSuspensionController {
             @AuthenticationPrincipal CustomUserDetails userDetails) {
 
         String teacherCode = userDetails.getSpecificCode();
-
         return ResponseEntity.ok(suspensionService.getTeacherSuspensionHistory(teacherCode));
     }
 
     @PostMapping(value = "/submit", consumes = "multipart/form-data")
-    public ResponseEntity<String> submitRequest(@Valid @ModelAttribute SuspensionSubmitRequest request) {
-        suspensionService.submitSuspensionRequest(request);
-        return ResponseEntity.ok("Đề xuất tạm ngừng lịch dạy đã được gửi thành công và đang chờ xét duyệt!");
+    public ResponseEntity<String> submitRequest(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @Valid @RequestPart("data") SuspensionSubmitRequest request,
+            @RequestPart(value = "proofFile", required = false) MultipartFile proofFile) {
+
+        String teacherCode = userDetails.getSpecificCode();
+        suspensionService.submitSuspensionRequest(teacherCode, request, proofFile);
+
+        return ResponseEntity.ok("Đề xuất tạm ngừng lịch dạy đã được gửi và đang chờ Phòng Đào tạo xét duyệt!");
     }
 }

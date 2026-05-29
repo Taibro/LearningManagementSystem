@@ -18,6 +18,5 @@ public class SuspensionSubmitRequest {
 
     @NotBlank(message = "Vui lòng nhập lý do xin tạm ngừng")
     private String reason;
-
-    private MultipartFile proofFile;
+    
 }

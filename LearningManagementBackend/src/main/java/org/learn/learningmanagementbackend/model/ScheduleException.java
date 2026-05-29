@@ -45,6 +45,10 @@ public class ScheduleException extends BaseEntity {
     @Column(name = "proof_file_url")
     private String ProofFileUrl;
 
+    @Column(name = "replacement_start_period")
+    private Integer replacementStartPeriod;
+
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "replacement_room_id", referencedColumnName = "id")
     private Room replacementRoom;

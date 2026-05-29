@@ -18,7 +18,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/teacher/schedules")
+@RequestMapping("/api/lecturer/schedules")
 @RequiredArgsConstructor
 public class TeacherScheduleController {
 

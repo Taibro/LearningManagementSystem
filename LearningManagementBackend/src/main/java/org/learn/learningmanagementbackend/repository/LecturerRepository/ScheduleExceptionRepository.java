@@ -12,7 +12,16 @@ public interface ScheduleExceptionRepository extends JpaRepository<ScheduleExcep
     @Query("SELECT se FROM ScheduleException se " +
             "JOIN FETCH se.schedule s " +
             "JOIN FETCH s.classes c " +
-            "WHERE c.teacher.teacherCode = :teacherCode " +
+            "JOIN c.teacherLecturings ct " +
+            "JOIN ct.teacher t " +
+            "WHERE t.teacherCode = :teacherCode " +
             "ORDER BY se.createdAt DESC")
-    List<ScheduleException> findExceptionHistoryByTeacherCode(@Param("teacherCode") String teacherCode);
+    List<ScheduleException> findHistoryByTeacherCode(@Param("teacherCode") String teacherCode);
+    
+    @Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM Schedule s " +
+            "JOIN s.classes c " +
+            "JOIN c.teacherLecturings ct " +
+            "JOIN ct.teacher t " +
+            "WHERE s.id = :scheduleId AND t.teacherCode = :teacherCode")
+    boolean isScheduleOwnedByTeacher(@Param("scheduleId") Integer scheduleId, @Param("teacherCode") String teacherCode);
 }
