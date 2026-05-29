@@ -428,6 +428,10 @@ CREATE TABLE schedule_exceptions (
   replacement_room_id INT UNSIGNED,
   approval_status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'pending' COMMENT 'Trạng thái duyệt đơn',
   proof_file_url VARCHAR(500) COMMENT 'Đường dẫn file minh chứng (Cloudinary/S3...)',
+  replacement_start_period INT COMMENT 'Tiết bắt đầu ca dạy bù (VD: 1)',
+    replacement_end_period INT COMMENT 'Tiết kết thúc ca dạy bù (VD: 3)',
+    makeup_notes TEXT COMMENT 'Ghi chú cho đơn dạy bù',
+    makeup_status ENUM('pending', 'approved', 'rejected', 'completed') DEFAULT NULL COMMENT 'Trạng thái duyệt đơn dạy bù',
 
   -- Audit Columns
   created_at          TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
