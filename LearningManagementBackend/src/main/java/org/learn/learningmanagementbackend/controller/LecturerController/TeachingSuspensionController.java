@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/teaching-suspensions")
+@RequestMapping("/api/lecturer/teaching-suspensions")
 @RequiredArgsConstructor
 public class TeachingSuspensionController {
 

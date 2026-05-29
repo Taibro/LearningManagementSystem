@@ -1,4 +1,4 @@
-package org.learn.learningmanagementbackend.service.LecturerService;
+package org.learn.learningmanagementbackend.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;

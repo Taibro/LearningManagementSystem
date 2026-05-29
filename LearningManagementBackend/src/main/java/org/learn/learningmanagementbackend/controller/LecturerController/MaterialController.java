@@ -19,7 +19,7 @@ import java.net.URLConnection;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/materials")
+@RequestMapping("/api/lecturer/materials")
 @RequiredArgsConstructor
 public class MaterialController {
 

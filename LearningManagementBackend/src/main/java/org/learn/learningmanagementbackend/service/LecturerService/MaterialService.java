@@ -6,6 +6,7 @@ import org.learn.learningmanagementbackend.model.ClassMaterial;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.ClassMaterialRepository;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.ClassRepository;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.TeacherRepository;
+import org.learn.learningmanagementbackend.service.FileStorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;

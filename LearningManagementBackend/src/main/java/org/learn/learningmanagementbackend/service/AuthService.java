@@ -1,4 +1,4 @@
-package org.learn.learningmanagementbackend.service.LecturerService;
+package org.learn.learningmanagementbackend.service;
 
 import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.dto.request.AuthRequest;

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping("/api/attendance")
+@RequestMapping("/api/lecturer/attendance")
 @RequiredArgsConstructor
 public class AttendanceController {
 

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/test-payroll")
+@RequestMapping("/api/lecturer/test-payroll")
 @RequiredArgsConstructor
 public class TestPayrollController {
 

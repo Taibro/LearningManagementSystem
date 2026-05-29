@@ -8,11 +8,11 @@ import org.learn.learningmanagementbackend.enums.ExceptionType;
 import org.learn.learningmanagementbackend.model.ScheduleException;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.ScheduleExceptionRepository;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.ScheduleRepository;
+import org.learn.learningmanagementbackend.service.FileStorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 

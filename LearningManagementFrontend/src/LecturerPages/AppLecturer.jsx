@@ -53,7 +53,7 @@ function AppLecturer() {
           <Route path="settings" element={<Settings />} />
           <Route path="statistics" element={<Statistics />} />
           <Route path="survey" element={<Survey />} />
-          <Route path="/view-schedule" element={<WeeklySchedule />} />
+          {/* <Route path="/view-schedule" element={<WeeklySchedule />} /> */}
         </Route>
       </Routes>
     </Router>
