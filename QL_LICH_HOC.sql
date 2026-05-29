@@ -171,7 +171,6 @@ INSERT INTO roles (name, description) VALUES
   ('lecturer', 'Giảng viên'),
   ('student', 'Sinh viên / Học sinh');
 
-
 -- ============================================================
 -- 7. NGƯỜI DÙNG
 -- ============================================================

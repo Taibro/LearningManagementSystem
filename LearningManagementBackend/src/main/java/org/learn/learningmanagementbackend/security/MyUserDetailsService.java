@@ -57,7 +57,7 @@ public class MyUserDetailsService implements UserDetailsService {
         } else {
             throw new UsernameNotFoundException("Loại tài khoản không hợp lệ");
         }
-        
+
         return new CustomUserDetails(
                 user.getId(),
                 user.getFullName(),
