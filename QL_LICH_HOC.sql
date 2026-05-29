@@ -729,3 +729,29 @@ CREATE TABLE system_error_logs (
   PRIMARY KEY (id),
   CONSTRAINT fk_err_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE SET NULL
 ) ENGINE=InnoDB COMMENT='Nhật ký bắt lỗi toàn hệ thống';
+
+-- Tạo bảng lưu trữ đánh giá của sinh viên
+CREATE TABLE teacher_evaluations (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  teacher_id INT UNSIGNED NOT NULL,
+  semester_id INT UNSIGNED NOT NULL,
+  class_id INT UNSIGNED NOT NULL,
+
+  -- 5 Tiêu chí đánh giá (Thang điểm 5)
+  score_knowledge DECIMAL(2,1) NOT NULL COMMENT 'Kiến thức chuyên môn',
+  score_method DECIMAL(2,1) NOT NULL COMMENT 'Phương pháp giảng dạy',
+  score_interaction DECIMAL(2,1) NOT NULL COMMENT 'Tương tác với sinh viên',
+  score_materials DECIMAL(2,1) NOT NULL COMMENT 'Tài liệu giảng dạy',
+  score_punctuality DECIMAL(2,1) NOT NULL COMMENT 'Đúng giờ, kỷ luật',
+
+  comment TEXT COMMENT 'Nhận xét từ sinh viên',
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  -- Lưu ý: Có thể có cột student_id để hệ thống check trùng, nhưng TUYỆT ĐỐI KHÔNG JOIN để lấy tên.
+  student_id INT UNSIGNED NULL,
+
+  PRIMARY KEY (id),
+  CONSTRAINT fk_eval_teacher FOREIGN KEY (teacher_id) REFERENCES teacher(id) ON DELETE CASCADE,
+  CONSTRAINT fk_eval_semester FOREIGN KEY (semester_id) REFERENCES semester(id) ON DELETE CASCADE,
+  CONSTRAINT fk_eval_class FOREIGN KEY (class_id) REFERENCES class(id) ON DELETE CASCADE
+) ENGINE=InnoDB COMMENT='Bảng lưu kết quả khảo sát giảng viên';

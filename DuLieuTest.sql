@@ -429,4 +429,9 @@ INSERT INTO Teacher_salary_detail (id, sheet_id, teacher_id, class_id, schedule_
 (11, 9, 9, 10, 10, '2026-03-14', 3, 'MAIN', 250000.00, 750000.00),
 (12, 12, 1, 12, 12, '2026-04-01', 3, 'MAIN', 250000.00, 750000.00);
 
-SELECT * FROM teacher_declarations;
+INSERT INTO teacher_evaluations (teacher_id, semester_id, class_id, score_knowledge, score_method, score_interaction, score_materials, score_punctuality, comment) VALUES
+(1, 2, 1, 5.0, 4.5, 5.0, 4.0, 5.0, 'Thầy giảng rất rõ ràng và dễ hiểu. Có nhiều ví dụ thực tế.'),
+(1, 2, 1, 4.5, 4.5, 4.0, 4.5, 5.0, 'Môn học thú vị, thầy nhiệt tình.'),
+(1, 2, 1, 4.0, 4.0, 4.5, 4.0, 4.5, 'Tốc độ giảng đôi lúc hơi nhanh nhưng slide rất chi tiết.'),
+(1, 2, 2, 5.0, 5.0, 5.0, 5.0, 5.0, 'Không có gì để chê, 10 điểm không có nhưng!'),
+(1, 2, 2, 4.5, 4.0, 4.5, 4.5, 4.5, 'Thầy vui tính, hay tương tác hỏi bài sinh viên.');
