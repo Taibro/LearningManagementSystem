@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/school-admin")
+@RequestMapping("/api/auth/school-admin") // Tạm mượn /api/auth để test không cần token
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*") // Cho phép frontend React/Vite gọi
 public class DepartmentController {
 
     private final DepartmentService departmentService;

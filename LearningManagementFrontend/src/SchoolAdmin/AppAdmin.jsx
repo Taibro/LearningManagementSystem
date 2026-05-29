@@ -2,8 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './admin.css';
 
-// import AdminLogin from './pages/Login/AdminLogin';
-import SaaSAdminLogin from '../SaaSAdminSystem/pages/Login/SaaSAdminLogin';
+import AdminLogin from './pages/Login/AdminLogin';
+// import SaaSAdminLogin from '../SaaSAdminSystem/pages/Login/SaaSAdminLogin';
 import MainLayout from './components/Layout/MainLayout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import BranchesRooms from './pages/BranchesRooms/BranchesRooms';
@@ -28,7 +28,7 @@ export default function AppAdmin() {
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<SaaSAdminLogin />} />
+        <Route path="/login" element={<AdminLogin />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/" element={<MainLayout />}>
           
@@ -49,7 +49,7 @@ export default function AppAdmin() {
           <Route path="tuition" element={<Tuition />} />
           <Route path="payments" element={<Payments />} />
           <Route path="notifications" element={<Notifications />} />
-          <Route path="set-tings" element={<Settings />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
 
         <Route path="/" element={<Navigate to="/login" replace />} />

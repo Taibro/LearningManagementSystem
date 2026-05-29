@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const API_BASE = 'http://localhost:8080/api/school-admin';
+const API_BASE = 'http://localhost:8080/api/auth/school-admin';
 
 export default function Departments() {
   const [departments, setDepartments] = useState([]);
@@ -9,6 +9,13 @@ export default function Departments() {
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentDept, setCurrentDept] = useState({ id: null, code: '', name: '', description: '' });
+  
+  // Toast State
+  const [toast, setToast] = useState({ show: false, msg: '', type: 'success' });
+  const showToast = (msg, type = 'success') => {
+    setToast({ show: true, msg, type });
+    setTimeout(() => setToast({ show: false, msg: '', type: 'success' }), 3000);
+  };
 
   // schoolId tạm fix = 1, sau khi có JWT sẽ lấy từ token
   const schoolId = 1;
@@ -69,11 +76,11 @@ export default function Departments() {
         const txt = await res.text();
         throw new Error(txt || 'Có lỗi xảy ra');
       }
-      alert(isEditMode ? 'Cập nhật khoa thành công!' : 'Thêm khoa thành công!');
+      showToast(isEditMode ? 'Cập nhật khoa thành công!' : 'Thêm khoa thành công!', 'success');
       setShowModal(false);
       fetchDepartments();
     } catch (err) {
-      alert(`Lỗi: ${err.message}`);
+      showToast(`Lỗi: ${err.message}`, 'error');
     }
   };
 
@@ -82,10 +89,10 @@ export default function Departments() {
     try {
       const res = await fetch(`${API_BASE}/delete-department/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Xóa thất bại');
-      alert('Xóa khoa thành công!');
+      showToast('Xóa khoa thành công!', 'success');
       fetchDepartments();
     } catch (err) {
-      alert(`Lỗi: ${err.message}`);
+      showToast(`Lỗi: ${err.message}`, 'error');
     }
   };
 
@@ -194,6 +201,18 @@ export default function Departments() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+    {/* Toast */}
+      {toast.show && (
+        <div style={{
+          position: 'fixed', top: 24, right: 24, zIndex: 10000,
+          background: toast.type === 'success' ? '#10b981' : '#ef4444',
+          color: 'white', padding: '14px 24px', borderRadius: 8,
+          boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14,
+          transition: 'all 0.3s ease-out'
+        }}>
+          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
         </div>
       )}
     </div>
