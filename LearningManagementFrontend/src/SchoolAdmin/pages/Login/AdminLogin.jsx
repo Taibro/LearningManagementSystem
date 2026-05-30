@@ -53,6 +53,10 @@ export default function AdminLogin() {
       
       if (res.ok) {
         const data = await res.json();
+        // Lấy tên thật từ Backend bỏ vô túi áo
+        localStorage.setItem('adminName', data.fullName || 'Admin');
+        localStorage.setItem('adminEmail', data.email || '');
+        
         setSchoolView('otp');
         addToast(`Đăng nhập thành công, đang chuyển hướng...`, 'green');
       } else {

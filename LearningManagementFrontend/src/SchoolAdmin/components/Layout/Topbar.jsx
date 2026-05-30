@@ -19,8 +19,12 @@ export default function Topbar() {
         <div className="top-btn" onClick={() => alert('Không có thông báo mới')}>🔔<span className="dot"></span></div>
         <div className="top-btn">⚙️</div>
         <div style={{display:'flex', alignItems:'center', gap:'8px', padding:'5px 12px', background:'var(--blue-pale)', border:'1px solid #b3d4f5', borderRadius:'8px', cursor:'pointer'}}>
-          <div className="av av-blue" style={{width:'28px', height:'28px', fontSize:'11px'}}>AD</div>
-          <span style={{fontSize:'12.5px', fontWeight:700, color:'var(--blue)'}}>Admin</span>
+          <div className="av av-blue" style={{width:'28px', height:'28px', fontSize:'11px'}}>
+            {localStorage.getItem('adminName') ? localStorage.getItem('adminName').charAt(0).toUpperCase() : 'AD'}
+          </div>
+          <span style={{fontSize:'12.5px', fontWeight:700, color:'var(--blue)'}}>
+            {localStorage.getItem('adminName') || 'Admin'}
+          </span>
         </div>
       </div>
     </header>
