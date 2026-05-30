@@ -25,11 +25,29 @@ import SubstituteTeaching from './pages/Proposals/SubstituteTeaching';
 import Statistics from './pages/Statistics/Statistics';
 import Survey from './pages/Survey/Survey';
 import Settings from './pages/Settings/settings';
+import LecturerLogin from './pages/Login/LecturerLogin';
+
+// Component Bảo vệ: Ai chưa có token thì đuổi về trang login
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('lecturerToken');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 function AppLecturer() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<MainLayout />}>
+        <Route path="/login" element={<LecturerLogin />} />
+        
+        {/* Bọc MainLayout trong Bảo vệ */}
+        <Route path="/" element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }>
 
           <Route index element={<Navigate to="/weekly-schedule" />} />
 

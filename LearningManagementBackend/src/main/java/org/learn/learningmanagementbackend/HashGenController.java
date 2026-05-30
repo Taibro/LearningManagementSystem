@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HashGenController {
-    @GetMapping("/api/hash")
+    @GetMapping("/api/auth/hash")
     public String getHash() {
-        return new BCryptPasswordEncoder().encode("hash123");
+        return new BCryptPasswordEncoder().encode("Admin@123");
     }
 }

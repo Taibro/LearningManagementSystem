@@ -6,7 +6,7 @@ import org.learn.learningmanagementbackend.dto.response.NotificationResponse;
 import org.learn.learningmanagementbackend.model.Notification;
 import org.learn.learningmanagementbackend.model.Users;
 import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.NotificationRepository;
-import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.UsersRepository;
+import org.learn.learningmanagementbackend.repository.LecturerRepository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
-    private final UsersRepository usersRepository;
+    private final UserRepository userRepository;
 
     public List<NotificationResponse> getAllNotifications() {
         return notificationRepository.findAll().stream()
@@ -28,7 +28,7 @@ public class NotificationService {
     }
 
     public NotificationResponse createNotification(NotificationRequest request) {
-        Users user = usersRepository.findById(request.getUserId())
+        Users user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Notification notification = new Notification();
