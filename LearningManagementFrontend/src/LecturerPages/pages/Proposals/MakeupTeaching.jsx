@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Check, RefreshCw, CheckCircle2, AlertTriangle, Upload, X } from 'lucide-react';
 
 const MakeupTeaching = () => {
   const [history, setHistory] = useState([]);
@@ -89,8 +90,8 @@ const MakeupTeaching = () => {
 
   const getStatusStyle = (status) => {
     switch(status?.toLowerCase()) {
-      case 'approved': return { box: 'border-green-200 bg-green-50', text: 'text-green-800', badge: 'bg-green-200 text-green-700', label: '✓ Đã duyệt', subtext: 'text-green-600' };
-      case 'rejected': return { box: 'border-red-200 bg-red-50', text: 'text-red-800', badge: 'bg-red-200 text-red-700', label: '✕ Từ chối', subtext: 'text-red-600' };
+      case 'approved': return { box: 'border-green-200 bg-green-50', text: 'text-green-800', badge: 'bg-green-200 text-green-700', label: <><Check className="w-4 h-4 inline-block mr-2" /> Đã duyệt</>, subtext: 'text-green-600' };
+      case 'rejected': return { box: 'border-red-200 bg-red-50', text: 'text-red-800', badge: 'bg-red-200 text-red-700', label: <><X className="w-4 h-4 inline-block mr-2" /> Từ chối</>, subtext: 'text-red-600' };
       default: return { box: 'border-yellow-200 bg-yellow-50', text: 'text-yellow-800', badge: 'bg-yellow-200 text-yellow-700', label: '⏳ Chờ duyệt', subtext: 'text-yellow-600' };
     }
   };
@@ -105,7 +106,7 @@ const MakeupTeaching = () => {
           color: 'white', padding: '14px 24px', borderRadius: 8,
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
         </div>
       )}
 
@@ -184,7 +185,7 @@ const MakeupTeaching = () => {
               disabled={submitting || cancelledSessions.length === 0}
               className={`w-full font-bold py-2.5 mt-2 uppercase text-xs tracking-widest ${cancelledSessions.length === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed rounded-lg' : 'btn-primary shadow-lg shadow-purple-200'}`}
             >
-              {submitting ? '⏳ Đang gửi...' : '📤 Gửi đề xuất dạy bù'}
+              {submitting ? '⏳ Đang gửi...' : <><Upload className="w-4 h-4 inline-block mr-2" /> Gửi đề xuất dạy bù</>}
             </button>
           </div>
         </div>
@@ -192,7 +193,7 @@ const MakeupTeaching = () => {
         <div className="card p-6 shadow-sm border border-gray-100 h-fit max-h-[600px] flex flex-col">
           <div className="flex justify-between items-center mb-5 border-b pb-2">
             <h3 className="font-bold text-gray-700 uppercase text-[11px] tracking-widest">Trạng thái dạy bù</h3>
-            <button onClick={fetchData} className="text-xs text-[#6B4FA0] font-bold hover:underline">🔄 Làm mới</button>
+            <button onClick={fetchData} className="text-xs text-[#6B4FA0] font-bold hover:underline"><RefreshCw className="w-4 h-4 inline-block mr-2" /> Làm mới</button>
           </div>
 
           <div className="space-y-3 overflow-y-auto pr-2 custom-scrollbar flex-1">

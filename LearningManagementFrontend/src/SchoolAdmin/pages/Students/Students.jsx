@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { GraduationCap, Search, User, Save, Download } from 'lucide-react';
 
 export default function Students() {
   const [students, setStudents] = useState([]);
@@ -128,13 +129,13 @@ export default function Students() {
           <div className="ph-sub">{students.length} sinh viên đang theo học</div>
         </div>
         <div style={{display:'flex', gap:'8px'}}>
-          <button className="btn btn-ghost">📥 Import Excel</button>
+          <button className="btn btn-ghost"><Download className="w-4 h-4 inline-block mr-2" /> Import Excel</button>
           <button className="btn btn-blue" onClick={() => openStudentModal()}>+ Thêm sinh viên</button>
         </div>
       </div>
 
       <div className="filter-bar">
-        <input className="fc" style={{maxWidth:'260px'}} placeholder="🔍 MSSV, tên, email..." />
+        <input className="fc" style={{maxWidth:'260px'}} placeholder="MSSV, tên, email..." />
         <select className="fc" style={{maxWidth:'140px'}}>
           <option>Tất cả khoa</option>
         </select>
@@ -202,7 +203,7 @@ export default function Students() {
         <div className="ov open">
           <div className="modal">
             <div className="modal-hd">
-              <span className="modal-title">{currentStudent.id ? '👨‍🎓 Sửa thông tin Sinh viên' : '👨‍🎓 Thêm Sinh viên'}</span>
+              <span className="modal-title">{currentStudent.id ? <><User className="w-4 h-4 inline-block mr-2" />‍<GraduationCap className="w-4 h-4 inline-block mr-2" /> Sửa thông tin Sinh viên</> : <><User className="w-4 h-4 inline-block mr-2" />‍<GraduationCap className="w-4 h-4 inline-block mr-2" /> Thêm Sinh viên</>}</span>
               <button className="close-btn" onClick={() => setSModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -239,7 +240,7 @@ export default function Students() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setSModal(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveStudent}>💾 Lưu</button>
+              <button className="btn btn-blue" onClick={handleSaveStudent}><Save className="w-4 h-4 inline-block mr-2" /> Lưu</button>
             </div>
           </div>
         </div>

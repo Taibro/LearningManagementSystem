@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { Settings, CheckCircle2, GraduationCap, CreditCard } from 'lucide-react';
 
 export default function Sidebar() {
   const [open, setOpen] = useState({
@@ -35,7 +36,7 @@ export default function Sidebar() {
 
       <div className="sidebar-section">
         <div className={`sidebar-parent ${open.hoctap ? 'open' : ''}`} onClick={() => toggle('hoctap')}>
-          <span>🎓 HỌC TẬP</span><span className="caret">▾</span>
+          <span><GraduationCap className="w-4 h-4 inline-block mr-2" /> HỌC TẬP</span><span className="caret">▾</span>
         </div>
         <div className={`sub-menu ${open.hoctap ? 'open' : ''}`}>
           <NavLink to="/grades" className={navClass}>Kết quả học tập</NavLink>
@@ -49,7 +50,7 @@ export default function Sidebar() {
 
       <div className="sidebar-section">
         <div className={`sidebar-parent ${open.dkhp ? 'open' : ''}`} onClick={() => toggle('dkhp')}>
-          <span>✅ ĐĂNG KÝ HỌC PHẦN</span><span className="caret">▾</span>
+          <span><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> ĐĂNG KÝ HỌC PHẦN</span><span className="caret">▾</span>
         </div>
         <div className={`sub-menu ${open.dkhp ? 'open' : ''}`}>
           <NavLink to="/curriculum" className={navClass}>Chương trình khung</NavLink>
@@ -59,7 +60,7 @@ export default function Sidebar() {
 
       <div className="sidebar-section">
         <div className={`sidebar-parent ${open.hocphi ? 'open' : ''}`} onClick={() => toggle('hocphi')}>
-          <span>💳 HỌC PHÍ</span><span className="caret">▾</span>
+          <span><CreditCard className="w-4 h-4 inline-block mr-2" /> HỌC PHÍ</span><span className="caret">▾</span>
         </div>
         <div className={`sub-menu ${open.hocphi ? 'open' : ''}`}>
           <NavLink to="/tuition-fee" className={navClass}>Tra cứu công nợ</NavLink>
@@ -73,7 +74,7 @@ export default function Sidebar() {
       
       <div className="sidebar-section">
         <div className={`sidebar-parent ${open.khac ? 'open' : ''}`} onClick={() => toggle('khac')}>
-          <span>⚙ KHÁC</span><span className="caret">▾</span>
+          <span><Settings className="w-4 h-4 inline-block mr-2" /> KHÁC</span><span className="caret">▾</span>
         </div>
         <div className={`sub-menu ${open.khac ? 'open' : ''}`}>
           <NavLink to="/change-password" className={navClass}>Đổi mật khẩu</NavLink>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { Check, CheckCircle2, XCircle } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8080/api/saas-admin';
 
@@ -55,10 +56,10 @@ export default function SystemLogs() {
       if (res.ok) {
         setLogs(prev => prev.map(l => l.id === id ? { ...l, isResolved: true } : l));
         setUnresolvedCount(prev => Math.max(0, prev - 1));
-        addToast('✅', 'Đã đánh dấu lỗi là Resolved', 'green');
+        addToast(<CheckCircle2 className="w-4 h-4 inline-block mr-2" />, 'Đã đánh dấu lỗi là Resolved', 'green');
       }
     } catch (err) {
-      addToast('❌', 'Lỗi khi cập nhật trạng thái', 'red');
+      addToast(<XCircle className="w-4 h-4 inline-block mr-2" />, 'Lỗi khi cập nhật trạng thái', 'red');
     }
   };
 
@@ -95,7 +96,7 @@ export default function SystemLogs() {
                 <td className="text-xs max-w-xs truncate" style={{ maxWidth: '200px', color: 'var(--accent2)' }}>{l.errorMessage}</td>
                 <td className="text-xs">{l.schoolName}</td>
                 <td className="font-mono text-xs" style={{ color: 'var(--muted)' }}>{formatTime(l.createdAt)}</td>
-                <td>{l.isResolved ? <span className="badge badge-green">✓ Đã fix</span> : <span className="badge badge-red pulse-red">● Chưa xử lý</span>}</td>
+                <td>{l.isResolved ? <span className="badge badge-green"><Check className="w-4 h-4 inline-block mr-2" /> Đã fix</span> : <span className="badge badge-red pulse-red">● Chưa xử lý</span>}</td>
                 <td>{!l.isResolved && <button className="btn btn-ghost btn-sm" onClick={() => markResolved(l.id)}>Mark fixed</button>}</td>
               </tr>
             ))}

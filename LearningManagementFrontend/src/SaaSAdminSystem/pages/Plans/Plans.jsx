@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Check, X } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8080/api/saas-admin';
 
@@ -96,11 +97,11 @@ export default function Plans() {
               </p>
               
               <div className="space-y-2 text-xs mb-5">
-                <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Tối đa <strong>{plan.maxStudents === -1 ? 'Không giới hạn' : plan.maxStudents?.toLocaleString()}</strong> sinh viên</div>
-                <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> {plan.maxStorageGb === -1 ? 'Storage theo yêu cầu' : `${plan.maxStorageGb}GB lưu trữ`}</div>
+                <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}><Check className="w-4 h-4 inline-block mr-2" /></span> Tối đa <strong>{plan.maxStudents === -1 ? 'Không giới hạn' : plan.maxStudents?.toLocaleString()}</strong> sinh viên</div>
+                <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}><Check className="w-4 h-4 inline-block mr-2" /></span> {plan.maxStorageGb === -1 ? 'Storage theo yêu cầu' : `${plan.maxStorageGb}GB lưu trữ`}</div>
                 {features.map((f, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span style={{ color: f.included ? 'var(--accent3)' : 'var(--muted)' }}>{f.included ? '✓' : '✕'}</span>
+                    <span style={{ color: f.included ? 'var(--accent3)' : 'var(--muted)' }}>{f.included ? <Check className="w-4 h-4 inline-block mr-2" /> : <X className="w-4 h-4 inline-block mr-2" />}</span>
                     <span style={f.included ? {} : { color: 'var(--muted)' }}>{f.name}</span>
                   </div>
                 ))}
@@ -129,21 +130,21 @@ export default function Plans() {
           </thead>
           <tbody>
             <tr><td className="text-xs font-semibold py-2.5" style={{ color: 'var(--muted)' }}>HỌC VỤ CƠ BẢN</td>{plans.map(p => <td key={p.id}></td>)}</tr>
-            <tr><td className="text-sm">Quản lý lớp học & Lịch học</td>{plans.map(p => <td key={p.id} className="text-center text-green-400">✓</td>)}</tr>
-            <tr><td className="text-sm">Điểm danh & Đăng ký học phần</td>{plans.map(p => <td key={p.id} className="text-center text-green-400">✓</td>)}</tr>
-            <tr><td className="text-sm">Thông báo trong app</td>{plans.map(p => <td key={p.id} className="text-center text-green-400">✓</td>)}</tr>
+            <tr><td className="text-sm">Quản lý lớp học & Lịch học</td>{plans.map(p => <td key={p.id} className="text-center text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></td>)}</tr>
+            <tr><td className="text-sm">Điểm danh & Đăng ký học phần</td>{plans.map(p => <td key={p.id} className="text-center text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></td>)}</tr>
+            <tr><td className="text-sm">Thông báo trong app</td>{plans.map(p => <td key={p.id} className="text-center text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></td>)}</tr>
             
             <tr><td className="text-xs font-semibold py-2.5" style={{ color: 'var(--muted)' }}>TÀI CHÍNH & NHÂN SỰ</td>{plans.map(p => <td key={p.id}></td>)}</tr>
-            <tr><td className="text-sm">Quản lý học phí</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? '✕' : <span className="text-green-400">✓</span>}</td>)}</tr>
-            <tr><td className="text-sm">Bảng lương giảng viên theo bậc</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? '✕' : <span className="text-green-400">✓</span>}</td>)}</tr>
+            <tr><td className="text-sm">Quản lý học phí</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? <X className="w-4 h-4 inline-block mr-2" /> : <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span>}</td>)}</tr>
+            <tr><td className="text-sm">Bảng lương giảng viên theo bậc</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? <X className="w-4 h-4 inline-block mr-2" /> : <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span>}</td>)}</tr>
             
             <tr><td className="text-xs font-semibold py-2.5" style={{ color: 'var(--muted)' }}>NÂNG CAO</td>{plans.map(p => <td key={p.id}></td>)}</tr>
-            <tr><td className="text-sm">Báo cáo & Dashboard Analytics</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? '✕' : <span className="text-green-400">✓</span>}</td>)}</tr>
-            <tr><td className="text-sm">QR Code điểm danh</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? '✕' : <span className="text-green-400">✓</span>}</td>)}</tr>
-            <tr><td className="text-sm">SSO / Azure AD / Google Workspace</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400">✓</span> : '✕'}</td>)}</tr>
-            <tr><td className="text-sm">Open API tích hợp ERP</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400">✓</span> : '✕'}</td>)}</tr>
-            <tr><td className="text-sm">Audit Log đầy đủ + Export</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400">✓</span> : '✕'}</td>)}</tr>
-            <tr><td className="text-sm">SLA & Backup riêng</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400">✓</span> : '✕'}</td>)}</tr>
+            <tr><td className="text-sm">Báo cáo & Dashboard Analytics</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? <X className="w-4 h-4 inline-block mr-2" /> : <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span>}</td>)}</tr>
+            <tr><td className="text-sm">QR Code điểm danh</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? <X className="w-4 h-4 inline-block mr-2" /> : <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span>}</td>)}</tr>
+            <tr><td className="text-sm">SSO / Azure AD / Google Workspace</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span> : <X className="w-4 h-4 inline-block mr-2" />}</td>)}</tr>
+            <tr><td className="text-sm">Open API tích hợp ERP</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span> : <X className="w-4 h-4 inline-block mr-2" />}</td>)}</tr>
+            <tr><td className="text-sm">Audit Log đầy đủ + Export</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span> : <X className="w-4 h-4 inline-block mr-2" />}</td>)}</tr>
+            <tr><td className="text-sm">SLA & Backup riêng</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span> : <X className="w-4 h-4 inline-block mr-2" />}</td>)}</tr>
           </tbody>
         </table>
       </div>

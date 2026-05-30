@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './StudentLogin.css';
+import { GraduationCap } from 'lucide-react';
 
 export default function StudentLogin() {
   const [studentCode, setStudentCode] = useState('2001216301');
@@ -40,7 +41,7 @@ export default function StudentLogin() {
     <div className="student-login-container">
       <div className="login-box">
         <div className="login-header">
-          <div className="logo-placeholder">🎓</div>
+          <div className="logo-placeholder"><GraduationCap className="w-4 h-4 inline-block mr-2" /></div>
           <h2>Cổng thông tin sinh viên</h2>
           <p>Đăng nhập để xem thời khóa biểu, điểm số và học phí</p>
         </div>
@@ -48,23 +49,23 @@ export default function StudentLogin() {
         <form onSubmit={handleLogin} className="login-form">
           <div className="form-group">
             <label>Mã số sinh viên</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={studentCode}
               onChange={(e) => setStudentCode(e.target.value)}
               placeholder="VD: 2001216301"
-              required 
+              required
             />
           </div>
 
           <div className="form-group">
             <label>Mật khẩu</label>
-            <input 
-              type="password" 
+            <input
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Nhập mật khẩu..."
-              required 
+              required
             />
           </div>
 

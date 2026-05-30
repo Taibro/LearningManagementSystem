@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { RefreshCw, CheckCircle2, AlertTriangle, Upload } from 'lucide-react';
 
 const StopTeaching = () => {
   const [history, setHistory] = useState([]);
@@ -110,7 +111,7 @@ const StopTeaching = () => {
           color: 'white', padding: '14px 24px', borderRadius: 8,
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
         </div>
       )}
 
@@ -169,7 +170,7 @@ const StopTeaching = () => {
               disabled={submitting}
               className="btn-primary w-full font-bold py-2.5 mt-2 shadow-lg shadow-purple-200 uppercase text-xs tracking-widest"
             >
-              {submitting ? '⏳ Đang gửi...' : '📤 Gửi đề xuất'}
+              {submitting ? '⏳ Đang gửi...' : <><Upload className="w-4 h-4 inline-block mr-2" /> Gửi đề xuất</>}
             </button>
           </div>
         </div>
@@ -177,7 +178,7 @@ const StopTeaching = () => {
         <div className="card p-6 shadow-sm border border-gray-100 h-fit max-h-[600px] flex flex-col">
           <div className="flex justify-between items-center mb-5 border-b pb-2">
             <h3 className="font-bold text-gray-700 uppercase text-[11px] tracking-widest">Lịch sử đề xuất</h3>
-            <button onClick={fetchHistory} className="text-xs text-[#6B4FA0] font-bold hover:underline">🔄 Làm mới</button>
+            <button onClick={fetchHistory} className="text-xs text-[#6B4FA0] font-bold hover:underline"><RefreshCw className="w-4 h-4 inline-block mr-2" /> Làm mới</button>
           </div>
           
           <div className="space-y-3 overflow-y-auto pr-2 custom-scrollbar flex-1">

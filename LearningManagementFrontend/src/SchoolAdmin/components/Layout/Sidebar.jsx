@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { BarChart, CalendarDays, Settings, User, DollarSign, ClipboardList, CheckCircle2, GraduationCap, School, Bell, AlertTriangle, MapPin, Landmark, Library, Receipt } from 'lucide-react';
 
 export default function Sidebar() {
   const navClass = ({ isActive }) => `nav-item ${isActive ? 'active' : ''}`;
@@ -34,38 +35,38 @@ export default function Sidebar() {
         </div>
         <div className="nav-section">
           <div className="nav-label">Cơ sở hạ tầng</div>
-          <NavLink to="/branches" className={navClass}><span className="nav-icon">📍</span> Cơ sở &amp; Phòng học</NavLink>
-          <NavLink to="/departments" className={navClass}><span className="nav-icon">🏛</span> Khoa / Bộ môn</NavLink>
-          <NavLink to="/semesters" className={navClass}><span className="nav-icon">📆</span> Năm học &amp; Học kỳ</NavLink>
+          <NavLink to="/branches" className={navClass}><span className="nav-icon"><MapPin className="w-4 h-4 inline-block mr-2" /></span> Cơ sở &amp; Phòng học</NavLink>
+          <NavLink to="/departments" className={navClass}><span className="nav-icon"><Landmark className="w-4 h-4 inline-block mr-2" /></span> Khoa / Bộ môn</NavLink>
+          <NavLink to="/semesters" className={navClass}><span className="nav-icon"><CalendarDays className="w-4 h-4 inline-block mr-2" /></span> Năm học &amp; Học kỳ</NavLink>
         </div>
         <div className="nav-section">
           <div className="nav-label">Học vụ</div>
-          <NavLink to="/courses" className={navClass}><span className="nav-icon">📚</span> Môn học</NavLink>
-          <NavLink to="/classes" className={navClass}><span className="nav-icon">🎓</span> Lớp học <span className="nav-badge">3</span></NavLink>
-          <NavLink to="/schedule" className={navClass}><span className="nav-icon">🗓</span> Lịch học</NavLink>
-          <NavLink to="/exceptions" className={navClass}><span className="nav-icon">⚠️</span> Ngoại lệ lịch <span className="nav-badge warn">1</span></NavLink>
+          <NavLink to="/courses" className={navClass}><span className="nav-icon"><Library className="w-4 h-4 inline-block mr-2" /></span> Môn học</NavLink>
+          <NavLink to="/classes" className={navClass}><span className="nav-icon"><GraduationCap className="w-4 h-4 inline-block mr-2" /></span> Lớp học <span className="nav-badge">3</span></NavLink>
+          <NavLink to="/schedule" className={navClass}><span className="nav-icon"><CalendarDays className="w-4 h-4 inline-block mr-2" /></span> Lịch học</NavLink>
+          <NavLink to="/exceptions" className={navClass}><span className="nav-icon"><AlertTriangle className="w-4 h-4 inline-block mr-2" /></span> Ngoại lệ lịch <span className="nav-badge warn">1</span></NavLink>
         </div>
         <div className="nav-section">
           <div className="nav-label">Nhân sự &amp; Học sinh</div>
-          <NavLink to="/teachers" className={navClass}><span className="nav-icon">👨‍🏫</span> Giảng viên <span className="nav-badge">3</span></NavLink>
-          <NavLink to="/students" className={navClass}><span className="nav-icon">👨‍🎓</span> Sinh viên <span className="nav-badge">3</span></NavLink>
-          <NavLink to="/users" className={navClass}><span className="nav-icon">👤</span> Tài khoản</NavLink>
+          <NavLink to="/teachers" className={navClass}><span className="nav-icon"><User className="w-4 h-4 inline-block mr-2" />‍<School className="w-4 h-4 inline-block mr-2" /></span> Giảng viên <span className="nav-badge">3</span></NavLink>
+          <NavLink to="/students" className={navClass}><span className="nav-icon"><User className="w-4 h-4 inline-block mr-2" />‍<GraduationCap className="w-4 h-4 inline-block mr-2" /></span> Sinh viên <span className="nav-badge">3</span></NavLink>
+          <NavLink to="/users" className={navClass}><span className="nav-icon"><User className="w-4 h-4 inline-block mr-2" /></span> Tài khoản</NavLink>
         </div>
         <div className="nav-section">
           <div className="nav-label">Học tập</div>
-          <NavLink to="/enrollments" className={navClass}><span className="nav-icon">✅</span> Đăng ký học phần</NavLink>
-          <NavLink to="/attendance" className={navClass}><span className="nav-icon">📋</span> Điểm danh <span className="nav-badge danger">4</span></NavLink>
-          <NavLink to="/grades" className={navClass}><span className="nav-icon">📊</span> Kết quả &amp; Học bổng</NavLink>
+          <NavLink to="/enrollments" className={navClass}><span className="nav-icon"><CheckCircle2 className="w-4 h-4 inline-block mr-2" /></span> Đăng ký học phần</NavLink>
+          <NavLink to="/attendance" className={navClass}><span className="nav-icon"><ClipboardList className="w-4 h-4 inline-block mr-2" /></span> Điểm danh <span className="nav-badge danger">4</span></NavLink>
+          <NavLink to="/grades" className={navClass}><span className="nav-icon"><BarChart className="w-4 h-4 inline-block mr-2" /></span> Kết quả &amp; Học bổng</NavLink>
         </div>
         <div className="nav-section">
           <div className="nav-label">Tài chính</div>
-          <NavLink to="/tuition" className={navClass}><span className="nav-icon">💰</span> Học phí &amp; Công nợ</NavLink>
-          <NavLink to="/payments" className={navClass}><span className="nav-icon">🧾</span> Phiếu thu</NavLink>
+          <NavLink to="/tuition" className={navClass}><span className="nav-icon"><DollarSign className="w-4 h-4 inline-block mr-2" /></span> Học phí &amp; Công nợ</NavLink>
+          <NavLink to="/payments" className={navClass}><span className="nav-icon"><Receipt className="w-4 h-4 inline-block mr-2" /></span> Phiếu thu</NavLink>
         </div>
         <div className="nav-section">
           <div className="nav-label">Hệ thống</div>
-          <NavLink to="/notifications" className={navClass}><span className="nav-icon">🔔</span> Thông báo <span className="nav-badge danger">12</span></NavLink>
-          <NavLink to="/settings" className={navClass}><span className="nav-icon">⚙️</span> Cài đặt trường</NavLink>
+          <NavLink to="/notifications" className={navClass}><span className="nav-icon"><Bell className="w-4 h-4 inline-block mr-2" /></span> Thông báo <span className="nav-badge danger">12</span></NavLink>
+          <NavLink to="/settings" className={navClass}><span className="nav-icon"><Settings className="w-4 h-4 inline-block mr-2" /></span> Cài đặt trường</NavLink>
         </div>
       </div>
       <div className="sidebar-bottom">

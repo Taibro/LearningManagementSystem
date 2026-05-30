@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Bell } from 'lucide-react';
 
 export default function Topbar() {
   return (
@@ -15,7 +16,7 @@ export default function Topbar() {
       <div className="topbar-right">
         <Link className="topbar-link" to="/dashboard">🏠 Trang chủ</Link>
         <Link className="topbar-link" to="/notifications">
-          🔔 Tin tức <span className="notif-badge">812</span>
+          <Bell className="w-4 h-4 inline-block mr-2" /> Tin tức <span className="notif-badge">812</span>
         </Link>
         <Link className="user-chip" to="/student-info" style={{textDecoration: 'none', color: 'inherit'}}>
           <div style={{width:'32px',height:'32px',borderRadius:'50%',background:'linear-gradient(135deg,#1a6fb5,#60a5fa)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:'13px',fontWeight:700}}>NT</div>

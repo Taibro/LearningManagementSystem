@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CalendarDays, Save } from 'lucide-react';
 
 export default function Schedule() {
   const [sModal, setSModal] = useState(false);
@@ -183,7 +184,7 @@ export default function Schedule() {
         <div className="ov open">
           <div className="modal">
             <div className="modal-hd">
-              <span className="modal-title">{currentSc.id ? '🗓 Sửa Lịch học' : '🗓 Tạo Lịch học'}</span>
+              <span className="modal-title">{currentSc.id ? <><CalendarDays className="w-4 h-4 inline-block mr-2" /> Sửa Lịch học</> : <><CalendarDays className="w-4 h-4 inline-block mr-2" /> Tạo Lịch học</>}</span>
               <button className="close-btn" onClick={() => setSModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -247,7 +248,7 @@ export default function Schedule() {
                 <button className="btn btn-danger" style={{marginRight: 'auto'}} onClick={() => handleDeleteSc(currentSc.id)}>Xóa</button>
               )}
               <button className="btn btn-ghost" onClick={() => setSModal(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveSc}>💾 Lưu</button>
+              <button className="btn btn-blue" onClick={handleSaveSc}><Save className="w-4 h-4 inline-block mr-2" /> Lưu</button>
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Upload } from 'lucide-react';
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
@@ -182,7 +183,7 @@ export default function Notifications() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setNModal(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveNotification}>📤 Gửi ngay</button>
+              <button className="btn btn-blue" onClick={handleSaveNotification}><Upload className="w-4 h-4 inline-block mr-2" /> Gửi ngay</button>
             </div>
           </div>
         </div>

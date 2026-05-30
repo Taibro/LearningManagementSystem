@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './AdminLogin.css';
+import { BarChart, Check, CheckCircle2, XCircle, GraduationCap, School, AlertTriangle, Info, PartyPopper, Rocket, Globe, Mail, Lock, EyeOff, Eye, Circle, Upload, Hand, Shield, Zap } from 'lucide-react';
 
 export default function AdminLogin() {
   const navigate = useNavigate();
@@ -88,7 +89,7 @@ export default function AdminLogin() {
           setSaasView('otp');
           addToast('Mã OTP đã gửi đến thiết bị xác thực', 'blue');
         } else {
-          addToast('🎉 Đăng nhập Super Admin thành công!', 'green');
+          addToast(<><PartyPopper className="w-4 h-4 inline-block mr-2" /> Đăng nhập Super Admin thành công!</>, 'green');
           setTimeout(() => navigate('/admin/dashboard'), 1000);
         }
       } else {
@@ -98,12 +99,12 @@ export default function AdminLogin() {
   };
 
   const handleVerifySchoolOtp = () => {
-    addToast('🎉 Đăng nhập thành công! Chào mừng Admin!', 'green');
+    addToast(<><PartyPopper className="w-4 h-4 inline-block mr-2" /> Đăng nhập thành công! Chào mừng Admin!</>, 'green');
     setTimeout(() => navigate('/dashboard'), 1000); // Đổi hướng đến trang Admin Dashboard
   };
 
   const handleVerifySaasOtp = () => {
-    addToast('🚀 Super Admin đã xác thực thành công!', 'green');
+    addToast(<><Rocket className="w-4 h-4 inline-block mr-2" /> Super Admin đã xác thực thành công!</>, 'green');
     setTimeout(() => navigate('/dashboard'), 1000); // Đổi hướng đến trang Admin Dashboard
   };
 
@@ -129,7 +130,7 @@ export default function AdminLogin() {
       <div className="toast-wrap">
         {toasts.map(t => {
           const colors = { green: '#16a34a', blue: '#2563eb', amber: '#d97706', red: '#dc2626' };
-          const icons = { green: '✅', blue: 'ℹ️', amber: '⚠️', red: '❌' };
+          const icons = { green: <CheckCircle2 className="w-4 h-4 inline-block mr-2" />, blue: <Info className="w-4 h-4 inline-block mr-2" />, amber: <AlertTriangle className="w-4 h-4 inline-block mr-2" />, red: <XCircle className="w-4 h-4 inline-block mr-2" /> };
           return (
             <div key={t.id} className="toast" style={{ borderLeftColor: colors[t.type] || colors.blue }}>
               <span style={{ fontSize: '18px' }}>{icons[t.type]}</span>
@@ -151,7 +152,7 @@ export default function AdminLogin() {
         <div className={`school-card glass ${shake ? 'shake' : ''}`}>
           <div className="school-header">
             <div style={{ position: 'relative', zIndex: 1 }}>
-              <div className="school-logo anim-float">🏫</div>
+              <div className="school-logo anim-float"><School className="w-4 h-4 inline-block mr-2" /></div>
               <h1 style={{ fontSize: 20, fontWeight: 800, color: 'white', marginBottom: 4 }}>Cổng quản trị nhà trường</h1>
               <p style={{ fontSize: 12.5, color: 'rgba(255,255,255,.75)', lineHeight: 1.5 }}>Đăng nhập vào hệ thống quản lý lớp học<br />và lịch học của trường bạn</p>
             </div>
@@ -162,12 +163,12 @@ export default function AdminLogin() {
               <div style={{ marginBottom: 18 }}>
                 <label className="fl text-[#64748b] mb-1.5">Chọn trường / Trung tâm</label>
                 <div className="inp-wrap">
-                  <span className="inp-icon">🏫</span>
+                  <span className="inp-icon"><School className="w-4 h-4 inline-block mr-2" /></span>
                   <select className="inp school-inp" style={{ paddingLeft: 42, appearance: 'none', cursor: 'pointer' }} value={sSchool} onChange={e => setSSchool(e.target.value)}>
                     <option value="">-- Chọn tổ chức của bạn --</option>
-                    <option value="huit">🏫 Trường ĐH Công Thương TP.HCM (HUIT)</option>
-                    <option value="hcmut">🎓 Trường ĐH Bách Khoa TP.HCM (HCMUT)</option>
-                    <option value="ielts">🌐 Trung tâm Tiếng Anh IELTS Pro</option>
+                    <option value="huit"><School className="w-4 h-4 inline-block mr-2" /> Trường ĐH Công Thương TP.HCM (HUIT)</option>
+                    <option value="hcmut"><GraduationCap className="w-4 h-4 inline-block mr-2" /> Trường ĐH Bách Khoa TP.HCM (HCMUT)</option>
+                    <option value="ielts"><Globe className="w-4 h-4 inline-block mr-2" /> Trung tâm Tiếng Anh IELTS Pro</option>
                   </select>
                   <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none', fontSize: 12 }}>▾</span>
                 </div>
@@ -176,7 +177,7 @@ export default function AdminLogin() {
               <div style={{ marginBottom: 14 }}>
                 <label className="fl text-[#64748b] mb-1.5">Email đăng nhập</label>
                 <div className="inp-wrap">
-                  <span className="inp-icon">✉️</span>
+                  <span className="inp-icon"><Mail className="w-4 h-4 inline-block mr-2" />️</span>
                   <input type="email" placeholder="admin@school.edu.vn" className="inp school-inp" value={sEmail} onChange={e => setSEmail(e.target.value)} />
                 </div>
               </div>
@@ -187,9 +188,9 @@ export default function AdminLogin() {
                   <span onClick={() => setSchoolView('forgot')} style={{ fontSize: 12, color: '#1976d2', fontWeight: 600, cursor: 'pointer' }}>Quên mật khẩu?</span>
                 </div>
                 <div className="inp-wrap">
-                  <span className="inp-icon">🔒</span>
+                  <span className="inp-icon"><Lock className="w-4 h-4 inline-block mr-2" /></span>
                   <input type={sShowPass ? "text" : "password"} placeholder="Nhập mật khẩu..." className="inp school-inp" value={sPass} onChange={e => setSPass(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSchoolLogin()} />
-                  <span className="inp-eye" onClick={() => setSShowPass(!sShowPass)}>{sShowPass ? '🙈' : '👁'}</span>
+                  <span className="inp-eye" onClick={() => setSShowPass(!sShowPass)}>{sShowPass ? <EyeOff className="w-4 h-4 inline-block mr-2" /> : <Eye className="w-4 h-4 inline-block mr-2" />}</span>
                 </div>
               </div>
 
@@ -200,7 +201,7 @@ export default function AdminLogin() {
 
               {sError && (
                 <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '10px 12px', marginBottom: 14, fontSize: 13, color: '#b91c1c', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span>⚠️</span><span>{sError}</span>
+                  <span><AlertTriangle className="w-4 h-4 inline-block mr-2" /></span><span>{sError}</span>
                 </div>
               )}
 
@@ -216,7 +217,7 @@ export default function AdminLogin() {
 
               <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
                 <button onClick={() => addToast('Đang kết nối Google...', 'blue')} style={{ flex: 1, padding: 10, border: '1.5px solid #e2e8f0', borderRadius: 10, background: 'white', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#374151', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
-                  <span style={{ fontSize: 16 }}>🔵</span> Google
+                  <span style={{ fontSize: 16 }}><Circle className="w-4 h-4 inline-block mr-2" /></span> Google
                 </button>
                 <button onClick={() => addToast('Đang kết nối Microsoft...', 'blue')} style={{ flex: 1, padding: 10, border: '1.5px solid #e2e8f0', borderRadius: 10, background: 'white', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#374151', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7 }}>
                   <span style={{ fontSize: 16 }}>🟦</span> Microsoft
@@ -232,15 +233,15 @@ export default function AdminLogin() {
           {schoolView === 'forgot' && (
             <div className="school-body">
               <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <div className="anim-float" style={{ fontSize: 40, marginBottom: 12 }}>📧</div>
+                <div className="anim-float" style={{ fontSize: 40, marginBottom: 12 }}><Mail className="w-4 h-4 inline-block mr-2" /></div>
                 <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>Khôi phục mật khẩu</h3>
                 <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>Nhập email đăng ký tài khoản. Chúng tôi sẽ gửi liên kết đặt lại cho bạn.</p>
               </div>
               <div className="inp-wrap" style={{ marginBottom: 16 }}>
-                <span className="inp-icon">✉️</span>
+                <span className="inp-icon"><Mail className="w-4 h-4 inline-block mr-2" />️</span>
                 <input type="email" placeholder="Email tài khoản của bạn" className="inp school-inp" />
               </div>
-              <button className="btn-login school-btn" onClick={() => { addToast('Đã gửi link khôi phục', 'green'); setSchoolView('main'); }}>📤 Gửi link khôi phục</button>
+              <button className="btn-login school-btn" onClick={() => { addToast('Đã gửi link khôi phục', 'green'); setSchoolView('main'); }}><Upload className="w-4 h-4 inline-block mr-2" /> Gửi link khôi phục</button>
               <div style={{ textAlign: 'center', marginTop: 16 }}>
                 <span onClick={() => setSchoolView('main')} style={{ fontSize: 13, color: '#1976d2', fontWeight: 600, cursor: 'pointer' }}>← Quay lại đăng nhập</span>
               </div>
@@ -250,7 +251,7 @@ export default function AdminLogin() {
           {schoolView === 'otp' && (
             <div className="school-body">
               <div style={{ textAlign: 'center', marginBottom: 22 }}>
-                <div className="anim-float" style={{ fontSize: 40, marginBottom: 12 }}>🔐</div>
+                <div className="anim-float" style={{ fontSize: 40, marginBottom: 12 }}><Lock className="w-4 h-4 inline-block mr-2" /></div>
                 <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>Xác thực 2 bước</h3>
                 <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>Nhập mã OTP đã gửi đến<br /><strong style={{ color: '#0f172a' }}>a***n@hcmut.edu.vn</strong></p>
               </div>
@@ -259,7 +260,7 @@ export default function AdminLogin() {
                   <input key={idx} className="otp-input" maxLength="1" onInput={e => handleOtpInput(e, idx + 1, handleVerifySchoolOtp)} onKeyDown={e => handleOtpKey(e, idx - 1)} />
                 ))}
               </div>
-              <button className="btn-login school-btn" onClick={handleVerifySchoolOtp}>✓ Xác nhận OTP</button>
+              <button className="btn-login school-btn" onClick={handleVerifySchoolOtp}><Check className="w-4 h-4 inline-block mr-2" /> Xác nhận OTP</button>
               <div style={{ textAlign: 'center', marginTop: 14 }}>
                 <span onClick={() => setSchoolView('main')} style={{ fontSize: 13, color: '#94a3b8', cursor: 'pointer' }}>← Quay lại</span>
               </div>
@@ -297,9 +298,9 @@ export default function AdminLogin() {
             </div>
 
             <div className="anim-fadeup" style={{ animationDelay: '.2s' }}>
-              <div className="feat-item"><div className="feat-icon" style={{ background: 'rgba(99,102,241,.2)' }}>🏫</div><div><div style={{ fontSize: 13.5, fontWeight: 700, color: 'rgba(255,255,255,.9)' }}>Multi-tenant Management</div><div style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', marginTop: 2 }}>Quản lý nhiều trường/trung tâm với data hoàn toàn tách biệt</div></div></div>
-              <div className="feat-item"><div className="feat-icon" style={{ background: 'rgba(139,92,246,.2)' }}>📊</div><div><div style={{ fontSize: 13.5, fontWeight: 700, color: 'rgba(255,255,255,.9)' }}>Analytics Toàn hệ thống</div><div style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', marginTop: 2 }}>Theo dõi MRR, tenant growth, uptime và hoạt động real-time</div></div></div>
-              <div className="feat-item"><div className="feat-icon" style={{ background: 'rgba(16,185,129,.2)' }}>🔒</div><div><div style={{ fontSize: 13.5, fontWeight: 700, color: 'rgba(255,255,255,.9)' }}>Bảo mật cấp Enterprise</div><div style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', marginTop: 2 }}>2FA, audit logs, role-based access control (RBAC)</div></div></div>
+              <div className="feat-item"><div className="feat-icon" style={{ background: 'rgba(99,102,241,.2)' }}><School className="w-4 h-4 inline-block mr-2" /></div><div><div style={{ fontSize: 13.5, fontWeight: 700, color: 'rgba(255,255,255,.9)' }}>Multi-tenant Management</div><div style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', marginTop: 2 }}>Quản lý nhiều trường/trung tâm với data hoàn toàn tách biệt</div></div></div>
+              <div className="feat-item"><div className="feat-icon" style={{ background: 'rgba(139,92,246,.2)' }}><BarChart className="w-4 h-4 inline-block mr-2" /></div><div><div style={{ fontSize: 13.5, fontWeight: 700, color: 'rgba(255,255,255,.9)' }}>Analytics Toàn hệ thống</div><div style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', marginTop: 2 }}>Theo dõi MRR, tenant growth, uptime và hoạt động real-time</div></div></div>
+              <div className="feat-item"><div className="feat-icon" style={{ background: 'rgba(16,185,129,.2)' }}><Lock className="w-4 h-4 inline-block mr-2" /></div><div><div style={{ fontSize: 13.5, fontWeight: 700, color: 'rgba(255,255,255,.9)' }}>Bảo mật cấp Enterprise</div><div style={{ fontSize: 12, color: 'rgba(255,255,255,.45)', marginTop: 2 }}>2FA, audit logs, role-based access control (RBAC)</div></div></div>
             </div>
           </div>
         </div>
@@ -321,14 +322,14 @@ export default function AdminLogin() {
                     </div>
                     <div><div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>EduSaaS Platform</div><div style={{ fontSize: 11, color: '#94a3b8' }}>Super Admin Console</div></div>
                   </div>
-                  <h2 style={{ fontSize: 26, fontWeight: 900, color: '#0f172a', letterSpacing: '-.5px', lineHeight: 1.2, marginBottom: 6 }}>Chào mừng trở lại! 👋</h2>
+                  <h2 style={{ fontSize: 26, fontWeight: 900, color: '#0f172a', letterSpacing: '-.5px', lineHeight: 1.2, marginBottom: 6 }}>Chào mừng trở lại! <Hand className="w-4 h-4 inline-block mr-2" /></h2>
                   <p style={{ fontSize: 13.5, color: '#64748b' }}>Đăng nhập để quản lý toàn bộ hệ thống</p>
                 </div>
 
                 <div style={{ marginBottom: 14 }}>
                   <label className="fl text-[#64748b] mb-1.5">Super Admin Email</label>
                   <div className="inp-wrap">
-                    <span className="inp-icon">✉️</span>
+                    <span className="inp-icon"><Mail className="w-4 h-4 inline-block mr-2" />️</span>
                     <input type="email" placeholder="superadmin@edusaas.io" className="inp saas-inp" value={saEmail} onChange={e => setSaEmail(e.target.value)} />
                   </div>
                 </div>
@@ -338,14 +339,14 @@ export default function AdminLogin() {
                     <label className="fl text-[#64748b] !mb-0">Mật khẩu</label>
                   </div>
                   <div className="inp-wrap">
-                    <span className="inp-icon">🔒</span>
+                    <span className="inp-icon"><Lock className="w-4 h-4 inline-block mr-2" /></span>
                     <input type={saShowPass ? "text" : "password"} placeholder="Nhập mật khẩu..." className="inp saas-inp" value={saPass} onChange={e => setSaPass(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSaasLogin()} />
-                    <span className="inp-eye" onClick={() => setSaShowPass(!saShowPass)}>{saShowPass ? '🙈' : '👁'}</span>
+                    <span className="inp-eye" onClick={() => setSaShowPass(!saShowPass)}>{saShowPass ? <EyeOff className="w-4 h-4 inline-block mr-2" /> : <Eye className="w-4 h-4 inline-block mr-2" />}</span>
                   </div>
                 </div>
 
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 10, padding: '12px 14px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <span style={{ fontSize: 16 }}>🛡</span>
+                  <span style={{ fontSize: 16 }}><Shield className="w-4 h-4 inline-block mr-2" /></span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: '#0f172a' }}>Xác thực 2 bước (2FA)</div>
                     <div style={{ fontSize: 11.5, color: '#64748b', marginTop: 1 }}>Yêu cầu OTP sau khi đăng nhập</div>
@@ -360,12 +361,12 @@ export default function AdminLogin() {
 
                 {saError && (
                   <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '10px 12px', marginBottom: 14, fontSize: 13, color: '#b91c1c', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span>⚠️</span><span>{saError}</span>
+                    <span><AlertTriangle className="w-4 h-4 inline-block mr-2" /></span><span>{saError}</span>
                   </div>
                 )}
 
                 <button className="btn-login saas-btn" disabled={saLoading} onClick={handleSaasLogin}>
-                  {saLoading ? <span className="spinner"></span> : <><span>Đăng nhập hệ thống</span><span>⚡</span></>}
+                  {saLoading ? <span className="spinner"></span> : <><span>Đăng nhập hệ thống</span><span><Zap className="w-4 h-4 inline-block mr-2" /></span></>}
                 </button>
               </>
             )}
@@ -373,7 +374,7 @@ export default function AdminLogin() {
             {saasView === 'otp' && (
               <>
                 <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                  <div className="anim-float" style={{ width: 64, height: 64, borderRadius: 16, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, boxShadow: '0 8px 24px rgba(99,102,241,.3)' }}>🔐</div>
+                  <div className="anim-float" style={{ width: 64, height: 64, borderRadius: 16, background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, boxShadow: '0 8px 24px rgba(99,102,241,.3)' }}><Lock className="w-4 h-4 inline-block mr-2" /></div>
                   <h3 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 6 }}>Xác thực Super Admin</h3>
                   <p style={{ fontSize: 13, color: '#64748b', lineHeight: 1.6 }}>Mã OTP đã gửi đến thiết bị 2FA<br /><strong style={{ color: '#4f46e5' }}>superadmin@edusaas.io</strong></p>
                 </div>
@@ -382,7 +383,7 @@ export default function AdminLogin() {
                     <input key={idx} className="otp-input" maxLength="1" style={{ borderColor: '#e2e8f0' }} onInput={e => handleOtpInput(e, idx + 1, handleVerifySaasOtp)} onKeyDown={e => handleOtpKey(e, idx - 1)} />
                   ))}
                 </div>
-                <button className="btn-login saas-btn" onClick={handleVerifySaasOtp}>⚡ Xác nhận &amp; Vào hệ thống</button>
+                <button className="btn-login saas-btn" onClick={handleVerifySaasOtp}><Zap className="w-4 h-4 inline-block mr-2" /> Xác nhận &amp; Vào hệ thống</button>
                 <div style={{ textAlign: 'center', marginTop: 14 }}>
                   <span onClick={() => setSaasView('main')} style={{ fontSize: 13, color: '#94a3b8', cursor: 'pointer' }}>← Quay lại</span>
                 </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Plus, Edit, CheckCircle2, XCircle, AlertTriangle, Save } from 'lucide-react';
 
 const API_COURSE = 'http://localhost:8080/api/auth/school-admin/courses';
 const API_DEPT = 'http://localhost:8080/api/auth/school-admin'; // Để lấy danh sách khoa
@@ -131,7 +132,7 @@ export default function Courses() {
       {/* Table */}
       <div className="card">
         {loading && <p style={{ padding: 20 }}>⏳ Đang tải dữ liệu môn học...</p>}
-        {error && <p style={{ padding: 20, color: 'red' }}>❌ Lỗi: {error} — (Hãy kiểm tra DB và Backend)</p>}
+        {error && <p style={{ padding: 20, color: 'red' }}><XCircle className="w-4 h-4 inline-block mr-2" /> Lỗi: {error} — (Hãy kiểm tra DB và Backend)</p>}
         
         {!loading && !error && courses.length === 0 && (
           <p style={{ padding: 20 }}>Chưa có môn học nào. Hãy bấm "Thêm môn học" để tạo mới.</p>
@@ -183,7 +184,7 @@ export default function Courses() {
             boxShadow: '0 8px 32px rgba(0,0,0,0.18)', maxHeight: '90vh', overflowY: 'auto'
           }}>
             <h3 style={{ marginTop: 0, marginBottom: 20, fontSize: 18, fontWeight: 700 }}>
-              {isEditMode ? '✏️ Sửa thông tin Môn học' : '➕ Thêm Môn học mới'}
+              {isEditMode ? <><Edit className="w-4 h-4 inline-block mr-2" /> Sửa thông tin Môn học</> : <><Plus className="w-4 h-4 inline-block mr-2" /> Thêm Môn học mới</>}
             </h3>
             
             <form onSubmit={handleSubmit}>
@@ -266,7 +267,7 @@ export default function Courses() {
                 </button>
                 <button type="submit"
                   style={{ padding: '8px 18px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
-                  💾 Lưu dữ liệu
+                  <Save className="w-4 h-4 inline-block mr-2" /> Lưu dữ liệu
                 </button>
               </div>
             </form>
@@ -283,7 +284,7 @@ export default function Courses() {
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14,
           transition: 'all 0.3s ease-out'
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
         </div>
       )}
     </div>

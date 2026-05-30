@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { CheckCircle2, XCircle, PartyPopper, Lock, Zap, Unlock } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8080/api/saas-admin';
 
@@ -67,10 +68,10 @@ export default function Tenants() {
       if (res.ok) {
         setTenants(prev => prev.map(t => t.id === id ? { ...t, active: isActive } : t));
         const tName = tenants.find(x => x.id === id)?.name;
-        addToast(isActive ? '✅' : '🔒', `${isActive ? 'MỞ KHOÁ' : 'KHOÁ'} tenant: ${tName}`, isActive ? 'green' : 'blue');
+        addToast(isActive ? <CheckCircle2 className="w-4 h-4 inline-block mr-2" /> : <Lock className="w-4 h-4 inline-block mr-2" />, `${isActive ? 'MỞ KHOÁ' : 'KHOÁ'} tenant: ${tName}`, isActive ? 'green' : 'blue');
       }
     } catch (err) {
-      addToast('❌', 'Lỗi khi thay đổi trạng thái tenant', 'red');
+      addToast(<XCircle className="w-4 h-4 inline-block mr-2" />, 'Lỗi khi thay đổi trạng thái tenant', 'red');
     }
   };
 
@@ -84,14 +85,14 @@ export default function Tenants() {
       if (res.ok) {
         setIsAddOpen(false);
         fetchTenants();
-        addToast('🎉', 'Tạo Tenant thành công! Email đã gửi cho School Admin', 'green');
+        addToast(<PartyPopper className="w-4 h-4 inline-block mr-2" />, 'Tạo Tenant thành công! Email đã gửi cho School Admin', 'green');
         setForm({ schoolName: '', schoolCode: '', schoolType: 'UNIVERSITY', planId: plans[0]?.id || 1, billingCycle: 'MONTHLY', phone: '', adminName: '', adminEmail: '' });
       } else {
         const err = await res.json();
-        addToast('❌', err.message || 'Lỗi khi tạo tenant', 'red');
+        addToast(<XCircle className="w-4 h-4 inline-block mr-2" />, err.message || 'Lỗi khi tạo tenant', 'red');
       }
     } catch (err) {
-      addToast('❌', 'Không thể kết nối đến server', 'red');
+      addToast(<XCircle className="w-4 h-4 inline-block mr-2" />, 'Không thể kết nối đến server', 'red');
     }
   };
 
@@ -161,7 +162,7 @@ export default function Tenants() {
               </div>
 
               <div className="card-sm p-3 mt-3">
-                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--accent3)' }}>⚡ Tài khoản School Admin (tự động tạo)</p>
+                <p className="text-xs font-semibold mb-2" style={{ color: 'var(--accent3)' }}><Zap className="w-4 h-4 inline-block mr-2" /> Tài khoản School Admin (tự động tạo)</p>
                 <div className="grid grid-cols-2 gap-3">
                   <div><label className="text-xs font-mono mb-1.5 block" style={{ color: 'var(--muted)' }}>HỌ TÊN ADMIN</label><input className="inp" placeholder="VD: Nguyễn Văn A" value={form.adminName} onChange={e => setForm({...form, adminName: e.target.value})} /></div>
                   <div><label className="text-xs font-mono mb-1.5 block" style={{ color: 'var(--muted)' }}>EMAIL ADMIN *</label><input className="inp" type="email" placeholder="admin@truong.edu.vn" value={form.adminEmail} onChange={e => setForm({...form, adminEmail: e.target.value})} /></div>
@@ -221,7 +222,7 @@ export default function Tenants() {
                 toggleTenant(activeTenant.id, !activeTenant.active); 
                 setActiveTenant(null); 
               }}>
-                {activeTenant.active ? '⚡ Kích hoạt Kill Switch (Khoá ngay)' : '🔓 Mở khoá Tenant'}
+                {activeTenant.active ? <><Zap className="w-4 h-4 inline-block mr-2" /> Kích hoạt Kill Switch (Khoá ngay)</> : <><Unlock className="w-4 h-4 inline-block mr-2" /> Mở khoá Tenant</>}
               </button>
               <div className="flex gap-2">
                 <button className="btn btn-ghost btn-sm" onClick={() => setActiveTenant(null)}>Đóng</button>

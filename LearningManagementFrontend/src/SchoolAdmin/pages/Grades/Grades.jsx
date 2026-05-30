@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Info, Star } from 'lucide-react';
 
 export default function Grades() {
   const [grades, setGrades] = useState([]);
@@ -94,7 +95,7 @@ export default function Grades() {
                 <td>
                   {g.scholarshipAmount > 0 ? (
                     <div>
-                      <div style={{fontSize:'12px', color:'var(--amber)', fontWeight:600}}>⭐ {g.scholarshipName}</div>
+                      <div style={{fontSize:'12px', color:'var(--amber)', fontWeight:600}}><Star className="w-4 h-4 inline-block mr-2" /> {g.scholarshipName}</div>
                       <div style={{fontSize:'11px'}}>{g.scholarshipAmount.toLocaleString('vi-VN')} đ</div>
                     </div>
                   ) : '—'}
@@ -105,7 +106,7 @@ export default function Grades() {
           </tbody>
         </table>
         <div style={{padding:'14px 20px', background:'#eff6ff', fontSize:'12px', color:'var(--muted)', borderTop:'1px solid var(--border)'}}>
-          ℹ️ Điểm và học bổng được tổng hợp tự động từ các môn học trong kỳ.
+          <Info className="w-4 h-4 inline-block mr-2" /> Điểm và học bổng được tổng hợp tự động từ các môn học trong kỳ.
         </div>
       </div>
     </div>

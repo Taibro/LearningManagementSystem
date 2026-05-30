@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Bell } from 'lucide-react';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
@@ -103,7 +104,7 @@ const Dashboard = () => {
 
         {/* Cột Nhắc nhở */}
         <div className="card p-5 shadow-sm">
-          <h3 className="font-bold text-gray-700 mb-4 border-b pb-2">Nhắc nhở hệ thống 🔔</h3>
+          <h3 className="font-bold text-gray-700 mb-4 border-b pb-2">Nhắc nhở hệ thống <Bell className="w-4 h-4 inline-block mr-2" /></h3>
           {stats?.reminders && stats.reminders.length > 0 ? (
             <ul className="space-y-3">
               {stats.reminders.map((rem, idx) => (

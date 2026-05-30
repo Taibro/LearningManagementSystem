@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './CourseRegistration.css';
+import { FileText, User, Plus, Trash2, CheckCircle2, X, School, Search, Info, Eye, Library, Sparkles } from 'lucide-react';
 
 // --- MOCK DATA ---
 const MOCK_STUDENT = {
@@ -114,10 +115,10 @@ export default function CourseRegistration() {
 
             <div className="modern-menu">
               <div className={`menu-item ${activeTab === 'info' ? 'active' : ''}`} onClick={() => setActiveTab('info')}>
-                <span>👤</span> Thông tin sinh viên
+                <span><User className="w-4 h-4 inline-block mr-2" /></span> Thông tin sinh viên
               </div>
               <div className={`menu-item ${activeTab === 'registration' ? 'active' : ''}`} onClick={() => setActiveTab('registration')}>
-                <span>📝</span> Đăng ký học phần
+                <span><FileText className="w-4 h-4 inline-block mr-2" /></span> Đăng ký học phần
               </div>
             </div>
           </aside>
@@ -164,7 +165,7 @@ export default function CourseRegistration() {
                 </div>
 
                 {/* 1. Môn chờ ĐK */}
-                <div className="section-header"><h4>📚 Môn học phần đang chờ đăng ký</h4></div>
+                <div className="section-header"><h4><Library className="w-4 h-4 inline-block mr-2" /> Môn học phần đang chờ đăng ký</h4></div>
                 <div className="table-wrapper">
                   <table className="modern-table">
                     <thead>
@@ -177,7 +178,7 @@ export default function CourseRegistration() {
                           <td style={{fontFamily:'monospace', color:'var(--text-muted)'}}>{sub.id}</td>
                           <td style={{fontWeight:'500'}}>{sub.name}</td>
                           <td><span className="badge blue">{sub.credits}</span></td>
-                          <td>{sub.required ? <span style={{color:'#dc2626', fontWeight:'bold'}}>✖</span> : <span style={{color:'#16a34a'}}>Tự chọn</span>}</td>
+                          <td>{sub.required ? <span style={{color:'#dc2626', fontWeight:'bold'}}><X className="w-4 h-4 inline-block mr-2" /></span> : <span style={{color:'#16a34a'}}>Tự chọn</span>}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -188,7 +189,7 @@ export default function CourseRegistration() {
                 {selectedSubject && (
                   <>
                     <div className="section-header">
-                      <h4>🏫 Lớp học phần chờ đăng ký</h4>
+                      <h4><School className="w-4 h-4 inline-block mr-2" /> Lớp học phần chờ đăng ký</h4>
                       <label className="modern-checkbox">
                         <input type="checkbox" checked={hideConflict} onChange={(e) => setHideConflict(e.target.checked)}/> Lọc lớp trùng lịch
                       </label>
@@ -218,10 +219,10 @@ export default function CourseRegistration() {
                 {selectedClass && (
                   <div style={{background: '#f8fafc', padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color)', marginBottom: '24px'}}>
                     <div className="section-header" style={{marginTop: 0}}>
-                      <h4>ℹ️ Chi tiết lịch học</h4>
+                      <h4><Info className="w-4 h-4 inline-block mr-2" /> Chi tiết lịch học</h4>
                       <div style={{display:'flex', gap:'12px'}}>
-                        <button className="btn btn-outline" onClick={() => setModalType('conflict')}>🔍 Xem lịch trùng</button>
-                        <button className="btn btn-primary" onClick={handleRegister}>➕ Đăng ký lớp này</button>
+                        <button className="btn btn-outline" onClick={() => setModalType('conflict')}><Search className="w-4 h-4 inline-block mr-2" /> Xem lịch trùng</button>
+                        <button className="btn btn-primary" onClick={handleRegister}><Plus className="w-4 h-4 inline-block mr-2" /> Đăng ký lớp này</button>
                       </div>
                     </div>
                     <div className="table-wrapper" style={{marginBottom: 0, boxShadow: 'none'}}>
@@ -246,7 +247,7 @@ export default function CourseRegistration() {
                 )}
 
                 {/* 4. Lớp đã đăng ký */}
-                <div className="section-header"><h4>✅ Lớp học phần đã đăng ký (Học kỳ này)</h4></div>
+                <div className="section-header"><h4><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> Lớp học phần đã đăng ký (Học kỳ này)</h4></div>
                 <div className="table-wrapper">
                   <table className="modern-table">
                     <thead>
@@ -262,8 +263,8 @@ export default function CourseRegistration() {
                               <button className="action-btn" onClick={() => setDropdownOpen(dropdownOpen === cls.id ? null : cls.id)}>⋮</button>
                               {dropdownOpen === cls.id && (
                                 <div className="action-menu">
-                                  <div className="action-item" onClick={() => {setActionClass(cls); setModalType('classDetail'); setDropdownOpen(null);}}>👁 Xem chi tiết</div>
-                                  <div className="action-item danger" onClick={() => {setActionClass(cls); setModalType('cancelConfirm'); setDropdownOpen(null);}}>🗑 Hủy đăng ký</div>
+                                  <div className="action-item" onClick={() => {setActionClass(cls); setModalType('classDetail'); setDropdownOpen(null);}}><Eye className="w-4 h-4 inline-block mr-2" /> Xem chi tiết</div>
+                                  <div className="action-item danger" onClick={() => {setActionClass(cls); setModalType('cancelConfirm'); setDropdownOpen(null);}}><Trash2 className="w-4 h-4 inline-block mr-2" /> Hủy đăng ký</div>
                                 </div>
                               )}
                             </td>
@@ -292,7 +293,7 @@ export default function CourseRegistration() {
           <div className="modal-content">
             <div className="modal-header">Lịch học bị trùng</div>
             <div className="modal-body text-center" style={{padding: '40px', color: 'var(--text-muted)'}}>
-              <span style={{fontSize: '40px', display: 'block', marginBottom: '10px'}}>✅</span>
+              <span style={{fontSize: '40px', display: 'block', marginBottom: '10px'}}><CheckCircle2 className="w-4 h-4 inline-block mr-2" /></span>
               Không phát hiện lịch học nào bị trùng.
             </div>
             <div className="modal-footer"><button className="btn btn-outline" onClick={() => setModalType(null)}>Đóng</button></div>
@@ -345,7 +346,7 @@ export default function CourseRegistration() {
         <div className="modal-overlay">
           <div className="modal-content small">
             <div className="modal-body">
-              <div style={{fontSize: '50px', marginBottom: '16px'}}>🗑️</div>
+              <div style={{fontSize: '50px', marginBottom: '16px'}}><Trash2 className="w-4 h-4 inline-block mr-2" /></div>
               <h3 style={{margin: '0 0 12px 0', fontSize: '20px'}}>Xác nhận hủy môn</h3>
               <p style={{color: 'var(--text-muted)', lineHeight: '1.5', margin: 0}}>Bạn có chắc chắn muốn hủy đăng ký lớp học <b>{actionClass.subjectName}</b> không? Hành động này không thể hoàn tác.</p>
             </div>
@@ -360,7 +361,7 @@ export default function CourseRegistration() {
       {/* Toast Notification */}
       {toastMsg && (
         <div className="toast-msg">
-          <span>✨</span> {toastMsg}
+          <span><Sparkles className="w-4 h-4 inline-block mr-2" /></span> {toastMsg}
         </div>
       )}
     </div>

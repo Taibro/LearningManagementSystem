@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Input from '../../components/Layout/Input';
 import axios from 'axios';
+import { MapPin } from 'lucide-react';
 
 const WeeklySchedule = () => {
   const [selectedDate, setSelectedDate] = useState('2026-04-20');
@@ -63,7 +64,7 @@ const WeeklySchedule = () => {
         <div className={`font-semibold ${textColor} text-xs`}>{sch.courseName}</div>
         <div className={`${subColor} text-xs mt-1`}>{sch.classCode}</div>
         <div className={`${subColor} text-xs`}>Tiết {sch.startPeriod}–{sch.endPeriod}</div>
-        <div className={`${iconColor} text-xs font-medium mt-1`}>📍 {sch.roomName}</div>
+        <div className={`${iconColor} text-xs font-medium mt-1`}><MapPin className="w-4 h-4 inline-block mr-2" /> {sch.roomName}</div>
       </div>
     );
   };

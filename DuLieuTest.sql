@@ -203,7 +203,7 @@ INSERT INTO users (
     '079200000001',
     'Admin Bách Khoa',
     'admin@hcmut.edu.vn',
-    '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG', -- Đây là chuỗi Bcrypt hash của mật khẩu 'Admin@123'
+    '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG', -- Đây là chuỗi Bcrypt hash của mật khẩu '123456'
     '0909123456',
     '268 Lý Thường Kiệt, Quận 10, TP.HCM',
     'MALE',

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './SaaSAdminLogin.css';
+import { CheckCircle2, XCircle, GraduationCap, School, Key, AlertTriangle, Info, Mail, Lock, EyeOff, Eye, Shield } from 'lucide-react';
 
 export default function SaaSAdminLogin() {
   // Không dùng useNavigate nữa, vì ta cần nhảy hẳn sang App khác
@@ -161,7 +162,7 @@ export default function SaaSAdminLogin() {
       <div className="toast-stack">
         {toasts.map(t => {
           const borders = { green: '#16a34a', blue: '#2563eb', amber: '#d97706', red: '#dc2626' };
-          const icons = { green: '✅', blue: 'ℹ️', amber: '⚠️', red: '❌' };
+          const icons = { green: <CheckCircle2 className="w-4 h-4 inline-block mr-2" />, blue: <Info className="w-4 h-4 inline-block mr-2" />, amber: <AlertTriangle className="w-4 h-4 inline-block mr-2" />, red: <XCircle className="w-4 h-4 inline-block mr-2" /> };
           return (
             <div key={t.id} className="toast" style={{ borderLeftColor: borders[t.type] || borders.blue }}>
               <span style={{ fontSize: '16px' }}>{icons[t.type]}</span>
@@ -179,7 +180,7 @@ export default function SaaSAdminLogin() {
 
         <div className={`school-card glass ${sShake ? 'shake' : ''}`}>
           <div className="school-header">
-            <div className="school-logo anim-float">🏫</div>
+            <div className="school-logo anim-float"><School className="w-4 h-4 inline-block mr-2" /></div>
             <h1 style={{ fontSize: '20px', fontWeight: 800, color: 'white', marginBottom: '4px' }}>Cổng quản trị nhà trường</h1>
             <p style={{ fontSize: '12px', color: 'rgba(255,255,255,.8)', lineHeight: 1.5 }}>Đăng nhập hệ thống quản lý đào tạo, khóa học<br />và lịch học phân tán</p>
           </div>
@@ -189,11 +190,11 @@ export default function SaaSAdminLogin() {
               <div style={{ marginBottom: '16px' }}>
                 <label className="form-label" style={{ color: '#64748b', marginBottom: '6px' }}>Chọn đơn vị đào tạo</label>
                 <div className="inp-wrap">
-                  <span className="inp-icon">🏫</span>
+                  <span className="inp-icon"><School className="w-4 h-4 inline-block mr-2" /></span>
                   <select className="inp school-inp" style={{ appearance: 'none', cursor: 'pointer' }} value={sSchool} onChange={e => setSSchool(e.target.value)}>
                     <option value="">-- Chọn trường / trung tâm --</option>
-                    <option value="hcmut">🎓 Trường ĐH Bách Khoa TP.HCM (HCMUT)</option>
-                    <option value="huit">🎓 Trường ĐH Công Thương (HUIT)</option>
+                    <option value="hcmut"><GraduationCap className="w-4 h-4 inline-block mr-2" /> Trường ĐH Bách Khoa TP.HCM (HCMUT)</option>
+                    <option value="huit"><GraduationCap className="w-4 h-4 inline-block mr-2" /> Trường ĐH Công Thương (HUIT)</option>
                   </select>
                   <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none' }}>▾</span>
                 </div>
@@ -202,7 +203,7 @@ export default function SaaSAdminLogin() {
               <div style={{ marginBottom: '16px' }}>
                 <label className="form-label" style={{ color: '#64748b', marginBottom: '6px' }}>Email đăng nhập</label>
                 <div className="inp-wrap">
-                  <span className="inp-icon">✉️</span>
+                  <span className="inp-icon"><Mail className="w-4 h-4 inline-block mr-2" />️</span>
                   <input type="email" className="inp school-inp" placeholder="admin@school.edu.vn" value={sEmail} onChange={e => setSEmail(e.target.value)} />
                 </div>
               </div>
@@ -213,15 +214,15 @@ export default function SaaSAdminLogin() {
                   <span onClick={() => setSchoolView('forgot')} style={{ fontSize: '12px', color: '#1976d2', fontWeight: 600, cursor: 'pointer' }}>Quên mật khẩu?</span>
                 </div>
                 <div className="inp-wrap">
-                  <span className="inp-icon">🔒</span>
+                  <span className="inp-icon"><Lock className="w-4 h-4 inline-block mr-2" /></span>
                   <input type={sShowPass ? 'text' : 'password'} className="inp school-inp" placeholder="Nhập mật khẩu..." value={sPass} onChange={e => setSPass(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSchoolLogin()} />
-                  <span className="inp-eye" onClick={() => setSShowPass(!sShowPass)}>{sShowPass ? '🙈' : '👁'}</span>
+                  <span className="inp-eye" onClick={() => setSShowPass(!sShowPass)}>{sShowPass ? <EyeOff className="w-4 h-4 inline-block mr-2" /> : <Eye className="w-4 h-4 inline-block mr-2" />}</span>
                 </div>
               </div>
 
               {sError && (
                 <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px', marginTop: '14px', fontSize: '13px', color: '#b91c1c', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span>⚠️</span><span>{sError}</span>
+                  <span><AlertTriangle className="w-4 h-4 inline-block mr-2" /></span><span>{sError}</span>
                 </div>
               )}
 
@@ -238,7 +239,7 @@ export default function SaaSAdminLogin() {
           {schoolView === 'otp' && (
             <div className="school-body">
               <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                <div className="anim-float" style={{ fontSize: '36px', marginBottom: '8px' }}>🔐</div>
+                <div className="anim-float" style={{ fontSize: '36px', marginBottom: '8px' }}><Lock className="w-4 h-4 inline-block mr-2" /></div>
                 <h3 style={{ fontSize: '16px', fontWeight: 800, color: '#0f172a' }}>Xác thực bảo mật OTP</h3>
                 <p style={{ fontSize: '12.5px', color: '#64748b', marginTop: '4px' }}>Nhập chuỗi mã an toàn đã được hệ thống gửi về email của nhà trường.</p>
               </div>
@@ -292,7 +293,7 @@ export default function SaaSAdminLogin() {
                 <div style={{ marginBottom: '14px' }}>
                   <label className="form-label" style={{ color: '#64748b', marginBottom: '4px' }}>Super Admin Email</label>
                   <div className="inp-wrap">
-                    <span className="inp-icon">🔑</span>
+                    <span className="inp-icon"><Key className="w-4 h-4 inline-block mr-2" /></span>
                     <input type="email" className="inp saas-inp" placeholder="superadmin@edusaas.io" value={saEmail} onChange={e => setSaEmail(e.target.value)} />
                   </div>
                 </div>
@@ -300,14 +301,14 @@ export default function SaaSAdminLogin() {
                 <div style={{ marginBottom: '14px' }}>
                   <label className="form-label" style={{ color: '#64748b', marginBottom: '4px' }}>Mật khẩu bảo mật</label>
                   <div className="inp-wrap">
-                    <span className="inp-icon">🔒</span>
+                    <span className="inp-icon"><Lock className="w-4 h-4 inline-block mr-2" /></span>
                     <input type={saShowPass ? 'text' : 'password'} className="inp saas-inp" placeholder="••••••••" value={saPass} onChange={e => setSaPass(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSaasLogin()} />
-                    <span className="inp-eye" onClick={() => setSaShowPass(!saShowPass)}>{saShowPass ? '🙈' : '👁'}</span>
+                    <span className="inp-eye" onClick={() => setSaShowPass(!saShowPass)}>{saShowPass ? <EyeOff className="w-4 h-4 inline-block mr-2" /> : <Eye className="w-4 h-4 inline-block mr-2" />}</span>
                   </div>
                 </div>
 
                 <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '12px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span style={{ fontSize: '16px' }}>🛡️</span>
+                  <span style={{ fontSize: '16px' }}><Shield className="w-4 h-4 inline-block mr-2" />️</span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '13px', fontWeight: 600, color: '#0f172a' }}>Bắt buộc mã hóa 2FA</div>
                     <div style={{ fontSize: '11px', color: '#64748b', marginTop: '1px' }}>Xác thực qua Authenticator App</div>
@@ -321,7 +322,7 @@ export default function SaaSAdminLogin() {
                 </div>
 
                 {saError && (
-                  <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px', marginBottom: '14px', fontSize: '13px', color: '#b91c1c' }}>⚠️ {saError}</div>
+                  <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px', marginBottom: '14px', fontSize: '13px', color: '#b91c1c' }}><AlertTriangle className="w-4 h-4 inline-block mr-2" /> {saError}</div>
                 )}
 
                 <button className="btn-login saas-btn" disabled={saLoading} onClick={handleSaasLogin}>
