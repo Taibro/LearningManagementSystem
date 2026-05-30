@@ -21,7 +21,9 @@ export default function Classes() {
 
   const fetchClasses = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/classes');
+      const res = await fetch('http://localhost:8080/api/auth/school-admin/classes', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setClasses(data);
@@ -49,7 +51,10 @@ export default function Classes() {
     try {
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify(payload)
       });
       if (res.ok) {

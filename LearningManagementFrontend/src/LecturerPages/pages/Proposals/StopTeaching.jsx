@@ -1,73 +1,204 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const StopTeaching = () => {
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  
+  // Form states
+  const [date, setDate] = useState('');
+  const [reason, setReason] = useState('');
+  const [file, setFile] = useState(null);
+  
+  const [toast, setToast] = useState({ show: false, msg: '', type: 'success' });
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ show: true, msg, type });
+    setTimeout(() => setToast({ show: false, msg: '', type: 'success' }), 3000);
+  };
+
+  const fetchHistory = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('lecturerToken');
+      const res = await axios.get('http://localhost:8080/api/lecturer/teaching-suspensions/history', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setHistory(res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!date || !reason) {
+      showToast('Vui lòng chọn ngày và nhập lý do xin nghỉ', 'error');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const token = localStorage.getItem('lecturerToken');
+      const formData = new FormData();
+      
+      const dataPayload = {
+        scheduleId: 1, // Tạm fix cứng mã lịch học vì chưa có combobox thật
+        exceptionDate: date,
+        reason: reason
+      };
+
+      // Backend yêu cầu part "data" là một chuỗi JSON (hoặc Blob)
+      formData.append('data', new Blob([JSON.stringify(dataPayload)], { type: 'application/json' }));
+      
+      if (file) {
+        formData.append('proofFile', file);
+      }
+
+      const res = await axios.post('http://localhost:8080/api/lecturer/teaching-suspensions/submit', formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          // Không cần set Content-Type, axios sẽ tự gen boundary cho multipart
+        }
+      });
+      
+      showToast(res.data || 'Đã gửi đề xuất thành công!');
+      setDate('');
+      setReason('');
+      setFile(null);
+      fetchHistory(); // Reload lịch sử
+    } catch (err) {
+      console.error(err);
+      showToast(err.response?.data?.message || 'Có lỗi khi gửi đề xuất', 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    switch(status?.toLowerCase()) {
+      case 'approved': return <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-bold uppercase tracking-wider">Đã duyệt</span>;
+      case 'rejected': return <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded-full font-bold uppercase tracking-wider">Từ chối</span>;
+      default: return <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full font-bold uppercase tracking-wider">Chờ duyệt</span>;
+    }
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('vi-VN');
+  };
+
+  const formatDateTime = (dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return `${d.toLocaleDateString('vi-VN')} ${d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute:'2-digit' })}`;
+  };
+
   return (
-    <div className="animate-fadeIn">
+    <div className="animate-fadeIn relative">
+      {toast.show && (
+        <div style={{
+          position: 'fixed', top: 24, right: 24, zIndex: 10000,
+          background: toast.type === 'success' ? '#10b981' : '#ef4444',
+          color: 'white', padding: '14px 24px', borderRadius: 8,
+          boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14
+        }}>
+          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+        </div>
+      )}
+
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Đề xuất tạm ngừng lịch dạy</h1>
-        <p className="text-gray-400 text-sm mt-1">Yêu cầu tạm ngừng buổi dạy có lý do</p>
+        <p className="text-gray-400 text-sm mt-1">Yêu cầu tạm ngừng buổi dạy có lý do (Xin nghỉ phép)</p>
       </div>
-      <div className="grid grid-cols-2 gap-5">
-        <div className="card p-5">
-          <h3 className="font-semibold text-gray-700 mb-4">Tạo đề xuất mới</h3>
-          <div className="space-y-4">
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="card p-6 shadow-sm border border-gray-100 h-fit">
+          <h3 className="font-bold text-gray-700 mb-5 uppercase text-[11px] tracking-widest border-b pb-2">Tạo đề xuất mới</h3>
+          <div className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Lớp học phần</label>
-              <select className="input-field">
-                <option>010110195604 - 14DHTH04</option>
-                <option>010110195603 - 14DHTH03</option>
+              <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Lớp học phần</label>
+              <select className="input-field bg-gray-50 text-sm">
+                <option>010110195604 - 14DHTH04 (Giả lập)</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Ngày xin ngừng</label>
-              <input type="date" className="input-field" defaultValue="2026-04-25" />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Ngày xin ngừng</label>
+                <input 
+                  type="date" 
+                  value={date}
+                  onChange={e => setDate(e.target.value)}
+                  className="input-field text-sm font-bold text-[#6B4FA0]" 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Ca học</label>
+                <select className="input-field bg-gray-50 text-sm">
+                  <option>Sáng (Tiết 1-3)</option>
+                </select>
+              </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Ca học</label>
-              <select className="input-field">
-                <option>Sáng (Tiết 1-3)</option>
-                <option>Chiều (Tiết 7-9)</option>
-                <option>Tối (Tiết 13-15)</option>
-              </select>
+              <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Lý do</label>
+              <textarea 
+                value={reason}
+                onChange={e => setReason(e.target.value)}
+                className="input-field text-sm" 
+                rows="3" 
+                placeholder="Nhập lý do chi tiết..."
+              ></textarea>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Lý do</label>
-              <textarea className="input-field" rows="3" placeholder="Nhập lý do xin tạm ngừng..."></textarea>
+              <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Đính kèm minh chứng</label>
+              <input 
+                type="file" 
+                onChange={e => setFile(e.target.files[0])}
+                className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer" 
+              />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Đính kèm minh chứng</label>
-              <input type="file" className="input-field text-sm" />
-            </div>
-            <button className="btn-primary w-full">📤 Gửi đề xuất</button>
+            <button 
+              onClick={handleSubmit}
+              disabled={submitting}
+              className="btn-primary w-full font-bold py-2.5 mt-2 shadow-lg shadow-purple-200 uppercase text-xs tracking-widest"
+            >
+              {submitting ? '⏳ Đang gửi...' : '📤 Gửi đề xuất'}
+            </button>
           </div>
         </div>
-        <div className="card p-5">
-          <h3 className="font-semibold text-gray-700 mb-4">Lịch sử đề xuất</h3>
-          <div className="space-y-3">
-            <div className="border border-gray-100 rounded-lg p-3">
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-sm">14DHTH04 - 15/03/2026</span>
-                <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-semibold">Đã duyệt</span>
+        
+        <div className="card p-6 shadow-sm border border-gray-100 h-fit max-h-[600px] flex flex-col">
+          <div className="flex justify-between items-center mb-5 border-b pb-2">
+            <h3 className="font-bold text-gray-700 uppercase text-[11px] tracking-widest">Lịch sử đề xuất</h3>
+            <button onClick={fetchHistory} className="text-xs text-[#6B4FA0] font-bold hover:underline">🔄 Làm mới</button>
+          </div>
+          
+          <div className="space-y-3 overflow-y-auto pr-2 custom-scrollbar flex-1">
+            {loading ? (
+              <div className="text-center text-sm text-gray-400 py-5">Đang tải lịch sử...</div>
+            ) : history && history.length > 0 ? (
+              history.map(item => (
+                <div key={item.exceptionId} className="border border-gray-100 hover:border-purple-200 bg-gray-50/50 rounded-xl p-4 transition-all">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-sm text-gray-800">{item.classCode} - <span className="text-[#6B4FA0]">{formatDate(item.exceptionDate)}</span></span>
+                    {getStatusBadge(item.status)}
+                  </div>
+                  <p className="text-sm text-gray-600 font-medium">Lý do: <span className="font-normal">{item.reason}</span></p>
+                  <p className="text-[10px] text-gray-400 mt-2 font-bold uppercase tracking-wider">Gửi lúc: {formatDateTime(item.createdAt)}</p>
+                </div>
+              ))
+            ) : (
+              <div className="text-center text-sm text-gray-400 py-10 italic">
+                Bạn chưa gửi đề xuất tạm ngừng giảng dạy nào.
               </div>
-              <p className="text-xs text-gray-500">Lý do: Tham dự hội thảo khoa học quốc tế</p>
-              <p className="text-xs text-gray-400 mt-1">Gửi lúc: 10/03/2026 08:30</p>
-            </div>
-            <div className="border border-gray-100 rounded-lg p-3">
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-sm">14DHTH03 - 22/02/2026</span>
-                <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full font-semibold">Chờ duyệt</span>
-              </div>
-              <p className="text-xs text-gray-500">Lý do: Ốm, có giấy tờ y tế</p>
-              <p className="text-xs text-gray-400 mt-1">Gửi lúc: 20/02/2026 14:15</p>
-            </div>
-            <div className="border border-gray-100 rounded-lg p-3">
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-sm">16DHTH10 - 10/01/2026</span>
-                <span className="px-2 py-0.5 bg-red-100 text-red-600 text-xs rounded-full font-semibold">Từ chối</span>
-              </div>
-              <p className="text-xs text-gray-500">Lý do: Việc gia đình</p>
-              <p className="text-xs text-gray-400 mt-1">Gửi lúc: 08/01/2026 09:00</p>
-            </div>
+            )}
           </div>
         </div>
       </div>

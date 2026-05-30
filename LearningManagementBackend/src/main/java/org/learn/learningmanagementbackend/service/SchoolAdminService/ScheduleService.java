@@ -8,7 +8,10 @@ import org.learn.learningmanagementbackend.model.Room;
 import org.learn.learningmanagementbackend.model.Schedule;
 import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.RoomRepository;
 import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.ScheduleRepository;
+import org.learn.learningmanagementbackend.security.CustomUserDetails;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityManager;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,8 +22,19 @@ public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
     private final RoomRepository roomRepository;
-    // For Classes we just use dummy or entity manager reference
-    // Since we don't have ClassesRepository in SchoolAdminRepository yet, we create it dynamically by just using setID
+    private final EntityManager entityManager;
+
+    public List<ScheduleResponse> getAllSchedulesBySchool() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof CustomUserDetails)) return List.of();
+        Integer userId = ((CustomUserDetails) principal).getUserId();
+        try {
+            Integer schoolId = entityManager.createQuery(
+                    "SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    .setParameter("userId", userId).setMaxResults(1).getSingleResult();
+            return scheduleRepository.findBySchoolId(schoolId).stream().map(this::mapToResponse).collect(Collectors.toList());
+        } catch (Exception e) { return List.of(); }
+    }
 
     public List<ScheduleResponse> getAllSchedulesByClass(Integer classId) {
         return scheduleRepository.findByClassesId(classId).stream().map(this::mapToResponse).collect(Collectors.toList());

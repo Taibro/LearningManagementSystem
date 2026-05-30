@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-
+import { LecturerProvider } from './context/LecturerContext';
 import MainLayout from './components/Layout/MainLayout';
 
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -42,10 +42,12 @@ function AppLecturer() {
       <Routes>
         <Route path="/login" element={<LecturerLogin />} />
         
-        {/* Bọc MainLayout trong Bảo vệ */}
+        {/* Bọc MainLayout trong Bảo vệ và Provider */}
         <Route path="/" element={
           <ProtectedRoute>
-            <MainLayout />
+            <LecturerProvider>
+              <MainLayout />
+            </LecturerProvider>
           </ProtectedRoute>
         }>
 

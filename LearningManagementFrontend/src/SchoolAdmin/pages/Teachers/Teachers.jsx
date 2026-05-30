@@ -26,9 +26,12 @@ export default function Teachers() {
   const fetchData = async () => {
     setLoading(true);
     try {
+      const token = localStorage.getItem('token');
+      const headers = { 'Authorization': `Bearer ${token}` };
+
       const [resTeachers, resDepts] = await Promise.all([
-        fetch(`${API_TEACHER}/get-all`),
-        fetch(`${API_DEPT}/get-all-departments?schoolId=${schoolId}`)
+        fetch(`${API_TEACHER}/get-all`, { headers }),
+        fetch(`${API_DEPT}/get-all-departments?schoolId=${schoolId}`, { headers })
       ]);
       if (resTeachers.ok && resDepts.ok) {
         setTeachers(await resTeachers.json());
