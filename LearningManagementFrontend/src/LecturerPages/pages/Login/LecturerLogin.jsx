@@ -27,8 +27,9 @@ const LecturerLogin = () => {
 
       if (res.ok) {
         const data = await res.json();
-        // Lưu Token (nếu backend có trả về)
+        // Lưu Token và Tên của Giảng viên
         if (data.token) localStorage.setItem('lecturerToken', data.token);
+        localStorage.setItem('lecturerName', data.fullName || 'Giảng viên');
         
         // Chuyển hướng vào E-Office
         navigate('/weekly-schedule');
