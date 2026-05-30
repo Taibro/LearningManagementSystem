@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { getConduct } from '../../studentApi';
+import { getScholarships } from '../../studentApi';
 
 export default function Scholarships() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getConduct()
+    getScholarships()
       .then(data => {
-        // Chỉ lấy những kỳ có học bổng
-        setRows(data.filter(r => r.scholarshipName));
+        setRows(data);
         setLoading(false);
       })
       .catch(() => setLoading(false));
@@ -43,8 +42,8 @@ export default function Scholarships() {
                 <td>{i + 1}</td>
                 <td>{r.semesterName}</td>
                 <td style={{textAlign:'center',fontWeight:700,color:'var(--blue)'}}>{r.gpa != null ? Number(r.gpa).toFixed(2) : '—'}</td>
-                <td style={{textAlign:'center'}}>{r.creditsEarned ?? '—'}</td>
-                <td style={{color:'var(--green)',fontWeight:600}}>{r.scholarshipName}</td>
+                <td style={{textAlign:'center'}}>{r.totalCredits ?? '—'}</td>
+                <td style={{color:'var(--green)',fontWeight:600}}>{r.scholarshipType}</td>
                 <td style={{textAlign:'right',fontWeight:700,color:'var(--orange)'}}>{formatMoney(r.scholarshipAmount)}</td>
               </tr>
             ))}

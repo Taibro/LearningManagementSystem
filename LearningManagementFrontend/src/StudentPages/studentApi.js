@@ -43,6 +43,29 @@ export const getConduct = () =>
 export const getTuition = () =>
   axios.get(`${BASE_URL}/tuition`, getHeaders()).then(res => res.data);
 
+export const getDebtDetail = (semesterId) => {
+  const params = semesterId ? { semesterId } : {};
+  return axios.get(`${BASE_URL}/debt-detail`, { ...getHeaders(), params }).then(res => res.data);
+};
+
+export const createPayment = (payload) => 
+  axios.post(`${BASE_URL}/payment`, payload, getHeaders()).then(res => res.data);
+
+export const getPayments = () =>
+  axios.get(`${BASE_URL}/payments`, getHeaders()).then(res => res.data);
+
+export const cancelPayment = (id) =>
+  axios.post(`${BASE_URL}/payment/${id}/cancel`, {}, getHeaders()).then(res => res.data);
+
+export const mockPaymentSuccess = (id) =>
+  axios.post(`${BASE_URL}/payment/${id}/mock-success`, {}, getHeaders()).then(res => res.data);
+
+
+// ── SEMESTERS (cho dropdown) ──────────────────────────────────────────────────
+export const getSemesters = () =>
+  axios.get(`${BASE_URL}/semesters`, getHeaders()).then(res => res.data);
+
+
 // ── NOTIFICATIONS ────────────────────────────────────────────────────────────
 export const getNotifications = () =>
   axios.get(`${BASE_URL}/notifications`, getHeaders()).then(res => res.data);
@@ -54,3 +77,26 @@ export const getSurveys = () =>
 export const submitSurvey = (payload) =>
   axios.post(`${BASE_URL}/surveys`, payload, getHeaders()).then(res => res.data);
 
+// ── COURSE REGISTRATION ───────────────────────────────────────────────────────
+// type: 'NORMAL' | 'RETAKE' | 'IMPROVE'
+export const getCourseRegList = (semesterId, type = 'NORMAL') => {
+  const params = { type };
+  if (semesterId) params.semesterId = semesterId;
+  return axios.get(`${BASE_URL}/course-reg`, { ...getHeaders(), params }).then(res => res.data);
+};
+
+export const registerCourse = (classId, type = 'NORMAL') =>
+  axios.post(`${BASE_URL}/course-reg`, { classId, type }, getHeaders()).then(res => res.data);
+
+export const getEnrolledClasses = (semesterId) => {
+  const params = {};
+  if (semesterId) params.semesterId = semesterId;
+  return axios.get(`${BASE_URL}/course-reg/enrolled`, { ...getHeaders(), params }).then(res => res.data);
+};
+
+export const cancelCourseReg = (classId) =>
+  axios.delete(`${BASE_URL}/course-reg/cancel`, { ...getHeaders(), params: { classId } }).then(res => res.data);
+
+// ── SCHOLARSHIPS ──────────────────────────────────────────────────────────────
+export const getScholarships = () =>
+  axios.get(`${BASE_URL}/scholarships`, getHeaders()).then(res => res.data);
