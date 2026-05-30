@@ -4,6 +4,12 @@ import { NavLink } from 'react-router-dom';
 export default function Sidebar() {
   const navClass = ({ isActive }) => `nav-item ${isActive ? 'active' : ''}`;
 
+  const handleLogout = () => {
+    localStorage.removeItem('saas_token');
+    localStorage.removeItem('saas_user');
+    window.location.href = '/saas/login';
+  };
+
   return (
     <aside className="sidebar flex flex-col">
       <div className="px-5 py-5 border-b" style={{ borderColor: 'var(--border)' }}>
@@ -45,12 +51,25 @@ export default function Sidebar() {
       </div>
 
       <div className="px-4 py-4 border-t" style={{ borderColor: 'var(--border)' }}>
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2))' }}>SA</div>
-          <div>
-            <p className="text-xs font-semibold">Super Admin</p>
-            <p className="text-xs" style={{ color: 'var(--muted)' }}>admin@eduspace.vn</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ background: 'linear-gradient(135deg,var(--accent),var(--accent2))' }}>SA</div>
+            <div>
+              <p className="text-xs font-semibold" style={{ color: 'var(--text)' }}>Super Admin</p>
+              <p className="text-xs" style={{ color: 'var(--muted)' }}>admin@eduspace.vn</p>
+            </div>
           </div>
+          <button 
+            onClick={handleLogout} 
+            title="Đăng xuất"
+            style={{ padding: '6px', borderRadius: '6px', cursor: 'pointer', background: 'transparent', border: 'none', color: '#ef4444' }}
+            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+            onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+          >
+            <svg style={{ width: '20px', height: '20px' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
         </div>
       </div>
     </aside>

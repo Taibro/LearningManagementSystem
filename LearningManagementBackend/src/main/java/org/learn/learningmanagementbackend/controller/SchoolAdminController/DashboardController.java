@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController("schoolAdminDashboardController")
-@RequestMapping("/api/auth/school-admin/dashboard")
+@RequestMapping("/api/school-admin/dashboard")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class DashboardController {

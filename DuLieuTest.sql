@@ -42,6 +42,40 @@ INSERT INTO role (name, description) VALUES
   ('STUDENT', 'Sinh viên / Học sinh'),
   ('SCHOOL_ADMIN', 'Admin nha truong');
 
+INSERT INTO users (
+    school_id,
+    code,
+    citizen_id_number,
+    full_name,
+    email,
+    password_hash,
+    phone,
+    address,
+    gender,
+    is_active,
+    created_at,
+    updated_at
+) VALUES (
+    1,
+    'ADM-HCMUT-01',
+    '079200000001',
+    'Admin Bách Khoa',
+    'admin@hcmut.edu.vn',
+    '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG', -- Đây là chuỗi Bcrypt hash của mật khẩu 'Admin@123'
+    '0909123456',
+    '268 Lý Thường Kiệt, Quận 10, TP.HCM',
+    'MALE',
+    true,
+    NOW(),
+    NOW()
+);
+
+INSERT INTO user_roles (user_id, role_id)
+VALUES (
+    (SELECT id FROM users WHERE email = 'admin@hcmut.edu.vn' LIMIT 1),
+    (SELECT id FROM role WHERE name = 'SCHOOL_ADMIN' LIMIT 1)
+);
+
 -- 2. BẢNG SCHOOL (12 dòng)
 INSERT INTO School (id, code, name, short_name, type, email) VALUES
 (1, 'HUIT', 'Đại học Công Thương TP.HCM', 'HUIT', 'UNIVERSITY', 'contact@huit.edu.vn'),
@@ -149,6 +183,40 @@ INSERT INTO users (id, school_id, code, citizen_id_number, full_name, email, pas
 Update users
 set password_hash = '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG';
 SELECT * FROM users;
+
+INSERT INTO users (
+    school_id,
+    code,
+    citizen_id_number,
+    full_name,
+    email,
+    password_hash,
+    phone,
+    address,
+    gender,
+    is_active,
+    created_at,
+    updated_at
+) VALUES (
+    1,
+    'ADM-HCMUT-01',
+    '079200000001',
+    'Admin Bách Khoa',
+    'admin@hcmut.edu.vn',
+    '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG', -- Đây là chuỗi Bcrypt hash của mật khẩu 'Admin@123'
+    '0909123456',
+    '268 Lý Thường Kiệt, Quận 10, TP.HCM',
+    'MALE',
+    true,
+    NOW(),
+    NOW()
+);
+
+INSERT INTO user_roles (user_id, role_id)
+VALUES (
+    (SELECT id FROM users WHERE email = 'admin@hcmut.edu.vn' LIMIT 1),
+    (SELECT id FROM role WHERE name = 'SCHOOL_ADMIN' LIMIT 1)
+);
 
 -- 8. BẢNG USER_SCHOOL (24 dòng tương ứng)
 INSERT INTO user_roles (user_id, role_id) VALUES

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController("schoolAdminSemesterController")
-@RequestMapping("/api/auth/school-admin/semesters")
+@RequestMapping("/api/school-admin/semesters")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class SemesterController {

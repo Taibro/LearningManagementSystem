@@ -13,16 +13,16 @@ export default function SaaSAdminLogin() {
 
   // Form State Cổng Trường Học
   const [sSchool, setSSchool] = useState('');
-  const [sEmail, setSEmail] = useState('admin@hcmut.edu.vn');
-  const [sPass, setSPass] = useState('Admin@123');
+  const [sEmail, setSEmail] = useState('');
+  const [sPass, setSPass] = useState('');
   const [sShowPass, setSShowPass] = useState(false);
   const [sLoading, setSLoading] = useState(false);
   const [sError, setSError] = useState('');
   const [sShake, setSShake] = useState(false);
 
   // Form State Cổng Toàn Cục SaaS
-  const [saEmail, setSaEmail] = useState('superadmin@edusaas.io');
-  const [saPass, setSaPass] = useState('SuperAdmin@2024');
+  const [saEmail, setSaEmail] = useState('');
+  const [saPass, setSaPass] = useState('');
   const [saShowPass, setSaShowPass] = useState(false);
   const [use2fa, setUse2fa] = useState(true);
   const [saLoading, setSaLoading] = useState(false);
@@ -40,24 +40,45 @@ export default function SaaSAdminLogin() {
   /* ==========================================
      XỬ LÝ ĐĂNG NHẬP & OTP CHO ADMIN SCHOOL
   ========================================== */
-  const handleSchoolLogin = () => {
+  const handleSchoolLogin = async () => {
     setSError('');
     if (!sSchool) return setSError('Vui lòng chọn trường / trung tâm.');
     if (!sEmail) return setSError('Vui lòng nhập email đăng nhập.');
     if (!sPass) return setSError('Vui lòng nhập mật khẩu.');
 
     setSLoading(true);
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userType: 'SCHOOL_ADMIN',
+          loginCode: sEmail,
+          password: sPass
+        })
+      });
+
+      const data = await response.json();
       setSLoading(false);
-      if (sEmail === 'admin@hcmut.edu.vn' && sPass === 'Admin@123') {
-        setSchoolView('otp'); 
-        showToast('Mã OTP đã được gửi đến email của bạn', 'green');
-      } else {
-        setSError('Email hoặc mật khẩu không đúng.');
+
+      if (!response.ok) {
+        setSError(data.message || 'Email hoặc mật khẩu không đúng.');
         setSShake(true);
         setTimeout(() => setSShake(false), 400);
+        return;
       }
-    }, 1200);
+
+      localStorage.setItem('school_token', data.token);
+      localStorage.setItem('school_user', JSON.stringify(data));
+
+      setSchoolView('otp'); 
+      showToast('Mã OTP đã được gửi đến email của bạn', 'green');
+    } catch (err) {
+      setSLoading(false);
+      setSError('Không thể kết nối đến Backend Server. Vui lòng thử lại sau.');
+      setSShake(true);
+      setTimeout(() => setSShake(false), 400);
+    }
   };
 
   // NHẢY VỀ SCHOOL ADMIN

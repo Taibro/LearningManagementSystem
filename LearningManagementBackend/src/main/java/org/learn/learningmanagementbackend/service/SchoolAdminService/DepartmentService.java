@@ -6,10 +6,6 @@ import org.learn.learningmanagementbackend.dto.response.DepartmentResponse;
 import org.learn.learningmanagementbackend.model.Department;
 import org.learn.learningmanagementbackend.model.School;
 import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.DepartmentRepository;
-<<<<<<< HEAD
-=======
-import org.learn.learningmanagementbackend.repository.SaasAdminRepository.SchoolRepository;
->>>>>>> ea8b86850759435bf6a87ba6e5ebaeacada85627
 import org.springframework.stereotype.Service;
 
 import java.util.List;
