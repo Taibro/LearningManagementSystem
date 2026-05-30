@@ -24,7 +24,9 @@ export default function Exceptions() {
 
   const fetchExceptions = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedule-exceptions`);
+      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedule-exceptions`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setExceptions(data);
@@ -37,7 +39,9 @@ export default function Exceptions() {
   const fetchSchedules = async () => {
     try {
       // Tạm load tất cả schedule của lớp ID=1 (Giả định)
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedules/class/1`);
+      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedules/class/1`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setSchedules(data);
@@ -61,7 +65,10 @@ export default function Exceptions() {
     try {
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify(payload)
       });
       if (res.ok) {
@@ -79,7 +86,10 @@ export default function Exceptions() {
   const handleDeleteEx = async (id) => {
     if(!window.confirm("Bạn có chắc muốn xóa ngoại lệ này?")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedule-exceptions/${id}`, { method: 'DELETE' });
+      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedule-exceptions/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       if (res.ok) {
         showToast('Đã xóa ngoại lệ!');
         fetchExceptions();

@@ -20,7 +20,6 @@ public class EvaluationService {
     private final SemesterRepository semesterRepository;
 
     public EvaluationDashboardResponse getDashboardData(String teacherCode) {
-
         // Tự động lấy Học kỳ mới nhất
         Semester latestSemester = semesterRepository.findTopByOrderByStartDateDesc()
                 .orElseThrow(() -> new RuntimeException("Chưa có dữ liệu Học kỳ"));
@@ -43,16 +42,20 @@ public class EvaluationService {
 
         // Duyệt và tính toán
         for (TeacherEvaluation eval : evaluations) {
-            sumKnowledge += eval.getScoreKnowledge();
-            sumMethod += eval.getScoreMethod();
-            sumInteraction += eval.getScoreInteraction();
-            sumMaterials += eval.getScoreMaterials();
-            sumPunctuality += eval.getScorePunctuality();
+            double kn = eval.getScoreKnowledge() != null ? eval.getScoreKnowledge() : 0.0;
+            double me = eval.getScoreMethod() != null ? eval.getScoreMethod() : 0.0;
+            double in = eval.getScoreInteraction() != null ? eval.getScoreInteraction() : 0.0;
+            double ma = eval.getScoreMaterials() != null ? eval.getScoreMaterials() : 0.0;
+            double pu = eval.getScorePunctuality() != null ? eval.getScorePunctuality() : 0.0;
+
+            sumKnowledge += kn;
+            sumMethod += me;
+            sumInteraction += in;
+            sumMaterials += ma;
+            sumPunctuality += pu;
 
             // Điểm TB của 1 phiếu
-            double avgSingle = (eval.getScoreKnowledge() + eval.getScoreMethod() +
-                    eval.getScoreInteraction() + eval.getScoreMaterials() +
-                    eval.getScorePunctuality()) / 5.0;
+            double avgSingle = (kn + me + in + ma + pu) / 5.0;
             if (avgSingle >= 4.0) {
                 satisfiedCount++;
             }

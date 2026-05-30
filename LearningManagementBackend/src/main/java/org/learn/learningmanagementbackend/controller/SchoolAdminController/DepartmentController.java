@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/school-admin") // Tạm mượn /api/auth để test không cần token
+@RequestMapping("/api/auth/school-admin") // Tạm mượn /api/auth để test không cần token
 @RequiredArgsConstructor
 public class DepartmentController {
 

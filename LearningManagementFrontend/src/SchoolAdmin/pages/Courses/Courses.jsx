@@ -29,9 +29,11 @@ export default function Courses() {
     setError(null);
     try {
       // Gọi cả 2 API cùng lúc cho nhanh
+      const token = localStorage.getItem('token');
+      const headers = { 'Authorization': `Bearer ${token}` };
       const [resCourses, resDepts] = await Promise.all([
-        fetch(`${API_COURSE}/get-all`),
-        fetch(`${API_DEPT}/get-all-departments?schoolId=${schoolId}`)
+        fetch(`${API_COURSE}/get-all`, { headers }),
+        fetch(`${API_DEPT}/get-all-departments?schoolId=${schoolId}`, { headers })
       ]);
 
       if (!resCourses.ok || !resDepts.ok) throw new Error('Lỗi khi tải dữ liệu từ Server');
@@ -82,7 +84,10 @@ export default function Courses() {
     try {
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify({
           code: currentCourse.code,
           name: currentCourse.name,
@@ -109,7 +114,10 @@ export default function Courses() {
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn có chắc muốn xóa môn học này không? Tất cả các Lớp Học Phần thuộc môn này cũng sẽ bị xóa!')) return;
     try {
-      const res = await fetch(`${API_COURSE}/delete-course/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_COURSE}/delete-course/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       if (!res.ok) throw new Error('Xóa thất bại');
       showToast('Xóa môn học thành công!', 'success');
       fetchData();

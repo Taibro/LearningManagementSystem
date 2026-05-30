@@ -62,7 +62,8 @@ export default function Students() {
         setSModal(false);
         fetchStudents();
       } else {
-        showToast('Lỗi khi lưu sinh viên!', 'error');
+        const errText = await res.text();
+        showToast(`Lỗi: ${errText || 'Không xác định'}`, 'error');
       }
     } catch (err) {
       showToast('Lỗi kết nối mạng!', 'error');

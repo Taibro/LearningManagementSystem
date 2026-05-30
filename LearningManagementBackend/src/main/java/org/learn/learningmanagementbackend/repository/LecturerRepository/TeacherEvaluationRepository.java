@@ -21,6 +21,7 @@ public interface TeacherEvaluationRepository extends JpaRepository<TeacherEvalua
             @Param("teacherCode") String teacherCode,
             @Param("semesterId") Integer semesterId);
 
+
     // Kiểm tra sinh viên đã khảo sát lớp này chưa (qua teacher chính của lớp)
     @Query("""
             SELECT e FROM TeacherEvaluation e

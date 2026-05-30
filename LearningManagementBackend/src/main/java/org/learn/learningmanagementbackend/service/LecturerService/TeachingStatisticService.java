@@ -49,12 +49,19 @@ public class TeachingStatisticService {
             int classCompletedPeriods = 0;
 
             for (Schedule schedule : cls.getSchedules()) {
-                int periodsPerSession = schedule.getEndPeriod() - schedule.getStartPeriod() + 1;
+                int start = schedule.getStartPeriod() != null ? schedule.getStartPeriod() : 0;
+                int end = schedule.getEndPeriod() != null ? schedule.getEndPeriod() : 0;
+                int periodsPerSession = (start > 0 && end > 0) ? (end - start + 1) : 0;
 
                 LocalDate loopDate = schedule.getStartDate();
-                while (!loopDate.isAfter(schedule.getEndDate())) {
+                while (loopDate != null && schedule.getEndDate() != null && !loopDate.isAfter(schedule.getEndDate())) {
+                    
+                    // Chuyển đổi DayOfWeek của Java (1=Mon, 7=Sun) sang kiểu của DB (2=Mon, 8=Sun)
+                    int javaDow = loopDate.getDayOfWeek().getValue();
+                    int vietnameseDow = (javaDow == 7) ? 8 : (javaDow + 1); // Giả sử Chủ nhật là 8 trong DB, nếu Chủ nhật là 1 thì dùng javaDow == 7 ? 1 : javaDow + 1
 
-                    if (loopDate.getDayOfWeek().getValue() == schedule.getDayOfWeek()) {
+                    if (schedule.getDayOfWeek() != null && 
+                       (vietnameseDow == schedule.getDayOfWeek() || (javaDow == 7 && schedule.getDayOfWeek() == 1))) {
 
                         // Phân loại đếm tổng số tiết
                         if (schedule.getType() == ScheduleType.REGULAR || schedule.getType() == ScheduleType.SEMINAR) {
@@ -86,9 +93,11 @@ public class TeachingStatisticService {
             // Ghi nhận chi tiết từng môn cho Bảng dữ liệu
             if (classTotalPeriods > 0) {
                 int progress = (int) Math.round((double) classCompletedPeriods / classTotalPeriods * 100);
+                
+                String courseName = cls.getCourse() != null ? cls.getCourse().getName() : "Không rõ môn học";
 
                 classDetails.add(TeachingStatisticResponse.ClassTeachingDetail.builder()
-                        .subjectName(cls.getCourse().getName() + (cls.getSchedules().stream().anyMatch(s -> s.getType() == ScheduleType.LAB) ? " (TH)" : " (LT)"))
+                        .subjectName(courseName + (cls.getSchedules().stream().anyMatch(s -> s.getType() == ScheduleType.LAB) ? " (TH)" : " (LT)"))
                         .classCode(cls.getCode())
                         .completedPeriods(classCompletedPeriods)
                         .totalPeriods(classTotalPeriods)

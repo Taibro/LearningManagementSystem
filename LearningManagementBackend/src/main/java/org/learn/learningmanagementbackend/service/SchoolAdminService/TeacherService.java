@@ -71,6 +71,8 @@ public class TeacherService {
         user.setGender(request.getGender());
         user.setDateOfBirth(request.getDateOfBirth());
         user.setIsActive(true);
+        user.setCode(request.getTeacherCode());
+        user.setSchool(department.getSchool());
         // Có thể tạo password hash mặc định ở đây nếu cần
 
         Users savedUser = userRepository.save(user);

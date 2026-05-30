@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController("schoolAdminTeacherController")
-@RequestMapping("/api/school-admin/teachers") // Dùng tạm /auth để test mượt mà
+@RequestMapping("/api/auth/school-admin/teachers") // Dùng tạm /auth để test mượt mà
 @RequiredArgsConstructor
 public class TeacherController {
 

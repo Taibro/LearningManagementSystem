@@ -19,8 +19,8 @@ const Documents = () => {
 
   const [toast, setToast] = useState({ show: false, msg: '', type: 'success' });
 
-  const teacherId = 1; // Tạm cứng cho Giảng viên số 1
-  const classId = 1; // Tạm cứng cho Lớp 1
+  const teacherId = 2; // Tạm cứng cho Giảng viên số 2 (khớp với add_mock_salary.sql)
+  const classId = 901; // Tạm cứng cho Lớp 901 (khớp với mock)
 
   const showToast = (msg, type = 'success') => {
     setToast({ show: true, msg, type });
@@ -148,7 +148,7 @@ const Documents = () => {
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1.5">Lớp học phần</label>
               <select className="input-field font-medium">
-                <option>014DHTH04 (Giả lập)</option>
+                <option>Lớp 901 (Mock)</option>
               </select>
             </div>
             <div>

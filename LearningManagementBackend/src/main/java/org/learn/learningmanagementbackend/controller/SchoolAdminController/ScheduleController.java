@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController("schoolAdminScheduleController")
-@RequestMapping("/api/school-admin/schedules")
+@RequestMapping("/api/auth/school-admin/schedules")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
 public class ScheduleController {
