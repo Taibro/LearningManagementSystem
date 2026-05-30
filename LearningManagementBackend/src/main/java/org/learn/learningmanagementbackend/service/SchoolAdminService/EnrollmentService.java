@@ -20,8 +20,28 @@ public class EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     // Tạm thời giả định có tồn tại các repository này hoặc dùng object reference
     
+    @org.springframework.beans.factory.annotation.Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
     public List<EnrollmentResponse> getAllEnrollments() {
-        return enrollmentRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer userId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    .setParameter("userId", userId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<Enrollment> enrollments = entityManager.createQuery("SELECT e FROM Enrollment e WHERE e.student.department.school.id = :schoolId", Enrollment.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        return enrollments.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public List<EnrollmentResponse> getEnrollmentsByClass(Integer classId) {

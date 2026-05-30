@@ -19,8 +19,28 @@ public class TuitionPaymentService {
     private final TuitionPaymentRepository paymentRepository;
     private final TuitionInvoiceRepository invoiceRepository;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
     public List<TuitionPaymentResponse> getAllPayments() {
-        return paymentRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer userId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    .setParameter("userId", userId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<TuitionPayment> payments = entityManager.createQuery("SELECT p FROM TuitionPayment p WHERE p.tuitionInvoice.student.department.school.id = :schoolId", TuitionPayment.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        return payments.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public List<TuitionPaymentResponse> getPaymentsByInvoice(Integer invoiceId) {

@@ -23,10 +23,28 @@ public class TeacherService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
     public List<TeacherResponse> getAllTeachers() {
-        return teacherRepository.findAll().stream()
-                .map(TeacherResponse::new)
-                .collect(Collectors.toList());
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer userId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    .setParameter("userId", userId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<Teacher> teachers = entityManager.createQuery("SELECT t FROM Teacher t WHERE t.department.school.id = :schoolId", Teacher.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        return teachers.stream().map(TeacherResponse::new).collect(Collectors.toList());
     }
 
     @Transactional

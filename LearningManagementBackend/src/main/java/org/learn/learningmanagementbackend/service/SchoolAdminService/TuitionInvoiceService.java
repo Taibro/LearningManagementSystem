@@ -23,8 +23,28 @@ public class TuitionInvoiceService {
     private final StudentRepository studentRepository;
     private final SemesterRepository semesterRepository;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
     public List<TuitionInvoiceResponse> getAllInvoices() {
-        return invoiceRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer userId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    .setParameter("userId", userId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<TuitionInvoice> invoices = entityManager.createQuery("SELECT i FROM TuitionInvoice i WHERE i.student.department.school.id = :schoolId", TuitionInvoice.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        return invoices.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public List<TuitionInvoiceResponse> getInvoicesBySemester(Integer semesterId) {

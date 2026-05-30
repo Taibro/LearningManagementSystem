@@ -21,7 +21,9 @@ export default function Students() {
 
   const fetchStudents = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/students');
+      const res = await fetch('http://localhost:8080/api/auth/school-admin/students', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setStudents(data);
@@ -49,7 +51,10 @@ export default function Students() {
     try {
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify(payload)
       });
       if (res.ok) {
@@ -67,7 +72,10 @@ export default function Students() {
   const handleDeleteStudent = async (id) => {
     if(!window.confirm("Bạn có chắc muốn xóa sinh viên này?")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/students/${id}`, { method: 'DELETE' });
+      const res = await fetch(`http://localhost:8080/api/auth/school-admin/students/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       if (res.ok) {
         showToast('Đã xóa!');
         fetchStudents();
