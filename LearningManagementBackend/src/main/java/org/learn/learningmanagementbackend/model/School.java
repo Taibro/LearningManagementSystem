@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "schools")
+@Table(name = "school")
 public class School extends BaseEntity {
 
     @Id
@@ -26,7 +26,7 @@ public class School extends BaseEntity {
     private String code;
 
     @Column(name = "name", nullable = false)
-    private String  name;
+    private String name;
 
     @Column(name = "short_name", length = 50)
     private String shortName;
@@ -65,12 +65,12 @@ public class School extends BaseEntity {
     @OneToMany(mappedBy = "school", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Users> users = new ArrayList<>();
 
-    public void addUser(Users user){
+    public void addUser(Users user) {
         this.users.add(user);
         user.setSchool(this);
     }
 
-    public void removeUser(Users user){
+    public void removeUser(Users user) {
         this.users.remove(user);
         user.setSchool(null);
     }

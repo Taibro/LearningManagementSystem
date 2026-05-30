@@ -733,6 +733,22 @@ CREATE TABLE system_error_logs (
   CONSTRAINT fk_err_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE SET NULL
 ) ENGINE=InnoDB COMMENT='Nhật ký bắt lỗi toàn hệ thống';
 
+-- ============================================================
+-- 6. BẢNG AUDIT_LOGS (6 entries)
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    school_id INT,
+    user_email VARCHAR(255) NOT NULL,
+    action VARCHAR(20) NOT NULL,
+    table_name VARCHAR(100) NOT NULL,
+    record_id BIGINT,
+    ip_address VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (school_id) REFERENCES schools(id)
+);
+
 -- Tạo bảng lưu trữ đánh giá của sinh viên
 CREATE TABLE teacher_evaluations (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
