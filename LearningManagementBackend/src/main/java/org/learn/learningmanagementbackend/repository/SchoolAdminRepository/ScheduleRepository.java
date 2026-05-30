@@ -10,4 +10,7 @@ import java.util.List;
 public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
     List<Schedule> findByClassesId(Integer classId);
     List<Schedule> findByRoomId(Integer roomId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT s FROM Schedule s WHERE s.classes.course.department.school.id = :schoolId")
+    List<Schedule> findBySchoolId(@org.springframework.data.repository.query.Param("schoolId") Integer schoolId);
 }

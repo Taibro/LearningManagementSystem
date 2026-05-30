@@ -11,8 +11,6 @@ export default function Schedule() {
     startTime: '07:30', endTime: '09:30', startDate: '', endDate: '' 
   });
 
-  const CLASS_ID = 1; // Giả định ID của Lớp để lấy lịch học
-
   useEffect(() => {
     fetchSchedules();
   }, []);
@@ -24,7 +22,10 @@ export default function Schedule() {
 
   const fetchSchedules = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedules/class/${CLASS_ID}`);
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:8080/api/auth/school-admin/schedules', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setSchedules(data);
