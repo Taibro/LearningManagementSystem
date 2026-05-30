@@ -18,7 +18,7 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "Tuition_invoice", uniqueConstraints = {
+@Table(name = "tuition_invoices", uniqueConstraints = {
         @UniqueConstraint(columnNames = {"student_id", "semester_id"})
 })
 public class TuitionInvoice {

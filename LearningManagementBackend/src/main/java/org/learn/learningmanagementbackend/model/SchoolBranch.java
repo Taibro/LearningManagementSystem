@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "School_branches")
+@Table(name = "school_branches")
 public class SchoolBranch extends BaseEntity{
 
     @Id

@@ -48,7 +48,7 @@ public class SecurityConfig {
                 .build();
     }
 
-    // 2. CẤU HÌNH CHI TIẾT CÁC QUY TẮC CORS
+    // CẤU HÌNH CHI TIẾT CÁC QUY TẮC CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

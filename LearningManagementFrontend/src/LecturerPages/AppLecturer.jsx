@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-
+import { LecturerProvider } from './context/LecturerContext';
 import MainLayout from './components/Layout/MainLayout';
 
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -25,11 +25,31 @@ import SubstituteTeaching from './pages/Proposals/SubstituteTeaching';
 import Statistics from './pages/Statistics/Statistics';
 import Survey from './pages/Survey/Survey';
 import Settings from './pages/Settings/settings';
+import LecturerLogin from './pages/Login/LecturerLogin';
+
+// Component Bảo vệ: Ai chưa có token thì đuổi về trang login
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('lecturerToken');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 function AppLecturer() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<MainLayout />}>
+        <Route path="/login" element={<LecturerLogin />} />
+        
+        {/* Bọc MainLayout trong Bảo vệ và Provider */}
+        <Route path="/" element={
+          <ProtectedRoute>
+            <LecturerProvider>
+              <MainLayout />
+            </LecturerProvider>
+          </ProtectedRoute>
+        }>
 
           <Route index element={<Navigate to="/weekly-schedule" />} />
 

@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Table(name = "Role")
+@Table(name = "role")
 @NoArgsConstructor
 public class Role {
 
@@ -24,17 +24,5 @@ public class Role {
 
     @Column(name = "description")
     private String description;
-
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserSchool> userSchools = new ArrayList<>();
-
-    public void addUserSchool(UserSchool userSchool){
-        this.userSchools.add(userSchool);
-        userSchool.setRole(this);
-    }
-
-    public void removeUserSchool(UserSchool userSchool){
-        this.userSchools.remove(userSchool);
-        userSchool.setRole(null);
-    }
+    
 }

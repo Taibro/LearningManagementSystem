@@ -1,18 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Input from '../../components/Layout/Input';
 import axios from 'axios';
 
-
-
 const WeeklySchedule = () => {
-  // Tạo state để lưu trữ ngày được chọn (Mặc định để tạm ngày 20/04/2026)
   const [selectedDate, setSelectedDate] = useState('2026-04-20');
+  const [schedules, setSchedules] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Hàm xử lý khi chọn ngày mới
+  // Fetch dữ liệu từ API của Tài
+  useEffect(() => {
+    const fetchSchedule = async () => {
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('lecturerToken');
+        // Gọi API của Backend, tự động hiểu GV001 thông qua Token
+        const response = await axios.get(`http://localhost:8080/api/lecturer/schedules/weekly-schedule?date=${selectedDate}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSchedules(response.data);
+      } catch (error) {
+        console.error("Lỗi khi tải lịch học:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchedule();
+  }, [selectedDate]);
+
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
-    console.log("Ngày muốn xem lịch:", e.target.value);
-    // Sau này bạn sẽ gọi API fetch data lịch học ở đây dựa theo selectedDate
+  };
+
+  // Hàm nhóm lịch theo Buổi (Sáng/Chiều/Tối) và Thứ (2 -> CN)
+  const getSchedulesForSlot = (timeSlot, dayOfWeek) => {
+    return schedules.filter(sch => {
+      // timeSlot: 'SANG' (Tiết 1-6), 'CHIEU' (Tiết 7-12), 'TOI' (Tiết 13-16)
+      const isMorning = sch.startPeriod <= 6;
+      const isAfternoon = sch.startPeriod >= 7 && sch.startPeriod <= 12;
+      const isEvening = sch.startPeriod >= 13;
+
+      const matchSlot = 
+        (timeSlot === 'SANG' && isMorning) ||
+        (timeSlot === 'CHIEU' && isAfternoon) ||
+        (timeSlot === 'TOI' && isEvening);
+      
+      // dayOfWeek trong Java thường 1=Thứ 2, 2=Thứ 3... 7=Chủ nhật
+      return matchSlot && sch.dayOfWeek === dayOfWeek;
+    });
+  };
+
+  const renderScheduleCard = (sch, idx) => {
+    // Phân loại màu sắc dựa theo SessionType (LT/TH)
+    const isTheory = sch.sessionType === 'Lý thuyết' || sch.sessionType === 'LT';
+    const cardClass = isTheory ? 'schedule-theory' : 'schedule-practice';
+    const textColor = isTheory ? 'text-green-800' : 'text-indigo-800';
+    const subColor = isTheory ? 'text-green-600' : 'text-indigo-600';
+    const iconColor = isTheory ? 'text-green-700' : 'text-indigo-700';
+
+    return (
+      <div key={idx} className={`schedule-card ${cardClass} mb-2`}>
+        <div className={`font-semibold ${textColor} text-xs`}>{sch.courseName}</div>
+        <div className={`${subColor} text-xs mt-1`}>{sch.classCode}</div>
+        <div className={`${subColor} text-xs`}>Tiết {sch.startPeriod}–{sch.endPeriod}</div>
+        <div className={`${iconColor} text-xs font-medium mt-1`}>📍 {sch.roomName}</div>
+      </div>
+    );
   };
 
   return (
@@ -20,138 +73,67 @@ const WeeklySchedule = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Lịch theo tuần</h1>
-          <p className="text-gray-400 text-sm mt-1">Tuần 20/04/2026 – 26/04/2026</p>
+          <p className="text-gray-400 text-sm mt-1">Ngày đang chọn: {selectedDate}</p>
         </div>
         
-        {/* ĐÃ SỬA: Thêm khu vực chứa Input Date và các nút điều hướng */}
         <div className="flex items-center gap-4">
           <Input 
             type="date" 
             value={selectedDate} 
             onChange={handleDateChange}
-            className="w-40" // Giới hạn chiều rộng cho đẹp
+            className="w-40" 
           />
-          
           <div className="flex gap-2">
-            <button className="btn-outline text-sm flex items-center gap-1">Tuần trước</button>
-            <button className="btn-primary text-sm">Hôm nay</button>
-            <button className="btn-outline text-sm flex items-center gap-1">Tuần sau</button>
+            <button className="btn-primary text-sm">Tải lại lịch</button>
           </div>
         </div>
       </div>
 
-      {/* Legend */}
       <div className="flex gap-4 mb-4 text-sm">
-        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-green-400"></div><span className="text-gray-600">Lịch dạy lý thuyết</span></div>
-        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-indigo-400"></div><span className="text-gray-600">Lịch dạy thực hành</span></div>
-        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-yellow-400"></div><span className="text-gray-600">Lịch trực tuyến</span></div>
-        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-red-400"></div><span className="text-gray-600">Lịch tạm ngừng</span></div>
+        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-green-400"></div><span className="text-gray-600">Lý thuyết</span></div>
+        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded bg-indigo-400"></div><span className="text-gray-600">Thực hành</span></div>
       </div>
 
       <div className="card overflow-hidden">
-        <div className="week-grid">
-          {/* Header */}
-          <div className="week-header text-xs">Ca học</div>
-          <div className="week-header"><div>Thứ 2</div><div className="text-purple-200 font-normal text-xs">20/04/2026</div></div>
-          <div className="week-header"><div>Thứ 3</div><div className="text-purple-200 font-normal text-xs">21/04/2026</div></div>
-          <div className="week-header"><div>Thứ 4</div><div className="text-purple-200 font-normal text-xs">22/04/2026</div></div>
-          <div className="week-header"><div>Thứ 5</div><div className="text-purple-200 font-normal text-xs">23/04/2026</div></div>
-          <div className="week-header"><div>Thứ 6</div><div className="text-purple-200 font-normal text-xs">24/04/2026</div></div>
-          <div className="week-header"><div>Thứ 7</div><div className="text-purple-200 font-normal text-xs">25/04/2026</div></div>
-          <div className="week-header"><div>CN</div><div className="text-purple-200 font-normal text-xs">26/04/2026</div></div>
+        {loading ? (
+          <div className="p-10 text-center text-gray-500">Đang tải dữ liệu lịch học từ máy chủ...</div>
+        ) : (
+          <div className="week-grid">
+            {/* Header */}
+            <div className="week-header text-xs">Ca học</div>
+            <div className="week-header">Thứ 2</div>
+            <div className="week-header">Thứ 3</div>
+            <div className="week-header">Thứ 4</div>
+            <div className="week-header">Thứ 5</div>
+            <div className="week-header">Thứ 6</div>
+            <div className="week-header">Thứ 7</div>
+            <div className="week-header">CN</div>
 
-          {/* Sáng */}
-          <div className="week-cell session-label text-xs font-semibold text-purple-600">SÁNG</div>
-          <div className="week-cell">
-            <div className="schedule-card schedule-theory">
-              <div className="font-semibold text-green-800 text-xs">Kiến trúc máy tính (LT)</div>
-              <div className="text-green-600 text-xs mt-1">010100228915 - 16DHTH10</div>
-              <div className="text-green-600 text-xs">Tiết 1–3</div>
-              <div className="text-green-700 text-xs font-medium mt-1">📍 A401 - 140 Lê Trọng Tấn</div>
-            </div>
-          </div>
-          <div className="week-cell">
-            <div className="schedule-card schedule-theory">
-              <div className="font-semibold text-green-800 text-xs">Kiến trúc máy tính (LT)</div>
-              <div className="text-green-600 text-xs mt-1">010100228913 - 16DHTH08</div>
-              <div className="text-green-600 text-xs">Tiết 7–9</div>
-              <div className="text-green-700 text-xs font-medium mt-1">📍 B407 - 140 Lê Trọng Tấn</div>
-            </div>
-          </div>
-          <div className="week-cell"></div>
-          <div className="week-cell">
-            <div className="schedule-card schedule-theory mb-2">
-              <div className="font-semibold text-green-800 text-xs">Quản trị hệ thống mạng (LT)</div>
-              <div className="text-green-600 text-xs mt-1">010110197304 - 14DHTH04</div>
-              <div className="text-green-600 text-xs">Tiết 7–9</div>
-              <div className="text-green-700 text-xs font-medium mt-1">📍 A202 - 140 Lê Trọng Tấn</div>
-            </div>
-            <div className="schedule-card schedule-theory">
-              <div className="font-semibold text-green-800 text-xs">Quản trị hệ thống mạng (LT)</div>
-              <div className="text-green-600 text-xs mt-1">010110197303 - 14DHTH03</div>
-              <div className="text-green-600 text-xs">Tiết 10–12</div>
-              <div className="text-green-700 text-xs font-medium mt-1">📍 A301 - 140 Lê Trọng Tấn</div>
-            </div>
-          </div>
-          <div className="week-cell"></div>
-          <div className="week-cell">
-            <div className="schedule-card schedule-online">
-              <div className="font-semibold text-yellow-800 text-xs">Các vấn đề biên đại trong ATTT (LT)</div>
-              <div className="text-yellow-600 text-xs mt-1">932210293002 - 09CUICMITUE02</div>
-              <div className="text-yellow-600 text-xs">Tiết 2–6</div>
-              <div className="text-yellow-700 text-xs font-medium mt-1">📍 DP01 - Công ty Đại phát</div>
-            </div>
-          </div>
-          <div className="week-cell"></div>
+            {/* Buổi Sáng */}
+            <div className="week-cell session-label text-xs font-semibold text-purple-600">SÁNG</div>
+            {[1, 2, 3, 4, 5, 6, 7].map(day => (
+              <div key={`sang-${day}`} className="week-cell">
+                {getSchedulesForSlot('SANG', day).map((sch, i) => renderScheduleCard(sch, i))}
+              </div>
+            ))}
 
-          {/* Chiều */}
-          <div className="week-cell session-label text-xs font-semibold text-purple-600">CHIỀU</div>
-          <div className="week-cell"></div>
-          <div className="week-cell"></div>
-          <div className="week-cell"></div>
-          <div className="week-cell"></div>
-          <div className="week-cell"></div>
-          <div className="week-cell"></div>
-          <div className="week-cell"></div>
+            {/* Buổi Chiều */}
+            <div className="week-cell session-label text-xs font-semibold text-purple-600">CHIỀU</div>
+            {[1, 2, 3, 4, 5, 6, 7].map(day => (
+              <div key={`chieu-${day}`} className="week-cell">
+                {getSchedulesForSlot('CHIEU', day).map((sch, i) => renderScheduleCard(sch, i))}
+              </div>
+            ))}
 
-          {/* Tối */}
-          <div className="week-cell session-label text-xs font-semibold text-purple-600">TỐI</div>
-          <div className="week-cell">
-            <div className="schedule-card schedule-practice">
-              <div className="font-semibold text-indigo-800 text-xs">Thực hành QTHTM (TH)</div>
-              <div className="text-indigo-600 text-xs mt-1">010110192400 - 14DHTH40</div>
-              <div className="text-indigo-600 text-xs">Tiết 13–15</div>
-              <div className="text-indigo-700 text-xs font-medium mt-1">📍 A107 - Phòng máy BM</div>
-            </div>
+            {/* Buổi Tối */}
+            <div className="week-cell session-label text-xs font-semibold text-purple-600">TỐI</div>
+            {[1, 2, 3, 4, 5, 6, 7].map(day => (
+              <div key={`toi-${day}`} className="week-cell">
+                {getSchedulesForSlot('TOI', day).map((sch, i) => renderScheduleCard(sch, i))}
+              </div>
+            ))}
           </div>
-          <div className="week-cell">
-            <div className="schedule-card schedule-practice">
-              <div className="font-semibold text-indigo-800 text-xs">Thực hành QTHTM (TH)</div>
-              <div className="text-indigo-600 text-xs mt-1">010110192401 - 14DHTH41</div>
-              <div className="text-indigo-600 text-xs">Tiết 13–15</div>
-              <div className="text-indigo-700 text-xs font-medium mt-1">📍 A107 - Phòng máy BM</div>
-            </div>
-          </div>
-          <div className="week-cell"></div>
-          <div className="week-cell">
-            <div className="schedule-card schedule-practice">
-              <div className="font-semibold text-indigo-800 text-xs">Thực hành QTHTM (TH)</div>
-              <div className="text-indigo-600 text-xs mt-1">010110192402 - 14DHTH42</div>
-              <div className="text-indigo-600 text-xs">Tiết 13–15</div>
-              <div className="text-indigo-700 text-xs font-medium mt-1">📍 A108 - Phòng máy</div>
-            </div>
-          </div>
-          <div className="week-cell">
-            <div className="schedule-card schedule-practice">
-              <div className="font-semibold text-indigo-800 text-xs">Thực hành QTHTM (TH)</div>
-              <div className="text-indigo-600 text-xs mt-1">010110192403 - 14DHTH43</div>
-              <div className="text-indigo-600 text-xs">Tiết 13–15</div>
-              <div className="text-indigo-700 text-xs font-medium mt-1">📍 A108 - Phòng máy</div>
-            </div>
-          </div>
-          <div className="week-cell"></div>
-          <div className="week-cell"></div>
-        </div>
+        )}
       </div>
     </div>
   );

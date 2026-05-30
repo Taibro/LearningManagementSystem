@@ -36,24 +36,43 @@ export default function AdminLogin() {
   };
 
   // --- Handlers ---
-  const handleSchoolLogin = () => {
+  const handleSchoolLogin = async () => {
     setSError('');
     if (!sSchool) return setSError('Vui lòng chọn trường / trung tâm.');
     if (!sEmail) return setSError('Vui lòng nhập email đăng nhập.');
     if (!sPass) return setSError('Vui lòng nhập mật khẩu.');
     
     setSLoading(true);
-    setTimeout(() => {
+    try {
+      const res = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ loginCode: sEmail, password: sPass, userType: 'SCHOOL_ADMIN' })
+      });
       setSLoading(false);
-      if (sEmail === 'admin@hcmut.edu.vn' && sPass === 'Admin@123') {
+      
+      if (res.ok) {
+        const data = await res.json();
+        // Lấy tên thật từ Backend bỏ vô túi áo
+        localStorage.setItem('token', data.token); // QUAN TRỌNG: LƯU TOKEN
+        localStorage.setItem('adminName', data.fullName || 'Admin');
+        localStorage.setItem('adminEmail', data.email || '');
+        // Lưu luôn mã trường vừa chọn (huit, hcmut...)
+        localStorage.setItem('schoolId', sSchool);
+        
         setSchoolView('otp');
-        addToast('Mã OTP đã gửi đến email của bạn', 'green');
+        addToast(`Đăng nhập thành công, đang chuyển hướng...`, 'green');
       } else {
-        setSError('Email hoặc mật khẩu không đúng.');
+        setSError('Email hoặc mật khẩu không đúng!');
         setShake(true);
         setTimeout(() => setShake(false), 400);
       }
-    }, 1400);
+    } catch (err) {
+      setSLoading(false);
+      setSError('Lỗi kết nối đến máy chủ!');
+      setShake(true);
+      setTimeout(() => setShake(false), 400);
+    }
   };
 
   const handleSaasLogin = () => {
@@ -146,6 +165,7 @@ export default function AdminLogin() {
                   <span className="inp-icon">🏫</span>
                   <select className="inp school-inp" style={{ paddingLeft: 42, appearance: 'none', cursor: 'pointer' }} value={sSchool} onChange={e => setSSchool(e.target.value)}>
                     <option value="">-- Chọn tổ chức của bạn --</option>
+                    <option value="huit">🏫 Trường ĐH Công Thương TP.HCM (HUIT)</option>
                     <option value="hcmut">🎓 Trường ĐH Bách Khoa TP.HCM (HCMUT)</option>
                     <option value="ielts">🌐 Trung tâm Tiếng Anh IELTS Pro</option>
                   </select>

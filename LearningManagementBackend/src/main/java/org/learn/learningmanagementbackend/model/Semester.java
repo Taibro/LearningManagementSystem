@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @Getter
 @Entity
-@Table(name = "Semester")
+@Table(name = "semesters")
 public class Semester extends BaseEntity{
 
     @Id

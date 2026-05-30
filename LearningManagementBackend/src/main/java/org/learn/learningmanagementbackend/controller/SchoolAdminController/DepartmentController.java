@@ -4,16 +4,15 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.dto.request.DepartmentRequest;
 import org.learn.learningmanagementbackend.dto.response.DepartmentResponse;
-import org.learn.learningmanagementbackend.service.DepartmentService;
+import org.learn.learningmanagementbackend.service.SchoolAdminService.DepartmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/school-admin")
+@RequestMapping("/api/school-admin") // Tạm mượn /api/auth để test không cần token
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*") // Cho phép frontend React/Vite gọi
 public class DepartmentController {
 
     private final DepartmentService departmentService;

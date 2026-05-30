@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @Entity
 @NoArgsConstructor
-@Table(name = "Student")
+@Table(name = "students")
 public class Student extends BaseEntity{
 
     @Id
