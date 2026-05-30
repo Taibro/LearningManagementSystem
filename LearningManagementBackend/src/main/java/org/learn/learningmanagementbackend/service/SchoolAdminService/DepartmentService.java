@@ -62,3 +62,4 @@ public class DepartmentService {
         departmentRepository.deleteById(id);
     }
 }
+

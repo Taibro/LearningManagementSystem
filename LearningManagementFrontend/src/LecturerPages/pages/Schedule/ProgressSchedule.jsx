@@ -24,7 +24,7 @@ const ProgressSchedule = () => {
             classIds.add(item.classId);
             uniqueClasses.push({
               classId: item.classId,
-              className: item.classCode || item.subjectName
+              className: item.classCode || item.courseName
             });
           }
         });
@@ -60,7 +60,7 @@ const ProgressSchedule = () => {
         {schedules.map((item, idx) => {
           // Tính phần trăm tiến độ
           const percent = item.totalPeriods > 0 
-            ? Math.min(100, Math.round((item.completedPeriods / item.totalPeriods) * 100)) 
+            ? Math.min(100, Math.round(((item.taughtPeriods || 0) / item.totalPeriods) * 100)) 
             : 0;
 
           return (
@@ -73,7 +73,7 @@ const ProgressSchedule = () => {
                   <span className="text-xs font-bold text-gray-400">HK2 - 2025</span>
                 </div>
                 <h3 className="font-bold text-gray-800 text-lg group-hover:text-[#6B4FA0] transition-colors leading-tight line-clamp-2">
-                  {item.subjectName}
+                  {item.courseName}
                 </h3>
               </div>
               
@@ -92,11 +92,11 @@ const ProgressSchedule = () => {
                 
                 <div className="flex justify-between text-xs text-gray-500">
                   <div className="flex flex-col items-center p-2 bg-white rounded-lg border border-gray-100 flex-1 mr-2">
-                    <span className="font-bold text-gray-800 text-sm mb-0.5">{item.completedPeriods}</span>
+                    <span className="font-bold text-gray-800 text-sm mb-0.5">{item.taughtPeriods || 0}</span>
                     <span className="uppercase text-[9px] tracking-widest">Đã dạy</span>
                   </div>
                   <div className="flex flex-col items-center p-2 bg-white rounded-lg border border-gray-100 flex-1 ml-2">
-                    <span className="font-bold text-gray-800 text-sm mb-0.5">{item.totalPeriods}</span>
+                    <span className="font-bold text-gray-800 text-sm mb-0.5">{item.totalPeriods || 0}</span>
                     <span className="uppercase text-[9px] tracking-widest">Tổng tiết</span>
                   </div>
                 </div>

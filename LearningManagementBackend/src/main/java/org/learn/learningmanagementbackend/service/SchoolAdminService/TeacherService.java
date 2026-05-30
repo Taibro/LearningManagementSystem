@@ -35,7 +35,7 @@ public class TeacherService {
 
         Integer schoolId;
         try {
-            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+            schoolId = entityManager.createQuery("SELECT u.school.id FROM Users u WHERE u.id = :userId", Integer.class)
                     .setParameter("userId", userId).setMaxResults(1).getSingleResult();
         } catch (Exception e) {
             return java.util.Collections.emptyList();
@@ -140,3 +140,4 @@ public class TeacherService {
         // Tạm thời chỉ xóa Teacher, vì theo logic chuẩn thì User vẫn có thể tồn tại nếu họ chuyển role.
     }
 }
+

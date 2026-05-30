@@ -42,13 +42,13 @@ public class AttendanceService {
 
         List<AttendanceListResponse.StudentAttendanceDto> studentDtos = enrollments.stream().map(enrollment -> {
             Integer studentId = enrollment.getStudent().getId();
-            String status = String.valueOf(attendanceMap.get(studentId));
+            AttendanceStatus status = attendanceMap.get(studentId);
 
             return AttendanceListResponse.StudentAttendanceDto.builder()
                     .studentId(studentId)
                     .studentCode(enrollment.getStudent().getStudentCode())
                     .fullName(enrollment.getStudent().getUser().getFullName())
-                    .status(AttendanceStatus.valueOf(status))
+                    .status(status)
                     .build();
         }).collect(Collectors.toList());
 

@@ -73,7 +73,28 @@ const Results = () => {
       return st;
     });
 
-    setData({ ...data, students: updatedStudents });
+    // Recalculate metrics
+    let pass = 0, fail = 0, exc = 0, sum = 0, count = 0;
+    updatedStudents.forEach(st => {
+      if (st.total !== null && st.total !== undefined) {
+        if (st.total >= 5.0) pass++;
+        else fail++;
+        if (st.total >= 9.0) exc++;
+        sum += st.total;
+        count++;
+      }
+    });
+
+    const avg = count > 0 ? (sum / count) : 0;
+
+    setData({ 
+      ...data, 
+      students: updatedStudents,
+      passedCount: pass,
+      failedCount: fail,
+      excellentCount: exc,
+      classAverage: avg
+    });
   };
 
   const handleSave = async () => {
@@ -86,8 +107,8 @@ const Results = () => {
         classId: classId,
         grades: data.students.map(st => ({
           enrollmentId: st.enrollmentId,
-          gk: st.gk || 0,
-          ck: st.ck || 0
+          gk: (st.gk !== null && st.gk !== undefined && st.gk !== '') ? parseFloat(st.gk) : null,
+          ck: (st.ck !== null && st.ck !== undefined && st.ck !== '') ? parseFloat(st.ck) : null
         }))
       };
 

@@ -47,11 +47,10 @@ public class GradeService {
             // Tính điểm CC
             double cc = calculateCC(studentId, presentCounts, totalSessions);
 
-            // Tạm tính điểm tổng kết
-            Double total = e.getGradeTotal();
-            if (e.getGradeMidterm() != null && e.getGradeFinal() != null) {
-                total = round((cc * 0.1) + (e.getGradeMidterm() * 0.3) + (e.getGradeFinal() * 0.6), 1);
-            }
+            // Tạm tính điểm tổng kết (Thiếu điểm nào coi như 0 điểm đó)
+            double gk = e.getGradeMidterm() != null ? e.getGradeMidterm() : 0.0;
+            double ck = e.getGradeFinal() != null ? e.getGradeFinal() : 0.0;
+            Double total = round((cc * 0.1) + (gk * 0.3) + (ck * 0.6), 1);
 
             return GradeManagementResponse.StudentGradeDto.builder()
                     .enrollmentId(e.getId())
@@ -116,10 +115,10 @@ public class GradeService {
                 enrollment.setGradeMidterm(input.getGk());
                 enrollment.setGradeFinal(input.getCk());
 
-                if (input.getGk() != null && input.getCk() != null) {
-                    double calculatedTotal = (cc * 0.1) + (input.getGk() * 0.3) + (input.getCk() * 0.6);
-                    enrollment.setGradeTotal(round(calculatedTotal, 1));
-                }
+                double gk = input.getGk() != null ? input.getGk() : 0.0;
+                double ck = input.getCk() != null ? input.getCk() : 0.0;
+                double calculatedTotal = (cc * 0.1) + (gk * 0.3) + (ck * 0.6);
+                enrollment.setGradeTotal(round(calculatedTotal, 1));
 
                 enrollmentRepository.save(enrollment);
             }

@@ -30,12 +30,12 @@ public class DashboardService {
         Integer schoolId;
         try {
             schoolId = entityManager.createQuery(
-                    "SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    "SELECT u.school.id FROM Users u WHERE u.id = :userId", Integer.class)
                     .setParameter("userId", userId)
                     .setMaxResults(1)
                     .getSingleResult();
         } catch (Exception e) {
-            // Nếu không tìm thấy quyền quản lý trường nào, trả về 0 hết
+            // Nếu không tìm thấy trường của admin, trả về 0 hết
             return stats;
         }
 
@@ -74,3 +74,4 @@ public class DashboardService {
         return stats;
     }
 }
+

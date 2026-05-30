@@ -17,7 +17,7 @@ export default function Dashboard() {
   const fetchStats = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/dashboard/stats', {
+      const res = await fetch('http://localhost:8080/api/school-admin/dashboard/stats', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

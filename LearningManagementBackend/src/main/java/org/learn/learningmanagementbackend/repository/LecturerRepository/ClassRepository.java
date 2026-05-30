@@ -21,20 +21,20 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
                             c.status AS classStatus,
                             co.total_sessions AS totalPeriods,
                             COALESCE(taught.taughtPeriods, 0) AS taughtPeriods
-            FROM Class c
-            JOIN Course co ON c.course_id = co.id
-            JOIN Class_Teacher ct ON c.id = ct.class_id
-            JOIN Teacher t ON ct.teacher_id = t.id
-            JOIN Semester sem ON sem.id = c.semester_id
-            JOIN Academic_year acad ON acad.id = sem.academic_year_id
+            FROM classes c
+            JOIN courses co ON c.course_id = co.id
+            JOIN class_teacher ct ON c.id = ct.class_id
+            JOIN teachers t ON ct.teacher_id = t.id
+            JOIN semesters sem ON sem.id = c.semester_id
+            JOIN academic_years acad ON acad.id = sem.academic_year_id
             LEFT JOIN (
                             SELECT 
                                             s.class_id,
                                             SUM((s.end_period - s.start_period + 1) * att.session_count) AS taughtPeriods
-                            FROM Schedule s
+                            FROM schedules s
                             JOIN (
                                             SELECT schedule_id, COUNT(DISTINCT attendance_date) AS session_count
-                                            FROM Attendance_record
+                                            FROM attendance_records
                                             GROUP BY schedule_id
                                         ) att ON s.id = att.schedule_id
                                         GROUP BY s.class_id

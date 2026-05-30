@@ -57,15 +57,15 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 sch.end_date    AS endDate,
                 u.full_name     AS teacherName,
                 co.credits      AS credits
-            FROM Enrollment e
-            JOIN Class c        ON e.class_id = c.id
-            JOIN Course co      ON c.course_id = co.id
-            JOIN Schedule sch   ON sch.class_id = c.id
-            JOIN Room r         ON sch.room_id = r.id
-            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
-            LEFT JOIN Teacher t ON t.id = ct.teacher_id
-            LEFT JOIN Users u   ON u.id = t.user_id
-            WHERE e.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+            FROM enrollments e
+            JOIN classes c        ON e.class_id = c.id
+            JOIN courses co      ON c.course_id = co.id
+            JOIN schedules sch   ON sch.class_id = c.id
+            JOIN rooms r         ON sch.room_id = r.id
+            LEFT JOIN class_teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN teachers t ON t.id = ct.teacher_id
+            LEFT JOIN users u   ON u.id = t.user_id
+            WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
               AND e.status = 'ENROLLED'
               AND sch.start_date <= :endDate
               AND sch.end_date   >= :startDate
@@ -93,15 +93,15 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 sch.end_date    AS endDate,
                 u.full_name     AS teacherName,
                 co.credits      AS credits
-            FROM Enrollment e
-            JOIN Class c        ON e.class_id = c.id
-            JOIN Course co      ON c.course_id = co.id
-            JOIN Schedule sch   ON sch.class_id = c.id
-            JOIN Room r         ON sch.room_id = r.id
-            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
-            LEFT JOIN Teacher t ON t.id = ct.teacher_id
-            LEFT JOIN Users u   ON u.id = t.user_id
-            WHERE e.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+            FROM enrollments e
+            JOIN classes c        ON e.class_id = c.id
+            JOIN courses co      ON c.course_id = co.id
+            JOIN schedules sch   ON sch.class_id = c.id
+            JOIN rooms r         ON sch.room_id = r.id
+            LEFT JOIN class_teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN teachers t ON t.id = ct.teacher_id
+            LEFT JOIN users u   ON u.id = t.user_id
+            WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
               AND e.status = 'ENROLLED'
               AND (:semesterId = 0 OR c.semester_id = :semesterId)
               AND c.status != 'CANCELLED'
@@ -125,11 +125,11 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 e.grade_total   AS gradeTotal,
                 e.grade_letter  AS gradeLetter,
                 e.status        AS enrollmentStatus
-            FROM Enrollment e
-            JOIN Class c        ON e.class_id = c.id
-            JOIN Course co      ON c.course_id = co.id
-            JOIN Semester sem   ON c.semester_id = sem.id
-            WHERE e.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+            FROM enrollments e
+            JOIN classes c        ON e.class_id = c.id
+            JOIN courses co      ON c.course_id = co.id
+            JOIN semesters sem   ON c.semester_id = sem.id
+            WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
             ORDER BY sem.start_date DESC, co.name
             """, nativeQuery = true)
     List<StudentGradeDto> getGradesForStudent(@Param("studentCode") String studentCode);
@@ -144,15 +144,15 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 SUM(CASE WHEN ar.status = 'EXCUSED' THEN 1 ELSE 0 END) AS absentWithPermission,
                 SUM(CASE WHEN ar.status = 'ABSENT'  THEN 1 ELSE 0 END) AS absentWithoutPermission,
                 SUM(CASE WHEN ar.status = 'LATE'    THEN 1 ELSE 0 END) AS late
-            FROM Enrollment e
-            JOIN Class c        ON e.class_id = c.id
-            JOIN Course co      ON c.course_id = co.id
-            JOIN Semester sem   ON c.semester_id = sem.id
-            LEFT JOIN Schedule sch ON sch.class_id = c.id
-            LEFT JOIN Attendance_record ar
+            FROM enrollments e
+            JOIN classes c        ON e.class_id = c.id
+            JOIN courses co      ON c.course_id = co.id
+            JOIN semesters sem   ON c.semester_id = sem.id
+            LEFT JOIN schedules sch ON sch.class_id = c.id
+            LEFT JOIN attendance_records ar
                 ON ar.schedule_id = sch.id
                 AND ar.student_id = e.student_id
-            WHERE e.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+            WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
             GROUP BY sem.name, c.code, co.name, co.credits, sem.start_date
             ORDER BY sem.start_date DESC, co.name
             """, nativeQuery = true)
@@ -220,14 +220,14 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                     SELECT 1 FROM teacher_evaluations te
                     WHERE te.class_id = c.id
                 ) THEN 1 ELSE 0 END           AS isCompleted
-            FROM Enrollment e
-            JOIN Class c        ON e.class_id = c.id
-            JOIN Course co      ON c.course_id = co.id
-            JOIN Semester sem   ON c.semester_id = sem.id
-            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
-            LEFT JOIN Teacher t   ON t.id = ct.teacher_id
-            LEFT JOIN Users u     ON u.id = t.user_id
-            WHERE e.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+            FROM enrollments e
+            JOIN classes c        ON e.class_id = c.id
+            JOIN courses co      ON c.course_id = co.id
+            JOIN semesters sem   ON c.semester_id = sem.id
+            LEFT JOIN class_teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN teachers t   ON t.id = ct.teacher_id
+            LEFT JOIN users u     ON u.id = t.user_id
+            WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
               AND e.status = 'ENROLLED'
             ORDER BY sem.start_date DESC, co.name
             """, nativeQuery = true)
