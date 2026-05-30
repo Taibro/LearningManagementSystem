@@ -1,366 +1,563 @@
-import React, { useState } from 'react';
-import './CourseRegistration.css';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import { getCourseRegList, registerCourse, getSemesters, getEnrolledClasses, cancelCourseReg, getProfile } from '../../studentApi';
 
-// --- MOCK DATA ---
-const MOCK_STUDENT = {
-  name: 'Phan Sĩ Thịnh',
-  gender: 'Nam',
-  id: '2001230933',
-  status: 'Đang học',
-  course: '2023',
-  level: 'Đại học',
-  major: 'Công nghệ thông tin',
-  faculty: 'Khoa Công nghệ Thông tin',
-  class: '14DHTH05',
-  type: 'Chính quy',
-  spec: 'Công nghệ phần mềm',
-  campus: 'ĐHCT TP.HCM'
-};
+const DAY_NAMES = ['', 'CN', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7'];
 
-const MOCK_SUBJECTS = [
-  { id: '0101007881', oldId: '01202067', name: 'Công nghệ .NET', credits: 3, required: true },
-  { id: '0101101981', oldId: '01201073', name: 'Dữ liệu NoSQL', credits: 2, required: true },
-  { id: '0101001706', oldId: '16201001', name: 'Giáo dục thể chất 1 (Bơi lội)', credits: 2, required: false },
-  { id: '0101001702', oldId: '16201002', name: 'Giáo dục thể chất 3 (Bóng đá)', credits: 2, required: false },
-  { id: '0101101975', oldId: '01011019', name: 'Internet of Things', credits: 3, required: true },
+const TYPE_OPTIONS = [
+  { value: 'NORMAL',  label: 'HỌC MỚI' },
+  { value: 'RETAKE',  label: 'HỌC LẠI' },
+  { value: 'IMPROVE', label: 'HỌC CẢI THIỆN' },
 ];
-
-const MOCK_CLASSES = [
-  { id: '010100170201', subjectId: '0101001702', name: 'Giáo dục thể chất 3 (Bóng đá)', expected: 'bongda', max: 55, registered: 55, status: 'Chỉ đăng ký' },
-  { id: '010100170202', subjectId: '0101001702', name: 'Giáo dục thể chất 3 (Bóng đá)', expected: 'bongda', max: 55, registered: 20, status: 'Chỉ đăng ký' },
-  { id: '010110197501', subjectId: '0101101975', name: 'Internet of Things', expected: '14DHTH', max: 80, registered: 45, status: 'Chỉ đăng ký' }
-];
-
-const MOCK_SCHEDULES = {
-  '010100170202': [
-    { day: 'Thứ 3 (T1 -> T2)', room: 'Sân bóng đá', building: 'T', campus: 'ĐHCT TP.HCM', lecturer: 'ThS Phạm Văn Kiên', time: '07/07/26 - 04/08/26' },
-    { day: 'Thứ 5 (T1 -> T2)', room: 'Sân bóng đá', building: 'T', campus: 'ĐHCT TP.HCM', lecturer: 'ThS Phạm Văn Kiên', time: '09/07/26 - 06/08/26' }
-  ],
-  '010110197501': [
-    { day: 'Thứ 2 (T1 -> T3)', room: 'A307', building: 'A', campus: 'ĐHCT TP.HCM', lecturer: 'ThS Đinh Huy Hoàng', time: '06/07/26 - 03/08/26' }
-  ]
-};
 
 export default function CourseRegistration() {
-  const [activeTab, setActiveTab] = useState('registration'); // 'info' | 'registration'
-  const [toastMsg, setToastMsg] = useState('');
+  const [profile, setProfile] = useState(null);
+  const [activeTab, setActiveTab] = useState('REGISTRATION'); // 'INFO' or 'REGISTRATION'
 
-  // Form State
-  const [regType, setRegType] = useState('new');
+  const [semesters, setSemesters] = useState([]);
+  const [semId, setSemId] = useState('');
+  const [type, setType] = useState('NORMAL');
+
+  const [flatClasses, setFlatClasses] = useState([]);
+  const [enrolled, setEnrolled] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  const [selectedCourseId, setSelectedCourseId] = useState(null);
+  const [selectedClassId, setSelectedClassId] = useState(null);
   const [hideConflict, setHideConflict] = useState(false);
 
-  // Selection
-  const [selectedSubject, setSelectedSubject] = useState(null);
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [registeredClasses, setRegisteredClasses] = useState([]);
+  const [activeMenuId, setActiveMenuId] = useState(null);
 
-  // Modals
-  const [modalType, setModalType] = useState(null);
-  const [actionClass, setActionClass] = useState(null);
-  const [dropdownOpen, setDropdownOpen] = useState(null);
+  const [teacherModal, setTeacherModal] = useState(null);
+  const [conflictModal, setConflictModal] = useState(null);
+  const [cancelModal, setCancelModal] = useState(null);
+  const [viewModal, setViewModal] = useState(null);
 
-  const showToast = (msg) => {
-    setToastMsg(msg);
-    setTimeout(() => setToastMsg(''), 3000);
+  // 1. Fetch Profile & Semesters
+  useEffect(() => {
+    getProfile().then(res => setProfile(res)).catch(() => {});
+    getSemesters().then(data => {
+      setSemesters(data);
+      if (data.length > 0) setSemId(String(data[0].id));
+    }).catch(() => {});
+  }, []);
+
+  // 2. Fetch Classes and Enrolled whenever semId or type changes
+  const loadData = useCallback(() => {
+    if (!semId) return;
+    setLoading(true);
+    
+    Promise.all([
+      getCourseRegList(semId, type),
+      getEnrolledClasses(semId)
+    ]).then(([classesRes, enrolledRes]) => {
+      setFlatClasses(classesRes || []);
+      setEnrolled(enrolledRes || []);
+      setLoading(false);
+    }).catch(() => {
+      setLoading(false);
+    });
+  }, [semId, type]);
+
+  useEffect(() => {
+    loadData();
+    setSelectedCourseId(null);
+    setSelectedClassId(null);
+  }, [loadData]);
+
+  const showToast = (t, msg) => {
+    setToast({ type: t, msg });
+    setTimeout(() => setToast(null), 3500);
   };
 
-  const handleRegister = () => {
-    if (!selectedClass) return;
-    if (registeredClasses.some(c => c.id === selectedClass.id)) {
-      alert("Bạn đã đăng ký lớp này rồi!");
-      return;
+  // Group classes into courses for Table 1
+  const courses = useMemo(() => {
+    const map = new Map();
+    flatClasses.forEach(c => {
+      if (!map.has(c.courseId)) {
+        map.set(c.courseId, {
+          courseId: c.courseId,
+          courseCode: c.courseCode,
+          courseName: c.courseName,
+          credits: c.credits,
+          classes: []
+        });
+      }
+      map.get(c.courseId).classes.push(c);
+    });
+    return Array.from(map.values());
+  }, [flatClasses]);
+
+  // Classes for Table 2
+  const selectedCourseClasses = useMemo(() => {
+    if (!selectedCourseId) return [];
+    const crs = courses.find(c => c.courseId === selectedCourseId);
+    let clsList = crs ? crs.classes : [];
+
+    // Lọc trùng lịch
+    if (hideConflict) {
+      clsList = clsList.filter(cls => {
+        // Kiểm tra xem cls có trùng lịch với bất kỳ lớp nào trong enrolled không
+        const isConflict = enrolled.some(e => {
+          if (e.dayOfWeek && cls.dayOfWeek && e.dayOfWeek === cls.dayOfWeek) {
+            if (cls.startPeriod <= e.endPeriod && cls.endPeriod >= e.startPeriod) {
+              return true;
+            }
+          }
+          return false;
+        });
+        return !isConflict; // Giữ lại những lớp KHÔNG trùng
+      });
     }
-    const subject = MOCK_SUBJECTS.find(s => s.id === selectedClass.subjectId);
-    setRegisteredClasses([...registeredClasses, { ...selectedClass, subjectName: subject.name, credits: subject.credits }]);
-    showToast("Đăng ký học phần thành công!");
-    setSelectedClass(null);
+    return clsList;
+  }, [selectedCourseId, courses, hideConflict, enrolled]);
+
+  const selectedClass = useMemo(() => {
+    return selectedCourseClasses.find(c => c.classId === selectedClassId);
+  }, [selectedClassId, selectedCourseClasses]);
+
+  // Actions
+  const handleRegister = async (cls) => {
+    try {
+      await registerCourse(cls.classId, type);
+      showToast('success', '✅ Đăng ký môn học thành công!');
+      loadData();
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Đăng ký thất bại.';
+      showToast('error', `❌ ${msg}`);
+    }
   };
 
-  const handleCancelRegistration = () => {
-    setRegisteredClasses(registeredClasses.filter(c => c.id !== actionClass.id));
-    setModalType(null);
-    setActionClass(null);
-    showToast("Đã hủy đăng ký học phần!");
+  const handleCancel = async (cls) => {
+    try {
+      await cancelCourseReg(cls.classId);
+      showToast('success', '✅ Hủy môn học thành công!');
+      setCancelModal(null);
+      loadData();
+    } catch (err) {
+      const msg = err?.response?.data?.message || 'Hủy thất bại.';
+      showToast('error', `❌ ${msg}`);
+      setCancelModal(null);
+    }
   };
 
+  const checkConflict = (cls) => {
+    const conflicts = enrolled.filter(e => {
+      if (e.dayOfWeek && cls.dayOfWeek && e.dayOfWeek === cls.dayOfWeek) {
+        if (cls.startPeriod <= e.endPeriod && cls.endPeriod >= e.startPeriod) {
+          return true;
+        }
+      }
+      return false;
+    });
+    setConflictModal(conflicts);
+  };
+
+  // UI components
   return (
-    <div className="modern-portal">
-      {/* Header Banner */}
-      <header className="modern-header">
-        <img src="https://via.placeholder.com/800x80?text=CỔNG+ĐĂNG+KÝ+HỌC+PHẦN+SINH+VIÊN&bg=f8fafc&textColor=1d4ed8" alt="Banner" style={{borderRadius: '8px', objectFit: 'cover'}} />
-      </header>
+    <div className="page active" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+      
+      {toast && (
+        <div style={{
+          position: 'fixed', top: 20, right: 20, zIndex: 9999,
+          background: toast.type === 'success' ? '#4caf50' : '#f44336',
+          color: 'white', padding: '12px 24px', borderRadius: 4, fontWeight: 'bold',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.2)'
+        }}>
+          {toast.msg}
+        </div>
+      )}
 
-      <div className="modern-container">
-        <div className="modern-layout">
+      {/* TOP TITLE */}
+      <div style={{ background: 'var(--blue)', color: 'white', padding: '15px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '18px', textAlign: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+        CỔNG ĐĂNG KÝ HỌC PHẦN SINH VIÊN
+      </div>
+
+      <div style={{ display: 'flex', gap: 20 }}>
+        {/* LEFT COLUMN */}
+        <div style={{ width: 250, flexShrink: 0 }}>
+          <div style={{ background: '#456bd9', padding: 20, color: 'white', borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: 14, fontWeight: 'normal', opacity: 0.9 }}>Xin chào!</h3>
+            <h2 style={{ margin: '0 0 20px 0', fontSize: 18, fontWeight: '600' }}>{profile?.fullName || 'Sinh viên'}</h2>
+            <div style={{ fontSize: 13, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
+              <span>Giới tính:</span> <strong>{profile?.gender || 'Nam'}</strong>
+            </div>
+            <div style={{ fontSize: 13, marginBottom: 8, display: 'flex', justifyContent: 'space-between' }}>
+              <span>MSSV:</span> <strong>{profile?.studentCode}</strong>
+            </div>
+            <div style={{ fontSize: 13, display: 'flex', justifyContent: 'space-between' }}>
+              <span>Trạng thái:</span> <strong>Đang học</strong>
+            </div>
+          </div>
+          <div style={{ background: 'white', border: '1px solid #ddd', borderTop: 'none', padding: 15, borderBottomLeftRadius: 8, borderBottomRightRadius: 8 }}>
+            <div style={{ width: '100%', aspectRatio: '3/4', background: '#f8f9fa', borderRadius: 4, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+               <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.fullName || 'SV')}&size=200&background=e0e7ff&color=456bd9`} alt="Avatar" style={{width:'100%', height:'100%', objectFit:'cover'}} />
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN */}
+        <div className="card" style={{ flex: 1, minHeight: 600, padding: 0 }}>
           
-          {/* SIDEBAR LEFT */}
-          <aside className="modern-sidebar">
-            <div className="profile-card">
-              <div className="profile-header">
-                <h3>Thẻ Sinh Viên</h3>
-              </div>
-              <div className="profile-body">
-                <img src="https://ui-avatars.com/api/?name=Sĩ+Thịnh&background=0D8ABC&color=fff&size=128" alt="Avatar" className="profile-avatar" />
-                <div style={{textAlign: 'center'}}>
-                  <h4 style={{margin: '0 0 4px 0', fontSize: '18px', color: 'var(--text-main)'}}>{MOCK_STUDENT.name}</h4>
-                  <span className="badge blue">{MOCK_STUDENT.id}</span>
-                </div>
-                <div className="profile-info">
-                  <div className="info-row"><span className="info-label">Giới tính</span><span className="info-value">{MOCK_STUDENT.gender}</span></div>
-                  <div className="info-row"><span className="info-label">Trạng thái</span><span className="badge green" style={{fontSize: '11px'}}>{MOCK_STUDENT.status}</span></div>
-                </div>
-              </div>
+          {/* TABS */}
+          <div style={{ display: 'flex', borderBottom: '1px solid #ddd', background: '#f8f9fa', borderTopLeftRadius: 8, borderTopRightRadius: 8 }}>
+            <div 
+              style={{ padding: '15px 30px', cursor: 'pointer', fontWeight: 600, color: activeTab === 'INFO' ? '#1a73e8' : '#64748b', borderBottom: activeTab === 'INFO' ? '3px solid #1a73e8' : '3px solid transparent', transition: 'all 0.2s' }}
+              onClick={() => setActiveTab('INFO')}
+            >
+              THÔNG TIN SINH VIÊN
             </div>
-
-            <div className="modern-menu">
-              <div className={`menu-item ${activeTab === 'info' ? 'active' : ''}`} onClick={() => setActiveTab('info')}>
-                <span>👤</span> Thông tin sinh viên
-              </div>
-              <div className={`menu-item ${activeTab === 'registration' ? 'active' : ''}`} onClick={() => setActiveTab('registration')}>
-                <span>📝</span> Đăng ký học phần
-              </div>
+            <div 
+              style={{ padding: '15px 30px', cursor: 'pointer', fontWeight: 600, color: activeTab === 'REGISTRATION' ? '#1a73e8' : '#64748b', borderBottom: activeTab === 'REGISTRATION' ? '3px solid #1a73e8' : '3px solid transparent', transition: 'all 0.2s' }}
+              onClick={() => setActiveTab('REGISTRATION')}
+            >
+              ĐĂNG KÝ HỌC PHẦN
             </div>
-          </aside>
+          </div>
 
-          {/* MAIN CONTENT RIGHT */}
-          <main className="modern-content">
-            {activeTab === 'info' && (
+          <div style={{ padding: 20 }}>
+            {activeTab === 'INFO' && (
               <div>
-                <h2 className="page-title">Thông tin sinh viên</h2>
-                <div className="info-grid">
-                  <div>
-                    <p><span>Khóa</span><b>{MOCK_STUDENT.course}</b></p>
-                    <p style={{marginTop:'16px'}}><span>Bậc đào tạo</span><b>{MOCK_STUDENT.level}</b></p>
-                    <p style={{marginTop:'16px'}}><span>Ngành</span><b>{MOCK_STUDENT.major}</b></p>
-                    <p style={{marginTop:'16px'}}><span>Khoa</span><b>{MOCK_STUDENT.faculty}</b></p>
-                  </div>
-                  <div>
-                    <p><span>Lớp</span><b>{MOCK_STUDENT.class}</b></p>
-                    <p style={{marginTop:'16px'}}><span>Loại hình đào tạo</span><b>{MOCK_STUDENT.type}</b></p>
-                    <p style={{marginTop:'16px'}}><span>Chuyên ngành</span><b>{MOCK_STUDENT.spec}</b></p>
-                    <p style={{marginTop:'16px'}}><span>Cơ sở</span><b>{MOCK_STUDENT.campus}</b></p>
-                  </div>
+                <h3 style={{ color: '#1a73e8', borderBottom: '2px solid #eee', paddingBottom: 10 }}>THÔNG TIN SINH VIÊN</h3>
+                <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: 20, lineHeight: '2' }}>
+                  <div style={{ width: '50%' }}><b>Khóa:</b> 2023</div>
+                  <div style={{ width: '50%' }}><b>Lớp:</b> 14DHTH05</div>
+                  <div style={{ width: '50%' }}><b>Bậc đào tạo:</b> Đại học</div>
+                  <div style={{ width: '50%' }}><b>Loại hình đào tạo:</b> Chính quy</div>
+                  <div style={{ width: '50%' }}><b>Ngành:</b> Công nghệ thông tin</div>
+                  <div style={{ width: '50%' }}><b>Chuyên ngành:</b> Công nghệ phần mềm</div>
+                  <div style={{ width: '50%' }}><b>Khoa:</b> Khoa Công nghệ Thông tin</div>
+                  <div style={{ width: '50%' }}><b>Cơ sở:</b> ĐHCT TP.HCM</div>
                 </div>
               </div>
             )}
 
-            {activeTab === 'registration' && (
+            {activeTab === 'REGISTRATION' && (
               <div>
-                <h2 className="page-title">Đăng ký học phần</h2>
+                <h3 style={{ color: '#1a73e8', textAlign: 'center', marginBottom: 20, fontSize: 18, marginTop: 10 }}>ĐĂNG KÝ HỌC PHẦN</h3>
                 
-                <div className="filter-bar">
-                  <div>
-                    <span style={{fontSize:'13px', color:'var(--text-muted)', display:'block', marginBottom:'4px'}}>Đợt đăng ký</span>
-                    <select className="modern-select">
-                      <option>HK3 (2025 - 2026)</option>
+                {/* FILTER ROW */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginBottom: 25, justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <b style={{ color: '#334155' }}>Đợt đăng ký</b>
+                    <select className="form-ctrl" value={semId} onChange={e => setSemId(e.target.value)} style={{ padding: '6px 12px', minWidth: 150 }}>
+                      {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
                   </div>
-                  <div style={{width:'1px', height:'30px', background:'var(--border-color)', margin:'0 8px'}}></div>
-                  <div className="radio-group">
-                    <label className="radio-label"><input type="radio" checked={regType === 'new'} onChange={() => setRegType('new')} /> Học mới</label>
-                    <label className="radio-label"><input type="radio" checked={regType === 'retake'} onChange={() => setRegType('retake')} /> Học lại</label>
-                    <label className="radio-label"><input type="radio" checked={regType === 'improve'} onChange={() => setRegType('improve')} /> Học cải thiện</label>
-                  </div>
-                </div>
-
-                {/* 1. Môn chờ ĐK */}
-                <div className="section-header"><h4>📚 Môn học phần đang chờ đăng ký</h4></div>
-                <div className="table-wrapper">
-                  <table className="modern-table">
-                    <thead>
-                      <tr><th style={{width:'40px'}}></th><th>Mã MH</th><th>Tên môn học</th><th>TC</th><th>Bắt buộc</th></tr>
-                    </thead>
-                    <tbody>
-                      {MOCK_SUBJECTS.map(sub => (
-                        <tr key={sub.id} className={selectedSubject?.id === sub.id ? 'selected' : ''} onClick={() => {setSelectedSubject(sub); setSelectedClass(null);}}>
-                          <td><input type="radio" checked={selectedSubject?.id === sub.id} readOnly style={{accentColor: 'var(--huit-blue)'}}/></td>
-                          <td style={{fontFamily:'monospace', color:'var(--text-muted)'}}>{sub.id}</td>
-                          <td style={{fontWeight:'500'}}>{sub.name}</td>
-                          <td><span className="badge blue">{sub.credits}</span></td>
-                          <td>{sub.required ? <span style={{color:'#dc2626', fontWeight:'bold'}}>✖</span> : <span style={{color:'#16a34a'}}>Tự chọn</span>}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* 2. Lớp chờ ĐK */}
-                {selectedSubject && (
-                  <>
-                    <div className="section-header">
-                      <h4>🏫 Lớp học phần chờ đăng ký</h4>
-                      <label className="modern-checkbox">
-                        <input type="checkbox" checked={hideConflict} onChange={(e) => setHideConflict(e.target.checked)}/> Lọc lớp trùng lịch
+                  <div style={{ display: 'flex', gap: 20, background: '#f8fafc', padding: '6px 16px', borderRadius: 20, border: '1px solid #e2e8f0' }}>
+                    {TYPE_OPTIONS.map(opt => (
+                      <label key={opt.value} style={{ cursor: 'pointer', color: type === opt.value ? '#d97706' : '#64748b', fontWeight: type === opt.value ? 'bold' : 'normal', display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <input type="radio" name="regType" value={opt.value} checked={type === opt.value} onChange={() => setType(opt.value)} style={{ accentColor: '#d97706', width: 16, height: 16 }} />
+                        {opt.label}
                       </label>
-                    </div>
-                    <div className="table-wrapper">
-                      <table className="modern-table">
-                        <thead>
-                          <tr><th style={{width:'40px'}}></th><th>Mã Lớp</th><th>Tên lớp</th><th>Sĩ số</th><th>Trạng thái</th></tr>
-                        </thead>
-                        <tbody>
-                          {MOCK_CLASSES.filter(c => c.subjectId === selectedSubject.id).map(cls => (
-                            <tr key={cls.id} className={selectedClass?.id === cls.id ? 'selected' : ''} onClick={() => setSelectedClass(cls)}>
-                              <td><input type="radio" checked={selectedClass?.id === cls.id} readOnly style={{accentColor: 'var(--huit-blue)'}}/></td>
-                              <td style={{fontFamily:'monospace'}}>{cls.id}</td>
-                              <td style={{fontWeight:'500'}}>{cls.name} <span style={{color:'var(--text-muted)', fontSize:'12px'}}>({cls.expected})</span></td>
-                              <td><span style={{color: cls.registered >= cls.max ? '#dc2626' : 'inherit'}}>{cls.registered}/{cls.max}</span></td>
-                              <td><span className="badge orange">{cls.status}</span></td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </>
-                )}
-
-                {/* 3. Chi tiết lớp */}
-                {selectedClass && (
-                  <div style={{background: '#f8fafc', padding: '24px', borderRadius: '16px', border: '1px solid var(--border-color)', marginBottom: '24px'}}>
-                    <div className="section-header" style={{marginTop: 0}}>
-                      <h4>ℹ️ Chi tiết lịch học</h4>
-                      <div style={{display:'flex', gap:'12px'}}>
-                        <button className="btn btn-outline" onClick={() => setModalType('conflict')}>🔍 Xem lịch trùng</button>
-                        <button className="btn btn-primary" onClick={handleRegister}>➕ Đăng ký lớp này</button>
-                      </div>
-                    </div>
-                    <div className="table-wrapper" style={{marginBottom: 0, boxShadow: 'none'}}>
-                      <table className="modern-table">
-                        <thead>
-                          <tr><th>Lịch học</th><th>Phòng / Tòa</th><th>Giảng viên</th><th>Thời gian</th><th></th></tr>
-                        </thead>
-                        <tbody>
-                          {(MOCK_SCHEDULES[selectedClass.id] || []).map((sch, idx) => (
-                            <tr key={idx}>
-                              <td style={{fontWeight:'500'}}>{sch.day}</td>
-                              <td>{sch.room} - {sch.building}</td>
-                              <td>{sch.lecturer}</td>
-                              <td style={{color:'var(--text-muted)'}}>{sch.time}</td>
-                              <td style={{textAlign:'right'}}><button className="btn btn-outline" style={{padding:'4px 12px', fontSize:'12px'}} onClick={() => setModalType('lecturer')}>Info</button></td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                    ))}
                   </div>
-                )}
+                </div>
 
-                {/* 4. Lớp đã đăng ký */}
-                <div className="section-header"><h4>✅ Lớp học phần đã đăng ký (Học kỳ này)</h4></div>
-                <div className="table-wrapper">
-                  <table className="modern-table">
-                    <thead>
-                      <tr><th style={{width:'60px'}}></th><th>Mã LHP</th><th>Tên môn học</th><th>TC</th><th>Học phí</th><th>Trạng thái</th></tr>
-                    </thead>
-                    <tbody>
-                      {registeredClasses.length === 0 ? (
-                        <tr><td colSpan="6" style={{textAlign:'center', padding:'32px', color:'var(--text-muted)'}}>Chưa có môn học nào được đăng ký</td></tr>
-                      ) : (
-                        registeredClasses.map(cls => (
-                          <tr key={cls.id}>
-                            <td className="action-dropdown">
-                              <button className="action-btn" onClick={() => setDropdownOpen(dropdownOpen === cls.id ? null : cls.id)}>⋮</button>
-                              {dropdownOpen === cls.id && (
-                                <div className="action-menu">
-                                  <div className="action-item" onClick={() => {setActionClass(cls); setModalType('classDetail'); setDropdownOpen(null);}}>👁 Xem chi tiết</div>
-                                  <div className="action-item danger" onClick={() => {setActionClass(cls); setModalType('cancelConfirm'); setDropdownOpen(null);}}>🗑 Hủy đăng ký</div>
+                {loading ? <div style={{ textAlign: 'center', padding: 50, color: '#64748b' }}>Đang tải dữ liệu...</div> : (
+                  <>
+                    {/* TABLE 1: MÔN HỌC CHỜ ĐĂNG KÝ */}
+                    <div style={{ borderLeft: '4px solid #f59e0b', paddingLeft: 10, color: '#d97706', fontWeight: 'bold', marginBottom: 12, textTransform: 'uppercase' }}>
+                      Môn học phần đang chờ đăng ký
+                    </div>
+                    <div style={{ overflowX: 'auto', marginBottom: 30 }}>
+                      <table className="tbl" style={{ width: '100%', fontSize: 13, border: '1px solid #e2e8f0' }}>
+                        <thead>
+                          <tr style={{ background: '#456bd9', color: 'white' }}>
+                            <th style={{ padding: 10, borderBottom: 'none' }}>STT</th>
+                            <th style={{ padding: 10, borderBottom: 'none' }}>Mã HP</th>
+                            <th style={{ padding: 10, borderBottom: 'none', textAlign: 'left' }}>Tên môn học</th>
+                            <th style={{ padding: 10, borderBottom: 'none' }}>TC</th>
+                            <th style={{ padding: 10, borderBottom: 'none' }}>Bắt buộc</th>
+                            <th style={{ padding: 10, borderBottom: 'none' }}>Học kỳ</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {courses.map((crs, idx) => (
+                            <tr key={crs.courseId} 
+                                style={{ cursor: 'pointer', background: selectedCourseId === crs.courseId ? '#fef3c7' : 'white', transition: 'background 0.2s' }}
+                                onClick={() => { setSelectedCourseId(crs.courseId); setSelectedClassId(null); }}
+                                className="hover-row">
+                              <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>
+                                <input type="radio" checked={selectedCourseId === crs.courseId} readOnly style={{ accentColor: '#f59e0b' }} /> {idx + 1}
+                              </td>
+                              <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0', color: '#1a73e8', fontWeight: 600 }}>{crs.courseCode}</td>
+                              <td style={{ padding: 10, borderTop: '1px solid #e2e8f0', fontWeight: 500 }}>{crs.courseName}</td>
+                              <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>{crs.credits}</td>
+                              <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0', color: '#ef4444' }}>✖</td>
+                              <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>{semId}</td>
+                            </tr>
+                          ))}
+                          {courses.length === 0 && <tr><td colSpan="6" style={{ padding: 30, textAlign: 'center', color: '#94a3b8' }}>Không tìm thấy dữ liệu</td></tr>}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* TABLE 2: LỚP HỌC PHẦN CHỜ ĐĂNG KÝ */}
+                    {selectedCourseId && (
+                      <>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                          <div style={{ borderLeft: '4px solid #f59e0b', paddingLeft: 10, color: '#d97706', fontWeight: 'bold', textTransform: 'uppercase' }}>
+                            Lớp học phần chờ đăng ký
+                          </div>
+                          <label style={{ fontSize: 13, cursor: 'pointer', color: '#1e293b', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 500 }}>
+                            <input type="checkbox" checked={hideConflict} onChange={e => setHideConflict(e.target.checked)} style={{ width: 16, height: 16, accentColor: '#456bd9' }} />
+                            Hiển thị lớp học phần không trùng lịch
+                          </label>
+                        </div>
+                        <div style={{ overflowX: 'auto', marginBottom: 30 }}>
+                          <table className="tbl" style={{ width: '100%', fontSize: 13, border: '1px solid #e2e8f0' }}>
+                            <thead>
+                              <tr style={{ background: '#456bd9', color: 'white' }}>
+                                <th style={{ padding: 10, borderBottom: 'none' }}>STT</th>
+                                <th style={{ padding: 10, borderBottom: 'none' }}>Mã LHP</th>
+                                <th style={{ padding: 10, borderBottom: 'none', textAlign: 'left' }}>Tên lớp học phần</th>
+                                <th style={{ padding: 10, borderBottom: 'none' }}>Sĩ số tối đa</th>
+                                <th style={{ padding: 10, borderBottom: 'none' }}>Đã đăng ký</th>
+                                <th style={{ padding: 10, borderBottom: 'none' }}>Trạng thái</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {selectedCourseClasses.map((cls, idx) => (
+                                <tr key={cls.classId}
+                                    style={{ cursor: 'pointer', background: selectedClassId === cls.classId ? '#fef3c7' : 'white', transition: 'background 0.2s' }}
+                                    onClick={() => setSelectedClassId(cls.classId)}
+                                    className="hover-row">
+                                  <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>
+                                    <input type="radio" checked={selectedClassId === cls.classId} readOnly style={{ accentColor: '#f59e0b' }} /> {idx + 1}
+                                  </td>
+                                  <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0', color: '#1a73e8', fontWeight: 600 }}>{cls.classCode}</td>
+                                  <td style={{ padding: 10, borderTop: '1px solid #e2e8f0', fontWeight: 500 }}>{cls.courseName}</td>
+                                  <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>{cls.maxStudents}</td>
+                                  <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0', color: cls.enrolledCount >= cls.maxStudents ? '#ef4444' : '#22c55e', fontWeight: 600 }}>{cls.enrolledCount}</td>
+                                  <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>
+                                    {cls.alreadyEnrolled === 1 ? <span style={{color: '#16a34a', fontWeight: 'bold'}}>Đã Đ.Ký</span> : <span style={{color: '#64748b'}}>Chờ đăng ký</span>}
+                                  </td>
+                                </tr>
+                              ))}
+                              {selectedCourseClasses.length === 0 && <tr><td colSpan="6" style={{ padding: 30, textAlign: 'center', color: '#94a3b8' }}>Không tìm thấy lớp học phần phù hợp</td></tr>}
+                            </tbody>
+                          </table>
+                        </div>
+                      </>
+                    )}
+
+                    {/* CHI TIẾT LỚP HỌC PHẦN */}
+                    {selectedClassId && selectedClass && (
+                      <div style={{ background: '#f8fafc', padding: 20, borderRadius: 8, border: '1px solid #e2e8f0', marginBottom: 30 }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 }}>
+                          <div style={{ color: '#d97706', fontWeight: 'bold', textTransform: 'uppercase', fontSize: 14 }}>CHI TIẾT LỚP HỌC PHẦN</div>
+                          <button className="btn btn-blue" style={{ background: '#f59e0b', borderColor: '#f59e0b', color: 'white' }}
+                                  onClick={() => checkConflict(selectedClass)}>
+                            Xem lịch trùng
+                          </button>
+                        </div>
+                        
+                        <div style={{ overflowX: 'auto', marginBottom: 20 }}>
+                          <table className="tbl" style={{ width: '100%', fontSize: 13, background: 'white' }}>
+                            <thead>
+                              <tr style={{ background: '#456bd9', color: 'white' }}>
+                                <th style={{ padding: 10 }}>STT</th>
+                                <th style={{ padding: 10 }}>Lịch học</th>
+                                <th style={{ padding: 10 }}>Phòng</th>
+                                <th style={{ padding: 10 }}>Dãy nhà</th>
+                                <th style={{ padding: 10 }}>Cơ sở</th>
+                                <th style={{ padding: 10 }}>Giảng viên</th>
+                                <th style={{ padding: 10 }}>Thao tác</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td style={{ padding: 10, borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>1</td>
+                                <td style={{ padding: 10, borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>
+                                  {DAY_NAMES[selectedClass.dayOfWeek]} (T{selectedClass.startPeriod} - T{selectedClass.endPeriod})
+                                </td>
+                                <td style={{ padding: 10, borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>{selectedClass.roomNumber}</td>
+                                <td style={{ padding: 10, borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>{selectedClass.building}</td>
+                                <td style={{ padding: 10, borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>ĐHCT TP.HCM</td>
+                                <td style={{ padding: 10, borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>{selectedClass.teacherName}</td>
+                                <td style={{ padding: 10, borderTop: '1px solid #e2e8f0', textAlign: 'center' }}>
+                                  <button style={{ background: '#456bd9', color: 'white', border: 'none', padding: '5px 12px', borderRadius: 4, cursor: 'pointer', fontSize: 12 }}
+                                          onClick={() => setTeacherModal(selectedClass.teacherName)}>Xem</button>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                          <button className="btn" style={{ background: '#d97706', borderColor: '#d97706', color: 'white', padding: '10px 30px', fontSize: 15, fontWeight: 'bold' }}
+                                  onClick={() => handleRegister(selectedClass)}
+                                  disabled={selectedClass.alreadyEnrolled === 1 || loading}>
+                            {selectedClass.alreadyEnrolled === 1 ? 'Đã đăng ký' : 'Đăng ký môn học'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* LỚP HỌC PHẦN ĐÃ ĐĂNG KÝ TRONG HỌC KỲ NÀY */}
+                    <div style={{ borderLeft: '4px solid #f59e0b', paddingLeft: 10, color: '#d97706', fontWeight: 'bold', marginBottom: 12, textTransform: 'uppercase' }}>
+                      Lớp học phần đã đăng ký trong học kỳ này
+                    </div>
+                    <div style={{ overflowX: 'auto', paddingBottom: 50 }}>
+                      <table className="tbl" style={{ width: '100%', fontSize: 13, border: '1px solid #e2e8f0' }}>
+                        <thead>
+                          <tr style={{ background: '#456bd9', color: 'white' }}>
+                            <th style={{ padding: 10, borderBottom: 'none' }}>STT</th>
+                            <th style={{ padding: 10, borderBottom: 'none' }}>Mã LHP</th>
+                            <th style={{ padding: 10, borderBottom: 'none', textAlign: 'left' }}>Tên môn học</th>
+                            <th style={{ padding: 10, borderBottom: 'none' }}>TC</th>
+                            <th style={{ padding: 10, borderBottom: 'none' }}>Học phí</th>
+                            <th style={{ padding: 10, borderBottom: 'none' }}>Thao tác</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {enrolled.map((e, idx) => (
+                            <tr key={e.classId} className="hover-row">
+                              <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>{idx + 1}</td>
+                              <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0', color: '#1a73e8', fontWeight: 600 }}>{e.classCode}</td>
+                              <td style={{ padding: 10, borderTop: '1px solid #e2e8f0', fontWeight: 500 }}>{e.courseName}</td>
+                              <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>{e.credits}</td>
+                              <td style={{ padding: 10, textAlign: 'right', borderTop: '1px solid #e2e8f0', color: '#d97706', fontWeight: 'bold' }}>
+                              {(e.credits * 1135000).toLocaleString('vi-VN')} đ
+                            </td>
+                            <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center', position: 'relative' }}>
+                              <button 
+                                style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#666' }}
+                                onClick={() => setActiveMenuId(activeMenuId === e.classId ? null : e.classId)}
+                              >
+                                ...
+                              </button>
+                              {activeMenuId === e.classId && (
+                                <div style={{
+                                  position: 'absolute', top: 30, right: 0, zIndex: 100,
+                                  background: 'white', border: '1px solid #ccc', borderRadius: 4,
+                                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)', overflow: 'hidden'
+                                }}>
+                                  <div 
+                                    style={{ padding: '8px 20px', cursor: 'pointer', background: '#456bd9', color: 'white', fontSize: 13, textAlign: 'center' }}
+                                    onClick={() => { setViewModal(e); setActiveMenuId(null); }}
+                                  >
+                                    Xem
+                                  </div>
+                                  <div 
+                                    style={{ padding: '8px 20px', cursor: 'pointer', background: '#f28b18', color: 'white', fontSize: 13, textAlign: 'center' }}
+                                    onClick={() => { setCancelModal(e); setActiveMenuId(null); }}
+                                  >
+                                    Hủy đăng ký
+                                  </div>
                                 </div>
                               )}
                             </td>
-                            <td style={{fontFamily:'monospace'}}>{cls.id}</td>
-                            <td style={{fontWeight:'600'}}>{cls.subjectName}</td>
-                            <td><span className="badge blue">{cls.credits}</span></td>
-                            <td style={{fontWeight:'500'}}>2,355,000 đ</td>
-                            <td><span className="badge green">Thành công</span></td>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
+                        ))}
+                        {enrolled.length === 0 && <tr><td colSpan="6" style={{ padding: 30, textAlign: 'center', color: '#94a3b8' }}>Chưa đăng ký môn học nào</td></tr>}
+                      </tbody>
+                    </table>
+                    </div>
+                  </>
+                )}
               </div>
             )}
-          </main>
+          </div>
         </div>
       </div>
 
-      {/* --- MODALS --- */}
-      
-      {modalType === 'conflict' && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">Lịch học bị trùng</div>
-            <div className="modal-body text-center" style={{padding: '40px', color: 'var(--text-muted)'}}>
-              <span style={{fontSize: '40px', display: 'block', marginBottom: '10px'}}>✅</span>
-              Không phát hiện lịch học nào bị trùng.
-            </div>
-            <div className="modal-footer"><button className="btn btn-outline" onClick={() => setModalType(null)}>Đóng</button></div>
-          </div>
-        </div>
-      )}
-
-      {modalType === 'lecturer' && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">Hồ sơ Giảng viên</div>
-            <div className="modal-body">
-              <div style={{display: 'flex', gap: '24px', alignItems: 'center', marginBottom: '24px'}}>
-                <img src="https://ui-avatars.com/api/?name=Phạm+Văn+Kiên&background=f97316&color=fff&size=80" style={{borderRadius: '12px'}} alt="GV"/>
-                <div>
-                  <h3 style={{margin: '0 0 8px 0', fontSize: '20px', color: 'var(--huit-blue)'}}>ThS. PHẠM VĂN KIÊN</h3>
-                  <p style={{margin: 0, color: 'var(--text-muted)', fontSize: '14px'}}>Khoa Giáo dục Thể chất và Quốc phòng</p>
-                </div>
-              </div>
-              <div className="info-grid">
-                <p><span>Mã NS</span><b>01011013</b></p><p><span>Giới tính</span><b>Nam</b></p>
-                <p><span>Chức vụ</span><b>Giảng viên</b></p><p><span>Email</span><b>kienpv@huit.edu.vn</b></p>
-              </div>
-            </div>
-            <div className="modal-footer"><button className="btn btn-outline" onClick={() => setModalType(null)}>Đóng</button></div>
-          </div>
-        </div>
-      )}
-
-      {modalType === 'classDetail' && actionClass && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">Chi tiết lịch học: {actionClass.subjectName}</div>
-            <div className="modal-body" style={{padding: 0}}>
-              <table className="modern-table">
-                <thead><tr><th>Lịch học</th><th>Phòng</th><th>Giảng viên</th><th>Thời gian</th></tr></thead>
-                <tbody>
-                  {(MOCK_SCHEDULES[actionClass.id] || MOCK_SCHEDULES['010110197501']).map((sch, idx) => (
-                    <tr key={idx}><td>{sch.day}</td><td>{sch.room} - {sch.campus}</td><td>{sch.lecturer}</td><td>{sch.time}</td></tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="modal-footer"><button className="btn btn-outline" onClick={() => setModalType(null)}>Đóng</button></div>
-          </div>
-        </div>
-      )}
-
-      {modalType === 'cancelConfirm' && actionClass && (
-        <div className="modal-overlay">
-          <div className="modal-content small">
-            <div className="modal-body">
-              <div style={{fontSize: '50px', marginBottom: '16px'}}>🗑️</div>
-              <h3 style={{margin: '0 0 12px 0', fontSize: '20px'}}>Xác nhận hủy môn</h3>
-              <p style={{color: 'var(--text-muted)', lineHeight: '1.5', margin: 0}}>Bạn có chắc chắn muốn hủy đăng ký lớp học <b>{actionClass.subjectName}</b> không? Hành động này không thể hoàn tác.</p>
-            </div>
-            <div className="modal-footer" style={{justifyContent: 'center', borderTop: 'none', paddingBottom: '24px'}}>
-              <button className="btn btn-outline" onClick={() => setModalType(null)}>Quay lại</button>
-              <button className="btn btn-danger" onClick={handleCancelRegistration}>Xác nhận Hủy</button>
+      {/* MODALS */}
+      {teacherModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+          <div style={{ background: 'white', padding: 20, borderRadius: 8, width: 600 }}>
+            <h3 style={{ borderBottom: '1px solid #eee', paddingBottom: 10, margin: '0 0 20px 0' }}>THÔNG TIN GIẢNG VIÊN</h3>
+            <h2 style={{ color: 'orange', textAlign: 'center' }}>{teacherModal.toUpperCase()}</h2>
+            <div style={{ textAlign: 'center', marginTop: 30 }}>
+              <button onClick={() => setTeacherModal(null)} style={{ padding: '5px 20px', cursor: 'pointer' }}>Đóng</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Toast Notification */}
-      {toastMsg && (
-        <div className="toast-msg">
-          <span>✨</span> {toastMsg}
+      {conflictModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+          <div style={{ background: 'white', padding: 20, borderRadius: 8, width: 800 }}>
+            <h3 style={{ margin: '0 0 20px 0' }}>DANH SÁCH LỊCH HỌC BỊ TRÙNG</h3>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, marginBottom: 20 }}>
+              <thead>
+                <tr style={{ background: '#456bd9', color: 'white' }}>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>Mã LHP</th>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>Tên môn học</th>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>Thứ</th>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>Tiết</th>
+                </tr>
+              </thead>
+              <tbody>
+                {conflictModal.length === 0 ? (
+                  <tr><td colSpan="4" style={{ padding: 20, textAlign: 'center' }}>Không tìm thấy lịch học trùng</td></tr>
+                ) : conflictModal.map(c => (
+                  <tr key={c.classId}>
+                    <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center' }}>{c.classCode}</td>
+                    <td style={{ padding: 10, border: '1px solid #ddd' }}>{c.courseName}</td>
+                    <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center' }}>{DAY_NAMES[c.dayOfWeek]}</td>
+                    <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center' }}>T{c.startPeriod} - T{c.endPeriod}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <div style={{ textAlign: 'right' }}>
+              <button onClick={() => setConflictModal(null)} style={{ padding: '5px 20px', cursor: 'pointer' }}>Đóng</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cancelModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+          <div style={{ background: 'white', padding: 30, borderRadius: 8, width: 450, textAlign: 'center', boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
+            <div style={{ width: 60, height: 60, borderRadius: '50%', border: '2px solid orange', color: 'orange', fontSize: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px auto' }}>!</div>
+            <h3 style={{ margin: '0 0 10px 0', fontSize: 18, color: '#333' }}>HỦY ĐĂNG KÝ</h3>
+            <p style={{ color: '#666', fontSize: 14, marginBottom: 25 }}>Bạn muốn hủy đăng ký lớp học [{cancelModal.courseName}] ?</p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: 10 }}>
+              <button onClick={() => handleCancel(cancelModal)} style={{ padding: '8px 25px', background: '#456bd9', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', fontWeight: 'bold' }}>OK</button>
+              <button onClick={() => setCancelModal(null)} style={{ padding: '8px 25px', background: '#d32f2f', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer', fontWeight: 'bold' }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {viewModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+          <div style={{ background: 'white', padding: '20px', borderRadius: 8, width: 850, boxShadow: '0 4px 15px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ margin: '0 0 20px 0', fontSize: 16 }}>CHI TIẾT LỚP HỌC ĐÃ ĐĂNG KÝ</h3>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13, marginBottom: 20 }}>
+              <thead>
+                <tr style={{ background: '#456bd9', color: 'white' }}>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>STT</th>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>Lịch học</th>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>Nhóm</th>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>Phòng</th>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>Dãy nhà</th>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>Cơ sở</th>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>Giảng viên</th>
+                  <th style={{ padding: 10, border: '1px solid #ddd' }}>Thời gian</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center' }}>1</td>
+                  <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center' }}>
+                    LT - {DAY_NAMES[viewModal.dayOfWeek]} (T{viewModal.startPeriod} - T{viewModal.endPeriod})
+                  </td>
+                  <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center' }}></td>
+                  <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center' }}>{viewModal.roomNumber}</td>
+                  <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center' }}>{viewModal.building}</td>
+                  <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center' }}>ĐHCT TP.HCM</td>
+                  <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center' }}>{viewModal.teacherName}</td>
+                  <td style={{ padding: 10, border: '1px solid #ddd', textAlign: 'center' }}>06/07/2026 - 03/08/2026</td>
+                </tr>
+              </tbody>
+            </table>
+            <div style={{ textAlign: 'right' }}>
+              <button onClick={() => setViewModal(null)} style={{ padding: '6px 20px', border: '1px solid #ccc', background: 'white', borderRadius: 4, cursor: 'pointer' }}>Đóng</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

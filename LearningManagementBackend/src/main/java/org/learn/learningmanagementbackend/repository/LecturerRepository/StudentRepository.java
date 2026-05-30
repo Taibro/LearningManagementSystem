@@ -180,6 +180,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     @Query("""
             SELECT
                 ti.id            AS invoiceId,
+                sem.id           AS semesterId,
                 sem.name         AS semesterName,
                 ti.totalAmount   AS totalAmount,
                 ti.paidAmount    AS paidAmount,
@@ -191,6 +192,68 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             ORDER BY sem.startDate DESC
             """)
     List<StudentTuitionDto> getTuitionForStudent(@Param("studentCode") String studentCode);
+
+    // ── DEBT DETAIL: chi tiết công nợ từng môn học ─────────────────────────────
+    @Query(value = """
+            SELECT
+                sem.id                                   AS semesterId,
+                sem.name                                 AS semesterName,
+                DATE_FORMAT(sem.start_date, '%Y-%m-%d')  AS semesterStartDate,
+                c.code                                   AS classCode,
+                co.code                                  AS courseCode,
+                co.name                                  AS courseName,
+                co.credits                               AS credits,
+                (co.credits * 1135000)                   AS mucNop,
+                -- Phân bổ tiền đã nộp tỉ lệ theo môn (= mucNop nếu đã đủ, 0 nếu chưa)
+                CASE
+                    WHEN ti.status = 'PAID'    THEN (co.credits * 1135000)
+                    WHEN ti.status = 'PARTIAL' THEN
+                        LEAST((co.credits * 1135000),
+                              GREATEST(0, ti.paid_amount - (
+                                  SELECT COALESCE(SUM(co2.credits * 1135000), 0)
+                                  FROM Enrollment e2
+                                  JOIN Class c2 ON c2.id = e2.class_id
+                                  JOIN Course co2 ON co2.id = c2.course_id
+                                  WHERE e2.student_id = e.student_id
+                                    AND c2.semester_id = sem.id
+                                    AND e2.id < e.id
+                                    AND e2.status IN ('ENROLLED','COMPLETED','FAILED')
+                              )))
+                    ELSE 0
+                END                                      AS soTienNop,
+                CASE WHEN ti.status = 'PAID' THEN 1
+                     WHEN ti.status = 'PARTIAL' AND
+                          (co.credits * 1135000) <= (ti.paid_amount - (
+                              SELECT COALESCE(SUM(co2.credits * 1135000), 0)
+                              FROM Enrollment e2
+                              JOIN Class c2 ON c2.id = e2.class_id
+                              JOIN Course co2 ON co2.id = c2.course_id
+                              WHERE e2.student_id = e.student_id
+                                AND c2.semester_id = sem.id
+                                AND e2.id < e.id
+                                AND e2.status IN ('ENROLLED','COMPLETED','FAILED')
+                          )) THEN 1
+                     ELSE 0
+                END                                      AS isPaid,
+                CASE WHEN ti.status = 'PAID'
+                     THEN DATE_FORMAT(ti.updated_at, '%d/%m/%Y')
+                     ELSE NULL
+                END                                      AS paidDate,
+                COALESCE(ti.paid_amount, 0)              AS invoicePaid,
+                COALESCE(ti.total_amount, co.credits * 1135000) AS invoiceTotal
+            FROM Enrollment e
+            JOIN Class c ON c.id = e.class_id
+            JOIN Course co ON co.id = c.course_id
+            JOIN Semester sem ON sem.id = c.semester_id
+            LEFT JOIN Tuition_invoice ti ON ti.student_id = e.student_id AND ti.semester_id = sem.id
+            WHERE e.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+              AND e.status IN ('ENROLLED', 'COMPLETED', 'FAILED')
+              AND (:semesterId = 0 OR sem.id = :semesterId)
+            ORDER BY sem.start_date DESC, e.id ASC
+            """, nativeQuery = true)
+    List<StudentDebtDetailDto> getDebtDetail(
+            @Param("studentCode") String studentCode,
+            @Param("semesterId")  Integer semesterId);
 
     // ── NOTIFICATIONS ─────────────────────────────────────────
     @Query("""
@@ -232,7 +295,192 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             ORDER BY sem.start_date DESC, co.name
             """, nativeQuery = true)
     List<StudentSurveyListDto> getSurveyListForStudent(@Param("studentCode") String studentCode);
+
+    // ── ĐĂNG KÝ THƯỜNG: lớp OPEN trong HK, SV chưa có môn này (ENROLLED/COMPLETED) ──
+    @Query(value = """
+            SELECT
+                c.id                AS classId,
+                c.code              AS classCode,
+                co.id               AS courseId,
+                co.code             AS courseCode,
+                co.name             AS courseName,
+                co.credits          AS credits,
+                sem.id              AS semesterId,
+                sem.name            AS semesterName,
+                u.full_name         AS teacherName,
+                (SELECT COUNT(*) FROM Enrollment en
+                    WHERE en.class_id = c.id AND en.status IN ('ENROLLED','PENDING')) AS enrolledCount,
+                c.max_students      AS maxStudents,
+                sch.day_of_week     AS dayOfWeek,
+                TIME_FORMAT(sch.start_time,'%H:%i') AS startTime,
+                TIME_FORMAT(sch.end_time,'%H:%i')   AS endTime,
+                sch.start_period    AS startPeriod,
+                sch.end_period      AS endPeriod,
+                r.room_number       AS roomNumber,
+                r.building          AS building,
+                CASE WHEN EXISTS (
+                    SELECT 1 FROM Enrollment ex
+                    WHERE ex.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                      AND ex.class_id = c.id AND ex.status IN ('ENROLLED','PENDING')
+                ) THEN 1 ELSE 0 END AS alreadyEnrolled
+            FROM Class c
+            JOIN Course co ON co.id = c.course_id
+            JOIN Semester sem ON sem.id = c.semester_id
+            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN Teacher t ON t.id = ct.teacher_id
+            LEFT JOIN Users u ON u.id = t.user_id
+            LEFT JOIN Schedule sch ON sch.class_id = c.id
+            LEFT JOIN Room r ON r.id = sch.room_id
+            WHERE c.status = 'OPEN'
+              AND (:semesterId = 0 OR sem.id = :semesterId)
+              AND co.id NOT IN (
+                  SELECT c2.course_id FROM Enrollment e2
+                  JOIN Class c2 ON c2.id = e2.class_id
+                  WHERE e2.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                    AND e2.status IN ('ENROLLED','PENDING','COMPLETED')
+              )
+            ORDER BY co.name, c.code
+            """, nativeQuery = true)
+    List<StudentCourseRegDto> getAvailableClasses(
+            @Param("studentCode") String studentCode,
+            @Param("semesterId")  Integer semesterId);
+
+    // ── HỌC LẠI: lớp OPEN của môn sinh viên đã FAILED ───────────────────────────
+    @Query(value = """
+            SELECT
+                c.id                AS classId,
+                c.code              AS classCode,
+                co.id               AS courseId,
+                co.code             AS courseCode,
+                co.name             AS courseName,
+                co.credits          AS credits,
+                sem.id              AS semesterId,
+                sem.name            AS semesterName,
+                u.full_name         AS teacherName,
+                (SELECT COUNT(*) FROM Enrollment en
+                    WHERE en.class_id = c.id AND en.status IN ('ENROLLED','PENDING')) AS enrolledCount,
+                c.max_students      AS maxStudents,
+                sch.day_of_week     AS dayOfWeek,
+                TIME_FORMAT(sch.start_time,'%H:%i') AS startTime,
+                TIME_FORMAT(sch.end_time,'%H:%i')   AS endTime,
+                sch.start_period    AS startPeriod,
+                sch.end_period      AS endPeriod,
+                r.room_number       AS roomNumber,
+                r.building          AS building,
+                CASE WHEN EXISTS (
+                    SELECT 1 FROM Enrollment ex
+                    WHERE ex.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                      AND ex.class_id = c.id AND ex.status IN ('ENROLLED','PENDING')
+                ) THEN 1 ELSE 0 END AS alreadyEnrolled
+            FROM Class c
+            JOIN Course co ON co.id = c.course_id
+            JOIN Semester sem ON sem.id = c.semester_id
+            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN Teacher t ON t.id = ct.teacher_id
+            LEFT JOIN Users u ON u.id = t.user_id
+            LEFT JOIN Schedule sch ON sch.class_id = c.id
+            LEFT JOIN Room r ON r.id = sch.room_id
+            WHERE c.status = 'OPEN'
+              AND (:semesterId = 0 OR sem.id = :semesterId)
+              AND co.id IN (
+                  SELECT c2.course_id FROM Enrollment e2
+                  JOIN Class c2 ON c2.id = e2.class_id
+                  WHERE e2.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                    AND e2.status = 'FAILED'
+              )
+            ORDER BY co.name, c.code
+            """, nativeQuery = true)
+    List<StudentCourseRegDto> getRetakeClasses(
+            @Param("studentCode") String studentCode,
+            @Param("semesterId")  Integer semesterId);
+
+    // ── HỌC CẢI THIỆN: lớp OPEN của môn sinh viên đã COMPLETED ─────────────────
+    @Query(value = """
+            SELECT
+                c.id                AS classId,
+                c.code              AS classCode,
+                co.id               AS courseId,
+                co.code             AS courseCode,
+                co.name             AS courseName,
+                co.credits          AS credits,
+                sem.id              AS semesterId,
+                sem.name            AS semesterName,
+                u.full_name         AS teacherName,
+                (SELECT COUNT(*) FROM Enrollment en
+                    WHERE en.class_id = c.id AND en.status IN ('ENROLLED','PENDING')) AS enrolledCount,
+                c.max_students      AS maxStudents,
+                sch.day_of_week     AS dayOfWeek,
+                TIME_FORMAT(sch.start_time,'%H:%i') AS startTime,
+                TIME_FORMAT(sch.end_time,'%H:%i')   AS endTime,
+                sch.start_period    AS startPeriod,
+                sch.end_period      AS endPeriod,
+                r.room_number       AS roomNumber,
+                r.building          AS building,
+                CASE WHEN EXISTS (
+                    SELECT 1 FROM Enrollment ex
+                    WHERE ex.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                      AND ex.class_id = c.id AND ex.status IN ('ENROLLED','PENDING')
+                ) THEN 1 ELSE 0 END AS alreadyEnrolled
+            FROM Class c
+            JOIN Course co ON co.id = c.course_id
+            JOIN Semester sem ON sem.id = c.semester_id
+            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN Teacher t ON t.id = ct.teacher_id
+            LEFT JOIN Users u ON u.id = t.user_id
+            LEFT JOIN Schedule sch ON sch.class_id = c.id
+            LEFT JOIN Room r ON r.id = sch.room_id
+            WHERE c.status = 'OPEN'
+              AND (:semesterId = 0 OR sem.id = :semesterId)
+              AND co.id IN (
+                  SELECT c2.course_id FROM Enrollment e2
+                  JOIN Class c2 ON c2.id = e2.class_id
+                  WHERE e2.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                    AND e2.status = 'COMPLETED'
+              )
+            ORDER BY co.name, c.code
+            """, nativeQuery = true)
+    List<StudentCourseRegDto> getImproveClasses(
+            @Param("studentCode") String studentCode,
+            @Param("semesterId")  Integer semesterId);
+
+    // ── LẤY DANH SÁCH ĐÃ ĐĂNG KÝ TRONG HỌC KỲ ──────────────────────────────────
+    @Query(value = """
+            SELECT
+                c.id                AS classId,
+                c.code              AS classCode,
+                co.id               AS courseId,
+                co.code             AS courseCode,
+                co.name             AS courseName,
+                co.credits          AS credits,
+                sem.id              AS semesterId,
+                sem.name            AS semesterName,
+                u.full_name         AS teacherName,
+                (SELECT COUNT(*) FROM Enrollment en
+                    WHERE en.class_id = c.id AND en.status IN ('ENROLLED','PENDING')) AS enrolledCount,
+                c.max_students      AS maxStudents,
+                sch.day_of_week     AS dayOfWeek,
+                TIME_FORMAT(sch.start_time,'%H:%i') AS startTime,
+                TIME_FORMAT(sch.end_time,'%H:%i')   AS endTime,
+                sch.start_period    AS startPeriod,
+                sch.end_period      AS endPeriod,
+                r.room_number       AS roomNumber,
+                r.building          AS building,
+                1                   AS alreadyEnrolled
+            FROM Enrollment e
+            JOIN Class c ON c.id = e.class_id
+            JOIN Course co ON co.id = c.course_id
+            JOIN Semester sem ON sem.id = c.semester_id
+            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN Teacher t ON t.id = ct.teacher_id
+            LEFT JOIN Users u ON u.id = t.user_id
+            LEFT JOIN Schedule sch ON sch.class_id = c.id
+            LEFT JOIN Room r ON r.id = sch.room_id
+            WHERE e.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+              AND e.status IN ('ENROLLED', 'PENDING')
+              AND (:semesterId = 0 OR sem.id = :semesterId)
+            ORDER BY co.name, c.code
+            """, nativeQuery = true)
+    List<StudentCourseRegDto> getEnrolledClasses(
+            @Param("studentCode") String studentCode,
+            @Param("semesterId")  Integer semesterId);
 }
-
-
-

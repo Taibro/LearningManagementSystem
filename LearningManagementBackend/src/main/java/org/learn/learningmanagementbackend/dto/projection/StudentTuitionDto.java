@@ -6,6 +6,7 @@ import java.time.LocalDate;
 public interface StudentTuitionDto {
 
     Integer getInvoiceId();
+    Integer getSemesterId();
     String getSemesterName();
     BigDecimal getTotalAmount();
     BigDecimal getPaidAmount();

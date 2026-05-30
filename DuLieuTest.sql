@@ -350,10 +350,14 @@ INSERT INTO schedule_exceptions (id, schedule_id, exception_date, reason, except
 
 -- 17. BẢNG ENROLLMENT (12 dòng)
 INSERT INTO enrollments (id, student_id, class_id, status, grade_total) VALUES
-(1, 1, 1, 'ENROLLED', NULL),
+(1, 1, 1, 'ENROLLED', 9.5),
 (2, 2, 1, 'ENROLLED', NULL),
 (3, 3, 1, 'ENROLLED', NULL),
-(4, 1, 2, 'ENROLLED', NULL),
+(4, 1, 2, 'ENROLLED', 9.0),
+(13, 1, 3, 'ENROLLED', 9.0),
+(14, 1, 8, 'ENROLLED', 8.5),
+(15, 1, 10, 'ENROLLED', 8.0),
+(16, 1, 12, 'ENROLLED', 9.5),
 (5, 2, 2, 'ENROLLED', NULL),
 (6, 4, 6, 'ENROLLED', NULL),
 (7, 5, 6, 'ENROLLED', NULL),
@@ -436,7 +440,8 @@ INSERT INTO student_semester_summaries (id, student_id, semester_id, gpa, credit
 (9, 9, 1, 3.00, 15, 82, 'Tốt'),
 (10, 10, 1, 3.60, 18, 88, 'Tốt'),
 (11, 11, 1, 2.20, 10, 60, 'Trung bình'),
-(12, 12, 1, 3.51, 15, 92, 'Xuất sắc');
+(12, 12, 1, 3.51, 15, 92, 'Xuất sắc'),
+(13, 1, 2, NULL, NULL, 95, 'Xuất sắc');
 
 -- 23. BẢNG SALARY_GRADE (12 dòng)
 INSERT INTO Salary_grade (id, school_id, degree, coefficient, rate_per_session, effective_from) VALUES
