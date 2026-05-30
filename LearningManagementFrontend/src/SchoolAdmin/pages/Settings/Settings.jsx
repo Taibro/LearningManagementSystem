@@ -15,7 +15,9 @@ export default function Settings() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/dashboard/stats');
+      const res = await fetch('http://localhost:8080/api/auth/school-admin/dashboard/stats', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setStats(data);

@@ -17,6 +17,11 @@ public class ScheduleController {
 
     private final ScheduleService scheduleService;
 
+    @GetMapping
+    public ResponseEntity<List<ScheduleResponse>> getAllSchedulesBySchool() {
+        return ResponseEntity.ok(scheduleService.getAllSchedulesBySchool());
+    }
+
     @GetMapping("/class/{classId}")
     public ResponseEntity<List<ScheduleResponse>> getAllSchedulesByClass(@PathVariable Integer classId) {
         return ResponseEntity.ok(scheduleService.getAllSchedulesByClass(classId));

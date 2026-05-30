@@ -21,7 +21,9 @@ export default function Attendance() {
 
   const fetchRecords = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/attendance');
+      const res = await fetch('http://localhost:8080/api/auth/school-admin/attendance', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setRecords(data);
@@ -48,7 +50,10 @@ export default function Attendance() {
     try {
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify(payload)
       });
       if (res.ok) {

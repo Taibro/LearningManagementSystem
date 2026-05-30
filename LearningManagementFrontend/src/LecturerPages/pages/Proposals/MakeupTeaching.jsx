@@ -1,68 +1,221 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const MakeupTeaching = () => {
+  const [history, setHistory] = useState([]);
+  const [cancelledSessions, setCancelledSessions] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Form states
+  const [exceptionId, setExceptionId] = useState('');
+  const [makeupDate, setMakeupDate] = useState('');
+  const [shift, setShift] = useState('morning'); // morning, afternoon, evening
+  const [room, setRoom] = useState('');
+  const [notes, setNotes] = useState('');
+
+  const [toast, setToast] = useState({ show: false, msg: '', type: 'success' });
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ show: true, msg, type });
+    setTimeout(() => setToast({ show: false, msg: '', type: 'success' }), 3000);
+  };
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('lecturerToken');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      // Fetch cancelled sessions for dropdown
+      const resSessions = await axios.get('http://localhost:8080/api/lecturer/makeup-classes/cancelled-sessions', { headers });
+      setCancelledSessions(resSessions.data);
+      if (resSessions.data.length > 0 && !exceptionId) {
+        setExceptionId(resSessions.data[0].exceptionId);
+      }
+
+      // Fetch history
+      const resHistory = await axios.get('http://localhost:8080/api/lecturer/makeup-classes/history', { headers });
+      setHistory(resHistory.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleSubmit = async () => {
+    if (!exceptionId || !makeupDate) {
+      showToast('Vui lòng chọn buổi nghỉ gốc và ngày dạy bù!', 'error');
+      return;
+    }
+
+    let start = 1, end = 3;
+    if (shift === 'afternoon') { start = 7; end = 9; }
+    if (shift === 'evening') { start = 13; end = 15; }
+
+    setSubmitting(true);
+    try {
+      const token = localStorage.getItem('lecturerToken');
+      const payload = {
+        exceptionId: exceptionId,
+        makeupDate: makeupDate,
+        replacementStartPeriod: start,
+        replacementEndPeriod: end,
+        suggestedRoom: room,
+        makeupNotes: notes
+      };
+
+      const res = await axios.post('http://localhost:8080/api/lecturer/makeup-classes/submit', payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      showToast(res.data || 'Đã gửi đề xuất dạy bù!');
+      setMakeupDate('');
+      setRoom('');
+      setNotes('');
+      fetchData(); // Reload
+    } catch (err) {
+      console.error(err);
+      showToast(err.response?.data?.message || 'Có lỗi khi gửi đề xuất', 'error');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const getStatusStyle = (status) => {
+    switch(status?.toLowerCase()) {
+      case 'approved': return { box: 'border-green-200 bg-green-50', text: 'text-green-800', badge: 'bg-green-200 text-green-700', label: '✓ Đã duyệt', subtext: 'text-green-600' };
+      case 'rejected': return { box: 'border-red-200 bg-red-50', text: 'text-red-800', badge: 'bg-red-200 text-red-700', label: '✕ Từ chối', subtext: 'text-red-600' };
+      default: return { box: 'border-yellow-200 bg-yellow-50', text: 'text-yellow-800', badge: 'bg-yellow-200 text-yellow-700', label: '⏳ Chờ duyệt', subtext: 'text-yellow-600' };
+    }
+  };
+
   return (
-    <div className="animate-fadeIn">
+    <div className="animate-fadeIn relative">
+      {/* Toast */}
+      {toast.show && (
+        <div style={{
+          position: 'fixed', top: 24, right: 24, zIndex: 10000,
+          background: toast.type === 'success' ? '#10b981' : '#ef4444',
+          color: 'white', padding: '14px 24px', borderRadius: 8,
+          boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14
+        }}>
+          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+        </div>
+      )}
+
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Đề xuất dạy bù</h1>
-        <p className="text-gray-400 text-sm mt-1">Lên lịch bù cho các buổi đã nghỉ</p>
+        <p className="text-gray-400 text-sm mt-1">Lên lịch bù cho các buổi đã xin phép nghỉ</p>
       </div>
-      <div className="grid grid-cols-2 gap-5">
-        <div className="card p-5">
-          <h3 className="font-semibold text-gray-700 mb-4">Tạo lịch dạy bù</h3>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="card p-6 shadow-sm border border-gray-100 h-fit">
+          <h3 className="font-bold text-gray-700 mb-5 uppercase text-[11px] tracking-widest border-b pb-2">Tạo lịch dạy bù</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Lớp học phần</label>
-              <select className="input-field">
-                <option>010110195604 - 14DHTH04</option>
+              <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Buổi nghỉ gốc cần bù</label>
+              <select 
+                value={exceptionId}
+                onChange={e => setExceptionId(e.target.value)}
+                className="input-field bg-gray-50 text-sm font-bold text-[#6B4FA0]"
+              >
+                {cancelledSessions.length > 0 ? (
+                  cancelledSessions.map(session => (
+                    <option key={session.exceptionId} value={session.exceptionId}>{session.displayLabel}</option>
+                  ))
+                ) : (
+                  <option value="">Không có buổi nghỉ nào cần bù</option>
+                )}
               </select>
             </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Ngày dạy bù</label>
+                <input 
+                  type="date" 
+                  value={makeupDate}
+                  onChange={e => setMakeupDate(e.target.value)}
+                  className="input-field text-sm font-bold text-[#6B4FA0]" 
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Ca học bù</label>
+                <select 
+                  value={shift}
+                  onChange={e => setShift(e.target.value)}
+                  className="input-field bg-gray-50 text-sm"
+                >
+                  <option value="morning">Sáng (Tiết 1-3)</option>
+                  <option value="afternoon">Chiều (Tiết 7-9)</option>
+                  <option value="evening">Tối (Tiết 13-15)</option>
+                </select>
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Buổi nghỉ gốc</label>
-              <select className="input-field">
-                <option>22/02/2026 - Ca sáng</option>
-              </select>
+              <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Phòng học đề xuất</label>
+              <input 
+                type="text"
+                value={room}
+                onChange={e => setRoom(e.target.value)}
+                className="input-field text-sm" 
+                placeholder="VD: A401, X11..." 
+              />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Ngày dạy bù</label>
-              <input type="date" className="input-field" defaultValue="2026-04-26" />
+              <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Ghi chú</label>
+              <textarea 
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                className="input-field text-sm" 
+                rows="2" 
+                placeholder="Ghi chú thêm (Không bắt buộc)..."
+              ></textarea>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Ca học bù</label>
-              <select className="input-field">
-                <option>Sáng (Tiết 1-3)</option>
-                <option>Chiều</option>
-                <option>Tối</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Phòng học đề xuất</label>
-              <input className="input-field" placeholder="VD: A401" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-600 mb-1.5">Ghi chú</label>
-              <textarea className="input-field" rows="2" placeholder="Ghi chú thêm..."></textarea>
-            </div>
-            <button className="btn-primary w-full">📤 Gửi đề xuất dạy bù</button>
+            <button 
+              onClick={handleSubmit}
+              disabled={submitting || cancelledSessions.length === 0}
+              className={`w-full font-bold py-2.5 mt-2 uppercase text-xs tracking-widest ${cancelledSessions.length === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed rounded-lg' : 'btn-primary shadow-lg shadow-purple-200'}`}
+            >
+              {submitting ? '⏳ Đang gửi...' : '📤 Gửi đề xuất dạy bù'}
+            </button>
           </div>
         </div>
-        <div className="card p-5">
-          <h3 className="font-semibold text-gray-700 mb-4">Trạng thái dạy bù</h3>
-          <div className="space-y-3">
-            <div className="p-3 border border-green-200 bg-green-50 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="font-medium text-sm text-green-800">14DHTH04 - Bù 15/03</span>
-                <span className="text-xs bg-green-200 text-green-700 px-2 py-0.5 rounded-full font-semibold">✓ Đã dạy bù</span>
+
+        <div className="card p-6 shadow-sm border border-gray-100 h-fit max-h-[600px] flex flex-col">
+          <div className="flex justify-between items-center mb-5 border-b pb-2">
+            <h3 className="font-bold text-gray-700 uppercase text-[11px] tracking-widest">Trạng thái dạy bù</h3>
+            <button onClick={fetchData} className="text-xs text-[#6B4FA0] font-bold hover:underline">🔄 Làm mới</button>
+          </div>
+
+          <div className="space-y-3 overflow-y-auto pr-2 custom-scrollbar flex-1">
+            {loading ? (
+               <div className="text-center text-sm text-gray-400 py-5">Đang tải lịch sử...</div>
+            ) : history && history.length > 0 ? (
+              history.map((item, idx) => {
+                const style = getStatusStyle(item.status);
+                return (
+                  <div key={idx} className={`p-4 border ${style.box} rounded-xl transition-all`}>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className={`font-black text-sm ${style.text}`}>{item.title}</span>
+                      <span className={`text-[10px] uppercase tracking-wider ${style.badge} px-2 py-1 rounded-full font-bold`}>{item.status || style.label}</span>
+                    </div>
+                    <p className={`text-xs font-medium mt-2 ${style.subtext}`}>{item.makeupDetails}</p>
+                  </div>
+                )
+              })
+            ) : (
+              <div className="text-center text-sm text-gray-400 py-10 italic">
+                Bạn chưa có đề xuất dạy bù nào.
               </div>
-              <p className="text-xs text-green-600 mt-1">Ca sáng, Phòng A401, 15/03/2026</p>
-            </div>
-            <div className="p-3 border border-yellow-200 bg-yellow-50 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="font-medium text-sm text-yellow-800">14DHTH03 - Bù 26/04</span>
-                <span className="text-xs bg-yellow-200 text-yellow-700 px-2 py-0.5 rounded-full font-semibold">⏳ Chờ duyệt</span>
-              </div>
-              <p className="text-xs text-yellow-600 mt-1">Ca sáng, Phòng đề xuất A202</p>
-            </div>
+            )}
           </div>
         </div>
       </div>

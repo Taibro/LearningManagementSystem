@@ -25,10 +25,28 @@ public class CourseService {
                 .collect(Collectors.toList());
     }
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
     public List<CourseResponse> getAllCourses() {
-        return courseRepository.findAll().stream()
-                .map(CourseResponse::new)
-                .collect(Collectors.toList());
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer userId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    .setParameter("userId", userId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<Course> courses = entityManager.createQuery("SELECT c FROM Course c WHERE c.department.school.id = :schoolId", Course.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        return courses.stream().map(CourseResponse::new).collect(Collectors.toList());
     }
 
     public CourseResponse createCourse(CourseRequest request) {

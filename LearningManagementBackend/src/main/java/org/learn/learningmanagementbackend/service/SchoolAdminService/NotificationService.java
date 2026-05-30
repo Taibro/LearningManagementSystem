@@ -6,7 +6,7 @@ import org.learn.learningmanagementbackend.dto.response.NotificationResponse;
 import org.learn.learningmanagementbackend.model.Notification;
 import org.learn.learningmanagementbackend.model.Users;
 import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.NotificationRepository;
-import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.UsersRepository;
+import org.learn.learningmanagementbackend.repository.LecturerRepository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -18,17 +18,35 @@ import java.util.stream.Collectors;
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
-    private final UsersRepository usersRepository;
+    private final UserRepository userRepository;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    private jakarta.persistence.EntityManager entityManager;
 
     public List<NotificationResponse> getAllNotifications() {
-        return notificationRepository.findAll().stream()
-                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer currentUserId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    .setParameter("userId", currentUserId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<Notification> notifications = entityManager.createQuery(
+                "SELECT n FROM Notification n JOIN UserSchool us ON n.user.id = us.user.id WHERE us.school.id = :schoolId ORDER BY n.createdAt DESC", Notification.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        return notifications.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public NotificationResponse createNotification(NotificationRequest request) {
-        Users user = usersRepository.findById(request.getUserId())
+        Users user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Notification notification = new Notification();

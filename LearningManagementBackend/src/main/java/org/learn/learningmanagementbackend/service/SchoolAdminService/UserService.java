@@ -16,8 +16,28 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
     public List<UserResponse> getAllUsers() {
-        return userRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer currentUserId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    .setParameter("userId", currentUserId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<Users> users = entityManager.createQuery("SELECT us.user FROM UserSchool us WHERE us.school.id = :schoolId", Users.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        return users.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public UserResponse getUserById(Integer id) {

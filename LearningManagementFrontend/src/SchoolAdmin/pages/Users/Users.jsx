@@ -15,7 +15,9 @@ export default function Users() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/users');
+      const res = await fetch('http://localhost:8080/api/auth/school-admin/users', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setUsers(data);

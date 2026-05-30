@@ -25,8 +25,28 @@ public class ScheduleExceptionService {
     private final TeacherRepository teacherRepository;
     private final RoomRepository roomRepository;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
     public List<ScheduleExceptionResponse> getAllExceptions() {
-        return exceptionRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer userId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    .setParameter("userId", userId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<ScheduleException> exceptions = entityManager.createQuery("SELECT e FROM ScheduleException e WHERE e.schedule.classes.course.department.school.id = :schoolId", ScheduleException.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        return exceptions.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public List<ScheduleExceptionResponse> getExceptionsBySchedule(Integer scheduleId) {

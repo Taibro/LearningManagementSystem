@@ -16,10 +16,17 @@ export default function Dashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/dashboard/stats');
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:8080/api/auth/school-admin/dashboard/stats', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (res.ok) {
         const data = await res.json();
         setStats(data);
+      } else {
+        console.warn("Lỗi xác thực hoặc không có quyền truy cập");
       }
     } catch (err) {
       console.error("Lỗi tải Dashboard:", err);
@@ -30,7 +37,7 @@ export default function Dashboard() {
     <div className="page">
       <div className="ph mb6">
         <div>
-          <div className="ph-title">Tổng quan · Trường ĐH Bách Khoa TP.HCM</div>
+          <div className="ph-title">Tổng quan · {localStorage.getItem('schoolId') === 'huit' ? 'Trường ĐH Công Thương TP.HCM' : 'Trường ĐH Bách Khoa TP.HCM'}</div>
           <div className="ph-sub">Cập nhật lúc: {new Date().toLocaleTimeString('vi-VN')} · Thống kê thời gian thực</div>
         </div>
         <button className="btn btn-blue" onClick={() => alert('Đã xuất báo cáo tổng hợp PDF')}>📄 Xuất báo cáo</button>

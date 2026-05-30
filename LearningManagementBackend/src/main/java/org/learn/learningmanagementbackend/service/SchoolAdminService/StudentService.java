@@ -22,8 +22,28 @@ public class StudentService {
     private final UserRepository userRepository;
     private final DepartmentRepository departmentRepository;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
     public List<StudentResponse> getAllStudents() {
-        return studentRepository.findAll().stream().map(this::mapToResponse).collect(Collectors.toList());
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer userId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    .setParameter("userId", userId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<Student> students = entityManager.createQuery("SELECT s FROM Student s WHERE s.department.school.id = :schoolId", Student.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        return students.stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
     public StudentResponse getStudentById(Integer id) {

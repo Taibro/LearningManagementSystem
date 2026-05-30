@@ -53,6 +53,13 @@ export default function AdminLogin() {
       
       if (res.ok) {
         const data = await res.json();
+        // Lấy tên thật từ Backend bỏ vô túi áo
+        localStorage.setItem('token', data.token); // QUAN TRỌNG: LƯU TOKEN
+        localStorage.setItem('adminName', data.fullName || 'Admin');
+        localStorage.setItem('adminEmail', data.email || '');
+        // Lưu luôn mã trường vừa chọn (huit, hcmut...)
+        localStorage.setItem('schoolId', sSchool);
+        
         setSchoolView('otp');
         addToast(`Đăng nhập thành công, đang chuyển hướng...`, 'green');
       } else {
@@ -158,6 +165,7 @@ export default function AdminLogin() {
                   <span className="inp-icon">🏫</span>
                   <select className="inp school-inp" style={{ paddingLeft: 42, appearance: 'none', cursor: 'pointer' }} value={sSchool} onChange={e => setSSchool(e.target.value)}>
                     <option value="">-- Chọn tổ chức của bạn --</option>
+                    <option value="huit">🏫 Trường ĐH Công Thương TP.HCM (HUIT)</option>
                     <option value="hcmut">🎓 Trường ĐH Bách Khoa TP.HCM (HCMUT)</option>
                     <option value="ielts">🌐 Trung tâm Tiếng Anh IELTS Pro</option>
                   </select>

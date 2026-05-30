@@ -1,112 +1,135 @@
-// import React from 'react';
-//
-// const Documents = () => {
-//   return (
-//     <div className="animate-fadeIn">
-//       <div className="flex items-center justify-between mb-6">
-//         <div>
-//           <h1 className="text-2xl font-bold text-gray-800">Quản lý tài liệu bài giảng</h1>
-//           <p className="text-gray-400 text-sm mt-1">Upload và quản lý slide, tài liệu giảng dạy</p>
-//         </div>
-//         <button className="btn-primary text-sm">+ Thêm tài liệu</button>
-//       </div>
-//       <div className="card p-5 mb-5">
-//         <div className="grid grid-cols-3 gap-4">
-//           <div>
-//             <label className="block text-sm font-medium text-gray-600 mb-1.5">Lớp học phần</label>
-//             <select className="input-field">
-//               <option>Tất cả lớp</option>
-//               <option>014DHTH04</option>
-//             </select>
-//           </div>
-//           <div>
-//             <label className="block text-sm font-medium text-gray-600 mb-1.5">Loại tài liệu</label>
-//             <select className="input-field">
-//               <option>Tất cả</option>
-//               <option>Slide bài giảng</option>
-//               <option>Bài tập</option>
-//               <option>Đề thi</option>
-//             </select>
-//           </div>
-//           <div className="flex items-end">
-//             <button className="btn-primary w-full">🔍 Tìm kiếm</button>
-//           </div>
-//         </div>
-//       </div>
-//       <div className="grid grid-cols-3 gap-4">
-//         <div className="card p-4 hover:shadow-md transition-shadow cursor-pointer">
-//           <div className="flex items-start gap-3">
-//             <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-red-500 text-lg flex-shrink-0">📊</div>
-//             <div className="flex-1 min-w-0">
-//               <h4 className="font-semibold text-gray-800 text-sm truncate">Slide Chương 1 - Giới thiệu</h4>
-//               <p className="text-xs text-gray-400 mt-0.5">Kiến trúc máy tính</p>
-//               <div className="flex items-center gap-2 mt-2">
-//                 <span className="text-xs text-gray-400">2.3 MB</span>
-//                 <span className="text-xs text-gray-300">|</span>
-//                 <span className="text-xs text-gray-400">15/01/2026</span>
-//               </div>
-//             </div>
-//           </div>
-//           <div className="flex gap-1 mt-3">
-//             <button className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded hover:bg-purple-100">👁 Xem</button>
-//             <button className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100">📥 Tải</button>
-//             <button className="text-xs px-2 py-1 bg-red-50 text-red-500 rounded hover:bg-red-100">🗑 Xóa</button>
-//           </div>
-//         </div>
-//         <div className="card p-4 hover:shadow-md transition-shadow cursor-pointer">
-//           <div className="flex items-start gap-3">
-//             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-500 text-lg flex-shrink-0">📝</div>
-//             <div className="flex-1 min-w-0">
-//               <h4 className="font-semibold text-gray-800 text-sm truncate">Bài tập Chương 2</h4>
-//               <p className="text-xs text-gray-400 mt-0.5">QTHTM - 14DHTH04</p>
-//               <div className="flex items-center gap-2 mt-2">
-//                 <span className="text-xs text-gray-400">450 KB</span>
-//                 <span className="text-xs text-gray-300">|</span>
-//                 <span className="text-xs text-gray-400">20/01/2026</span>
-//               </div>
-//             </div>
-//           </div>
-//           <div className="flex gap-1 mt-3">
-//             <button className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded">👁 Xem</button>
-//             <button className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded">📥 Tải</button>
-//             <button className="text-xs px-2 py-1 bg-red-50 text-red-500 rounded">🗑 Xóa</button>
-//           </div>
-//         </div>
-//         <div className="card p-4 hover:shadow-md transition-shadow cursor-pointer">
-//           <div className="flex items-start gap-3">
-//             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-500 text-lg flex-shrink-0">📋</div>
-//             <div className="flex-1 min-w-0">
-//               <h4 className="font-semibold text-gray-800 text-sm truncate">Đề cương môn học</h4>
-//               <p className="text-xs text-gray-400 mt-0.5">Kiến trúc máy tính</p>
-//               <div className="flex items-center gap-2 mt-2">
-//                 <span className="text-xs text-gray-400">128 KB</span>
-//                 <span className="text-xs text-gray-300">|</span>
-//                 <span className="text-xs text-gray-400">01/01/2026</span>
-//               </div>
-//             </div>
-//           </div>
-//           <div className="flex gap-1 mt-3">
-//             <button className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded">👁 Xem</button>
-//             <button className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded">📥 Tải</button>
-//             <button className="text-xs px-2 py-1 bg-red-50 text-red-500 rounded">🗑 Xóa</button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-//
-// export default Documents;
-import React, { useState } from 'react';
-import { X, UploadCloud } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import { X, UploadCloud, FileText, Download, Trash2, Eye } from 'lucide-react';
 
 const Documents = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [materials, setMaterials] = useState([]);
+  const [loading, setLoading] = useState(false);
+  
+  // Upload states
+  const [file, setFile] = useState(null);
+  const [title, setTitle] = useState('');
+  const [docType, setDocType] = useState('Slide bài giảng');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  // Filters
+  const [filterType, setFilterType] = useState('');
+
+  const [toast, setToast] = useState({ show: false, msg: '', type: 'success' });
+
+  const teacherId = 1; // Tạm cứng cho Giảng viên số 1
+  const classId = 1; // Tạm cứng cho Lớp 1
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ show: true, msg, type });
+    setTimeout(() => setToast({ show: false, msg: '', type: 'success' }), 3000);
+  };
+
+  const fetchMaterials = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('lecturerToken');
+      let url = `http://localhost:8080/api/lecturer/materials?teacherId=${teacherId}`;
+      if (filterType && filterType !== 'Tất cả') {
+        url += `&docType=${encodeURIComponent(filterType)}`;
+      }
+      
+      const res = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
+      setMaterials(res.data);
+    } catch (err) {
+      console.error(err);
+      setMaterials([]); // fallback to empty
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMaterials();
+  }, [filterType]);
+
+  const handleUpload = async () => {
+    if (!file || !title) {
+      showToast('Vui lòng nhập tên tài liệu và chọn file!', 'error');
+      return;
+    }
+
+    setUploading(true);
+    const token = localStorage.getItem('lecturerToken');
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('title', title);
+    formData.append('docType', docType);
+    formData.append('classId', classId);
+    formData.append('teacherId', teacherId);
+
+    try {
+      const res = await axios.post('http://localhost:8080/api/lecturer/materials/upload', formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      showToast(res.data || 'Tải lên thành công!');
+      setIsModalOpen(false);
+      setFile(null);
+      setTitle('');
+      fetchMaterials(); // Reload list
+    } catch (err) {
+      console.error(err);
+      showToast(err.response?.data || 'Có lỗi khi tải lên', 'error');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa tài liệu này?')) return;
+    
+    try {
+      const token = localStorage.getItem('lecturerToken');
+      await axios.delete(`http://localhost:8080/api/lecturer/materials/${id}?teacherId=${teacherId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      showToast('Đã xóa tài liệu!');
+      fetchMaterials();
+    } catch (err) {
+      console.error(err);
+      showToast('Lỗi khi xóa tài liệu', 'error');
+    }
+  };
+
+  const getIconForType = (type) => {
+    if (type?.includes('Slide')) return { icon: '📊', color: 'text-red-500', bg: 'bg-red-100' };
+    if (type?.includes('Bài tập')) return { icon: '📝', color: 'text-blue-500', bg: 'bg-blue-100' };
+    return { icon: '📋', color: 'text-green-500', bg: 'bg-green-100' };
+  };
+
+  // Format bytes to human readable size
+  const formatSize = (bytes) => {
+    if (!bytes || bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
 
   return (
     <>
-      {/* 1. NỘI DUNG CHÍNH (Vẫn giữ hiệu ứng mượt mà) */}
-      <div className="animate-fadeIn">
+      <div className="animate-fadeIn relative">
+        {toast.show && (
+          <div style={{
+            position: 'fixed', top: 24, right: 24, zIndex: 10000,
+            background: toast.type === 'success' ? '#10b981' : '#ef4444',
+            color: 'white', padding: '14px 24px', borderRadius: 8,
+            boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14
+          }}>
+            {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Quản lý tài liệu bài giảng</h1>
@@ -114,111 +137,89 @@ const Documents = () => {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="btn-primary text-sm"
+            className="btn-primary text-sm shadow-md"
           >
             + Thêm tài liệu
           </button>
         </div>
 
-        <div className="card p-5 mb-5">
+        <div className="card p-5 mb-5 shadow-sm border border-gray-100">
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1.5">Lớp học phần</label>
-              <select className="input-field">
-                <option>Tất cả lớp</option>
-                <option>014DHTH04</option>
+              <select className="input-field font-medium">
+                <option>014DHTH04 (Giả lập)</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1.5">Loại tài liệu</label>
-              <select className="input-field">
-                <option>Tất cả</option>
-                <option>Slide bài giảng</option>
-                <option>Bài tập</option>
-                <option>Đề thi</option>
+              <select className="input-field font-medium" value={filterType} onChange={e => setFilterType(e.target.value)}>
+                <option value="">Tất cả</option>
+                <option value="Slide bài giảng">Slide bài giảng</option>
+                <option value="Bài tập">Bài tập</option>
+                <option value="Đề thi">Đề thi</option>
               </select>
             </div>
             <div className="flex items-end">
-              <button className="btn-primary w-full">🔍 Tìm kiếm</button>
+              <button onClick={fetchMaterials} className="btn-primary w-full shadow-md hover:shadow-lg">
+                {loading ? '⏳ Đang tải...' : '🔍 Tìm kiếm'}
+              </button>
             </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="card p-4 hover:shadow-md transition-shadow cursor-pointer">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center text-red-500 text-lg flex-shrink-0">📊</div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-gray-800 text-sm truncate">Slide Chương 1 - Giới thiệu</h4>
-                <p className="text-xs text-gray-400 mt-0.5">Kiến trúc máy tính</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-xs text-gray-400">2.3 MB</span>
-                  <span className="text-xs text-gray-300">|</span>
-                  <span className="text-xs text-gray-400">15/01/2026</span>
+        {materials && materials.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {materials.map((mat) => {
+              const style = getIconForType(mat.docType);
+              return (
+                <div key={mat.id} className="card p-5 hover:shadow-lg transition-all cursor-pointer border border-gray-100 group">
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 ${style.bg} rounded-xl flex items-center justify-center ${style.color} text-2xl flex-shrink-0 group-hover:scale-110 transition-transform`}>
+                      {style.icon}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-800 text-sm truncate" title={mat.title}>{mat.title}</h4>
+                      <p className="text-xs font-bold text-purple-600 mt-1 uppercase tracking-wider">{mat.docType || 'Tài liệu'}</p>
+                      <div className="flex items-center gap-2 mt-2 font-medium">
+                        <span className="text-xs text-gray-500">{formatSize(mat.fileSize)}</span>
+                        <span className="text-xs text-gray-300">•</span>
+                        <span className="text-xs text-gray-500">{mat.uploadDate ? new Date(mat.uploadDate).toLocaleDateString('vi-VN') : 'Mới'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-2 mt-5 pt-4 border-t border-gray-50">
+                    <a href={`http://localhost:8080/api/lecturer/materials/${mat.id}/view`} target="_blank" rel="noreferrer" className="flex-1 text-xs px-2 py-2 bg-purple-50 text-purple-700 font-bold rounded-lg hover:bg-purple-100 flex items-center justify-center gap-1 transition-colors">
+                      <Eye className="w-3 h-3" /> Xem
+                    </a>
+                    <a href={`http://localhost:8080/api/lecturer/materials/${mat.id}/download`} className="flex-1 text-xs px-2 py-2 bg-blue-50 text-blue-700 font-bold rounded-lg hover:bg-blue-100 flex items-center justify-center gap-1 transition-colors">
+                      <Download className="w-3 h-3" /> Tải về
+                    </a>
+                    <button onClick={() => handleDelete(mat.id)} className="flex-1 text-xs px-2 py-2 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 flex items-center justify-center gap-1 transition-colors">
+                      <Trash2 className="w-3 h-3" /> Xóa
+                    </button>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="flex gap-1 mt-3">
-              <button className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded hover:bg-purple-100">👁 Xem</button>
-              <button className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100">📥 Tải</button>
-              <button className="text-xs px-2 py-1 bg-red-50 text-red-500 rounded hover:bg-red-100">🗑 Xóa</button>
-            </div>
+              );
+            })}
           </div>
-
-          <div className="card p-4 hover:shadow-md transition-shadow cursor-pointer">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-500 text-lg flex-shrink-0">📝</div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-gray-800 text-sm truncate">Bài tập Chương 2</h4>
-                <p className="text-xs text-gray-400 mt-0.5">QTHTM - 14DHTH04</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-xs text-gray-400">450 KB</span>
-                  <span className="text-xs text-gray-300">|</span>
-                  <span className="text-xs text-gray-400">20/01/2026</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-1 mt-3">
-              <button className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded">👁 Xem</button>
-              <button className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded">📥 Tải</button>
-              <button className="text-xs px-2 py-1 bg-red-50 text-red-500 rounded">🗑 Xóa</button>
-            </div>
+        ) : (
+          <div className="card p-10 text-center text-gray-400 font-medium flex flex-col items-center">
+            <FileText className="w-16 h-16 text-gray-200 mb-3" />
+            <p>{loading ? 'Đang tải dữ liệu đám mây...' : 'Chưa có tài liệu nào được tải lên.'}</p>
+            {!loading && <p className="text-sm mt-1">Bấm nút "Thêm tài liệu" ở góc trên để upload bài giảng.</p>}
           </div>
-
-          <div className="card p-4 hover:shadow-md transition-shadow cursor-pointer">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-green-500 text-lg flex-shrink-0">📋</div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-semibold text-gray-800 text-sm truncate">Đề cương môn học</h4>
-                <p className="text-xs text-gray-400 mt-0.5">Kiến trúc máy tính</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-xs text-gray-400">128 KB</span>
-                  <span className="text-xs text-gray-300">|</span>
-                  <span className="text-xs text-gray-400">01/01/2026</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-1 mt-3">
-              <button className="text-xs px-2 py-1 bg-purple-50 text-purple-600 rounded">👁 Xem</button>
-              <button className="text-xs px-2 py-1 bg-blue-50 text-blue-600 rounded">📥 Tải</button>
-              <button className="text-xs px-2 py-1 bg-red-50 text-red-500 rounded">🗑 Xóa</button>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
 
-      {/* 2. POPUP FORM NẰM BÊN NGOÀI ĐỂ KHÔNG BỊ NHỐT */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[9999] flex justify-center items-center bg-transparent pointer-events-auto">
-
+        <div className="fixed inset-0 z-[9999] flex justify-center items-center bg-black/40 backdrop-blur-sm pointer-events-auto">
           <div className="relative bg-white w-full max-w-xl rounded-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border border-gray-200 overflow-hidden transform transition-all animate-fadeIn">
-
             <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100 bg-gray-50/50">
               <h3 className="font-extrabold text-lg text-gray-800">Thêm tài liệu mới</h3>
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="text-gray-400 hover:text-red-500 bg-white hover:bg-red-50 p-1.5 rounded-lg transition-colors"
-                title="Đóng"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -229,18 +230,51 @@ const Documents = () => {
                 <label className="block text-[12px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Tên tài liệu</label>
                 <input
                   type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   className="w-full border-[1.5px] border-[#E0D8F0] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#8B6BBF] bg-gray-50/50 text-sm font-medium transition-colors"
                   placeholder="Nhập tên bài giảng, slide..."
                 />
               </div>
 
               <div>
+                <label className="block text-[12px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Phân loại</label>
+                <select 
+                  value={docType}
+                  onChange={(e) => setDocType(e.target.value)}
+                  className="w-full border-[1.5px] border-[#E0D8F0] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#8B6BBF] bg-gray-50/50 text-sm font-medium"
+                >
+                  <option value="Slide bài giảng">Slide bài giảng</option>
+                  <option value="Bài tập">Bài tập</option>
+                  <option value="Đề thi">Đề thi</option>
+                </select>
+              </div>
+
+              <div>
                 <label className="block text-[12px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">File đính kèm</label>
-                <div className="border-2 border-dashed border-[#E0D8F0] rounded-xl p-8 flex flex-col items-center justify-center text-gray-400 hover:bg-purple-50 hover:border-[#8B6BBF] transition-all cursor-pointer group">
-                    <UploadCloud className="w-10 h-10 mb-3 text-gray-300 group-hover:text-[#8B6BBF] transition-colors" />
-                    <span className="text-sm font-bold text-gray-500">Kéo thả file vào đây</span>
-                    <span className="text-xs mt-1">hoặc nhấn để duyệt file trên máy</span>
+                <div 
+                  onClick={() => fileInputRef.current.click()}
+                  className={`border-2 border-dashed ${file ? 'border-[#6B4FA0] bg-purple-50/50' : 'border-[#E0D8F0] hover:bg-purple-50'} rounded-xl p-8 flex flex-col items-center justify-center text-gray-400 transition-all cursor-pointer group`}
+                >
+                    <UploadCloud className={`w-10 h-10 mb-3 transition-colors ${file ? 'text-[#6B4FA0]' : 'text-gray-300 group-hover:text-[#8B6BBF]'}`} />
+                    {file ? (
+                      <div className="text-center">
+                        <span className="text-sm font-bold text-[#6B4FA0] block">{file.name}</span>
+                        <span className="text-xs text-gray-400 mt-1 block">{formatSize(file.size)}</span>
+                      </div>
+                    ) : (
+                      <>
+                        <span className="text-sm font-bold text-gray-500">Nhấn để duyệt file trên máy</span>
+                        <span className="text-xs mt-1 text-gray-400">(PDF, DOCX, PPTX, JPG...)</span>
+                      </>
+                    )}
                 </div>
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  className="hidden" 
+                  onChange={(e) => setFile(e.target.files[0])} 
+                />
               </div>
             </div>
 
@@ -251,12 +285,15 @@ const Documents = () => {
               >
                 Hủy bỏ
               </button>
-              <button className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#6B4FA0] to-[#8B6BBF] rounded-lg hover:shadow-md active:scale-95 transition-all">
-                Lưu tài liệu
+              <button 
+                onClick={handleUpload}
+                disabled={uploading}
+                className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#6B4FA0] to-[#8B6BBF] rounded-lg hover:shadow-md active:scale-95 transition-all shadow-purple-200"
+              >
+                {uploading ? '⏳ Đang tải lên mây...' : '💾 Lưu tài liệu'}
               </button>
             </div>
           </div>
-
         </div>
       )}
     </>
