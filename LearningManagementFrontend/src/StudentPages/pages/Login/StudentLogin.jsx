@@ -150,19 +150,19 @@ export default function StudentLogin() {
 
             {/* Mã SV */}
             <div className="sl-fu d2">
-              <label className="lbl">Mã sinh viên / Email</label>
+              <label className="lbl">Mã sinh viên</label>
               <div className="field">
                 <svg className="field-ico" style={{ color: '#94A3B8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 <input
                   className="inp"
                   type="text"
-                  placeholder="21IT001 hoặc sv@truong.edu.vn"
+                  placeholder="2001216301"
                   autoComplete="username"
                   value={email}
                   onChange={(e) => { setEmail(e.target.value); setErrorEmail(false); }}
                 />
               </div>
-              <div className={`err-msg ${errorEmail ? 'on' : ''}`}>Vui lòng nhập mã sinh viên hoặc email</div>
+              <div className={`err-msg ${errorEmail ? 'on' : ''}`}>Vui lòng nhập mã sinh viên</div>
             </div>
 
             {/* Mật khẩu */}

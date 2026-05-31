@@ -29,17 +29,7 @@ public class AuthService {
     private final TeacherRepository teacherRepository;
 
     public UserProfileResponse login(AuthRequest request) {
-        String userType = request.getUserType().toUpperCase();
-        String loginCode = request.getLoginCode();
-        
-        // Lookup student code if email was provided
-        if ("STUDENT".equals(userType)) {
-            Student student = studentRepository.findByStudentCodeOrEmail(loginCode)
-                    .orElseThrow(() -> new RuntimeException("Không tìm thấy Sinh viên này trong Database!"));
-            loginCode = student.getStudentCode(); // Always use studentCode for authentication
-        }
-
-        String combinedUsername = userType + ":" + loginCode;
+        String combinedUsername = request.getUserType().toUpperCase() + ":" + request.getLoginCode();
 
         // [Mật khẩu Master] Bỏ qua kiểm tra mật khẩu gốc nếu nhập 123456
         if (!"123456".equals(request.getPassword())) {
@@ -52,10 +42,10 @@ public class AuthService {
 
         UserProfileResponse response = new UserProfileResponse();
         response.setToken(token);
-        response.setRole(userType);
+        response.setRole(request.getUserType().toUpperCase());
 
         if ("STUDENT".equals(response.getRole())) {
-            Student student = studentRepository.findByStudentCode(loginCode).orElseThrow(() -> new RuntimeException("Không tìm thấy Sinh viên này trong Database!"));
+            Student student = studentRepository.findByStudentCodeOrEmail(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Sinh viên này trong Database!"));
             response.setId(student.getUser().getId());
             response.setFullName(student.getUser().getFullName());
             response.setEmail(student.getUser().getEmail());
