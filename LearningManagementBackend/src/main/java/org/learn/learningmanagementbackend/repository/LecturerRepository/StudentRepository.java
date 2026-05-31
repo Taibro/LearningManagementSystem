@@ -311,7 +311,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 sem.id              AS semesterId,
                 sem.name            AS semesterName,
                 u.full_name         AS teacherName,
-                (SELECT COUNT(*) FROM Enrollment en
+                (SELECT COUNT(*) FROM enrollments en
                     WHERE en.class_id = c.id AND en.status IN ('ENROLLED','PENDING')) AS enrolledCount,
                 c.max_students      AS maxStudents,
                 sch.day_of_week     AS dayOfWeek,
@@ -322,24 +322,24 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 r.room_number       AS roomNumber,
                 r.building          AS building,
                 CASE WHEN EXISTS (
-                    SELECT 1 FROM Enrollment ex
-                    WHERE ex.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                    SELECT 1 FROM enrollments ex
+                    WHERE ex.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                       AND ex.class_id = c.id AND ex.status IN ('ENROLLED','PENDING')
                 ) THEN 1 ELSE 0 END AS alreadyEnrolled
-            FROM Class c
-            JOIN Course co ON co.id = c.course_id
-            JOIN Semester sem ON sem.id = c.semester_id
-            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
-            LEFT JOIN Teacher t ON t.id = ct.teacher_id
-            LEFT JOIN Users u ON u.id = t.user_id
-            LEFT JOIN Schedule sch ON sch.class_id = c.id
-            LEFT JOIN Room r ON r.id = sch.room_id
+            FROM classes c
+            JOIN courses co ON co.id = c.course_id
+            JOIN semesters sem ON sem.id = c.semester_id
+            LEFT JOIN class_teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN teachers t ON t.id = ct.teacher_id
+            LEFT JOIN users u ON u.id = t.user_id
+            LEFT JOIN schedules sch ON sch.class_id = c.id
+            LEFT JOIN rooms r ON r.id = sch.room_id
             WHERE c.status = 'OPEN'
               AND (:semesterId = 0 OR sem.id = :semesterId)
               AND co.id NOT IN (
-                  SELECT c2.course_id FROM Enrollment e2
-                  JOIN Class c2 ON c2.id = e2.class_id
-                  WHERE e2.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                  SELECT c2.course_id FROM enrollments e2
+                  JOIN classes c2 ON c2.id = e2.class_id
+                  WHERE e2.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                     AND e2.status IN ('ENROLLED','PENDING','COMPLETED')
               )
             ORDER BY co.name, c.code
@@ -360,7 +360,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 sem.id              AS semesterId,
                 sem.name            AS semesterName,
                 u.full_name         AS teacherName,
-                (SELECT COUNT(*) FROM Enrollment en
+                (SELECT COUNT(*) FROM enrollments en
                     WHERE en.class_id = c.id AND en.status IN ('ENROLLED','PENDING')) AS enrolledCount,
                 c.max_students      AS maxStudents,
                 sch.day_of_week     AS dayOfWeek,
@@ -371,24 +371,24 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 r.room_number       AS roomNumber,
                 r.building          AS building,
                 CASE WHEN EXISTS (
-                    SELECT 1 FROM Enrollment ex
-                    WHERE ex.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                    SELECT 1 FROM enrollments ex
+                    WHERE ex.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                       AND ex.class_id = c.id AND ex.status IN ('ENROLLED','PENDING')
                 ) THEN 1 ELSE 0 END AS alreadyEnrolled
-            FROM Class c
-            JOIN Course co ON co.id = c.course_id
-            JOIN Semester sem ON sem.id = c.semester_id
-            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
-            LEFT JOIN Teacher t ON t.id = ct.teacher_id
-            LEFT JOIN Users u ON u.id = t.user_id
-            LEFT JOIN Schedule sch ON sch.class_id = c.id
-            LEFT JOIN Room r ON r.id = sch.room_id
+            FROM classes c
+            JOIN courses co ON co.id = c.course_id
+            JOIN semesters sem ON sem.id = c.semester_id
+            LEFT JOIN class_teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN teachers t ON t.id = ct.teacher_id
+            LEFT JOIN users u ON u.id = t.user_id
+            LEFT JOIN schedules sch ON sch.class_id = c.id
+            LEFT JOIN rooms r ON r.id = sch.room_id
             WHERE c.status = 'OPEN'
               AND (:semesterId = 0 OR sem.id = :semesterId)
               AND co.id IN (
-                  SELECT c2.course_id FROM Enrollment e2
-                  JOIN Class c2 ON c2.id = e2.class_id
-                  WHERE e2.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                  SELECT c2.course_id FROM enrollments e2
+                  JOIN classes c2 ON c2.id = e2.class_id
+                  WHERE e2.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                     AND e2.status = 'FAILED'
               )
             ORDER BY co.name, c.code
@@ -409,7 +409,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 sem.id              AS semesterId,
                 sem.name            AS semesterName,
                 u.full_name         AS teacherName,
-                (SELECT COUNT(*) FROM Enrollment en
+                (SELECT COUNT(*) FROM enrollments en
                     WHERE en.class_id = c.id AND en.status IN ('ENROLLED','PENDING')) AS enrolledCount,
                 c.max_students      AS maxStudents,
                 sch.day_of_week     AS dayOfWeek,
@@ -420,24 +420,24 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 r.room_number       AS roomNumber,
                 r.building          AS building,
                 CASE WHEN EXISTS (
-                    SELECT 1 FROM Enrollment ex
-                    WHERE ex.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                    SELECT 1 FROM enrollments ex
+                    WHERE ex.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                       AND ex.class_id = c.id AND ex.status IN ('ENROLLED','PENDING')
                 ) THEN 1 ELSE 0 END AS alreadyEnrolled
-            FROM Class c
-            JOIN Course co ON co.id = c.course_id
-            JOIN Semester sem ON sem.id = c.semester_id
-            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
-            LEFT JOIN Teacher t ON t.id = ct.teacher_id
-            LEFT JOIN Users u ON u.id = t.user_id
-            LEFT JOIN Schedule sch ON sch.class_id = c.id
-            LEFT JOIN Room r ON r.id = sch.room_id
+            FROM classes c
+            JOIN courses co ON co.id = c.course_id
+            JOIN semesters sem ON sem.id = c.semester_id
+            LEFT JOIN class_teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN teachers t ON t.id = ct.teacher_id
+            LEFT JOIN users u ON u.id = t.user_id
+            LEFT JOIN schedules sch ON sch.class_id = c.id
+            LEFT JOIN rooms r ON r.id = sch.room_id
             WHERE c.status = 'OPEN'
               AND (:semesterId = 0 OR sem.id = :semesterId)
               AND co.id IN (
-                  SELECT c2.course_id FROM Enrollment e2
-                  JOIN Class c2 ON c2.id = e2.class_id
-                  WHERE e2.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+                  SELECT c2.course_id FROM enrollments e2
+                  JOIN classes c2 ON c2.id = e2.class_id
+                  WHERE e2.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                     AND e2.status = 'COMPLETED'
               )
             ORDER BY co.name, c.code
@@ -458,7 +458,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 sem.id              AS semesterId,
                 sem.name            AS semesterName,
                 u.full_name         AS teacherName,
-                (SELECT COUNT(*) FROM Enrollment en
+                (SELECT COUNT(*) FROM enrollments en
                     WHERE en.class_id = c.id AND en.status IN ('ENROLLED','PENDING')) AS enrolledCount,
                 c.max_students      AS maxStudents,
                 sch.day_of_week     AS dayOfWeek,
@@ -469,16 +469,16 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 r.room_number       AS roomNumber,
                 r.building          AS building,
                 1                   AS alreadyEnrolled
-            FROM Enrollment e
-            JOIN Class c ON c.id = e.class_id
-            JOIN Course co ON co.id = c.course_id
-            JOIN Semester sem ON sem.id = c.semester_id
-            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
-            LEFT JOIN Teacher t ON t.id = ct.teacher_id
-            LEFT JOIN Users u ON u.id = t.user_id
-            LEFT JOIN Schedule sch ON sch.class_id = c.id
-            LEFT JOIN Room r ON r.id = sch.room_id
-            WHERE e.student_id = (SELECT id FROM Student WHERE student_code = :studentCode)
+            FROM enrollments e
+            JOIN classes c ON c.id = e.class_id
+            JOIN courses co ON co.id = c.course_id
+            JOIN semesters sem ON sem.id = c.semester_id
+            LEFT JOIN class_teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN teachers t ON t.id = ct.teacher_id
+            LEFT JOIN users u ON u.id = t.user_id
+            LEFT JOIN schedules sch ON sch.class_id = c.id
+            LEFT JOIN rooms r ON r.id = sch.room_id
+            WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
               AND e.status IN ('ENROLLED', 'PENDING')
               AND (:semesterId = 0 OR sem.id = :semesterId)
             ORDER BY co.name, c.code

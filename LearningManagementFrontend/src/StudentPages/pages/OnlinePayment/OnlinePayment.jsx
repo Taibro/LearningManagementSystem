@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getDebtDetail, getSemesters, createPayment } from '../../studentApi';
+import { getDebtDetail, getSemesters, createPayment, getPayments } from '../../studentApi';
 
 const fmt = (n) => n != null ? Number(n).toLocaleString('vi-VN') : '0';
 
@@ -31,9 +31,19 @@ export default function OnlinePayment() {
 
   useEffect(() => {
     setLoading(true);
-    getDebtDetail(semId || 0)
-      .then(data => {
-        setRows(data || []);
+    Promise.all([getDebtDetail(semId || 0), getPayments()])
+      .then(([debtData, payments]) => {
+        const pendingPayments = payments.filter(p => p.status === 'PENDING');
+        let lockedClassCodes = new Set();
+        pendingPayments.forEach(p => {
+          try {
+            const courseData = JSON.parse(p.courseData || '[]');
+            courseData.forEach(c => lockedClassCodes.add(c.classCode));
+          } catch (e) {}
+        });
+
+        const filteredDebt = (debtData || []).filter(r => !lockedClassCodes.has(r.classCode));
+        setRows(filteredDebt);
         setChecked({});
         setLoading(false);
       })
@@ -98,6 +108,50 @@ export default function OnlinePayment() {
       navigate(`/payment-processing/${qrModal.paymentId}`);
     }
   };
+
+  const handleDownloadQR = () => {
+    if (!qrModal) return;
+    const qrUrl = `https://img.vietqr.io/image/vcb-1041516278-compact2.png?amount=1000&addInfo=${qrModal.transactionCode}&accountName=PHAN%20SI%20THINH`;
+    
+    // Create an invisible anchor tag to trigger download
+    fetch(qrUrl)
+      .then(response => response.blob())
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
+        a.download = `QR_ThanhToan_${qrModal.transactionCode}.png`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(err => console.error('Lỗi khi tải QR:', err));
+  };
+
+  // Secret trick for Demo
+  const handleSecretDemoSuccess = () => {
+    if (!qrModal) return;
+    // Call the force-success API
+    fetch(`http://localhost:8080/api/student/payment/${qrModal.paymentId}/force-success`)
+      .then(res => {
+        if(res.ok) {
+           // Close QR modal, which will navigate to PaymentProcessing, which will then see SUCCESS
+           closeQR();
+        }
+      });
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Secret shortcut: Shift + S
+      if (e.shiftKey && (e.key === 'S' || e.key === 's') && qrModal) {
+        handleSecretDemoSuccess();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [qrModal]);
 
   return (
     <div className="page active">
@@ -226,9 +280,9 @@ export default function OnlinePayment() {
 
       {/* Modal QR Code */}
       {qrModal && (
-        <div style={{ position: 'fixed', inset: 0, background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-          <div style={{ background: 'white', borderRadius: 8, padding: '20px', width: 450, boxShadow: '0 20px 60px #0004', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 8, color: '#334155' }}>
+        <div style={{ position: 'fixed', inset: 0, background: '#0008', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '20px' }}>
+          <div style={{ background: 'white', borderRadius: 8, padding: '20px', width: 450, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px #0004', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 8, color: '#334155', textAlign: 'center' }}>
               Quét bằng ứng dụng ngân hàng để thanh toán
             </div>
             <div style={{ fontSize: 13, marginBottom: 16 }}>
@@ -242,11 +296,20 @@ export default function OnlinePayment() {
               <div style={{ position: 'absolute', bottom: -2, left: -2, width: 20, height: 20, borderBottom: '4px solid #ef4444', borderLeft: '4px solid #ef4444' }} />
               <div style={{ position: 'absolute', bottom: -2, right: -2, width: 20, height: 20, borderBottom: '4px solid #ef4444', borderRight: '4px solid #ef4444' }} />
               
-              <div style={{ textAlign: 'center', marginBottom: 8, fontWeight: 700, color: '#0f172a', fontSize: 18 }}>VIET<span style={{ color: '#ef4444' }}>QR</span></div>
-              <img src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg" alt="QR" style={{ width: 180, height: 180 }} />
+              <div 
+                style={{ textAlign: 'center', marginBottom: 8, fontWeight: 700, color: '#0f172a', fontSize: 18, cursor: 'default' }}
+                onDoubleClick={handleSecretDemoSuccess}
+              >
+                VIET<span style={{ color: '#ef4444' }}>QR</span> / MoMo
+              </div>
+              <img 
+                src={`https://img.vietqr.io/image/vcb-1041516278-compact2.png?amount=1000&addInfo=${qrModal.transactionCode}&accountName=PHAN%20SI%20THINH`} 
+                alt="QR Code" 
+                style={{ width: '100%', height: 'auto', borderRadius: 8 }} 
+              />
               <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: 8 }}>
                 <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-Napas.png" alt="Napas" style={{ height: 20 }} />
-                <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 600, color: '#2563eb' }}>Scan to Pay</span>
+                <span style={{ marginLeft: 8, fontSize: 12, fontWeight: 600, color: '#2563eb' }}>Quét bằng MoMo hoặc App Ngân hàng</span>
               </div>
             </div>
 
@@ -254,14 +317,18 @@ export default function OnlinePayment() {
               <tbody>
                 <tr><td style={{ color: '#64748b', paddingBottom: 4 }}>Mã tra cứu:</td><td style={{ textAlign: 'right', fontWeight: 600, color: '#334155', paddingBottom: 4 }}>{qrModal.transactionCode} 📋</td></tr>
                 <tr><td style={{ color: '#64748b', paddingBottom: 4 }}>Ngân hàng:</td><td style={{ textAlign: 'right', fontWeight: 600, color: '#334155', paddingBottom: 4 }}>{qrModal.bankName}</td></tr>
-                <tr><td style={{ color: '#64748b', paddingBottom: 4 }}>Tên tải khoản:</td><td style={{ textAlign: 'right', fontWeight: 600, color: '#334155', paddingBottom: 4 }}>TRUONG DAI HOC CONG THUONG</td></tr>
-                <tr><td style={{ color: '#64748b', paddingBottom: 4 }}>Tổng tiền thanh toán:</td><td style={{ textAlign: 'right', fontWeight: 700, color: '#ea580c', fontSize: 15, paddingBottom: 4 }}>{fmt(qrModal.amount)} VNĐ</td></tr>
+                <tr><td style={{ color: '#64748b', paddingBottom: 4 }}>Tên tài khoản:</td><td style={{ textAlign: 'right', fontWeight: 600, color: '#334155', paddingBottom: 4 }}>PHAN SI THINH</td></tr>
+                <tr><td style={{ color: '#64748b', paddingBottom: 4 }}>Số tiền thực tế:</td><td style={{ textAlign: 'right', fontWeight: 700, color: '#ea580c', fontSize: 15, paddingBottom: 4 }}>{fmt(qrModal.amount)} VNĐ</td></tr>
+                <tr><td style={{ color: '#64748b', paddingBottom: 4 }}>Số tiền Demo (Thử nghiệm):</td><td style={{ textAlign: 'right', fontWeight: 700, color: '#16a34a', fontSize: 15, paddingBottom: 4 }}>1.000 VNĐ</td></tr>
                 <tr><td style={{ color: '#64748b' }}>Mã GD:</td><td style={{ textAlign: 'right', fontWeight: 600, color: '#334155' }}>{qrModal.transactionCode}</td></tr>
               </tbody>
             </table>
 
             <div style={{ display: 'flex', gap: 12 }}>
-              <button style={{ background: '#1e3a8a', color: 'white', border: 'none', padding: '8px 24px', borderRadius: 4, fontWeight: 600, cursor: 'pointer' }}>
+              <button 
+                onClick={handleDownloadQR}
+                style={{ background: '#1e3a8a', color: 'white', border: 'none', padding: '8px 24px', borderRadius: 4, fontWeight: 600, cursor: 'pointer' }}
+              >
                 Tải QR-Code
               </button>
               <button style={{ background: 'white', color: '#475569', border: '1px solid #cbd5e1', padding: '8px 24px', borderRadius: 4, fontWeight: 600, cursor: 'pointer' }} onClick={closeQR}>
