@@ -45,7 +45,7 @@ public class AuthService {
         response.setRole(request.getUserType().toUpperCase());
 
         if ("STUDENT".equals(response.getRole())) {
-            Student student = studentRepository.findByStudentCode(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Sinh viên này trong Database!"));
+            Student student = studentRepository.findByStudentCodeOrEmail(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Sinh viên này trong Database!"));
             response.setId(student.getUser().getId());
             response.setFullName(student.getUser().getFullName());
             response.setEmail(student.getUser().getEmail());

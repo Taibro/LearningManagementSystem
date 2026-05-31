@@ -17,6 +17,9 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     @Query("SELECT s FROM Student s JOIN FETCH s.user WHERE s.studentCode = :code")
     Optional<Student> findByStudentCode(@Param("code") String code);
 
+    @Query("SELECT s FROM Student s JOIN FETCH s.user u WHERE s.studentCode = :code OR u.email = :code")
+    Optional<Student> findByStudentCodeOrEmail(@Param("code") String code);
+
     // ── PROFILE ──────────────────────────────────────────────
     @Query("""
             SELECT
