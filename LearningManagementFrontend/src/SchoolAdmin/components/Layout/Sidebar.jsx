@@ -5,12 +5,12 @@ export default function Sidebar() {
   const navClass = ({ isActive }) => `nav-item ${isActive ? 'active' : ''}`;
   
   // Lấy dữ liệu từ LocalStorage
-  const schoolId = localStorage.getItem('schoolId') || 'hcmut';
+  const schoolId = parseInt(localStorage.getItem('schoolId')) || 0;
   const adminName = localStorage.getItem('adminName') || 'Quản trị viên';
-  const adminEmail = localStorage.getItem('adminEmail') || 'admin@hcmut.edu.vn';
+  const adminEmail = localStorage.getItem('adminEmail') || '';
   
-  // Xác định thông tin trường
-  const isHuit = schoolId === 'huit';
+  // Xác định thông tin trường: school_id=1 là HUIT, school_id=2 là HCMUT
+  const isHuit = schoolId === 1;
   const schoolName = isHuit ? 'ĐH Công Thương TP.HCM' : 'ĐH Bách Khoa HCM';
   const schoolBadge = isHuit ? 'HUIT' : 'BK';
   

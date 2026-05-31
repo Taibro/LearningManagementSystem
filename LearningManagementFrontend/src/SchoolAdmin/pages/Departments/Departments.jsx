@@ -17,8 +17,7 @@ export default function Departments() {
     setTimeout(() => setToast({ show: false, msg: '', type: 'success' }), 3000);
   };
 
-  // schoolId tạm fix = 1, sau khi có JWT sẽ lấy từ token
-  const schoolId = 1;
+  const schoolId = localStorage.getItem('schoolId') || 1;
 
   const fetchDepartments = async () => {
     setLoading(true);

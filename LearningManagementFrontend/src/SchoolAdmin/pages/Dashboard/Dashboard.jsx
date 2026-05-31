@@ -37,7 +37,7 @@ export default function Dashboard() {
     <div className="page">
       <div className="ph mb6">
         <div>
-          <div className="ph-title">Tổng quan · {localStorage.getItem('schoolId') === 'huit' ? 'Trường ĐH Công Thương TP.HCM' : 'Trường ĐH Bách Khoa TP.HCM'}</div>
+          <div className="ph-title">Tổng quan · {localStorage.getItem('schoolId') === '1' ? 'Trường ĐH Công Thương TP.HCM' : 'Trường ĐH Bách Khoa TP.HCM'}</div>
           <div className="ph-sub">Cập nhật lúc: {new Date().toLocaleTimeString('vi-VN')} · Thống kê thời gian thực</div>
         </div>
         <button className="btn btn-blue" onClick={() => alert('Đã xuất báo cáo tổng hợp PDF')}>📄 Xuất báo cáo</button>

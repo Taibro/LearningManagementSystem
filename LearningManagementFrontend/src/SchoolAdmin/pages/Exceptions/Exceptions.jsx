@@ -24,7 +24,10 @@ export default function Exceptions() {
 
   const fetchExceptions = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedule-exceptions`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedule-exceptions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setExceptions(data);
@@ -36,8 +39,10 @@ export default function Exceptions() {
 
   const fetchSchedules = async () => {
     try {
-      // Tạm load tất cả schedule của lớp ID=1 (Giả định)
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedules/class/1`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedules`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setSchedules(data);

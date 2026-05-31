@@ -23,7 +23,7 @@ export default function Topbar() {
   return (
     <header className="admin-topbar">
       <div className="breadcrumb">
-        <span className="bc-root">🏫 {localStorage.getItem('schoolId') === 'huit' ? 'HUIT' : 'HCMUT'}</span>
+        <span className="bc-root">🏫 {localStorage.getItem('schoolId') === '1' ? 'HUIT' : 'HCMUT'}</span>
         <span className="bc-sep">/</span>
         <span className="bc-cur">Dashboard</span>
       </div>

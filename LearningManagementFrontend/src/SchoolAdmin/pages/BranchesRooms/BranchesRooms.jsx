@@ -13,7 +13,7 @@ export default function BranchesRooms() {
   const [currentBranch, setCurrentBranch] = useState({ id: null, code: '', name: '', address: '', city: '', district: '', phone: '', email: '', isMain: false, isActive: true });
   const [currentRoom, setCurrentRoom] = useState({ id: null, schoolBranchId: '', roomNumber: '', building: '', roomType: 'CLASSROOM', capacity: 40, equipments: '', isActive: true });
 
-  const SCHOOL_ID = 1; // Giả định ID trường học hiện tại
+  const SCHOOL_ID = localStorage.getItem('schoolId') || 1;
 
   useEffect(() => {
     fetchBranches();
@@ -26,7 +26,10 @@ export default function BranchesRooms() {
 
   const fetchBranches = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/branches/school/${SCHOOL_ID}`);
+      const token = localStorage.getItem('token');
+      const res = await fetch(`http://localhost:8080/api/auth/school-admin/branches/school/${SCHOOL_ID}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setBranches(data);
@@ -38,10 +41,13 @@ export default function BranchesRooms() {
   };
 
   const fetchAllRooms = async (branchesList) => {
+    const token = localStorage.getItem('token');
     let allRooms = [];
     for (let branch of branchesList) {
       try {
-        const res = await fetch(`http://localhost:8080/api/auth/school-admin/rooms/branch/${branch.id}`);
+        const res = await fetch(`http://localhost:8080/api/auth/school-admin/rooms/branch/${branch.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         if (res.ok) {
           const data = await res.json();
           allRooms = [...allRooms, ...data];

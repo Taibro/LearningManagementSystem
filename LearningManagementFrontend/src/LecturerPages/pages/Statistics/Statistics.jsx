@@ -41,10 +41,11 @@ const Statistics = () => {
     );
   }
 
-  // Calculate max period to render chart height properly (if data exists, max at least 100)
-  const maxPeriods = data.chartData && data.chartData.length > 0 
-    ? Math.max(...data.chartData.map(d => d.periods), 100) 
-    : 100;
+  const actualMax = data.chartData && data.chartData.length > 0 
+    ? Math.max(...data.chartData.map(d => d.periods)) 
+    : 0;
+  // Cân đối lại maxPeriods để biểu đồ không bị quá lùn nếu số tiết ít
+  const maxPeriods = actualMax > 0 ? Math.max(actualMax * 1.2, 20) : 100;
 
   return (
     <div className="animate-fadeIn pb-10">
@@ -78,15 +79,13 @@ const Statistics = () => {
                 // Highlight the current/highest month loosely
                 const isHighlight = chartItem.periods === Math.max(...data.chartData.map(d => d.periods));
                 return (
-                  <div key={i} className="flex flex-col items-center gap-3 flex-1 group">
-                    <div className="relative w-full flex justify-center items-end h-full">
-                      <div
-                        className={`w-full max-w-[40px] rounded-t-lg transition-all duration-300 cursor-pointer ${isHighlight ? 'bg-[#6B4FA0]' : chartItem.periods < 20 ? 'bg-gray-100' : 'bg-[#8B6BBF] opacity-50 hover:opacity-100'}`}
-                        style={{ height: `${Math.max(5, heightPercent)}%` }} // min 5% height to show it exists
-                      >
-                        <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap">
-                          {chartItem.periods} tiết
-                        </div>
+                  <div key={i} className="flex flex-col justify-end items-center gap-3 flex-1 group h-full">
+                    <div
+                      className={`relative w-full max-w-[40px] rounded-t-lg transition-all duration-300 cursor-pointer ${isHighlight ? 'bg-[#6B4FA0]' : chartItem.periods < 20 ? 'bg-[#8B6BBF] opacity-40 hover:opacity-100' : 'bg-[#8B6BBF] opacity-80 hover:opacity-100'}`}
+                      style={{ height: `${Math.max(10, heightPercent)}%` }} // min 10% height to show it exists
+                    >
+                      <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap z-10 pointer-events-none">
+                        {chartItem.periods} tiết
                       </div>
                     </div>
                     <span className="text-[11px] font-bold text-gray-400">{chartItem.month}</span>

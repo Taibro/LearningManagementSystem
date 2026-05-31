@@ -22,16 +22,17 @@ export default function Courses() {
     setTimeout(() => setToast({ show: false, msg: '', type: 'success' }), 3000);
   };
 
-  const schoolId = 1; // Fix tạm cứng schoolId cho trang Admin
+  const schoolId = localStorage.getItem('schoolId') || 1;
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
       // Gọi cả 2 API cùng lúc cho nhanh
+      const token = localStorage.getItem('token');
       const [resCourses, resDepts] = await Promise.all([
-        fetch(`${API_COURSE}/get-all`),
-        fetch(`${API_DEPT}/get-all-departments?schoolId=${schoolId}`)
+        fetch(`${API_COURSE}/get-all`, { headers: { 'Authorization': `Bearer ${token}` } }),
+        fetch(`${API_DEPT}/get-all-departments?schoolId=${schoolId}`, { headers: { 'Authorization': `Bearer ${token}` } })
       ]);
 
       if (!resCourses.ok || !resDepts.ok) throw new Error('Lỗi khi tải dữ liệu từ Server');

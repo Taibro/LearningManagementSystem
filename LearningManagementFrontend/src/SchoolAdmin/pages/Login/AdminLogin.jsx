@@ -13,7 +13,7 @@ export default function AdminLogin() {
   // Input States
   const [sSchool, setSSchool] = useState('');
   const [sEmail, setSEmail] = useState('admin@hcmut.edu.vn');
-  const [sPass, setSPass] = useState('Admin@123');
+  const [sPass, setSPass] = useState('123456');
   const [sShowPass, setSShowPass] = useState(false);
   const [sLoading, setSLoading] = useState(false);
   const [sError, setSError] = useState('');
@@ -57,8 +57,8 @@ export default function AdminLogin() {
         localStorage.setItem('token', data.token); // QUAN TRỌNG: LƯU TOKEN
         localStorage.setItem('adminName', data.fullName || 'Admin');
         localStorage.setItem('adminEmail', data.email || '');
-        // Lưu luôn mã trường vừa chọn (huit, hcmut...)
-        localStorage.setItem('schoolId', sSchool);
+        // Lưu luôn mã trường được Backend trả về thay vì mã UI
+        localStorage.setItem('schoolId', data.schoolId || '');
         
         setSchoolView('otp');
         addToast(`Đăng nhập thành công, đang chuyển hướng...`, 'green');

@@ -13,7 +13,7 @@ export default function Semesters() {
   const [currentAy, setCurrentAy] = useState({ id: null, name: '', startDate: '', endDate: '', isActive: true });
   const [currentSem, setCurrentSem] = useState({ id: null, academicYearId: '', name: '', startDate: '', endDate: '', isActive: true });
 
-  const SCHOOL_ID = 1; // Giả định ID trường học hiện tại
+  const SCHOOL_ID = localStorage.getItem('schoolId') || 1;
 
   useEffect(() => {
     fetchAcademicYears();

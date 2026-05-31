@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useLecturerContext } from '../../context/LecturerContext';
 
 const Dashboard = () => {
   const [stats, setStats] = useState(null);

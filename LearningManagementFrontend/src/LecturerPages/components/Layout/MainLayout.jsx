@@ -1,10 +1,41 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { useLecturerContext } from '../../context/LecturerContext';
 
 const MainLayout = () => {
-  const { classes, activeClass, setActiveClass } = useLecturerContext();
+  const { classes, activeClass, setActiveClass, loadClasses } = useLecturerContext();
+
+  useEffect(() => {
+    if (!classes || classes.length === 0) {
+      const token = localStorage.getItem('lecturerToken');
+      if (token) {
+        fetch('http://localhost:8080/api/lecturer/schedules/progress-schedule', {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (Array.isArray(data)) {
+            const uniqueClasses = [];
+            const classIds = new Set();
+            data.forEach(item => {
+              if (item.classId && !classIds.has(item.classId)) {
+                classIds.add(item.classId);
+                uniqueClasses.push({
+                  classId: item.classId,
+                  className: item.classCode || item.subjectName
+                });
+              }
+            });
+            if (uniqueClasses.length > 0) {
+               loadClasses(uniqueClasses);
+            }
+          }
+        })
+        .catch(err => console.error("Error loading classes globally:", err));
+      }
+    }
+  }, [classes, loadClasses]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-100">
