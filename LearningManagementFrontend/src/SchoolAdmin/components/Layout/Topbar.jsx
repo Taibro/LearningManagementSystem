@@ -24,7 +24,7 @@ export default function Topbar() {
   return (
     <header className="admin-topbar">
       <div className="breadcrumb">
-        <span className="bc-root"><School className="w-4 h-4 inline-block mr-2" /> {localStorage.getItem('schoolId') === 'huit' ? 'HUIT' : 'HCMUT'}</span>
+        <span className="bc-root"><School className="w-4 h-4 inline-block mr-2" /> {localStorage.getItem('schoolName') || 'Trường học'}</span>
         <span className="bc-sep">/</span>
         <span className="bc-cur">Dashboard</span>
       </div>

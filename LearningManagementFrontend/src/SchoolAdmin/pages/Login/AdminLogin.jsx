@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SearchableSelect from '../../../components/SearchableSelect';
 import './AdminLogin.css';
 import { BarChart, Check, CheckCircle2, XCircle, GraduationCap, School, AlertTriangle, Info, PartyPopper, Rocket, Globe, Mail, Lock, EyeOff, Eye, Circle, Upload, Hand, Shield, Zap } from 'lucide-react';
 
@@ -14,6 +15,7 @@ export default function AdminLogin() {
   // Input States
   const [sEmail, setSEmail] = useState('admin@hcmut.edu.vn');
   const [sPass, setSPass] = useState('Admin@123');
+  const [school, setSchool] = useState('');
   const [sShowPass, setSShowPass] = useState(false);
   const [sLoading, setSLoading] = useState(false);
   const [sError, setSError] = useState('');
@@ -38,6 +40,7 @@ export default function AdminLogin() {
   // --- Handlers ---
   const handleSchoolLogin = async () => {
     setSError('');
+    if (!school) return setSError('Vui lòng chọn trường học.');
     if (!sEmail) return setSError('Vui lòng nhập email đăng nhập.');
     if (!sPass) return setSError('Vui lòng nhập mật khẩu.');
 
@@ -56,6 +59,17 @@ export default function AdminLogin() {
         localStorage.setItem('token', data.token); // QUAN TRỌNG: LƯU TOKEN
         localStorage.setItem('adminName', data.fullName || 'Admin');
         localStorage.setItem('adminEmail', data.email || '');
+
+        const schoolOptions = [
+          { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
+          { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
+          { value: 'FPT', label: 'CĐ FPT Polytechnic' },
+          { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
+          { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
+        ];
+        const selectedSchool = schoolOptions.find(s => s.value === school);
+        if (selectedSchool) localStorage.setItem('schoolName', selectedSchool.label);
+
 
         setSchoolView('otp');
         addToast(`Đăng nhập thành công, đang chuyển hướng...`, 'green');
@@ -156,6 +170,23 @@ export default function AdminLogin() {
 
           {schoolView === 'main' && (
             <div className="school-body">
+              <div style={{ position: 'relative', zIndex: 10, marginBottom: 14 }}>
+                <label className="fl text-[#64748b] mb-1.5">Trường / Trung tâm</label>
+                <SearchableSelect 
+                  options={[
+                    { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
+                    { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
+                    { value: 'FPT', label: 'CĐ FPT Polytechnic' },
+                    { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
+                    { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
+                  ]}
+                  value={school}
+                  onChange={setSchool}
+                  icon={<School className="w-4 h-4 inline-block mr-2" />}
+                  triggerStyle={{ background: '#fff', border: '1px solid #e2e8f0', height: '44px', borderRadius: '10px' }}
+                />
+              </div>
+
               <div style={{ marginBottom: 14 }}>
                 <label className="fl text-[#64748b] mb-1.5">Email đăng nhập</label>
                 <div className="inp-wrap">

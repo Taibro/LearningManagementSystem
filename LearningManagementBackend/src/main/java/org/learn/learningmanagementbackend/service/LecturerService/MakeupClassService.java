@@ -7,8 +7,13 @@ import org.learn.learningmanagementbackend.dto.response.MakeupHistoryResponse;
 import org.learn.learningmanagementbackend.enums.MakeupStatus;
 import org.learn.learningmanagementbackend.model.ScheduleException;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.ScheduleExceptionRepository;
+import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.NotificationRepository;
+import org.learn.learningmanagementbackend.model.Notification;
+import org.learn.learningmanagementbackend.model.Users;
+import org.learn.learningmanagementbackend.enums.NotificationType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -19,6 +24,8 @@ import java.util.stream.Collectors;
 public class MakeupClassService {
 
     private final ScheduleExceptionRepository exceptionRepository;
+    private final NotificationRepository notificationRepository;
+    private final EntityManager entityManager;
 
     // 1. Lấy dữ liệu Dropdown Buổi nghỉ gốc
     public List<CancelledSessionResponse> getAvailableCancelledSessions(String teacherCode) {
@@ -54,7 +61,30 @@ public class MakeupClassService {
 
         exception.setMakeupStatus(MakeupStatus.PENDING);
 
-        exceptionRepository.save(exception);
+        ScheduleException savedException = exceptionRepository.save(exception);
+
+        // Notify School Admins
+        try {
+            Integer schoolId = savedException.getSchedule().getClasses().getCourse().getDepartment().getSchool().getId();
+            List<Users> admins = entityManager.createQuery(
+                "SELECT us.user FROM UserSchool us JOIN us.user.roles r WHERE us.school.id = :schoolId AND r.name = 'ROLE_SCHOOL_ADMIN'", Users.class)
+                .setParameter("schoolId", schoolId)
+                .getResultList();
+
+            for (Users admin : admins) {
+                Notification notif = new Notification();
+                notif.setUser(admin);
+                notif.setType(NotificationType.SYSTEM);
+                notif.setTitle("Yêu cầu dạy bù mới");
+                notif.setBody("Giảng viên có mã " + teacherCode + " vừa gửi một yêu cầu dạy bù cho lớp " + 
+                              savedException.getSchedule().getClasses().getCode() + " vào ngày " + 
+                              (request.getMakeupDate() != null ? request.getMakeupDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "") + 
+                              ". Vui lòng kiểm tra và phê duyệt.");
+                notificationRepository.save(notif);
+            }
+        } catch (Exception e) {
+            // Ignore if fails to notify admins
+        }
     }
 
     public List<MakeupHistoryResponse> getMakeupHistory(String teacherCode) {

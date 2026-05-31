@@ -48,4 +48,11 @@ public class TeacherScheduleController {
         List<ClassProgressDto> schedules = scheduleService.getTeacherProgressSchedule(teacherCode, semesterId, courseId, academicYearId);
         return ResponseEntity.ok(schedules);
     }
+
+    @GetMapping("/active-classes")
+    public ResponseEntity<List<org.learn.learningmanagementbackend.dto.response.ActiveClassScheduleDto>> getActiveClasses(
+            @AuthenticationPrincipal CustomUserDetails currentUser) {
+        String teacherCode = currentUser.getSpecificCode();
+        return ResponseEntity.ok(scheduleService.getActiveClassesWithSchedules(teacherCode));
+    }
 }

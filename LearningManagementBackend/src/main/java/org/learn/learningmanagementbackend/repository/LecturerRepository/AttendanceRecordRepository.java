@@ -21,9 +21,9 @@ public interface AttendanceRecordRepository extends JpaRepository<AttendanceReco
                         c.id AS classId,
                         ar.attendance_date AS sessionDate,
                         (s.end_period - s.start_period + 1) AS sessionCount
-                    FROM Attendance_record ar
-                    JOIN Schedule s ON ar.schedule_id = s.id
-                    JOIN Class c ON s.class_id = c.id
+                    FROM attendance_records ar
+                    JOIN schedules s ON ar.schedule_id = s.id
+                    JOIN classes c ON s.class_id = c.id
                     WHERE ar.checked_by = :userId
                         AND MONTH(ar.attendance_date) = :month
                         AND YEAR(ar.attendance_date) = :year

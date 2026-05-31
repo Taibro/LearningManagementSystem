@@ -5,6 +5,9 @@ import { BarChart, Users, CalendarDays, FileText, Settings, User, DollarSign, Fo
 
 const Sidebar = () => {
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(true);
+  const rawSchoolName = localStorage.getItem('schoolName') || 'Ho Chi Minh City University of Industry and Trade';
+  const schoolName = rawSchoolName.replace(/\n/g, ' ');
+  const schoolShort = schoolName.split(' ').map(w => w[0]).join('').substring(0, 4).toUpperCase() || 'HUIT';
 
   const navClass = ({ isActive }) =>
     `px-4 py-2.5 text-white text-[13px] flex items-center gap-3 transition-all no-underline font-medium mx-2 my-0 rounded-lg outline-none ${
@@ -23,10 +26,16 @@ const Sidebar = () => {
     >
       <div className="p-4 pb-2 border-b border-white/15 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center font-bold text-[#6B4FA0] text-lg shadow-inner">HUIT</div>
-          <div>
-            <div className="font-bold text-[13px] leading-tight text-white uppercase tracking-tighter">HO CHI MINH CITY</div>
-            <div className="text-[10px] text-purple-200 opacity-80 mt-0.5 font-medium">University of Industry and Trade</div>
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center font-bold text-[#6B4FA0] text-sm shadow-inner text-center leading-none tracking-tighter shrink-0">
+            {schoolShort}
+          </div>
+          <div className="overflow-hidden">
+            <div 
+              className="font-bold text-[12px] leading-tight text-white uppercase tracking-tighter"
+              style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+            >
+              {schoolName}
+            </div>
           </div>
         </div>
       </div>
@@ -75,9 +84,6 @@ const Sidebar = () => {
 
         <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">HỆ THỐNG</div>
         <NavLink to="/settings" className={navClass}><Settings className="w-4 h-4 inline-block mr-2" /> Cài đặt hệ thống</NavLink>
-
-        {/* <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">THỜI KHÓA BIỂU</div>
-        <NavLink to="/view-schedule" className={navClass}><CalendarDays className="w-4 h-4 inline-block mr-2" /> Xem thời khóa biểu</NavLink> */}
 
       </SimpleBar>
     </aside>

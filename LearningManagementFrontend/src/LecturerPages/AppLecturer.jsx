@@ -38,7 +38,7 @@ const ProtectedRoute = ({ children }) => {
 
 function AppLecturer() {
   return (
-    <Router>
+    <Router basename="/lecturer">
       <Routes>
         <Route path="/login" element={<LecturerLogin />} />
         

@@ -1,37 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import Input from '../../components/Layout/Input';
 import axios from 'axios';
-import { MapPin } from 'lucide-react';
+import { MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const WeeklySchedule = () => {
-  const [selectedDate, setSelectedDate] = useState('2026-04-20');
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch dữ liệu từ API của Tài
-  useEffect(() => {
-    const fetchSchedule = async () => {
-      setLoading(true);
-      try {
-        const token = localStorage.getItem('lecturerToken');
-        // Gọi API của Backend, tự động hiểu GV001 thông qua Token
-        const response = await axios.get(`http://localhost:8080/api/lecturer/schedules/weekly-schedule?date=${selectedDate}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setSchedules(response.data);
-      } catch (error) {
-        console.error("Lỗi khi tải lịch học:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchSchedule = async () => {
+    setLoading(true);
+    try {
+      const token = localStorage.getItem('lecturerToken');
+      // Gọi API của Backend, tự động hiểu GV001 thông qua Token
+      const response = await axios.get(`http://localhost:8080/api/lecturer/schedules/weekly-schedule?date=${selectedDate}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSchedules(response.data);
+    } catch (error) {
+      console.error("Lỗi khi tải lịch học:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchSchedule();
   }, [selectedDate]);
 
   const handleDateChange = (e) => {
     setSelectedDate(e.target.value);
   };
+
+  const handlePrevWeek = () => {
+    const dateObj = new Date(selectedDate);
+    dateObj.setDate(dateObj.getDate() - 7);
+    setSelectedDate(dateObj.toISOString().split('T')[0]);
+  };
+
+  const handleNextWeek = () => {
+    const dateObj = new Date(selectedDate);
+    dateObj.setDate(dateObj.getDate() + 7);
+    setSelectedDate(dateObj.toISOString().split('T')[0]);
+  };
+
+  const getMondayOf = (date) => {
+    const d = new Date(date);
+    const day = d.getDay(); // 0=CN
+    const diff = (day === 0) ? -6 : 1 - day;
+    d.setDate(d.getDate() + diff);
+    return d;
+  };
+
+  const monday = getMondayOf(selectedDate);
+  const weekDates = [0, 1, 2, 3, 4, 5, 6].map((i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
 
   // Hàm nhóm lịch theo Buổi (Sáng/Chiều/Tối) và Thứ (2 -> CN)
   const getSchedulesForSlot = (timeSlot, dayOfWeek) => {
@@ -53,7 +79,7 @@ const WeeklySchedule = () => {
 
   const renderScheduleCard = (sch, idx) => {
     // Phân loại màu sắc dựa theo SessionType (LT/TH)
-    const isTheory = sch.sessionType === 'Lý thuyết' || sch.sessionType === 'LT';
+    const isTheory = sch.sessionType === 'Lý thuyết' || sch.sessionType === 'LT' || sch.sessionType === 'REGULAR';
     const cardClass = isTheory ? 'schedule-theory' : 'schedule-practice';
     const textColor = isTheory ? 'text-green-800' : 'text-indigo-800';
     const subColor = isTheory ? 'text-green-600' : 'text-indigo-600';
@@ -77,16 +103,16 @@ const WeeklySchedule = () => {
           <p className="text-gray-400 text-sm mt-1">Ngày đang chọn: {selectedDate}</p>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 flex-wrap">
           <Input 
             type="date" 
             value={selectedDate} 
             onChange={handleDateChange}
-            className="w-40" 
+            className="w-36 text-sm" 
           />
-          <div className="flex gap-2">
-            <button className="btn-primary text-sm">Tải lại lịch</button>
-          </div>
+          <button onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])} className="btn-primary text-sm px-3 py-1.5">Hiện tại</button>
+          <button onClick={handlePrevWeek} className="px-3 py-1.5 text-sm border border-gray-300 rounded text-gray-600 hover:bg-gray-50 font-medium">‹ Trở về</button>
+          <button onClick={handleNextWeek} className="btn-primary text-sm px-3 py-1.5">Tiếp ›</button>
         </div>
       </div>
 
@@ -101,14 +127,13 @@ const WeeklySchedule = () => {
         ) : (
           <div className="week-grid">
             {/* Header */}
-            <div className="week-header text-xs">Ca học</div>
-            <div className="week-header">Thứ 2</div>
-            <div className="week-header">Thứ 3</div>
-            <div className="week-header">Thứ 4</div>
-            <div className="week-header">Thứ 5</div>
-            <div className="week-header">Thứ 6</div>
-            <div className="week-header">Thứ 7</div>
-            <div className="week-header">CN</div>
+            <div className="week-header text-xs flex items-center justify-center">Ca học</div>
+            {weekDates.map((d, i) => (
+              <div key={i} className="week-header flex flex-col items-center justify-center leading-tight py-1.5">
+                <span className="font-bold">{i === 6 ? 'CN' : `Thứ ${i + 2}`}</span>
+                <span className="text-[10.5px] font-medium text-purple-200 mt-0.5">{d.toLocaleDateString('vi-VN')}</span>
+              </div>
+            ))}
 
             {/* Buổi Sáng */}
             <div className="week-cell session-label text-xs font-semibold text-purple-600">SÁNG</div>

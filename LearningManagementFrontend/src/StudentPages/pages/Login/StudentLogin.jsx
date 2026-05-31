@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import SearchableSelect from '../../../components/SearchableSelect';
 import './StudentLogin.css';
 
 export default function StudentLogin() {
@@ -49,6 +50,16 @@ export default function StudentLogin() {
       if (res.data && res.data.token) {
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data));
+        
+        const schoolOptions = [
+          { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
+          { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
+          { value: 'FPT', label: 'CĐ FPT Polytechnic' },
+          { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
+          { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
+        ];
+        const selectedSchool = schoolOptions.find(s => s.value === school);
+        if (selectedSchool) localStorage.setItem('schoolName', selectedSchool.label);
         
         setShowSuccess(true);
         setTimeout(() => setProgressWidth('100%'), 50);
@@ -186,44 +197,28 @@ export default function StudentLogin() {
             </div>
 
             {/* Chọn trường */}
-            <div className="sl-fu d3">
+            <div className="sl-fu d3" style={{ position: 'relative', zIndex: 10 }}>
               <label className="lbl">Trường / Trung tâm</label>
-              <div className="field select-wrap">
-                <svg className="field-ico" style={{ color: '#94A3B8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m9-7h-4" /></svg>
-                <select
-                  className="inp inp-select"
-                  value={school}
-                  onChange={(e) => { setSchool(e.target.value); setErrorSchool(false); }}
-                >
-                  <option value="">-- Chọn trường của bạn --</option>
-                  <option value="HUIT">ĐH Bách Khoa TP.HCM</option>
-                  <option value="NEU">ĐH Kinh tế Quốc dân</option>
-                  <option value="FPT">CĐ FPT Polytechnic</option>
-                  <option value="IELTS">TT Ngoại ngữ IELTS Pro</option>
-                  <option value="LHP">THPT Chuyên Lê Hồng Phong</option>
-                </select>
-                <svg className="select-arrow" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
-              </div>
+              <SearchableSelect 
+                options={[
+                  { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
+                  { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
+                  { value: 'FPT', label: 'CĐ FPT Polytechnic' },
+                  { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
+                  { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
+                ]}
+                value={school}
+                onChange={(val) => { setSchool(val); setErrorSchool(false); }}
+                hasError={errorSchool}
+                icon={<svg width="20" height="20" style={{ color: '#94A3B8' }} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m9-7h-4" /></svg>}
+                triggerStyle={{ background: '#F8FAFC', border: errorSchool ? '1px solid #ef4444' : '1px solid #E2E8F0', height: '48px', borderRadius: '12px' }}
+              />
               <div className={`err-msg ${errorSchool ? 'on' : ''}`}>Vui lòng chọn trường của bạn</div>
             </div>
 
             {/* General Error Message */}
             {generalError && <div className="err-general sl-fu d3">{generalError}</div>}
 
-            {/* 2FA */}
-            <div className="tfa-row sl-fu d3">
-              <div className="tfa-left">
-                <div className="tfa-icon">🔒</div>
-                <div>
-                  <div className="tfa-title">Xác thực 2 bước (2FA)</div>
-                  <div className="tfa-desc">Bảo vệ tài khoản sinh viên</div>
-                </div>
-              </div>
-              <label className="toggle-switch">
-                <input type="checkbox" />
-                <span className="slider"></span>
-              </label>
-            </div>
 
             {/* Remember / Forgot */}
             <div className="row-mid sl-fu d4">
@@ -243,12 +238,6 @@ export default function StudentLogin() {
               </div>
             </button>
 
-            <div className="divider sl-fu d5">hoặc tiếp tục với</div>
-
-            <button className="btn-sso sl-fu d5" onClick={() => alert('Redirect đến Google Workspace của trường')}>
-              <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /><path fill="#FBBC05" d="M10.53 28.59c-.5-1.45-.79-3-.79-4.59s.29-3.14.79-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.97 6.19C12.43 13.72 17.74 9.5 24 9.5z" /></svg>
-              Tiếp tục với Google Workspace
-            </button>
 
             <p className="form-footer sl-fu d6">
               Giảng viên? <a href="/lecturer/login">Đăng nhập tại đây →</a>
