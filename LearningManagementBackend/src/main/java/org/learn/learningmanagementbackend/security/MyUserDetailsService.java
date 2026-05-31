@@ -40,7 +40,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
         // Xử lý nhánh lấy User dựa vào Role
         if ("STUDENT".equals(userType)) {
-            Student student = studentRepository.findByStudentCodeOrEmail(loginCode)
+            Student student = studentRepository.findByStudentCode(loginCode)
                     .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy sinh viên"));
             user = student.getUser();
             assignedRole = "ROLE_STUDENT";
