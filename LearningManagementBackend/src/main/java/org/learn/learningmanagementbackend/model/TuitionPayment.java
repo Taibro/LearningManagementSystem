@@ -45,4 +45,7 @@ public class TuitionPayment {
 
     @Column(name = "note")
     private String note;
+
+    @Column(name = "course_data", columnDefinition = "TEXT")
+    private String courseData;
 }

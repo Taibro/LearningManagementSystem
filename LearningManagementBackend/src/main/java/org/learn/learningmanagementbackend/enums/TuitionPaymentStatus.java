@@ -2,6 +2,5 @@ package org.learn.learningmanagementbackend.enums;
 
 public enum TuitionPaymentStatus {
 
-    PENDING,SUCCESS,FAILED,REFUNDED
-
+    PENDING, SUCCESS, FAILED, REFUNDED, CANCELLED
 }

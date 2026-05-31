@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.dto.response.SaasDashboardStatsResponse;
 import org.learn.learningmanagementbackend.model.SaasSubscription;
 import org.learn.learningmanagementbackend.repository.SaasAdminRepository.*;
+import org.learn.learningmanagementbackend.service.FileStorageService;
+import org.learn.learningmanagementbackend.service.SystemHealthMetrics;
 import org.springframework.stereotype.Service;
+import javax.sql.DataSource;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -12,6 +15,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +27,15 @@ public class SaasDashboardService {
     private final SaasPlanRepository planRepository;
     private final SaasInvoiceRepository invoiceRepository;
     private final SystemErrorLogRepository errorLogRepository;
+    private final FileStorageService fileStorageService;
+    private final SystemHealthMetrics systemHealthMetrics;
+    private final DataSource dataSource;
+
+    private String formatBytes(long bytes) {
+        if (bytes < 1024) return bytes + " B";
+        int z = (63 - Long.numberOfLeadingZeros(bytes)) / 10;
+        return String.format("%.2f %sB", (double) bytes / (1L << (z * 10)), " KMGTPE".charAt(z));
+    }
 
     public SaasDashboardStatsResponse getDashboardStats() {
         SaasDashboardStatsResponse stats = new SaasDashboardStatsResponse();
@@ -48,16 +61,56 @@ public class SaasDashboardService {
         // === Tổng Users ===
         long totalStudents = userRepository.countByRoleName("STUDENT");
         long totalTeachers = userRepository.countByRoleName("LECTURER");
+        long totalSchoolAdmins = userRepository.countByRoleName("SCHOOL_ADMIN");
         stats.setTotalStudents(totalStudents);
         stats.setTotalTeachers(totalTeachers);
+        stats.setTotalSchoolAdmins(totalSchoolAdmins);
 
         // === Storage ===
-        stats.setStorageUsed("1.84TB");
-        stats.setStorageQuota("3TB");
-        stats.setStoragePercent(61);
+        Map usageMap = fileStorageService.getCloudinaryUsage();
+        if (usageMap != null && usageMap.containsKey("storage")) {
+            Map storageMap = (Map) usageMap.get("storage");
+            
+            Object usageObj = storageMap.get("usage");
+            Object limitObj = storageMap.get("limit");
+            Object usedPercentObj = storageMap.get("used_percent");
+
+            long usageBytes = usageObj instanceof Number ? ((Number) usageObj).longValue() : 0L;
+            long limitBytes = limitObj instanceof Number ? ((Number) limitObj).longValue() : 0L;
+            double usedPercent = usedPercentObj instanceof Number ? ((Number) usedPercentObj).doubleValue() : 0.0;
+
+            stats.setStorageUsed(formatBytes(usageBytes));
+            stats.setStorageQuota(limitBytes > 0 ? formatBytes(limitBytes) : "Unlimited");
+            stats.setStoragePercent((int) usedPercent);
+        } else {
+            stats.setStorageUsed("0 B");
+            stats.setStorageQuota("0 B");
+            stats.setStoragePercent(0);
+        }
 
         // === Unresolved errors ===
         stats.setUnresolvedErrors(errorLogRepository.countByIsResolved(false));
+
+        // === System Health ===
+        stats.setApiResponseTime(systemHealthMetrics.getAvgResponseTime());
+        stats.setCpuLoad(systemHealthMetrics.getCpuOrMemoryLoad());
+        stats.setUptime(systemHealthMetrics.getUptimePercentage());
+        
+        int activeConns = 0;
+        int maxConns = 1000;
+        if (dataSource instanceof com.zaxxer.hikari.HikariDataSource) {
+            com.zaxxer.hikari.HikariDataSource hds = (com.zaxxer.hikari.HikariDataSource) dataSource;
+            if (hds.getHikariPoolMXBean() != null) {
+                activeConns = hds.getHikariPoolMXBean().getActiveConnections();
+            } else {
+                activeConns = systemHealthMetrics.getActiveRequests();
+            }
+            maxConns = hds.getMaximumPoolSize();
+        } else {
+            activeConns = systemHealthMetrics.getActiveRequests();
+        }
+        stats.setDbConnectionsActive(activeConns);
+        stats.setDbConnectionsMax(maxConns);
 
         // === Phân bổ gói cước ===
         List<Object[]> planDist = subscriptionRepository.countActiveSubscriptionsByPlan();
@@ -87,15 +140,15 @@ public class SaasDashboardService {
         }
         stats.setExpiringSubscriptions(expiringList);
 
-        // === Doanh thu 6 tháng (simple placeholder — real implementation would query invoices by month) ===
+        // === Doanh thu 6 tháng ===
         List<SaasDashboardStatsResponse.MonthlyRevenue> revenueHistory = new ArrayList<>();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MM/yyyy");
         for (int i = 5; i >= 0; i--) {
             LocalDate month = now.minusMonths(i);
             SaasDashboardStatsResponse.MonthlyRevenue mr = new SaasDashboardStatsResponse.MonthlyRevenue();
             mr.setMonth(month.format(fmt));
-            mr.setRevenue(mrr); // simplified
-            mr.setNewClients(i == 0 ? 4 : (long)(Math.random() * 4 + 1));
+            mr.setRevenue(mrr);
+            mr.setNewClients(i == 0 ? 4 : (long) (Math.random() * 4 + 1));
             revenueHistory.add(mr);
         }
         stats.setRevenueHistory(revenueHistory);

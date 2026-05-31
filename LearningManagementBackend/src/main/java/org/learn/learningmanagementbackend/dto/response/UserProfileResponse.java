@@ -11,5 +11,7 @@ public class UserProfileResponse {
     private String specificCode;
     private String role;
     private String token;
+    private Boolean require2fa;
+    private Boolean requireSetup;
 
 }

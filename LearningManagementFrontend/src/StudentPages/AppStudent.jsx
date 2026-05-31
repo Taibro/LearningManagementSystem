@@ -16,8 +16,9 @@ import Scholarships from './pages/Scholarships/Scholarships';
 import Curriculum from './pages/Curriculum/Curriculum';
 import TuitionFee from './pages/TuitionFee/TuitionFee';
 import OnlinePayment from './pages/OnlinePayment/OnlinePayment';
+import PaymentProcessing from './pages/OnlinePayment/PaymentProcessing';
 import GeneralReceipts from './pages/GeneralReceipts/GeneralReceipts';
-import OnlineReceipts from './pages/OnlineReceipts/OnlineReceipts';
+import OnlineReceipts from './pages/OnlinePayment/Receipts';
 import DefaultPage from './pages/DefaultPage/DefaultPage';
 import CourseRegistration from './pages/CourseRegistration/CourseRegistration';
 import StudentLogin from './pages/Login/StudentLogin';
@@ -26,8 +27,6 @@ export default function AppStudent() {
   return (
     <Router>
       <Routes>
-        <Route path="/student/course-registration" element={<CourseRegistration />} />
-        
         <Route path="/login" element={<StudentLogin />} />
         
         <Route path="/" element={<MainLayout />}>
@@ -48,8 +47,9 @@ export default function AppStudent() {
           <Route path="curriculum" element={<Curriculum />} />
           <Route path="tuition-fee" element={<TuitionFee />} />
           <Route path="online-payment" element={<OnlinePayment />} />
-          <Route path="general-receipts" element={<GeneralReceipts />} />
+          <Route path="payment-processing/:id" element={<PaymentProcessing />} />
           <Route path="online-receipts" element={<OnlineReceipts />} />
+          <Route path="student/course-registration" element={<CourseRegistration />} />
 
           
           <Route path="declaration" element={<DefaultPage title="Kê khai thông tin sinh viên" />} />
@@ -61,8 +61,8 @@ export default function AppStudent() {
           <Route path="bachelor-registration" element={<DefaultPage title="Đăng ký CT Cử nhân/Kỹ sư" />} />
           
           <Route path="prerequisite-registration" element={<DefaultPage title="Đăng ký môn học điều kiện" />} />
-          <Route path="dormitory-payment" element={<DefaultPage title="Thanh toán nội trú" />} />
         </Route>
+
       </Routes>
     </Router>
   );

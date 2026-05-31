@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Collections;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,15 @@ public class FileStorageService {
         } catch (IOException e) {
             log.error("Thất bại khi đẩy file lên hệ thống Cloudinary: ", e);
             throw new RuntimeException("Hệ thống không thể tải file lên đám mây. Vui lòng thử lại!");
+        }
+    }
+
+    public Map getCloudinaryUsage() {
+        try {
+            return cloudinary.api().usage(ObjectUtils.emptyMap());
+        } catch (Exception e) {
+            log.error("Không thể lấy thông tin usage từ Cloudinary: ", e);
+            return Collections.emptyMap();
         }
     }
 }

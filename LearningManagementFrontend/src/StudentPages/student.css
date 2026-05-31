@@ -101,3 +101,13 @@
 .info-row .val { font-weight: 500; }
 .icon-check { color: #22c55e; font-size: 18px; }
 .icon-x { color: #ef4444; font-size: 18px; }
+
+/* TUITION SUMMARY */
+.tuition-summary-cell { flex: 1; min-width: 160px; padding: 12px 20px; border-right: 1px solid var(--border); }
+.tuition-summary-cell:last-child { border-right: none; }
+.ts-label { display: block; font-size: 11px; color: var(--text-light); margin-bottom: 4px; }
+.ts-value { font-size: 14px; font-weight: 700; color: var(--text); }
+
+/* ROW SELECTED in payment table */
+.tr-selected td { background: #eff6ff !important; }
+.tbl tr.tr-selected:hover td { background: #dbeafe !important; }

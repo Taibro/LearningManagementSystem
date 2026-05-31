@@ -55,4 +55,16 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
     @Query("SELECT COUNT(s) FROM Schedule s WHERE s.classes.id = :classId")
     Long countTotalSessionsByClassId(@Param("classId") Integer classId);
 
+    // Lấy tất cả lịch theo class_id (cho check trùng lịch khi đăng ký)
+    List<Schedule> findByClasses_Id(Integer classId);
+
+    // Lấy lịch học hiện tại của sinh viên (để check trùng lịch)
+    @Query("""
+            SELECT sch FROM Schedule sch
+            JOIN sch.classes cls
+            JOIN cls.enrollments enr
+            WHERE enr.student.id = :studentId
+              AND enr.status IN ('ENROLLED', 'PENDING')
+            """)
+    List<Schedule> findActiveSchedulesForStudent(@Param("studentId") Integer studentId);
 }

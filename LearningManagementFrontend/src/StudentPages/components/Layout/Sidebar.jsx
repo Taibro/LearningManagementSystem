@@ -65,8 +65,6 @@ export default function Sidebar() {
         <div className={`sub-menu ${open.hocphi ? 'open' : ''}`}>
           <NavLink to="/tuition-fee" className={navClass}>Tra cứu công nợ</NavLink>
           <NavLink to="/online-payment" className={navClass}>Thanh toán trực tuyến</NavLink>
-          <NavLink to="/dormitory-payment" className={navClass}>Thanh toán nội trú</NavLink>
-          <NavLink to="/general-receipts" className={navClass}>Phiếu thu tổng hợp</NavLink>
           <NavLink to="/online-receipts" className={navClass}>Phiếu thu trực tuyến</NavLink>
         </div>
       </div>

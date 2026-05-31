@@ -112,6 +112,13 @@
             <version>2.9.0</version>
         </dependency>
 
+        <!-- Thư viện TOTP (2FA Authenticator) -->
+        <dependency>
+            <groupId>dev.samstevens.totp</groupId>
+            <artifactId>totp</artifactId>
+            <version>1.7.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
