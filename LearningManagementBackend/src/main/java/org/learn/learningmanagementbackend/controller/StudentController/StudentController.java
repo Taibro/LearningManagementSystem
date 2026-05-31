@@ -4,11 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.dto.projection.*;
 import org.learn.learningmanagementbackend.dto.request.CourseRegistrationRequest;
 import org.learn.learningmanagementbackend.dto.request.SurveySubmitRequest;
-import org.learn.learningmanagementbackend.repository.LecturerRepository.SemesterRepository;
 import org.learn.learningmanagementbackend.security.CustomUserDetails;
 import org.learn.learningmanagementbackend.service.StudentService.CourseRegistrationService;
 import org.learn.learningmanagementbackend.service.StudentService.StudentService;
-import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,9 +23,7 @@ import java.util.stream.Collectors;
 public class StudentController {
 
     private final StudentService studentService;
-    private final SemesterRepository semesterRepository;
     private final CourseRegistrationService courseRegistrationService;
-    private final org.learn.learningmanagementbackend.repository.LecturerRepository.StudentRepository studentRepository;
 
     // GET /api/student/profile
     @GetMapping("/profile")
@@ -86,19 +82,14 @@ public class StudentController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "0") Integer semesterId) {
         String code = userDetails.getSpecificCode();
-        List<StudentDebtDetailDto> result = studentRepository
-                .getDebtDetail(code, semesterId);
+        List<StudentDebtDetailDto> result = studentService.getDebtDetail(code, semesterId);
         return ResponseEntity.ok(result);
     }
 
     // GET /api/student/semesters
     @GetMapping("/semesters")
     public ResponseEntity<List<Map<String, Object>>> getSemesters() {
-        List<Map<String, Object>> result = semesterRepository
-                .findAll(Sort.by("startDate").descending())
-                .stream()
-                .map(s -> Map.<String, Object>of("id", s.getId(), "name", s.getName()))
-                .collect(Collectors.toList());
+        List<Map<String, Object>> result = studentService.getSemesters();
         return ResponseEntity.ok(result);
     }
 
