@@ -32,16 +32,8 @@ public class Course extends BaseEntity{
     @Column(name = "credits")
     private Integer credits;
 
-    @Column(name = "theory_sessions", nullable = false)
-    @ColumnDefault("30")
-    private Integer theorySessions = 30;
-
-    @Column(name = "practical_sessions", nullable = false)
-    @ColumnDefault("0")
-    private Integer practicalSessions = 0;
-
     @Column(name = "total_sessions")
-    private Integer totalSessions = theorySessions + practicalSessions;
+    private Integer totalSessions = 30;
 
     @Column(name = "description")
     private String description;

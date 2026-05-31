@@ -109,7 +109,7 @@ public class TeachingStatisticService {
         // Chuyển đổi Map thành List cho Biểu đồ
         List<TeachingStatisticResponse.MonthlyChartData> chartData = monthlyPeriodsMap.entrySet().stream()
                 .map(entry -> TeachingStatisticResponse.MonthlyChartData.builder()
-                        .month("T" + entry.getKey()) // Hiển thị "T1", "T2"...
+                        .month("Tháng " + entry.getKey()) // Hiển thị "Tháng 1", "Tháng 2"... để tránh nhầm với Thứ
                         .periods(entry.getValue())
                         .build())
                 .collect(Collectors.toList());

@@ -11,5 +11,6 @@ public class UserProfileResponse {
     private String specificCode;
     private String role;
     private String token;
+    private Integer schoolId;
 
 }

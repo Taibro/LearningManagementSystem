@@ -2,13 +2,14 @@
 --  HỆ THỐNG QUẢN LÝ LỚP HỌC & LỊCH HỌC (Phiên bản có Audit Log)
 -- ============================================================
 
-SET FOREIGN_KEY_CHECKS = 0;
-
+DROP DATABASE IF EXISTS quan_ly_lop_hoc;
 CREATE DATABASE IF NOT EXISTS quan_ly_lop_hoc
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
 USE quan_ly_lop_hoc;
+
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- ============================================================
 -- 1. TRƯỜNG HỌC / TRUNG TÂM DẠY HỌC
@@ -39,9 +40,7 @@ CREATE TABLE schools (
 
   PRIMARY KEY (id),
   UNIQUE KEY uq_school_code (code),
-  INDEX idx_school_type (type),
-  CONSTRAINT fk_sch_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_sch_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+  INDEX idx_school_type (type)
 ) ENGINE=InnoDB COMMENT='Trường học / Trung tâm dạy học';
 
 
@@ -70,9 +69,7 @@ CREATE TABLE school_branches (
   PRIMARY KEY (id),
   UNIQUE KEY uq_branch (school_id, code),
   INDEX idx_branch_school (school_id),
-  CONSTRAINT fk_branch_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE,
-  CONSTRAINT fk_sbr_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_sbr_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+  CONSTRAINT fk_branch_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='Cơ sở / Chi nhánh của trường';
 
 
@@ -97,9 +94,7 @@ CREATE TABLE academic_years (
   UNIQUE KEY uq_year_name (school_id, name),
   INDEX idx_year_school (school_id),
   CONSTRAINT fk_year_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE RESTRICT,
-  CONSTRAINT chk_year_dates CHECK (end_date > start_date),
-  CONSTRAINT fk_ay_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_ay_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+  CONSTRAINT chk_year_dates CHECK (end_date > start_date)
 ) ENGINE=InnoDB COMMENT='Năm học';
 
 
@@ -123,9 +118,7 @@ CREATE TABLE semesters (
   PRIMARY KEY (id),
   UNIQUE KEY uq_semester (academic_year_id, name),
   CONSTRAINT fk_sem_year   FOREIGN KEY (academic_year_id) REFERENCES academic_years(id) ON DELETE RESTRICT,
-  CONSTRAINT chk_sem_dates CHECK (end_date > start_date),
-  CONSTRAINT fk_sem_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_sem_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+  CONSTRAINT chk_sem_dates CHECK (end_date > start_date)
 ) ENGINE=InnoDB COMMENT='Học kỳ';
 
 
@@ -148,9 +141,7 @@ CREATE TABLE departments (
   PRIMARY KEY (id),
   UNIQUE KEY uq_dept_code (school_id, code),
   INDEX idx_dept_school (school_id),
-  CONSTRAINT fk_dept_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE RESTRICT,
-  CONSTRAINT fk_dep_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_dep_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+  CONSTRAINT fk_dept_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB COMMENT='Khoa / Bộ môn';
 
 
@@ -166,7 +157,7 @@ CREATE TABLE role (
   UNIQUE KEY uq_role_name (name)
 ) ENGINE=InnoDB COMMENT='Vai trò hệ thống';
 
-INSERT INTO role (name, description) VALUES
+INSERT IGNORE INTO role (name, description) VALUES
   ('SAAS_ADMIN',   'Quản trị viên hệ thống'),
   ('LECTURER', 'Giảng viên'),
   ('STUDENT', 'Sinh viên / Học sinh'),
@@ -203,11 +194,32 @@ CREATE TABLE users (
   UNIQUE KEY uq_user_email (email),
   INDEX idx_user_name      (full_name),
   INDEX idx_user_school    (school_id),
-  CONSTRAINT fk_user_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE RESTRICT,
-  CONSTRAINT fk_usr_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
-  CONSTRAINT fk_usr_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+  CONSTRAINT fk_user_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE RESTRICT
 ) ENGINE=InnoDB COMMENT='Tài khoản người dùng';
 
+ALTER TABLE schools
+  ADD CONSTRAINT fk_sch_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  ADD CONSTRAINT fk_sch_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL;
+
+ALTER TABLE school_branches
+  ADD CONSTRAINT fk_sbr_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  ADD CONSTRAINT fk_sbr_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL;
+
+ALTER TABLE academic_years
+  ADD CONSTRAINT fk_ay_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  ADD CONSTRAINT fk_ay_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL;
+
+ALTER TABLE semesters
+  ADD CONSTRAINT fk_sem_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  ADD CONSTRAINT fk_sem_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL;
+
+ALTER TABLE departments
+  ADD CONSTRAINT fk_dep_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  ADD CONSTRAINT fk_dep_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL;
+
+ALTER TABLE users
+  ADD CONSTRAINT fk_usr_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  ADD CONSTRAINT fk_usr_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL;
 
 -- ============================================================
 -- 8. NGƯỜI DÙNG ↔ VAI TRÒ
@@ -231,6 +243,7 @@ CREATE TABLE user_roles (
 CREATE TABLE teachers (
   id             INT UNSIGNED  NOT NULL AUTO_INCREMENT,
   user_id        INT UNSIGNED  NOT NULL,
+  teacher_code   VARCHAR(20)   NOT NULL COMMENT 'Mã giảng viên',
   department_id  INT UNSIGNED  NOT NULL,
   degree         VARCHAR(50)   COMMENT 'Cử nhân, Thạc sĩ, Tiến sĩ…',
   specialization VARCHAR(150),
@@ -245,6 +258,7 @@ CREATE TABLE teachers (
 
   PRIMARY KEY (id),
   UNIQUE KEY uq_teacher_user (user_id),
+  UNIQUE KEY uq_teacher_code (teacher_code),
   INDEX idx_teacher_dept     (department_id),
   CONSTRAINT fk_teacher_user FOREIGN KEY (user_id)       REFERENCES users(id)       ON DELETE CASCADE,
   CONSTRAINT fk_teacher_dept FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE RESTRICT,
@@ -322,7 +336,7 @@ CREATE TABLE rooms (
   building    VARCHAR(50)   NOT NULL,
   room_number VARCHAR(20)   NOT NULL,
   capacity    SMALLINT      NOT NULL,
-  room_type   ENUM('CLASSROOM','LAB','SEMINAR','LECTURE_HALL','ONLINE')
+  type        ENUM('CLASSROOM','LAB','SEMINAR','LECTURE_HALL','ONLINE')
               NOT NULL DEFAULT 'CLASSROOM',
   equipment   JSON,
   is_active   TINYINT(1)    NOT NULL DEFAULT 1,
@@ -336,7 +350,7 @@ CREATE TABLE rooms (
   PRIMARY KEY (id),
   UNIQUE KEY uq_room (branch_id, building, room_number),
   INDEX idx_room_branch (branch_id),
-  INDEX idx_room_type   (room_type),
+  INDEX idx_room_type   (type),
   CONSTRAINT fk_room_branch FOREIGN KEY (branch_id) REFERENCES school_branches(id) ON DELETE RESTRICT,
   CONSTRAINT chk_capacity   CHECK (capacity > 0),
   CONSTRAINT fk_rm_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
@@ -396,6 +410,8 @@ CREATE TABLE schedules (
   type        ENUM('REGULAR','MAKEUP','EXAM','LAB','SEMINAR')
               NOT NULL DEFAULT 'REGULAR',
   notes       TEXT,
+  start_period TINYINT       NULL COMMENT 'Tiết bắt đầu',
+  end_period   TINYINT       NULL COMMENT 'Tiết kết thúc',
 
   -- Audit Columns
   created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -659,11 +675,6 @@ CREATE TABLE class_materials (
   CONSTRAINT fk_mat_teacher FOREIGN KEY (uploaded_by) REFERENCES teachers(id) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='Tài liệu giảng dạy của lớp học phần';
 
-SELECT * FROM class_materials;
-
--- Bật lại kiểm tra khóa ngoại sau khi đã tạo xong các bảng
-SET FOREIGN_KEY_CHECKS = 1;
-
 -- ============================================================
 -- SAAS
 -- ============================================================
@@ -680,7 +691,13 @@ CREATE TABLE saas_plans (
   is_active      TINYINT(1)    NOT NULL DEFAULT 1,
 
   created_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (id)
+  updated_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by     INT UNSIGNED  NULL,
+  updated_by     INT UNSIGNED  NULL,
+
+  PRIMARY KEY (id),
+  CONSTRAINT fk_sp_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT fk_sp_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB COMMENT='Danh mục gói cước phần mềm EduSpace';
 
 -- BẢNG 2: LỊCH SỬ THUÊ BAO CỦA TRƯỜNG (Saas Subscriptions)
@@ -695,10 +712,14 @@ CREATE TABLE saas_subscriptions (
 
   created_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by     INT UNSIGNED  NULL,
+  updated_by     INT UNSIGNED  NULL,
 
   PRIMARY KEY (id),
   CONSTRAINT fk_sub_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE,
-  CONSTRAINT fk_sub_plan   FOREIGN KEY (plan_id)   REFERENCES saas_plans(id)
+  CONSTRAINT fk_sub_plan   FOREIGN KEY (plan_id)   REFERENCES saas_plans(id),
+  CONSTRAINT fk_ssub_cby   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT fk_ssub_uby   FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB COMMENT='Hợp đồng thuê bao của các trường';
 
 -- BẢNG 3: HÓA ĐƠN THU TIỀN PHẦN MỀM (Saas Invoices)
@@ -739,7 +760,7 @@ CREATE TABLE system_error_logs (
 
 CREATE TABLE IF NOT EXISTS audit_logs (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    school_id INT,
+    school_id INT UNSIGNED,
     user_email VARCHAR(255) NOT NULL,
     action VARCHAR(20) NOT NULL,
     table_name VARCHAR(100) NOT NULL,
@@ -766,11 +787,7 @@ CREATE TABLE teacher_evaluations (
   comment TEXT COMMENT 'Nhận xét từ sinh viên',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-  -- Lưu ý: Có thể có cột student_id để hệ thống check trùng, nhưng TUYỆT ĐỐI KHÔNG JOIN để lấy tên.
   student_id INT UNSIGNED NULL,
-  
-  
-  
 
   PRIMARY KEY (id),
   CONSTRAINT fk_eval_teacher FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE,
@@ -796,45 +813,105 @@ CREATE TABLE class_teacher (
   CONSTRAINT fk_ct_teacher FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='Phân công giảng viên vào lớp';
 
-CREATE TABLE salary_config (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  role_name VARCHAR(50) NOT NULL,
-  base_salary DECIMAL(12,2) NOT NULL,
-  allowance DECIMAL(12,2) DEFAULT 0,
-  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (id)
-) ENGINE=InnoDB COMMENT='Cấu hình lương cơ bản';
-
 CREATE TABLE salary_grade (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  grade_name VARCHAR(50) NOT NULL,
-  multiplier DECIMAL(4,2) NOT NULL DEFAULT 1.0,
+  school_id INT UNSIGNED NOT NULL,
+  degree VARCHAR(50) NOT NULL COMMENT 'Cử nhân, Thạc sĩ, Tiến sĩ...',
+  coefficient DECIMAL(4,2) NOT NULL DEFAULT 1.0 COMMENT 'Hệ số',
+  rate_per_session DECIMAL(12,2) NOT NULL DEFAULT 0.0 COMMENT 'Đơn giá tiết dạy',
+  description VARCHAR(255) NULL,
+  effective_from DATE NOT NULL,
+  effective_to DATE NULL,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (id)
-) ENGINE=InnoDB COMMENT='Bậc lương';
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by INT UNSIGNED NULL,
+  updated_by INT UNSIGNED NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_sg_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE,
+  CONSTRAINT fk_sg_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT fk_sg_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB COMMENT='Bậc lương giảng viên';
+
+CREATE TABLE salary_config (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  school_id INT UNSIGNED NOT NULL,
+  salary_grade_id INT UNSIGNED NOT NULL,
+  name VARCHAR(100) NOT NULL COMMENT 'Tên cấu hình',
+  base_salary DECIMAL(12,2) NOT NULL COMMENT 'Lương cơ bản',
+  effective_from DATE NOT NULL,
+  effective_to DATE NULL,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  note VARCHAR(255) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by INT UNSIGNED NULL,
+  updated_by INT UNSIGNED NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_sc_school FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE,
+  CONSTRAINT fk_sc_grade FOREIGN KEY (salary_grade_id) REFERENCES salary_grade(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_sc_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT fk_sc_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB COMMENT='Cấu hình lương cơ bản';
 
 CREATE TABLE teacher_salary_sheet (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   teacher_id INT UNSIGNED NOT NULL,
+  salary_config_id INT UNSIGNED NOT NULL,
+  salary_grade_id INT UNSIGNED NULL,
   semester_id INT UNSIGNED NOT NULL,
-  total_hours INT NOT NULL DEFAULT 0,
-  total_salary DECIMAL(12,2) NOT NULL DEFAULT 0,
-  status ENUM('PENDING', 'PAID', 'CANCELLED') NOT NULL DEFAULT 'PENDING',
+  period_month INT NOT NULL,
+  period_year INT NOT NULL,
+  degree_snapshot VARCHAR(50) NOT NULL,
+  coefficient_snapshot DECIMAL(4,2) NOT NULL,
+  base_salary_snapshot DECIMAL(12,2) NOT NULL,
+  rate_snapshot DECIMAL(12,2) NULL,
+  planned_sessions INT NOT NULL,
+  actual_sessions INT NOT NULL,
+  base_amount DECIMAL(12,2) NOT NULL,
+  session_amount DECIMAL(12,2) NOT NULL,
+  bonus_amount DECIMAL(12,2) NOT NULL,
+  deduction_amount DECIMAL(12,2) NOT NULL,
+  net_amount DECIMAL(12,2) NOT NULL,
+  status ENUM('DRAFT', 'CONFIRMED', 'PAID', 'CANCELLED') NOT NULL DEFAULT 'DRAFT',
+  payment_date DATE NULL,
+  text VARCHAR(255) NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by INT UNSIGNED NULL,
+  updated_by INT UNSIGNED NULL,
   PRIMARY KEY (id),
   CONSTRAINT fk_tss_teacher FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE,
-  CONSTRAINT fk_tss_semester FOREIGN KEY (semester_id) REFERENCES semesters(id) ON DELETE CASCADE
+  CONSTRAINT fk_tss_config FOREIGN KEY (salary_config_id) REFERENCES salary_config(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_tss_grade FOREIGN KEY (salary_grade_id) REFERENCES salary_grade(id) ON DELETE SET NULL,
+  CONSTRAINT fk_tss_semester FOREIGN KEY (semester_id) REFERENCES semesters(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_tss_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT fk_tss_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB COMMENT='Bảng lương tổng của giảng viên theo kỳ';
 
 CREATE TABLE teacher_salary_detail (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   sheet_id INT UNSIGNED NOT NULL,
+  teacher_id INT UNSIGNED NOT NULL,
   class_id INT UNSIGNED NOT NULL,
-  hours INT NOT NULL DEFAULT 0,
+  schedule_id INT UNSIGNED NULL,
+  session_date DATE NOT NULL,
+  session_count INT NOT NULL,
+  teacher_role ENUM('MAIN', 'ASSISTANT', 'SUBSTITUTE') NOT NULL DEFAULT 'MAIN',
+  rate_snapshot DECIMAL(12,2) NOT NULL,
   amount DECIMAL(12,2) NOT NULL,
+  note VARCHAR(255) NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  created_by INT UNSIGNED NULL,
+  updated_by INT UNSIGNED NULL,
   PRIMARY KEY (id),
   CONSTRAINT fk_tsd_sheet FOREIGN KEY (sheet_id) REFERENCES teacher_salary_sheet(id) ON DELETE CASCADE,
-  CONSTRAINT fk_tsd_class FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE RESTRICT
-) ENGINE=InnoDB COMMENT='Chi tiết lương theo từng lớp';
+  CONSTRAINT fk_tsd_teacher FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE,
+  CONSTRAINT fk_tsd_class FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE RESTRICT,
+  CONSTRAINT fk_tsd_schedule FOREIGN KEY (schedule_id) REFERENCES schedules(id) ON DELETE SET NULL,
+  CONSTRAINT fk_tsd_cby FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  CONSTRAINT fk_tsd_uby FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+) ENGINE=InnoDB COMMENT='Chi tiết thanh toán lương giảng viên';
+
+SET FOREIGN_KEY_CHECKS = 1;

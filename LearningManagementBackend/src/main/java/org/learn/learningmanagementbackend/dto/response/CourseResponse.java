@@ -9,8 +9,8 @@ public class CourseResponse {
     private String code;
     private String name;
     private Integer credits;
-    private Integer theorySessions;
-    private Integer practicalSessions;
+
+
     private Integer totalSessions;
     private String description;
     private Integer departmentId;
@@ -22,8 +22,8 @@ public class CourseResponse {
         this.code = course.getCode();
         this.name = course.getName();
         this.credits = course.getCredits();
-        this.theorySessions = course.getTheorySessions();
-        this.practicalSessions = course.getPracticalSessions();
+
+
         this.totalSessions = course.getTotalSessions();
         this.description = course.getDescription();
         this.isActive = course.getIsActive() != null ? course.getIsActive() : true;

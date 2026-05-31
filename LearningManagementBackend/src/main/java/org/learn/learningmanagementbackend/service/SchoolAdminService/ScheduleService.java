@@ -30,7 +30,7 @@ public class ScheduleService {
         Integer userId = ((CustomUserDetails) principal).getUserId();
         try {
             Integer schoolId = entityManager.createQuery(
-                    "SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    "SELECT u.school.id FROM Users u WHERE u.id = :userId", Integer.class)
                     .setParameter("userId", userId).setMaxResults(1).getSingleResult();
             return scheduleRepository.findBySchoolId(schoolId).stream().map(this::mapToResponse).collect(Collectors.toList());
         } catch (Exception e) { return List.of(); }

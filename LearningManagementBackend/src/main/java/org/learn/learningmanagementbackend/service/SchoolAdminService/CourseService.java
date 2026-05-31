@@ -37,7 +37,7 @@ public class CourseService {
 
         Integer schoolId;
         try {
-            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+            schoolId = entityManager.createQuery("SELECT u.school.id FROM Users u WHERE u.id = :userId", Integer.class)
                     .setParameter("userId", userId).setMaxResults(1).getSingleResult();
         } catch (Exception e) {
             return java.util.Collections.emptyList();
@@ -61,9 +61,7 @@ public class CourseService {
         course.setCode(request.getCode());
         course.setName(request.getName());
         course.setCredits(request.getCredits());
-        course.setTheorySessions(request.getTheorySessions());
-        course.setPracticalSessions(request.getPracticalSessions());
-        course.setTotalSessions(request.getTheorySessions() + request.getPracticalSessions());
+        course.setTotalSessions(30);
         course.setDescription(request.getDescription());
         course.setDepartment(department);
         course.setIsActive(true);
@@ -86,9 +84,7 @@ public class CourseService {
         course.setCode(request.getCode());
         course.setName(request.getName());
         course.setCredits(request.getCredits());
-        course.setTheorySessions(request.getTheorySessions());
-        course.setPracticalSessions(request.getPracticalSessions());
-        course.setTotalSessions(request.getTheorySessions() + request.getPracticalSessions());
+        course.setTotalSessions(30);
         course.setDescription(request.getDescription());
         course.setDepartment(department);
 

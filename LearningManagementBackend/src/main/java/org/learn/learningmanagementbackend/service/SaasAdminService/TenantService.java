@@ -68,7 +68,7 @@ public class TenantService {
         adminUser.setCitizenIdNumber("079" + String.format("%09d", new Random().nextInt(999999999)));
         adminUser.setFullName(request.getAdminName() != null ? request.getAdminName() : "Admin " + request.getSchoolName());
         adminUser.setEmail(request.getAdminEmail());
-        adminUser.setPasswordHash(passwordEncoder.encode("Admin@123"));
+        adminUser.setPasswordHash(passwordEncoder.encode("123456"));
         adminUser.setIsActive(true);
 
         school.addUser(adminUser);

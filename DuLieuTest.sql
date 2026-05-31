@@ -30,19 +30,18 @@ TRUNCATE TABLE school_branches;
 TRUNCATE TABLE schools;
 TRUNCATE TABLE role;
 
-SET FOREIGN_KEY_CHECKS = 1;
-
+-- Giữ FOREIGN_KEY_CHECKS = 0 trong lúc insert để không bị lỗi thứ bậc
 -- ============================================================
 -- PHẦN 2: LỆNH INSERT DỮ LIỆU MẪU (MOCK DATA)
 -- ============================================================
 
-INSERT INTO role (name, description) VALUES
+INSERT IGNORE INTO role (name, description) VALUES
   ('SAAS_ADMIN',   'Quản trị viên hệ thống'),
   ('LECTURER', 'Giảng viên'),
   ('STUDENT', 'Sinh viên / Học sinh'),
   ('SCHOOL_ADMIN', 'Admin nha truong');
 
-INSERT INTO users (
+INSERT IGNORE INTO users (
     school_id,
     code,
     citizen_id_number,
@@ -70,14 +69,14 @@ INSERT INTO users (
     NOW()
 );
 
-INSERT INTO user_roles (user_id, role_id)
+INSERT IGNORE INTO user_roles (user_id, role_id)
 VALUES (
     (SELECT id FROM users WHERE email = 'admin@hcmut.edu.vn' LIMIT 1),
     (SELECT id FROM role WHERE name = 'SCHOOL_ADMIN' LIMIT 1)
 );
 
 -- 2. BẢNG SCHOOL (12 dòng)
-INSERT INTO schools (id, code, name, short_name, type, email) VALUES
+INSERT IGNORE INTO schools (id, code, name, short_name, type, email) VALUES
 (1, 'HUIT', 'Đại học Công Thương TP.HCM', 'HUIT', 'UNIVERSITY', 'contact@huit.edu.vn'),
 (2, 'HCMUT', 'Đại học Bách Khoa TP.HCM', 'HCMUT', 'UNIVERSITY', 'info@hcmut.edu.vn'),
 (3, 'KHTN', 'Đại học Khoa Học Tự Nhiên', 'HCMUS', 'UNIVERSITY', 'info@hcmus.edu.vn'),
@@ -92,7 +91,7 @@ INSERT INTO schools (id, code, name, short_name, type, email) VALUES
 (12, 'IELTS_HCM', 'Trung tâm IELTS HCM', 'IELTS', 'LANGUAGE_CENTER', 'ielts@hcm.com');
 
 -- 3. BẢNG SCHOOL_BRANCHES (12 dòng)
-INSERT INTO school_branches (id, school_id, code, name, address, is_main) VALUES
+INSERT IGNORE INTO school_branches (id, school_id, code, name, address, is_main) VALUES
 (1, 1, 'HUIT_CS1', 'Cơ sở chính HUIT', '140 Lê Trọng Tấn, Tân Phú', 1),
 (2, 2, 'HCMUT_CS1', 'Cơ sở Lý Thường Kiệt', '268 Lý Thường Kiệt, Q10', 1),
 (3, 3, 'KHTN_CS1', 'Cơ sở Nguyễn Văn Cừ', '227 Nguyễn Văn Cừ, Q5', 1),
@@ -107,7 +106,7 @@ INSERT INTO school_branches (id, school_id, code, name, address, is_main) VALUES
 (12, 12, 'IELTS_CS1', 'Chi nhánh IELTS Q1', '100 Trần Hưng Đạo, Q1', 1);
 
 -- 4. BẢNG ACADEMIC_YEAR (12 dòng - Tập trung cho trường 1 - HUIT)
-INSERT INTO academic_years (id, school_id, name, start_date, end_date) VALUES
+INSERT IGNORE INTO academic_years (id, school_id, name, start_date, end_date) VALUES
 (1, 1, '2024-2025', '2024-08-01', '2025-07-31'),
 (2, 1, '2025-2026', '2025-08-01', '2026-07-31'),
 (3, 1, '2026-2027', '2026-08-01', '2027-07-31'),
@@ -122,7 +121,7 @@ INSERT INTO academic_years (id, school_id, name, start_date, end_date) VALUES
 (12, 10, '2025-2026', '2025-08-01', '2026-07-31');
 
 -- 5. BẢNG SEMESTER (12 dòng)
-INSERT INTO semesters (id, academic_year_id, name, start_date, end_date) VALUES
+INSERT IGNORE INTO semesters (id, academic_year_id, name, start_date, end_date) VALUES
 (1, 2, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
 (2, 2, 'Học kỳ 2', '2026-01-15', '2026-05-31'),
 (3, 2, 'Học kỳ hè', '2026-06-01', '2026-07-30'),
@@ -137,7 +136,7 @@ INSERT INTO semesters (id, academic_year_id, name, start_date, end_date) VALUES
 (12, 10, 'Học kỳ 1', '2025-08-15', '2025-12-31');
 
 -- 6. BẢNG DEPARTMENT (12 dòng)
-INSERT INTO departments (id, school_id, code, name) VALUES
+INSERT IGNORE INTO departments (id, school_id, code, name) VALUES
 (1, 1, 'CNTT', 'Khoa Công Nghệ Thông Tin'),
 (2, 1, 'KTDN', 'Khoa Kế toán - Tài chính'),
 (3, 1, 'NN', 'Khoa Ngoại Ngữ'),
@@ -152,7 +151,7 @@ INSERT INTO departments (id, school_id, code, name) VALUES
 (12, 12, 'IELTS_ENG', 'Bộ môn IELTS');
 
 -- 7. BẢNG USERS (24 dòng: 12 GV, 12 SV để map cho thoải mái)
-INSERT INTO users (id, school_id, code, citizen_id_number, full_name, email, password_hash, gender, address) VALUES
+INSERT IGNORE INTO users (id, school_id, code, citizen_id_number, full_name, email, password_hash, gender, address) VALUES
 (99, 1, 'SAAS999', '079001000099', 'SaaS Super Admin', 'superadmin@edusaas.io', 'hash123', 'MALE', 'System'),
 (1, 1, 'USR001', '079001000001', 'Nguyễn Văn Admin', 'admin@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
 (2, 1, 'USR002', '079001000002', 'Trần Lập Trình', 'gv1@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
@@ -180,11 +179,12 @@ INSERT INTO users (id, school_id, code, citizen_id_number, full_name, email, pas
 (24, 1, 'USR024', '079001000024', 'Lưu Bị', 'bi.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC')
 ;
 
+SET SQL_SAFE_UPDATES = 0;
 Update users
 set password_hash = '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG';
 SELECT * FROM users;
 
-INSERT INTO users (
+INSERT IGNORE INTO users (
     school_id,
     code,
     citizen_id_number,
@@ -198,12 +198,12 @@ INSERT INTO users (
     created_at,
     updated_at
 ) VALUES (
-    1,
+    2,
     'ADM-HCMUT-01',
     '079200000001',
     'Admin Bách Khoa',
     'admin@hcmut.edu.vn',
-    '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG', -- Đây là chuỗi Bcrypt hash của mật khẩu 'Admin@123'
+    '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG',
     '0909123456',
     '268 Lý Thường Kiệt, Quận 10, TP.HCM',
     'MALE',
@@ -212,14 +212,14 @@ INSERT INTO users (
     NOW()
 );
 
-INSERT INTO user_roles (user_id, role_id)
+INSERT IGNORE INTO user_roles (user_id, role_id)
 VALUES (
     (SELECT id FROM users WHERE email = 'admin@hcmut.edu.vn' LIMIT 1),
     (SELECT id FROM role WHERE name = 'SCHOOL_ADMIN' LIMIT 1)
 );
 
 -- 8. BẢNG USER_SCHOOL (24 dòng tương ứng)
-INSERT INTO user_roles (user_id, role_id) VALUES
+INSERT IGNORE INTO user_roles (user_id, role_id) VALUES
 (99, 1),
 (1, 1), (2, 2), (3, 2), (4, 2),
 (5, 2), (6, 2), (7, 2), (8, 2),
@@ -229,7 +229,7 @@ INSERT INTO user_roles (user_id, role_id) VALUES
 (21, 3), (22, 3), (23, 3), (24, 3);
 
 -- 9. BẢNG TEACHER (11 dòng)
-INSERT INTO teachers (id, user_id, teacher_code, department_id, degree) VALUES
+INSERT IGNORE INTO teachers (id, user_id, teacher_code, department_id, degree) VALUES
 (1, 2, 'GV001', 1, 'Tiến sĩ'),
 (2, 3, 'GV002', 6, 'Thạc sĩ'),
 (3, 4, 'GV003', 3, 'Cử nhân'),
@@ -243,7 +243,7 @@ INSERT INTO teachers (id, user_id, teacher_code, department_id, degree) VALUES
 (11, 12, 'GV011', 2, 'Thạc sĩ');
 
 -- 10. BẢNG STUDENT (12 dòng)
-INSERT INTO students (id, user_id, student_code, department_id, enrollment_year, class_name) VALUES
+INSERT IGNORE INTO students (id, user_id, student_code, department_id, enrollment_year, class_name) VALUES
 (1, 13, '2001216301', 1, 2023, '12DHTH01'),
 (2, 14, '2001216302', 1, 2023, '12DHTH01'),
 (3, 15, '2001216303', 1, 2023, '12DHTH02'),
@@ -259,7 +259,7 @@ INSERT INTO students (id, user_id, student_code, department_id, enrollment_year,
 
 
 -- 11. BẢNG COURSE (12 dòng)
-INSERT INTO courses (id, code, name, credits, department_id) VALUES
+INSERT IGNORE INTO courses (id, code, name, credits, department_id) VALUES
 (1, 'INT101', 'Lập trình Java', 3, 1),
 (2, 'INT102', 'Lập trình Web (Spring Boot)', 3, 1),
 (3, 'INT103', 'Cơ sở dữ liệu', 3, 1),
@@ -274,7 +274,7 @@ INSERT INTO courses (id, code, name, credits, department_id) VALUES
 (12, 'INT104', 'Trí tuệ nhân tạo (AI)', 4, 1);
 
 -- 12. BẢNG ROOM (12 dòng)
-INSERT INTO rooms (id, branch_id, building, room_number, capacity, type) VALUES
+INSERT IGNORE INTO rooms (id, branch_id, building, room_number, capacity, type) VALUES
 (1, 1, 'C', 'C101', 50, 'CLASSROOM'),
 (2, 1, 'C', 'C102', 50, 'CLASSROOM'),
 (3, 1, 'F', 'F201', 40, 'LAB'),
@@ -289,37 +289,37 @@ INSERT INTO rooms (id, branch_id, building, room_number, capacity, type) VALUES
 (12, 1, 'A', 'A205', 40, 'SEMINAR');
 
 -- 13. BẢNG CLASS (12 dòng)
-INSERT INTO classes (id, code, course_id, semester_id, max_students, status) VALUES
-(1, 'INT101-HK2-01', 1, 2, 40, 'OPEN'),
-(2, 'INT102-HK2-01', 2, 2, 40, 'OPEN'),
-(3, 'INT103-HK2-01', 3, 2, 40, 'OPEN'),
-(4, 'ENG101-HK2-01', 4, 2, 40, 'IN_PROGRESS'),
-(5, 'ENG102-HK2-01', 5, 2, 40, 'OPEN'),
-(6, 'ACC101-HK2-01', 6, 2, 50, 'OPEN'),
-(7, 'ACC102-HK2-01', 7, 2, 50, 'COMPLETED'),
-(8, 'BUS101-HK2-01', 8, 2, 60, 'OPEN'),
-(9, 'BUS102-HK2-01', 9, 2, 60, 'CLOSED'),
-(10, 'ELE101-HK2-01', 10, 2, 40, 'OPEN'),
-(11, 'ELE102-HK2-01', 11, 2, 40, 'OPEN'),
-(12, 'INT104-HK2-01', 12, 2, 40, 'OPEN');
+INSERT IGNORE INTO classes (id, code, course_id, semester_id, max_students, status, teacher_id) VALUES
+(1, 'INT101-HK2-01', 1, 2, 40, 'OPEN', 1),
+(2, 'INT102-HK2-01', 2, 2, 40, 'OPEN', 1),
+(3, 'INT103-HK2-01', 3, 2, 40, 'OPEN', 2),
+(4, 'ENG101-HK2-01', 4, 2, 40, 'IN_PROGRESS', 3),
+(5, 'ENG102-HK2-01', 5, 2, 40, 'OPEN', 3),
+(6, 'ACC101-HK2-01', 6, 2, 50, 'OPEN', 8),
+(7, 'ACC102-HK2-01', 7, 2, 50, 'COMPLETED', 11),
+(8, 'BUS101-HK2-01', 8, 2, 60, 'OPEN', 10),
+(9, 'BUS102-HK2-01', 9, 2, 60, 'CLOSED', 10),
+(10, 'ELE101-HK2-01', 10, 2, 40, 'OPEN', 9),
+(11, 'ELE102-HK2-01', 11, 2, 40, 'OPEN', 9),
+(12, 'INT104-HK2-01', 12, 2, 40, 'OPEN', 1);
 
 -- 14. BẢNG CLASS_TEACHER (12 dòng)
-INSERT INTO Class_Teacher (class_id, teacher_id, role) VALUES
-(1, 1, 'main'),
-(2, 1, 'main'),
-(3, 2, 'main'),
-(4, 3, 'main'),
-(5, 3, 'main'),
-(6, 8, 'main'),
-(7, 11, 'main'),
-(8, 10, 'main'),
-(9, 10, 'main'),
-(10, 9, 'main'),
-(11, 9, 'assistant'),
-(12, 1, 'main');
+INSERT IGNORE INTO Class_Teacher (class_id, teacher_id, role) VALUES
+(1, 1, 'MAIN'),
+(2, 1, 'MAIN'),
+(3, 2, 'MAIN'),
+(4, 3, 'MAIN'),
+(5, 3, 'MAIN'),
+(6, 8, 'MAIN'),
+(7, 11, 'MAIN'),
+(8, 10, 'MAIN'),
+(9, 10, 'MAIN'),
+(10, 9, 'MAIN'),
+(11, 9, 'ASSISTANT'),
+(12, 1, 'MAIN');
 
 -- 15. BẢNG SCHEDULE (12 dòng)
-INSERT INTO schedules (id, class_id, room_id, day_of_week, start_time, end_time, start_date, end_date, start_period, end_period, type) VALUES
+INSERT IGNORE INTO schedules (id, class_id, room_id, day_of_week, start_time, end_time, start_date, end_date, start_period, end_period, type) VALUES
 (1, 1, 3, 2, '07:00:00', '09:30:00', '2026-01-15', '2026-05-15', 1, 3, 'REGULAR'),
 (2, 2, 4, 3, '09:40:00', '12:10:00', '2026-01-15', '2026-05-15', 4, 6, 'REGULAR'),
 (3, 3, 1, 4, '13:00:00', '15:30:00', '2026-01-15', '2026-05-15', 7, 9, 'REGULAR'),
@@ -334,22 +334,22 @@ INSERT INTO schedules (id, class_id, room_id, day_of_week, start_time, end_time,
 (12, 12, 4, 2, '15:40:00', '18:10:00', '2026-01-15', '2026-05-15', 10, 12, 'REGULAR');
 
 -- 16. BẢNG SCHEDULE_EXCEPTION (12 dòng)
-INSERT INTO schedule_exceptions (id, schedule_id, exception_date, reason, exception_type) VALUES
-(1, 1, '2026-03-02', 'Giảng viên bệnh', 'cancelled'),
-(2, 2, '2026-03-03', 'Họp khoa', 'cancelled'),
-(3, 3, '2026-03-04', 'Cúp điện', 'cancelled'),
-(4, 4, '2026-03-05', 'Lễ', 'cancelled'),
-(5, 5, '2026-03-06', 'Thi giữa kỳ', 'rescheduled'),
-(6, 6, '2026-03-09', 'Nghỉ bù', 'cancelled'),
-(7, 7, '2026-03-10', 'Bảo trì phòng máy', 'room_change'),
-(8, 8, '2026-03-11', 'Lịch công tác', 'cancelled'),
-(9, 9, '2026-03-12', 'Bận đột xuất', 'cancelled'),
-(10, 10, '2026-03-13', 'Thi Olimpic', 'cancelled'),
-(11, 11, '2026-03-14', 'Nghỉ hè', 'cancelled'),
-(12, 12, '2026-03-16', 'Họp Bộ môn', 'cancelled');
+INSERT IGNORE INTO schedule_exceptions (id, schedule_id, exception_date, reason, exception_type) VALUES
+(1, 1, '2026-03-02', 'Giảng viên bệnh', 'CANCELLED'),
+(2, 2, '2026-03-03', 'Họp khoa', 'CANCELLED'),
+(3, 3, '2026-03-04', 'Cúp điện', 'CANCELLED'),
+(4, 4, '2026-03-05', 'Lễ', 'CANCELLED'),
+(5, 5, '2026-03-06', 'Thi giữa kỳ', 'RESCHEDULED'),
+(6, 6, '2026-03-09', 'Nghỉ bù', 'CANCELLED'),
+(7, 7, '2026-03-10', 'Bảo trì phòng máy', 'ROOM_CHANGE'),
+(8, 8, '2026-03-11', 'Lịch công tác', 'CANCELLED'),
+(9, 9, '2026-03-12', 'Bận đột xuất', 'CANCELLED'),
+(10, 10, '2026-03-13', 'Thi Olimpic', 'CANCELLED'),
+(11, 11, '2026-03-14', 'Nghỉ hè', 'CANCELLED'),
+(12, 12, '2026-03-16', 'Họp Bộ môn', 'CANCELLED');
 
 -- 17. BẢNG ENROLLMENT (12 dòng)
-INSERT INTO enrollments (id, student_id, class_id, status, grade_total) VALUES
+INSERT IGNORE INTO enrollments (id, student_id, class_id, status, grade_total) VALUES
 (1, 1, 1, 'ENROLLED', 9.5),
 (2, 2, 1, 'ENROLLED', NULL),
 (3, 3, 1, 'ENROLLED', NULL),
@@ -368,7 +368,7 @@ INSERT INTO enrollments (id, student_id, class_id, status, grade_total) VALUES
 (12, 12, 1, 'ENROLLED', NULL);
 
 -- 18. BẢNG ATTENDANCE_RECORD (12 dòng)
-INSERT INTO attendance_records (id, schedule_id, student_id, attendance_date, status, checked_by, checked_at) VALUES
+INSERT IGNORE INTO attendance_records (id, schedule_id, student_id, attendance_date, status, checked_by, checked_at) VALUES
 (1, 1, 1, '2026-02-16', 'PRESENT', 2, '2026-02-16 08:00:00'),
 (2, 1, 2, '2026-02-16', 'LATE', 2, '2026-02-16 08:15:00'),
 (3, 1, 3, '2026-02-16', 'ABSENT', 2, '2026-02-16 08:00:00'),
@@ -383,7 +383,7 @@ INSERT INTO attendance_records (id, schedule_id, student_id, attendance_date, st
 (12, 1, 12, '2026-02-16', 'PRESENT', 2, '2026-02-16 08:00:00');
 
 -- 19. BẢNG NOTIFICATION (12 dòng)
-INSERT INTO notifications (id, user_id, title, body, type, is_read) VALUES
+INSERT IGNORE INTO notifications (id, user_id, title, body, type, is_read) VALUES
 (1, 13, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE', 0),
 (2, 14, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE', 0),
 (3, 15, 'Báo nghỉ học', 'Lớp INT101 nghỉ ngày 02/03', 'SCHEDULE_CHANGE', 0),
@@ -398,7 +398,7 @@ INSERT INTO notifications (id, user_id, title, body, type, is_read) VALUES
 (12, 13, 'Cập nhật điểm', 'Điểm QT đã được update', 'GRADE', 0);
 
 -- 20. BẢNG TUITION_INVOICE (12 dòng)
-INSERT INTO tuition_invoices (id, student_id, semester_id, total_amount, paid_amount, due_date, status) VALUES
+INSERT IGNORE INTO tuition_invoices (id, student_id, semester_id, total_amount, paid_amount, due_date, status) VALUES
 (1, 1, 2, 15000000.00, 15000000.00, '2026-03-30', 'PAID'),
 (2, 2, 2, 15000000.00, 5000000.00, '2026-03-30', 'PARTIAL'),
 (3, 3, 2, 15000000.00, 0.00, '2026-03-30', 'UNPAID'),
@@ -413,7 +413,7 @@ INSERT INTO tuition_invoices (id, student_id, semester_id, total_amount, paid_am
 (12, 12, 2, 15000000.00, 15000000.00, '2026-03-30', 'PAID');
 
 -- 21. BẢNG TUITION_PAYMENT (12 dòng)
-INSERT INTO tuition_payments (id, invoice_id, amount, payment_method, transaction_code, status, payment_date) VALUES
+INSERT IGNORE INTO tuition_payments (id, invoice_id, amount, payment_method, transaction_code, status, payment_date) VALUES
 (1, 1, 15000000.00, 'BANK_TRANSFER', 'VN123456', 'SUCCESS', '2026-03-30 12:00:00'),
 (2, 2, 5000000.00, 'MOMO', 'MM98765', 'SUCCESS', '2026-03-30 12:00:00'),
 (3, 4, 14000000.00, 'VNPAY', 'VNP1122', 'SUCCESS', '2026-03-30 12:00:00'),
@@ -428,7 +428,7 @@ INSERT INTO tuition_payments (id, invoice_id, amount, payment_method, transactio
 (12, 6, 0.00, 'VISA', 'FAIL04', 'FAILED', '2026-03-30 12:00:00');
 
 -- 22. BẢNG STUDENT_SEMESTER_SUMMARY (12 dòng)
-INSERT INTO student_semester_summaries (id, student_id, semester_id, gpa, credits_earned, conduct_score, conduct_grade) VALUES
+INSERT IGNORE INTO student_semester_summaries (id, student_id, semester_id, gpa, credits_earned, conduct_score, conduct_grade) VALUES
 (1, 1, 1, 3.50, 15, 90, 'Xuất sắc'),
 (2, 2, 1, 3.20, 15, 85, 'Tốt'),
 (3, 3, 1, 2.80, 15, 75, 'Khá'),
@@ -444,7 +444,7 @@ INSERT INTO student_semester_summaries (id, student_id, semester_id, gpa, credit
 (13, 1, 2, NULL, NULL, 95, 'Xuất sắc');
 
 -- 23. BẢNG SALARY_GRADE (12 dòng)
-INSERT INTO Salary_grade (id, school_id, degree, coefficient, rate_per_session, effective_from) VALUES
+INSERT IGNORE INTO Salary_grade (id, school_id, degree, coefficient, rate_per_session, effective_from) VALUES
 (1, 1, 'Tiến sĩ', 1.60, 250000.00, '2026-01-01'),
 (2, 1, 'Thạc sĩ', 1.30, 180000.00, '2026-01-01'),
 (3, 1, 'Cử nhân', 1.00, 120000.00, '2026-01-01'),
@@ -459,7 +459,7 @@ INSERT INTO Salary_grade (id, school_id, degree, coefficient, rate_per_session, 
 (12, 8, 'Cử nhân', 1.00, 110000.00, '2026-01-01');
 
 -- 24. BẢNG SALARY_CONFIG (12 dòng)
-INSERT INTO Salary_config (id, school_id, salary_grade_id, name, base_salary, effective_from) VALUES
+INSERT IGNORE INTO Salary_config (id, school_id, salary_grade_id, name, base_salary, effective_from) VALUES
 (1, 1, 1, 'Lương TS 2026', 2340000.00, '2026-01-01'),
 (2, 1, 2, 'Lương ThS 2026', 2340000.00, '2026-01-01'),
 (3, 1, 3, 'Lương CN 2026', 2340000.00, '2026-01-01'),
@@ -475,7 +475,7 @@ INSERT INTO Salary_config (id, school_id, salary_grade_id, name, base_salary, ef
 
 -- 25. BẢNG TEACHER_SALARY_SHEET (12 dòng)
 -- 25. BẢNG TEACHER_SALARY_SHEET (12 dòng)
-INSERT INTO Teacher_salary_sheet (id, teacher_id, salary_config_id, semester_id, period_month, period_year, degree_snapshot, coefficient_snapshot, base_salary_snapshot, rate_snapshot, planned_sessions, actual_sessions, base_amount, session_amount, bonus_amount, deduction_amount, net_amount, status) VALUES
+INSERT IGNORE INTO Teacher_salary_sheet (id, teacher_id, salary_config_id, semester_id, period_month, period_year, degree_snapshot, coefficient_snapshot, base_salary_snapshot, rate_snapshot, planned_sessions, actual_sessions, base_amount, session_amount, bonus_amount, deduction_amount, net_amount, status) VALUES
 (1, 1, 1, 2, 3, 2026, 'Tiến sĩ', 1.60, 2340000.00, 250000.00, 20, 20, 3744000.00, 5000000.00, 1000000.00, 500000.00, 9244000.00, 'CONFIRMED'),
 (2, 2, 2, 2, 3, 2026, 'Thạc sĩ', 1.30, 2340000.00, 180000.00, 16, 15, 3042000.00, 2700000.00, 500000.00, 300000.00, 5942000.00, 'CONFIRMED'),
 (3, 3, 3, 2, 3, 2026, 'Cử nhân', 1.00, 2340000.00, 120000.00, 10, 10, 2340000.00, 1200000.00, 0.00, 200000.00, 3340000.00, 'DRAFT'),
@@ -490,7 +490,7 @@ INSERT INTO Teacher_salary_sheet (id, teacher_id, salary_config_id, semester_id,
 (12, 1, 1, 2, 4, 2026, 'Tiến sĩ', 1.60, 2340000.00, 250000.00, 24, 24, 3744000.00, 6000000.00, 1000000.00, 600000.00, 10144000.00, 'DRAFT');
 
 -- 26. BẢNG TEACHER_SALARY_DETAIL (12 dòng)
-INSERT INTO Teacher_salary_detail (id, sheet_id, teacher_id, class_id, schedule_id, session_date, session_count, teacher_role, rate_snapshot, amount) VALUES
+INSERT IGNORE INTO Teacher_salary_detail (id, sheet_id, teacher_id, class_id, schedule_id, session_date, session_count, teacher_role, rate_snapshot, amount) VALUES
 (1, 1, 1, 1, 1, '2026-03-02', 3, 'MAIN', 250000.00, 750000.00),
 (2, 1, 1, 1, 1, '2026-03-09', 3, 'MAIN', 250000.00, 750000.00),
 (3, 1, 1, 2, 2, '2026-03-03', 3, 'MAIN', 250000.00, 750000.00),
@@ -504,14 +504,14 @@ INSERT INTO Teacher_salary_detail (id, sheet_id, teacher_id, class_id, schedule_
 (11, 9, 9, 10, 10, '2026-03-14', 3, 'MAIN', 250000.00, 750000.00),
 (12, 12, 1, 12, 12, '2026-04-01', 3, 'MAIN', 250000.00, 750000.00);
 
-INSERT INTO teacher_evaluations (teacher_id, semester_id, class_id, score_knowledge, score_method, score_interaction, score_materials, score_punctuality, comment) VALUES
+INSERT IGNORE INTO teacher_evaluations (teacher_id, semester_id, class_id, score_knowledge, score_method, score_interaction, score_materials, score_punctuality, comment) VALUES
 (1, 2, 1, 5.0, 4.5, 5.0, 4.0, 5.0, 'Thầy giảng rất rõ ràng và dễ hiểu. Có nhiều ví dụ thực tế.'),
 (1, 2, 1, 4.5, 4.5, 4.0, 4.5, 5.0, 'Môn học thú vị, thầy nhiệt tình.'),
 (1, 2, 1, 4.0, 4.0, 4.5, 4.0, 4.5, 'Tốc độ giảng đôi lúc hơi nhanh nhưng slide rất chi tiết.'),
 (1, 2, 2, 5.0, 5.0, 5.0, 5.0, 5.0, 'Không có gì để chê, 10 điểm không có nhưng!'),
 (1, 2, 2, 4.5, 4.0, 4.5, 4.5, 4.5, 'Thầy vui tính, hay tương tác hỏi bài sinh viên.');
 
-INSERT INTO saas_plans (id, code, name, monthly_price, yearly_price, max_students, max_storage_gb, features, is_active, created_at, updated_at) VALUES
+INSERT IGNORE INTO saas_plans (id, code, name, monthly_price, yearly_price, max_students, max_storage_gb, features, is_active, created_at, updated_at) VALUES
 (1, 'STARTER', 'Starter', 1500000.00, 15000000.00, 500, 10,
  '[{"name":"Quản lý lớp học & Lịch học","included":true},{"name":"Điểm danh & Đăng ký","included":true},{"name":"Thông báo trong app","included":true},{"name":"1 cơ sở","included":true},{"name":"Học phí & Lương GV","included":false},{"name":"Báo cáo nâng cao","included":false},{"name":"API & SSO","included":false}]',
  true, NOW(), NOW()),
@@ -528,7 +528,7 @@ INSERT INTO saas_plans (id, code, name, monthly_price, yearly_price, max_student
 -- 3. BẢNG SAAS_SUBSCRIPTIONS (8 subscriptions cho 8 trường)
 -- ============================================================
 
-INSERT INTO saas_subscriptions (id, school_id, plan_id, start_date, end_date, billing_cycle, status, created_at, updated_at) VALUES
+INSERT IGNORE INTO saas_subscriptions (id, school_id, plan_id, start_date, end_date, billing_cycle, status, created_at, updated_at) VALUES
 (1, 1, 3, '2025-01-01', '2025-12-31', 'YEARLY', 'ACTIVE', NOW(), NOW()),
 (2, 2, 3, '2025-01-01', '2026-09-01', 'YEARLY', 'ACTIVE', NOW(), NOW()),
 (3, 3, 2, '2025-03-01', '2025-06-18', 'MONTHLY', 'ACTIVE', NOW(), NOW()),
@@ -546,7 +546,7 @@ UPDATE schools SET is_active = false WHERE id = 6;
 -- 4. BẢNG SAAS_INVOICES (7 hoá đơn)
 -- ============================================================
 
-INSERT INTO saas_invoices (id, school_id, subscription_id, amount, payment_status, payment_method, paid_at, created_at) VALUES
+INSERT IGNORE INTO saas_invoices (id, school_id, subscription_id, amount, payment_status, payment_method, paid_at, created_at) VALUES
 (1, 2, 2, 150000000.00, 'PAID', 'BANK_TRANSFER', '2025-01-15 10:00:00', '2025-01-15 08:00:00'),
 (2, 1, 1, 12500000.00, 'PENDING', 'MOMO', NULL, '2025-05-01 08:00:00'),
 (3, 3, 3, 5800000.00, 'PAID', 'VNPAY', '2025-05-02 14:30:00', '2025-05-01 08:00:00'),
@@ -559,7 +559,7 @@ INSERT INTO saas_invoices (id, school_id, subscription_id, amount, payment_statu
 -- 5. BẢNG SYSTEM_ERROR_LOGS (6 log entries)
 -- ============================================================
 
-INSERT INTO system_error_logs (id, school_id, endpoint, error_message, stack_trace, user_agent, is_resolved, created_at) VALUES
+INSERT IGNORE INTO system_error_logs (id, school_id, endpoint, error_message, stack_trace, user_agent, is_resolved, created_at) VALUES
 (1, 2, 'POST /api/v1/enrollments', 'Duplicate entry for student_id+class_id', 'com.mysql.cj.jdbc.exceptions.MysqlDataTruncation...', 'Mozilla/5.0', false, '2025-05-10 14:32:18'),
 (2, 1, 'GET /api/v1/schedules/weekly', 'NullPointerException at ScheduleService.java:142', 'java.lang.NullPointerException\n\tat ScheduleService.getWeeklySchedule(ScheduleService.java:142)', 'Mozilla/5.0', false, '2025-05-10 11:08:44'),
 (3, 7, 'POST /api/v1/salary/generate', 'salary_grade_id not found for degree=PGS.TS', 'org.springframework.dao.DataIntegrityViolationException...', 'Mozilla/5.0', false, '2025-05-10 09:21:03'),
@@ -568,7 +568,7 @@ INSERT INTO system_error_logs (id, school_id, endpoint, error_message, stack_tra
 (6, 4, 'POST /api/v1/auth/login', 'Too many login attempts from 118.70.x.x', 'org.springframework.security.authentication.LockedException...', 'Mozilla/5.0', true, '2025-05-08 22:14:37');
 
 
-INSERT INTO audit_logs (id, school_id, user_email, action, table_name, record_id, ip_address, created_at) VALUES
+INSERT IGNORE INTO audit_logs (id, school_id, user_email, action, table_name, record_id, ip_address, created_at) VALUES
 (1, 2, 'admin.hcmut@edu.vn', 'UPDATE', 'classes', 471, '203.113.x.x', '2025-05-10 15:44:22'),
 (2, 1, 'gv.nguyen@huit.edu.vn', 'INSERT', 'attendance_records', 98234, '14.225.x.x', '2025-05-10 14:30:11'),
 (3, 5, 'admin@uel.edu.vn', 'DELETE', 'schedule_exceptions', 312, '27.72.x.x', '2025-05-10 13:22:09'),
@@ -584,3 +584,14 @@ UNION ALL SELECT 'saas_subscriptions', COUNT(*) FROM saas_subscriptions
 UNION ALL SELECT 'saas_invoices', COUNT(*) FROM saas_invoices
 UNION ALL SELECT 'system_error_logs', COUNT(*) FROM system_error_logs
 UNION ALL SELECT 'audit_logs', COUNT(*) FROM audit_logs;
+
+USE quan_ly_lop_hoc;
+
+-- 1. Tạo lại tài khoản School Admin (HUIT)
+INSERT IGNORE INTO users (school_id, code, citizen_id_number, full_name, email, password_hash, gender, address, is_active) 
+VALUES (1, 'USR-HUIT-ADMIN', '079999000001', 'Nguyễn Văn Admin', 'admin@huit.edu.vn', '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG', 'MALE', 'HCMC', 1);
+
+-- 2. Cấp quyền SCHOOL_ADMIN (role_id = 4)
+INSERT IGNORE INTO user_roles (user_id, role_id) 
+VALUES ((SELECT id FROM users WHERE email = 'admin@huit.edu.vn'), 4);
+

@@ -20,11 +20,11 @@ public class CourseRequest {
 
     @NotNull(message = "Số tiết lý thuyết không được để trống")
     @Min(value = 0, message = "Số tiết lý thuyết không được âm")
-    private Integer theorySessions;
+
 
     @NotNull(message = "Số tiết thực hành không được để trống")
     @Min(value = 0, message = "Số tiết thực hành không được âm")
-    private Integer practicalSessions;
+
 
     private String description;
 

@@ -16,7 +16,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Integer>
     @Query("SELECT e FROM Enrollment e " +
             "JOIN FETCH e.student s " +
             "JOIN FETCH s.user u " +
-            "WHERE e.classes.id = :classId AND e.status = 'enrolled' " +
+            "WHERE e.classes.id = :classId AND e.status = 'ENROLLED' " +
             "ORDER BY s.studentCode ASC")
     List<Enrollment> getEnrolledStudentsByClassId(@Param("classId") Integer classId);
 

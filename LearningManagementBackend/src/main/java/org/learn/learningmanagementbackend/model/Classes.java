@@ -48,8 +48,7 @@ public class Classes extends BaseEntity{
     public void addTeacher(Teacher teacher, String role){
         ClassTeacher classTeacher = new ClassTeacher();
 
-        ClassTeacherId id = new ClassTeacherId(this.id, teacher.getId());
-        classTeacher.setId(id);
+
         classTeacher.setCourseClass(this);
         classTeacher.setTeacher(teacher);
         classTeacher.setRole(role);
