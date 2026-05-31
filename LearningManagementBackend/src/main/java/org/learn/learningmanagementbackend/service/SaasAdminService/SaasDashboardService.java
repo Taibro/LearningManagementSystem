@@ -133,7 +133,7 @@ public class SaasDashboardService {
             es.setSchoolId(sub.getSchool().getId());
             es.setSchoolName(sub.getSchool().getName());
             es.setPlanName(sub.getPlan().getName());
-            es.setStudentCount(userRepository.countBySchoolIdAndRoleName(sub.getSchool().getId(), "STUDENT"));
+            es.setStudentCount(userRepository.countBySchoolIdAndRoleNameNative(sub.getSchool().getId(), "STUDENT"));
             es.setDaysLeft((int) java.time.temporal.ChronoUnit.DAYS.between(now, sub.getEndDate()));
             es.setMonthlyPrice(sub.getPlan().getMonthlyPrice());
             expiringList.add(es);

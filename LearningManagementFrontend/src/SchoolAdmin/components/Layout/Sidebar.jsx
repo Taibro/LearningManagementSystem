@@ -48,8 +48,8 @@ export default function Sidebar() {
         </div>
         <div className="nav-section">
           <div className="nav-label">Nhân sự &amp; Học sinh</div>
-          <NavLink to="/teachers" className={navClass}><span className="nav-icon"><User className="w-4 h-4 inline-block mr-2" />‍<School className="w-4 h-4 inline-block mr-2" /></span> Giảng viên <span className="nav-badge">3</span></NavLink>
-          <NavLink to="/students" className={navClass}><span className="nav-icon"><User className="w-4 h-4 inline-block mr-2" />‍<GraduationCap className="w-4 h-4 inline-block mr-2" /></span> Sinh viên <span className="nav-badge">3</span></NavLink>
+          <NavLink to="/teachers" className={navClass}><span className="nav-icon">‍<School className="w-4 h-4 inline-block mr-2" /></span> Giảng viên <span className="nav-badge">3</span></NavLink>
+          <NavLink to="/students" className={navClass}><span className="nav-icon">‍<GraduationCap className="w-4 h-4 inline-block mr-2" /></span> Sinh viên <span className="nav-badge">3</span></NavLink>
           <NavLink to="/users" className={navClass}><span className="nav-icon"><User className="w-4 h-4 inline-block mr-2" /></span> Tài khoản</NavLink>
         </div>
         <div className="nav-section">

@@ -101,8 +101,8 @@ export default function Dashboard() {
         </div>
         <div className="card p-5">
           <p className="text-xs font-mono mb-3" style={{ color: 'var(--muted)' }}>TỔNG USERS</p>
-          <p className="stat-num text-3xl">{((stats?.totalStudents || 0) + (stats?.totalTeachers || 0)).toLocaleString()}</p>
-          <p className="text-xs mt-2" style={{ color: 'var(--muted)' }}>{(stats?.totalStudents || 0).toLocaleString()} SV · {(stats?.totalTeachers || 0).toLocaleString()} GV</p>
+          <p className="stat-num text-3xl">{((stats?.totalStudents || 0) + (stats?.totalTeachers || 0) + (stats?.totalSchoolAdmins || 0)).toLocaleString()}</p>
+          <p className="text-xs mt-2" style={{ color: 'var(--muted)' }}>{(stats?.totalStudents || 0).toLocaleString()} SV · {(stats?.totalTeachers || 0).toLocaleString()} GV · {(stats?.totalSchoolAdmins || 0).toLocaleString()} Admin</p>
         </div>
         <div className="card p-5">
           <p className="text-xs font-mono mb-3" style={{ color: 'var(--muted)' }}>STORAGE DÙNG</p>
@@ -171,11 +171,11 @@ export default function Dashboard() {
             <span className="badge badge-green">● All systems operational</span>
           </div>
           <div className="p-4 space-y-4">
-            <div><div className="flex justify-between text-xs mb-1.5"><span style={{ color: 'var(--muted)' }}>API Response Time</span><span className="font-mono">142ms avg</span></div><div className="progress"><div className="progress-fill" style={{ width: '15%', background: 'var(--accent3)' }}></div></div></div>
-            <div><div className="flex justify-between text-xs mb-1.5"><span style={{ color: 'var(--muted)' }}>CPU Load</span><span className="font-mono">34%</span></div><div className="progress"><div className="progress-fill" style={{ width: '34%', background: 'var(--accent)' }}></div></div></div>
-            <div><div className="flex justify-between text-xs mb-1.5"><span style={{ color: 'var(--muted)' }}>DB Connections</span><span className="font-mono">287 / 1000</span></div><div className="progress"><div className="progress-fill" style={{ width: '29%', background: 'var(--accent)' }}></div></div></div>
+            <div><div className="flex justify-between text-xs mb-1.5"><span style={{ color: 'var(--muted)' }}>API Response Time</span><span className="font-mono">{stats?.apiResponseTime || 0}ms avg</span></div><div className="progress"><div className="progress-fill" style={{ width: `${Math.min((stats?.apiResponseTime || 0) / 10, 100)}%`, background: 'var(--accent3)' }}></div></div></div>
+            <div><div className="flex justify-between text-xs mb-1.5"><span style={{ color: 'var(--muted)' }}>System Load (Memory)</span><span className="font-mono">{stats?.cpuLoad || 0}%</span></div><div className="progress"><div className="progress-fill" style={{ width: `${stats?.cpuLoad || 0}%`, background: 'var(--accent)' }}></div></div></div>
+            <div><div className="flex justify-between text-xs mb-1.5"><span style={{ color: 'var(--muted)' }}>DB Connections</span><span className="font-mono">{stats?.dbConnectionsActive || 0} / {stats?.dbConnectionsMax || 1000}</span></div><div className="progress"><div className="progress-fill" style={{ width: `${Math.min(((stats?.dbConnectionsActive || 0) / Math.max(stats?.dbConnectionsMax || 1000, 1)) * 100, 100)}%`, background: 'var(--accent)' }}></div></div></div>
             <div><div className="flex justify-between text-xs mb-1.5"><span style={{ color: 'var(--muted)' }}>Cloudinary Storage</span><span className="font-mono">{stats?.storageUsed || '0'} / {stats?.storageQuota || '0'}</span></div><div className="progress"><div className="progress-fill" style={{ width: `${stats?.storagePercent || 0}%`, background: 'var(--accent4)' }}></div></div></div>
-            <div><div className="flex justify-between text-xs mb-1.5"><span style={{ color: 'var(--muted)' }}>Uptime (30 ngày)</span><span className="font-mono text-green-400">99.97%</span></div><div className="progress"><div className="progress-fill" style={{ width: '99.97%', background: 'var(--accent3)' }}></div></div></div>
+            <div><div className="flex justify-between text-xs mb-1.5"><span style={{ color: 'var(--muted)' }}>Uptime (30 ngày)</span><span className="font-mono text-green-400">{(stats?.uptime || 99.99).toFixed(2)}%</span></div><div className="progress"><div className="progress-fill" style={{ width: `${stats?.uptime || 99.99}%`, background: 'var(--accent3)' }}></div></div></div>
           </div>
           <div className="px-4 pb-4">
             <div className="card-sm p-3 flex items-center gap-2">

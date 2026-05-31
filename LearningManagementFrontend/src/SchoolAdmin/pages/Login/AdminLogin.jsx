@@ -12,7 +12,6 @@ export default function AdminLogin() {
   const [saasView, setSaasView] = useState('main'); // 'main' | 'otp'
 
   // Input States
-  const [sSchool, setSSchool] = useState('');
   const [sEmail, setSEmail] = useState('admin@hcmut.edu.vn');
   const [sPass, setSPass] = useState('Admin@123');
   const [sShowPass, setSShowPass] = useState(false);
@@ -39,10 +38,9 @@ export default function AdminLogin() {
   // --- Handlers ---
   const handleSchoolLogin = async () => {
     setSError('');
-    if (!sSchool) return setSError('Vui lòng chọn trường / trung tâm.');
     if (!sEmail) return setSError('Vui lòng nhập email đăng nhập.');
     if (!sPass) return setSError('Vui lòng nhập mật khẩu.');
-    
+
     setSLoading(true);
     try {
       const res = await fetch('http://localhost:8080/api/auth/login', {
@@ -51,16 +49,14 @@ export default function AdminLogin() {
         body: JSON.stringify({ loginCode: sEmail, password: sPass, userType: 'SCHOOL_ADMIN' })
       });
       setSLoading(false);
-      
+
       if (res.ok) {
         const data = await res.json();
         // Lấy tên thật từ Backend bỏ vô túi áo
         localStorage.setItem('token', data.token); // QUAN TRỌNG: LƯU TOKEN
         localStorage.setItem('adminName', data.fullName || 'Admin');
         localStorage.setItem('adminEmail', data.email || '');
-        // Lưu luôn mã trường vừa chọn (huit, hcmut...)
-        localStorage.setItem('schoolId', sSchool);
-        
+
         setSchoolView('otp');
         addToast(`Đăng nhập thành công, đang chuyển hướng...`, 'green');
       } else {
@@ -160,20 +156,6 @@ export default function AdminLogin() {
 
           {schoolView === 'main' && (
             <div className="school-body">
-              <div style={{ marginBottom: 18 }}>
-                <label className="fl text-[#64748b] mb-1.5">Chọn trường / Trung tâm</label>
-                <div className="inp-wrap">
-                  <span className="inp-icon"><School className="w-4 h-4 inline-block mr-2" /></span>
-                  <select className="inp school-inp" style={{ paddingLeft: 42, appearance: 'none', cursor: 'pointer' }} value={sSchool} onChange={e => setSSchool(e.target.value)}>
-                    <option value="">-- Chọn tổ chức của bạn --</option>
-                    <option value="huit"><School className="w-4 h-4 inline-block mr-2" /> Trường ĐH Công Thương TP.HCM (HUIT)</option>
-                    <option value="hcmut"><GraduationCap className="w-4 h-4 inline-block mr-2" /> Trường ĐH Bách Khoa TP.HCM (HCMUT)</option>
-                    <option value="ielts"><Globe className="w-4 h-4 inline-block mr-2" /> Trung tâm Tiếng Anh IELTS Pro</option>
-                  </select>
-                  <span style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', pointerEvents: 'none', fontSize: 12 }}>▾</span>
-                </div>
-              </div>
-
               <div style={{ marginBottom: 14 }}>
                 <label className="fl text-[#64748b] mb-1.5">Email đăng nhập</label>
                 <div className="inp-wrap">

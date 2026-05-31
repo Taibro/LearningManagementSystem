@@ -153,7 +153,7 @@ INSERT INTO departments (id, school_id, code, name) VALUES
 
 -- 7. BẢNG USERS (24 dòng: 12 GV, 12 SV để map cho thoải mái)
 INSERT INTO users (id, school_id, code, citizen_id_number, full_name, email, password_hash, gender, address) VALUES
-(99, 1, 'SAAS999', '079001000099', 'SaaS Super Admin', 'superadmin@edusaas.io', 'hash123', 'MALE', 'System'),
+(99, 1, 'SAAS999', '079001000099', 'SaaS Super Admin', 'ntai8448@gmail.com', 'hash123', 'MALE', 'System'),
 (1, 1, 'USR001', '079001000001', 'Nguyễn Văn Admin', 'admin@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
 (2, 1, 'USR002', '079001000002', 'Trần Lập Trình', 'gv1@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
 (3, 1, 'USR003', '079001000003', 'Lê Bách Khoa', 'gv2@hcmut.edu.vn', 'hash123', 'MALE', 'HCMC'),
@@ -218,9 +218,38 @@ VALUES (
     (SELECT id FROM role WHERE name = 'SCHOOL_ADMIN' LIMIT 1)
 );
 
+-- 1. Tự động gán role LECTURER cho các user có trong bảng teachers nhưng chưa được map trong user_roles
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id
+FROM users u
+JOIN teachers t ON u.id = t.user_id
+JOIN role r ON r.name = 'LECTURER'
+WHERE u.id NOT IN (SELECT user_id FROM user_roles);
+-- 2. Tự động gán role STUDENT cho các user có trong bảng students nhưng chưa được map trong user_roles
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id
+FROM users u
+JOIN students s ON u.id = s.user_id
+JOIN role r ON r.name = 'STUDENT'
+WHERE u.id NOT IN (SELECT user_id FROM user_roles);
+-- 3. Tự động gán role SCHOOL_ADMIN cho các tài khoản admin trường học chưa được map (dựa vào email/code chứa từ khóa admin)
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id
+FROM users u
+JOIN role r ON r.name = 'SCHOOL_ADMIN'
+WHERE u.id NOT IN (SELECT user_id FROM user_roles)
+  AND (u.email LIKE '%admin%' OR u.code LIKE '%ADM%')
+  AND u.email NOT LIKE '%saas%';
+-- 4. Tự động gán role SAAS_ADMIN cho các tài khoản SaaS Super Admin chưa được map (dựa vào email/code chứa saas)
+INSERT INTO user_roles (user_id, role_id)
+SELECT u.id, r.id
+FROM users u
+JOIN role r ON r.name = 'SAAS_ADMIN'
+WHERE u.id NOT IN (SELECT user_id FROM user_roles)
+  AND (u.email LIKE '%saas%' OR u.email = 'ntai8448@gmail.com' OR u.code LIKE '%SAAS%');
+
 -- 8. BẢNG USER_SCHOOL (24 dòng tương ứng)
 INSERT INTO user_roles (user_id, role_id) VALUES
-(99, 1),
 (1, 1), (2, 2), (3, 2), (4, 2),
 (5, 2), (6, 2), (7, 2), (8, 2),
 (9, 2), (10, 2), (11, 2), (12, 2),
@@ -444,19 +473,19 @@ INSERT INTO student_semester_summaries (id, student_id, semester_id, gpa, credit
 (13, 1, 2, NULL, NULL, 95, 'Xuất sắc');
 
 -- 23. BẢNG SALARY_GRADE (12 dòng)
-INSERT INTO Salary_grade (id, school_id, degree, coefficient, rate_per_session, effective_from) VALUES
-(1, 1, 'Tiến sĩ', 1.60, 250000.00, '2026-01-01'),
-(2, 1, 'Thạc sĩ', 1.30, 180000.00, '2026-01-01'),
-(3, 1, 'Cử nhân', 1.00, 120000.00, '2026-01-01'),
-(4, 1, 'PGS.TS', 1.90, 350000.00, '2026-01-01'),
-(5, 1, 'GS.TS', 2.20, 500000.00, '2026-01-01'),
-(6, 2, 'Tiến sĩ', 1.60, 300000.00, '2026-01-01'),
-(7, 3, 'Thạc sĩ', 1.30, 200000.00, '2026-01-01'),
-(8, 4, 'Tiến sĩ', 1.60, 280000.00, '2026-01-01'),
-(9, 5, 'Thạc sĩ', 1.30, 190000.00, '2026-01-01'),
-(10, 6, 'PGS.TS', 1.90, 400000.00, '2026-01-01'),
-(11, 7, 'Thạc sĩ', 1.30, 170000.00, '2026-01-01'),
-(12, 8, 'Cử nhân', 1.00, 110000.00, '2026-01-01');
+INSERT INTO Salary_grade (id, school_id, degree, coefficient, rate_per_session, effective_from, is_active) VALUES
+(1, 1, 'Tiến sĩ', 1.60, 250000.00, '2026-01-01', 1),
+(2, 1, 'Thạc sĩ', 1.30, 180000.00, '2026-01-01', 1),
+(3, 1, 'Cử nhân', 1.00, 120000.00, '2026-01-01', 1),
+(4, 1, 'PGS.TS', 1.90, 350000.00, '2026-01-01', 1),
+(5, 1, 'GS.TS', 2.20, 500000.00, '2026-01-01', 1),
+(6, 2, 'Tiến sĩ', 1.60, 300000.00, '2026-01-01', 1),
+(7, 3, 'Thạc sĩ', 1.30, 200000.00, '2026-01-01', 1),
+(8, 4, 'Tiến sĩ', 1.60, 280000.00, '2026-01-01', 1),
+(9, 5, 'Thạc sĩ', 1.30, 190000.00, '2026-01-01', 1),
+(10, 6, 'PGS.TS', 1.90, 400000.00, '2026-01-01', 1),
+(11, 7, 'Thạc sĩ', 1.30, 170000.00, '2026-01-01', 1),
+(12, 8, 'Cử nhân', 1.00, 110000.00, '2026-01-01', 1);
 
 -- 24. BẢNG SALARY_CONFIG (12 dòng)
 INSERT INTO Salary_config (id, school_id, salary_grade_id, name, base_salary, effective_from) VALUES
@@ -538,6 +567,10 @@ INSERT INTO saas_subscriptions (id, school_id, plan_id, start_date, end_date, bi
 (7, 7, 3, '2025-01-01', '2025-12-01', 'YEARLY', 'ACTIVE', NOW(), NOW()),
 (8, 8, 2, '2025-02-01', '2025-08-15', 'MONTHLY', 'ACTIVE', NOW(), NOW());
 
+UPDATE saas_subscriptions
+SET end_date = '2026-06-15'
+WHERE id = 1;
+
 -- Cập nhật is_active cho các trường
 UPDATE schools SET is_active = true WHERE id IN (1,2,3,4,5,7,8,9,10,11);
 UPDATE schools SET is_active = false WHERE id = 6;
@@ -576,11 +609,3 @@ INSERT INTO audit_logs (id, school_id, user_email, action, table_name, record_id
 (5, 3, 'admin.fpoly@hcmus.edu.vn', 'UPDATE', 'salary_grade', 5, '117.4.x.x', '2025-05-10 09:48:14'),
 (6, 4, 'gv.tran@ueh.edu.vn', 'INSERT', 'class_materials', 1041, '118.70.x.x', '2025-05-09 22:31:07');
 
--- ============================================================
--- KIỂM TRA DỮ LIỆU
--- ============================================================
-SELECT 'saas_plans' AS tbl, COUNT(*) AS cnt FROM saas_plans
-UNION ALL SELECT 'saas_subscriptions', COUNT(*) FROM saas_subscriptions
-UNION ALL SELECT 'saas_invoices', COUNT(*) FROM saas_invoices
-UNION ALL SELECT 'system_error_logs', COUNT(*) FROM system_error_logs
-UNION ALL SELECT 'audit_logs', COUNT(*) FROM audit_logs;

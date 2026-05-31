@@ -4,13 +4,16 @@ import { CheckCircle2, XCircle, GraduationCap, School, Key, AlertTriangle, Info,
 
 export default function SaaSAdminLogin() {
   // Không dùng useNavigate nữa, vì ta cần nhảy hẳn sang App khác
-  
+
   // Tự động nhận diện: Nếu link là /saas/login -> Bật sẵn giao diện SaaS Dark Mode
   const [activeScreen, setActiveScreen] = useState(
     window.location.pathname.includes('/saas') ? 'saas' : 'school'
-  ); 
+  );
   const [schoolView, setSchoolView] = useState('main'); // main | forgot | otp
-  const [saasView, setSaasView] = useState('main'); // main | otp
+  const [saasView, setSaasView] = useState('main'); // main | otp | setup
+
+  const [tempToken, setTempToken] = useState('');
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
 
   // Form State Cổng Trường Học
   const [sSchool, setSSchool] = useState('');
@@ -72,7 +75,7 @@ export default function SaaSAdminLogin() {
       localStorage.setItem('school_token', data.token);
       localStorage.setItem('school_user', JSON.stringify(data));
 
-      setSchoolView('otp'); 
+      setSchoolView('otp');
       showToast('Mã OTP đã được gửi đến email của bạn', 'green');
     } catch (err) {
       setSLoading(false);
@@ -120,14 +123,18 @@ export default function SaaSAdminLogin() {
         return;
       }
 
-      // Lưu Token vào localStorage
-      localStorage.setItem('saas_token', data.token);
-      localStorage.setItem('saas_user', JSON.stringify(data));
-
-      if (use2fa) {
-        setSaasView('otp'); 
-        showToast('Mã OTP đã gửi đến thiết bị xác thực bảo mật', 'blue');
+      if (data.requireSetup) {
+        setTempToken(data.token);
+        fetchQrCode(saEmail);
+        setSaasView('setup');
+        showToast('Vui lòng thiết lập Xác thực 2 bước', 'blue');
+      } else if (data.require2fa) {
+        setTempToken(data.token);
+        setSaasView('otp');
+        showToast('Mã OTP từ Authenticator App', 'blue');
       } else {
+        localStorage.setItem('saas_token', data.token);
+        localStorage.setItem('saas_user', JSON.stringify(data));
         showToast('Đăng nhập thành công!', 'green');
         setTimeout(() => window.location.href = '/saas/dashboard', 800);
       }
@@ -139,18 +146,95 @@ export default function SaaSAdminLogin() {
     }
   };
 
+  const fetchQrCode = async (email) => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/2fa/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setQrCodeUrl(data.qrCodeImageUri);
+      }
+    } catch (error) {
+      console.error('Error fetching QR code', error);
+    }
+  };
+
   // NHẢY VỀ SAAS DASHBOARD
-  const verifySaasOtp = () => {
-    showToast('Xác thực Super Admin thành công!', 'green');
-    setTimeout(() => {
-      window.location.href = '/saas/dashboard'; // Ép trình duyệt nhảy về luồng SaaS Admin
-    }, 800);
+  const verifySaasOtp = async (codeOverride) => {
+    const inputs = document.querySelectorAll('.saas-screen .otp-input');
+    const code = typeof codeOverride === 'string' ? codeOverride : Array.from(inputs).map(inp => inp.value).join('');
+    if (code.length !== 6) return;
+
+    try {
+      if (saasView === 'setup') {
+        const response = await fetch('http://localhost:8080/api/auth/2fa/verify-setup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: saEmail, code })
+        });
+        if (response.ok) {
+          const isValid = await response.json();
+          if (isValid) {
+            // Setup thành công, gọi luôn login verify
+            const loginResp = await fetch('http://localhost:8080/api/auth/login/verify-2fa', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${tempToken}`
+              },
+              body: JSON.stringify({ email: saEmail, code })
+            });
+            if (loginResp.ok) {
+              const data = await loginResp.json();
+              localStorage.setItem('saas_token', data.token);
+              localStorage.setItem('saas_user', JSON.stringify(data));
+
+              showToast('Xác thực & Thiết lập thành công!', 'green');
+              setTimeout(() => {
+                window.location.href = '/saas/dashboard';
+              }, 800);
+            } else {
+              showToast('Có lỗi xảy ra khi đăng nhập', 'red');
+            }
+          } else {
+            showToast('Mã OTP không đúng, vui lòng thử lại', 'red');
+          }
+        }
+      } else {
+        const response = await fetch('http://localhost:8080/api/auth/login/verify-2fa', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${tempToken}`
+          },
+          body: JSON.stringify({ email: saEmail, code })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          localStorage.setItem('saas_token', data.token);
+          localStorage.setItem('saas_user', JSON.stringify(data));
+
+          showToast('Xác thực Super Admin thành công!', 'green');
+          setTimeout(() => {
+            window.location.href = '/saas/dashboard';
+          }, 800);
+        } else {
+          showToast('Mã OTP không đúng hoặc đã hết hạn', 'red');
+        }
+      }
+    } catch (err) {
+      showToast('Lỗi kết nối máy chủ xác thực', 'red');
+    }
   };
 
   const handleOtpInput = (e, nextIdx, finalCallback) => {
-    e.target.value = e.target.value.replace(/\D/g, ''); 
+    e.target.value = e.target.value.replace(/\D/g, '');
     if (e.target.value && nextIdx < 6) e.target.nextElementSibling?.focus();
-    if (nextIdx === 6 && e.target.value) setTimeout(finalCallback, 300); 
+    if (nextIdx === 6 && e.target.value) setTimeout(finalCallback, 300);
   };
 
   const handleOtpKeyDown = (e, prevIdx) => {
@@ -342,7 +426,34 @@ export default function SaaSAdminLogin() {
                     <input key={idx} className="otp-input" maxLength="1" onInput={e => handleOtpInput(e, idx + 1, verifySaasOtp)} onKeyDown={e => handleOtpKeyDown(e, idx - 1)} />
                   ))}
                 </div>
-                <button className="btn-login saas-btn" onClick={verifySaasOtp}>Xác minh & Khởi động Console</button>
+                <button className="btn-login saas-btn" onClick={() => verifySaasOtp()}>Xác minh & Khởi động Console</button>
+                <div style={{ textAlign: 'center', marginTop: '14px' }}>
+                  <span onClick={() => setSaasView('main')} style={{ fontSize: '13px', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>← Hủy</span>
+                </div>
+              </div>
+            )}
+
+            {saasView === 'setup' && (
+              <div>
+                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#0f172a' }}>Thiết lập Token 2FA</h3>
+                  <p style={{ fontSize: '12.5px', color: '#64748b', marginTop: '4px' }}>Dùng Authenticator App quét mã QR này</p>
+                </div>
+                {qrCodeUrl ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+                    <img src={qrCodeUrl} alt="QR Code" style={{ width: 160, height: 160, borderRadius: 8, border: '2px solid #e2e8f0' }} />
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px', height: 160, alignItems: 'center' }}>
+                    <span className="spinner" style={{ borderColor: '#6366f1', borderRightColor: 'transparent' }}></span>
+                  </div>
+                )}
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '20px' }}>
+                  {[0, 1, 2, 3, 4, 5].map(idx => (
+                    <input key={idx} className="otp-input" maxLength="1" onInput={e => handleOtpInput(e, idx + 1, verifySaasOtp)} onKeyDown={e => handleOtpKeyDown(e, idx - 1)} />
+                  ))}
+                </div>
+                <button className="btn-login saas-btn" onClick={() => verifySaasOtp()}>Xác nhận thiết lập</button>
                 <div style={{ textAlign: 'center', marginTop: '14px' }}>
                   <span onClick={() => setSaasView('main')} style={{ fontSize: '13px', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>← Hủy</span>
                 </div>

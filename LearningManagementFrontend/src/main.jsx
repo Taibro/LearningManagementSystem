@@ -11,7 +11,8 @@ const isSaaS = currentPath.startsWith('/saas');
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AppLecturer/>
+    <AppStudent/>
+    {/* <AppLecturer/> */}
     {/* <AppSaaS /> */}
     {/* <AppAdmin/> */}
     {/* {isSaaS ? <AppSaaS /> : <AppAdmin />} */}

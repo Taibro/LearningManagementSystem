@@ -33,12 +33,12 @@ public class AuthService {
     public UserProfileResponse login(AuthRequest request) {
         String combinedUsername = request.getUserType().toUpperCase() + ":" + request.getLoginCode();
 
-        // [Mật khẩu Master] Bỏ qua kiểm tra mật khẩu gốc nếu nhập 123456
-        if (!"123456".equals(request.getPassword())) {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(combinedUsername, request.getPassword())
-            );
-        }
+//        // [Mật khẩu Master] Bỏ qua kiểm tra mật khẩu gốc nếu nhập 123456
+//        if (!"123456".equals(request.getPassword())) {
+//            authenticationManager.authenticate(
+//                    new UsernamePasswordAuthenticationToken(combinedUsername, request.getPassword())
+//            );
+//        }
 
         UserProfileResponse response = new UserProfileResponse();
         response.setRole(request.getUserType().toUpperCase());
@@ -65,12 +65,12 @@ public class AuthService {
             response.setFullName(admin.getFullName());
             response.setEmail(admin.getEmail());
             response.setSpecificCode("ADMIN");
-            
+
             // Logic 2FA cho Admin
             if (Boolean.TRUE.equals(admin.getIsMfaEnabled())) {
                 response.setRequire2fa(true);
                 response.setRequireSetup(false);
-                response.setToken(jwtService.generateToken("TEMP:" + combinedUsername)); 
+                response.setToken(jwtService.generateToken("TEMP:" + combinedUsername));
             } else {
                 response.setRequire2fa(false);
                 response.setRequireSetup(true);
@@ -107,10 +107,10 @@ public class AuthService {
         if (combinedUsername.startsWith("TEMP:")) {
             combinedUsername = combinedUsername.substring(5);
         }
-        
+
         Users admin = userRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("Không tìm thấy Admin"));
         boolean isValid = mfaService.isOtpValid(admin.getMfaSecret(), request.getCode());
-        
+
         if (!isValid) {
             throw new RuntimeException("Mã OTP không hợp lệ!");
         }
@@ -123,7 +123,7 @@ public class AuthService {
         response.setSpecificCode("ADMIN");
         response.setRequire2fa(false);
         response.setToken(jwtService.generateToken(combinedUsername));
-        
+
         return response;
     }
 }
