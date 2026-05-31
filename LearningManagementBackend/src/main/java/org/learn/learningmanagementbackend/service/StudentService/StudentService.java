@@ -13,6 +13,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class StudentService {
@@ -322,6 +325,20 @@ public class StudentService {
                 .note(p.getNote())
                 .courseData(p.getCourseData())
                 .build();
+    }
+
+    // ── SEMESTERS ─────────────────────────────────────────────────────────────
+    public List<Map<String, Object>> getSemesters() {
+        return semesterRepository
+                .findAll(Sort.by("startDate").descending())
+                .stream()
+                .map(s -> Map.<String, Object>of("id", s.getId(), "name", s.getName()))
+                .collect(Collectors.toList());
+    }
+
+    // ── DEBT DETAIL ───────────────────────────────────────────────────────────
+    public List<StudentDebtDetailDto> getDebtDetail(String studentCode, Integer semesterId) {
+        return studentRepository.getDebtDetail(studentCode, semesterId);
     }
 }
 
