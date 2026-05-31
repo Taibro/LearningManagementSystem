@@ -11,6 +11,13 @@ import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.Room
 import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.ScheduleExceptionRepository;
 import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.ScheduleRepository;
 import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.TeacherRepository;
+import org.learn.learningmanagementbackend.repository.LecturerRepository.EnrollmentRepository;
+import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.NotificationRepository;
+import org.learn.learningmanagementbackend.model.Notification;
+import org.learn.learningmanagementbackend.model.Enrollment;
+import org.learn.learningmanagementbackend.enums.NotificationType;
+import org.learn.learningmanagementbackend.enums.ApprovalStatus;
+import org.learn.learningmanagementbackend.enums.MakeupStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +31,8 @@ public class ScheduleExceptionService {
     private final ScheduleRepository scheduleRepository;
     private final TeacherRepository teacherRepository;
     private final RoomRepository roomRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final NotificationRepository notificationRepository;
 
     @org.springframework.beans.factory.annotation.Autowired
     private jakarta.persistence.EntityManager entityManager;
@@ -96,6 +105,9 @@ public class ScheduleExceptionService {
     public ScheduleExceptionResponse updateException(Integer id, ScheduleExceptionRequest request) {
         ScheduleException ex = exceptionRepository.findById(id).orElseThrow(() -> new RuntimeException("Exception not found"));
 
+        ApprovalStatus oldApproval = ex.getApprovalStatus();
+        MakeupStatus oldMakeup = ex.getMakeupStatus();
+
         if (!ex.getSchedule().getId().equals(request.getScheduleId())) {
             Schedule schedule = scheduleRepository.findById(request.getScheduleId())
                     .orElseThrow(() -> new RuntimeException("Schedule not found"));
@@ -132,7 +144,40 @@ public class ScheduleExceptionService {
             ex.setReplacementRoom(null);
         }
 
-        return mapToResponse(exceptionRepository.save(ex));
+        ScheduleException savedEx = exceptionRepository.save(ex);
+
+        // Notify students upon Approval of Suspension
+        if (oldApproval != ApprovalStatus.APPROVED && request.getApprovalStatus() == ApprovalStatus.APPROVED) {
+            List<Enrollment> enrollments = enrollmentRepository.getEnrolledStudentsByClassId(savedEx.getSchedule().getClasses().getId());
+            for (Enrollment e : enrollments) {
+                Notification notif = new Notification();
+                notif.setUser(e.getStudent().getUser());
+                notif.setType(NotificationType.SCHEDULE_CHANGE);
+                notif.setTitle("Thông báo nghỉ học");
+                notif.setBody("Lớp học phần " + savedEx.getSchedule().getClasses().getCode() + " vào ngày " + 
+                              (savedEx.getExceptionDate() != null ? savedEx.getExceptionDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "") + 
+                              " đã được thông báo nghỉ.");
+                notificationRepository.save(notif);
+            }
+        }
+
+        // Notify students upon Approval of Makeup Class
+        if (oldMakeup != MakeupStatus.APPROVED && request.getMakeupStatus() == MakeupStatus.APPROVED) {
+            List<Enrollment> enrollments = enrollmentRepository.getEnrolledStudentsByClassId(savedEx.getSchedule().getClasses().getId());
+            for (Enrollment e : enrollments) {
+                Notification notif = new Notification();
+                notif.setUser(e.getStudent().getUser());
+                notif.setType(NotificationType.SCHEDULE_CHANGE);
+                notif.setTitle("Thông báo học bù");
+                notif.setBody("Lớp học phần " + savedEx.getSchedule().getClasses().getCode() + " có lịch học bù vào ngày " + 
+                              (savedEx.getReplacementDate() != null ? savedEx.getReplacementDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "") + 
+                              ", tiết " + savedEx.getReplacementStartPeriod() + "-" + savedEx.getReplacementEndPeriod() +
+                              (savedEx.getReplacementRoom() != null ? ", phòng " + savedEx.getReplacementRoom().getRoomNumber() : "") + ".");
+                notificationRepository.save(notif);
+            }
+        }
+
+        return mapToResponse(savedEx);
     }
 
     public void deleteException(Integer id) {

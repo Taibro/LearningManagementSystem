@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CreditCard, Landmark, Smartphone, Banknote } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8080/api/saas-admin';
 
@@ -55,7 +56,7 @@ export default function Subscriptions() {
 
   const statusBadge = { PAID: 'badge-green', PENDING: 'badge-yellow', FAILED: 'badge-red' };
   const statusLabel = { PAID: 'Đã thanh toán', PENDING: 'Chờ TT', FAILED: 'Thất bại' };
-  const methodIcon = { BANK_TRANSFER: '🏦', MOMO: '📱', VNPAY: '💳', CASH: '💵', bank_transfer: '🏦', momo: '📱', vnpay: '💳', cash: '💵' };
+  const methodIcon = { BANK_TRANSFER: <Landmark className="w-4 h-4 inline-block mr-2" />, MOMO: <Smartphone className="w-4 h-4 inline-block mr-2" />, VNPAY: <CreditCard className="w-4 h-4 inline-block mr-2" />, CASH: <Banknote className="w-4 h-4 inline-block mr-2" />, bank_transfer: <Landmark className="w-4 h-4 inline-block mr-2" />, momo: <Smartphone className="w-4 h-4 inline-block mr-2" />, vnpay: <CreditCard className="w-4 h-4 inline-block mr-2" />, cash: <Banknote className="w-4 h-4 inline-block mr-2" /> };
 
   const formatAmount = (amount) => {
     if (!amount) return '₫0';
@@ -108,7 +109,7 @@ export default function Subscriptions() {
                 <td><span className={`badge ${i.planName === 'Enterprise' ? 'badge-green' : i.planName === 'Pro' ? 'badge-purple' : 'badge-yellow'}`}>{i.planName}</span></td>
                 <td className="text-xs font-mono">{i.billingCycle?.toLowerCase()}</td>
                 <td className="font-mono text-sm font-semibold">{formatAmount(i.amount)}</td>
-                <td className="text-xs">{methodIcon[i.paymentMethod] || '💳'} {(i.paymentMethod || '').replace(/_/g, ' ').toLowerCase()}</td>
+                <td className="text-xs">{methodIcon[i.paymentMethod] || <CreditCard className="w-4 h-4 inline-block mr-2" />} {(i.paymentMethod || '').replace(/_/g, ' ').toLowerCase()}</td>
                 <td className="text-xs font-mono">{i.createdAt ? new Date(i.createdAt).toLocaleDateString('vi-VN') : '-'}</td>
                 <td><span className={`badge ${statusBadge[i.paymentStatus] || 'badge-yellow'}`}>{statusLabel[i.paymentStatus] || i.paymentStatus}</span></td>
               </tr>

@@ -12,5 +12,7 @@ public class UserProfileResponse {
     private String role;
     private String token;
     private Integer schoolId;
+    private Boolean require2fa;
+    private Boolean requireSetup;
 
 }

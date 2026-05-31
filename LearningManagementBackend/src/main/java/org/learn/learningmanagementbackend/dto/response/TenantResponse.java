@@ -14,6 +14,7 @@ public class TenantResponse {
     private String planName;
     private long students;
     private long teachers;
+    private long admins;
     private String storage;
     private String expires;
     private Boolean active;

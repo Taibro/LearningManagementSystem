@@ -62,4 +62,14 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
     List<Classes> findClassesWithSchedulesByTeacherAndSemester(
             @Param("teacherCode") String teacherCode,
             @Param("semesterId") Integer semesterId);
+
+    // Lấy tất cả các lớp học phần đang dạy (có lịch học chưa kết thúc)
+    @Query("SELECT DISTINCT c FROM Classes c " +
+            "JOIN FETCH c.course cr " +
+            "JOIN FETCH c.schedules s " +
+            "JOIN c.teacherLecturings ct " +
+            "JOIN ct.teacher t " +
+            "WHERE t.teacherCode = :teacherCode AND s.endDate >= CURRENT_DATE")
+    List<Classes> findActiveClassesWithSchedulesByTeacher(
+            @Param("teacherCode") String teacherCode);
 }

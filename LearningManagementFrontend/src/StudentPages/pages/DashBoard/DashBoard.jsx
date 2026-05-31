@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getProfile, getWeeklySchedule, getNotifications, getGrades } from '../../studentApi';
+import { BarChart, DollarSign, LineChart, Calendar, ClipboardList, CheckCircle2, GraduationCap, Medal } from 'lucide-react';
 
 export default function Dashboard() {
   const [profile, setProfile] = useState(null);
@@ -62,28 +63,28 @@ export default function Dashboard() {
             <div className="card-body">
               <div className="quick-grid">
                 <Link to="/notifications" className="quick-item">
-                  <div className="qi-icon">📋</div><div className="qi-label">Nhắc nhở</div>
+                  <div className="qi-icon"><ClipboardList className="w-4 h-4 inline-block mr-2" /></div><div className="qi-label">Nhắc nhở</div>
                 </Link>
                 <Link to="/grades" className="quick-item">
-                  <div className="qi-icon">📊</div><div className="qi-label">Kết quả học tập</div>
+                  <div className="qi-icon"><BarChart className="w-4 h-4 inline-block mr-2" /></div><div className="qi-label">Kết quả học tập</div>
                 </Link>
                 <Link to="/weekly-schedule" className="quick-item">
-                  <div className="qi-icon">📅</div><div className="qi-label">Lịch theo tuần</div>
+                  <div className="qi-icon"><Calendar className="w-4 h-4 inline-block mr-2" /></div><div className="qi-label">Lịch theo tuần</div>
                 </Link>
                 <Link to="/progress-schedule" className="quick-item">
-                  <div className="qi-icon">📈</div><div className="qi-label">Lịch theo tiến độ</div>
+                  <div className="qi-icon"><LineChart className="w-4 h-4 inline-block mr-2" /></div><div className="qi-label">Lịch theo tiến độ</div>
                 </Link>
                 <Link to="/attendance" className="quick-item">
-                  <div className="qi-icon">✅</div><div className="qi-label">Điểm danh</div>
+                  <div className="qi-icon"><CheckCircle2 className="w-4 h-4 inline-block mr-2" /></div><div className="qi-label">Điểm danh</div>
                 </Link>
                 <Link to="/conduct-score" className="quick-item">
-                  <div className="qi-icon">🏅</div><div className="qi-label">Rèn luyện</div>
+                  <div className="qi-icon"><Medal className="w-4 h-4 inline-block mr-2" /></div><div className="qi-label">Rèn luyện</div>
                 </Link>
                 <Link to="/tuition-fee" className="quick-item">
-                  <div className="qi-icon">💰</div><div className="qi-label">Tra cứu công nợ</div>
+                  <div className="qi-icon"><DollarSign className="w-4 h-4 inline-block mr-2" /></div><div className="qi-label">Tra cứu công nợ</div>
                 </Link>
                 <Link to="/scholarships" className="quick-item">
-                  <div className="qi-icon">🎓</div><div className="qi-label">Học bổng</div>
+                  <div className="qi-icon"><GraduationCap className="w-4 h-4 inline-block mr-2" /></div><div className="qi-label">Học bổng</div>
                 </Link>
               </div>
             </div>

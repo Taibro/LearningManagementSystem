@@ -23,16 +23,28 @@ import DefaultPage from './pages/DefaultPage/DefaultPage';
 import CourseRegistration from './pages/CourseRegistration/CourseRegistration';
 import StudentLogin from './pages/Login/StudentLogin';
 
+// Component Bảo vệ: Chưa có token thì bắt quay lại trang login
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 export default function AppStudent() {
   return (
-    <Router>
+    <Router basename="/student">
       <Routes>
         <Route path="/login" element={<StudentLogin />} />
         
-        <Route path="/" element={<MainLayout />}>
+        <Route path="/" element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }>
           
-          
-          <Route index element={<Navigate to="/login" />} />
+          <Route index element={<Navigate to="/dashboard" />} />
 
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="student-info" element={<StudentInfo />} />
@@ -52,7 +64,7 @@ export default function AppStudent() {
           <Route path="student/course-registration" element={<CourseRegistration />} />
 
           
-          <Route path="declaration" element={<DefaultPage title="Kê khai thông tin sinh viên" />} />
+          {/* <Route path="declaration" element={<DefaultPage title="Kê khai thông tin sinh viên" />} /> */}
           <Route path="services" element={<DefaultPage title="Dịch vụ trực tuyến" />} />
           <Route path="certificates" element={<DefaultPage title="Đề xuất chứng chỉ" />} />
           <Route path="student-profile" element={<DefaultPage title="Hồ sơ sinh viên" />} />

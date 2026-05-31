@@ -1,4 +1,5 @@
 import React from 'react';
+import { Search, Save } from 'lucide-react';
 
 const Assesment = () => {
   return (
@@ -19,7 +20,7 @@ const Assesment = () => {
             <select className="input-field text-sm"><option>010110195604 - 14DHTH04</option></select>
           </div>
           <div className="flex items-end">
-            <button className="btn-primary w-full shadow-md text-sm py-2.5">🔍 Tải danh sách</button>
+            <button className="btn-primary w-full shadow-md text-sm py-2.5"><Search className="w-4 h-4 inline-block mr-2" /> Tải danh sách</button>
           </div>
         </div>
       </div>
@@ -53,7 +54,7 @@ const Assesment = () => {
           </table>
         </div>
         <div className="p-4 bg-gray-50/50 flex justify-end">
-          <button className="btn-primary px-10 font-bold uppercase text-[11px] tracking-widest">💾 Lưu phiếu đánh giá</button>
+          <button className="btn-primary px-10 font-bold uppercase text-[11px] tracking-widest"><Save className="w-4 h-4 inline-block mr-2" /> Lưu phiếu đánh giá</button>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { DollarSign, ClipboardList, GraduationCap, School, Info, User, File } from 'lucide-react';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -40,41 +41,41 @@ export default function Dashboard() {
           <div className="ph-title">Tổng quan · {localStorage.getItem('schoolId') === '1' ? 'Trường ĐH Công Thương TP.HCM' : 'Trường ĐH Bách Khoa TP.HCM'}</div>
           <div className="ph-sub">Cập nhật lúc: {new Date().toLocaleTimeString('vi-VN')} · Thống kê thời gian thực</div>
         </div>
-        <button className="btn btn-blue" onClick={() => alert('Đã xuất báo cáo tổng hợp PDF')}>📄 Xuất báo cáo</button>
+        <button className="btn btn-blue" onClick={() => alert('Đã xuất báo cáo tổng hợp PDF')}><File className="w-4 h-4 inline-block mr-2" /> Xuất báo cáo</button>
       </div>
 
       <div className="grid5 mb4">
         <Link to="/students" className="stat" style={{textDecoration:'none'}}>
           <div className="stat-top" style={{background:'linear-gradient(90deg,#1976d2,#42a5f5)'}}></div>
-          <div className="stat-icon">👨‍🎓</div>
+          <div className="stat-icon"><User className="w-4 h-4 inline-block mr-2" />‍<GraduationCap className="w-4 h-4 inline-block mr-2" /></div>
           <div className="stat-label">Sinh viên</div>
           <div className="stat-num">{stats.totalStudents}</div>
           <div className="stat-foot up">↑ Cập nhật liên tục</div>
         </Link>
         <Link to="/teachers" className="stat" style={{textDecoration:'none'}}>
           <div className="stat-top" style={{background:'linear-gradient(90deg,#00897b,#4db6ac)'}}></div>
-          <div className="stat-icon">👨‍🏫</div>
+          <div className="stat-icon"><User className="w-4 h-4 inline-block mr-2" />‍<School className="w-4 h-4 inline-block mr-2" /></div>
           <div className="stat-label">Giảng viên</div>
           <div className="stat-num">{stats.totalTeachers}</div>
           <div className="stat-foot">100% hoạt động</div>
         </Link>
         <Link to="/classes" className="stat" style={{textDecoration:'none'}}>
           <div className="stat-top" style={{background:'linear-gradient(90deg,#e65100,#ffb74d)'}}></div>
-          <div className="stat-icon">🎓</div>
+          <div className="stat-icon"><GraduationCap className="w-4 h-4 inline-block mr-2" /></div>
           <div className="stat-label">Lớp học</div>
           <div className="stat-num">{stats.totalClasses}</div>
           <div className="stat-foot">Đang hoạt động</div>
         </Link>
         <Link to="/attendance" className="stat" style={{textDecoration:'none'}}>
           <div className="stat-top" style={{background:'linear-gradient(90deg,#c62828,#ef5350)'}}></div>
-          <div className="stat-icon">📋</div>
+          <div className="stat-icon"><ClipboardList className="w-4 h-4 inline-block mr-2" /></div>
           <div className="stat-label">Vắng mặt hôm nay</div>
           <div className="stat-num">{stats.todayAbsences}</div>
           <div className="stat-foot down">Ghi nhận trong ngày</div>
         </Link>
         <Link to="/tuition" className="stat" style={{textDecoration:'none'}}>
           <div className="stat-top" style={{background:'linear-gradient(90deg,#6a1b9a,#ce93d8)'}}></div>
-          <div className="stat-icon">💰</div>
+          <div className="stat-icon"><DollarSign className="w-4 h-4 inline-block mr-2" /></div>
           <div className="stat-label">Công nợ học phí</div>
           <div className="stat-num">{stats.totalTuitionDebt ? stats.totalTuitionDebt.toLocaleString('vi-VN') : 0}đ</div>
           <div className="stat-foot up">Thống kê toàn khóa</div>
@@ -91,7 +92,7 @@ export default function Dashboard() {
             <Link to="/schedule" className="btn btn-ghost btn-sm" style={{textDecoration:'none'}}>Xem tuần →</Link>
           </div>
           <div className="card-body" style={{textAlign:'center', padding:'30px', color:'var(--muted)'}}>
-            ℹ️ Module Lịch học sẽ được tự động đồng bộ dựa trên dữ liệu lớp học
+            <Info className="w-4 h-4 inline-block mr-2" /> Module Lịch học sẽ được tự động đồng bộ dựa trên dữ liệu lớp học
           </div>
         </div>
 

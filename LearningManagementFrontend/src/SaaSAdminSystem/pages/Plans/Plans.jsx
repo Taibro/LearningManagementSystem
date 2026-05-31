@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useOutletContext } from 'react-router-dom';
+import { Check, X, Pencil, RefreshCw, XCircle, CheckCircle2 } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8080/api/saas-admin';
 
@@ -8,8 +10,15 @@ const getAuthHeaders = () => ({
 });
 
 export default function Plans() {
+  const { addToast } = useOutletContext();
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Edit Plan State
+  const [editPlan, setEditPlan] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: '', monthlyPrice: 0, yearlyPrice: 0, maxStudents: -1, maxStorageGb: -1
+  });
 
   useEffect(() => {
     fetchPlans();
@@ -61,6 +70,40 @@ export default function Plans() {
     return 'badge-blue';
   };
 
+  const openEditModal = (plan) => {
+    setEditPlan(plan);
+    setEditForm({
+      name: plan.name || '',
+      monthlyPrice: plan.monthlyPrice || 0,
+      yearlyPrice: plan.yearlyPrice || 0,
+      maxStudents: plan.maxStudents !== undefined ? plan.maxStudents : -1,
+      maxStorageGb: plan.maxStorageGb !== undefined ? plan.maxStorageGb : -1
+    });
+  };
+
+  const handleUpdatePlan = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/plans/${editPlan.id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(editForm)
+      });
+      if (res.ok) {
+        const updatedPlan = await res.json();
+        // Cập nhật lại số lượng subscriber vì server trả về obj entity gốc không có trường này
+        updatedPlan.subscriberCount = editPlan.subscriberCount;
+        setPlans(prev => prev.map(p => p.id === updatedPlan.id ? updatedPlan : p));
+        setEditPlan(null);
+        addToast(<CheckCircle2 className="w-4 h-4 inline-block mr-2" />, `Cập nhật gói "${updatedPlan.name}" thành công!`, 'green');
+      } else {
+        const err = await res.json();
+        addToast(<XCircle className="w-4 h-4 inline-block mr-2" />, err.message || 'Lỗi khi cập nhật gói cước', 'red');
+      }
+    } catch (err) {
+      addToast(<XCircle className="w-4 h-4 inline-block mr-2" />, 'Không thể kết nối đến server', 'red');
+    }
+  };
+
   if (loading) {
     return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '400px', color: 'var(--muted)' }}>Đang tải dữ liệu...</div>;
   }
@@ -68,7 +111,7 @@ export default function Plans() {
   return (
     <div>
       <div className="grid grid-cols-3 gap-5">
-        {plans.map((plan, index) => {
+        {plans.map((plan) => {
           const isPro = plan.code?.toUpperCase() === 'PRO';
           const features = parseFeatures(plan.features);
           const color = getPlanColor(plan.code);
@@ -96,19 +139,21 @@ export default function Plans() {
               </p>
               
               <div className="space-y-2 text-xs mb-5">
-                <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> Tối đa <strong>{plan.maxStudents === -1 ? 'Không giới hạn' : plan.maxStudents?.toLocaleString()}</strong> sinh viên</div>
-                <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}>✓</span> {plan.maxStorageGb === -1 ? 'Storage theo yêu cầu' : `${plan.maxStorageGb}GB lưu trữ`}</div>
+                <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}><Check className="w-4 h-4 inline-block mr-2" /></span> Tối đa <strong>{plan.maxStudents === -1 ? 'Không giới hạn' : plan.maxStudents?.toLocaleString()}</strong> sinh viên</div>
+                <div className="flex items-center gap-2"><span style={{ color: 'var(--accent3)' }}><Check className="w-4 h-4 inline-block mr-2" /></span> {plan.maxStorageGb === -1 ? 'Storage theo yêu cầu' : `${plan.maxStorageGb}GB lưu trữ`}</div>
                 {features.map((f, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span style={{ color: f.included ? 'var(--accent3)' : 'var(--muted)' }}>{f.included ? '✓' : '✕'}</span>
+                    <span style={{ color: f.included ? 'var(--accent3)' : 'var(--muted)' }}>{f.included ? <Check className="w-4 h-4 inline-block mr-2" /> : <X className="w-4 h-4 inline-block mr-2" />}</span>
                     <span style={f.included ? {} : { color: 'var(--muted)' }}>{f.name}</span>
                   </div>
                 ))}
               </div>
               
               <div className="flex items-center justify-between">
-                <span className={`badge ${badgeClass}`}>{plan.subscriberCount} trường đang dùng</span>
-                <button className="btn btn-ghost btn-sm">Sửa</button>
+                <span className={`badge ${badgeClass}`}>{plan.subscriberCount || 0} trường đang dùng</span>
+                <button className="btn btn-ghost btn-sm flex items-center gap-1" onClick={() => openEditModal(plan)}>
+                  <Pencil className="w-3.5 h-3.5" /> Sửa
+                </button>
               </div>
             </div>
           );
@@ -129,24 +174,77 @@ export default function Plans() {
           </thead>
           <tbody>
             <tr><td className="text-xs font-semibold py-2.5" style={{ color: 'var(--muted)' }}>HỌC VỤ CƠ BẢN</td>{plans.map(p => <td key={p.id}></td>)}</tr>
-            <tr><td className="text-sm">Quản lý lớp học & Lịch học</td>{plans.map(p => <td key={p.id} className="text-center text-green-400">✓</td>)}</tr>
-            <tr><td className="text-sm">Điểm danh & Đăng ký học phần</td>{plans.map(p => <td key={p.id} className="text-center text-green-400">✓</td>)}</tr>
-            <tr><td className="text-sm">Thông báo trong app</td>{plans.map(p => <td key={p.id} className="text-center text-green-400">✓</td>)}</tr>
+            <tr><td className="text-sm">Quản lý lớp học & Lịch học</td>{plans.map(p => <td key={p.id} className="text-center text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></td>)}</tr>
+            <tr><td className="text-sm">Điểm danh & Đăng ký học phần</td>{plans.map(p => <td key={p.id} className="text-center text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></td>)}</tr>
+            <tr><td className="text-sm">Thông báo trong app</td>{plans.map(p => <td key={p.id} className="text-center text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></td>)}</tr>
             
             <tr><td className="text-xs font-semibold py-2.5" style={{ color: 'var(--muted)' }}>TÀI CHÍNH & NHÂN SỰ</td>{plans.map(p => <td key={p.id}></td>)}</tr>
-            <tr><td className="text-sm">Quản lý học phí</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? '✕' : <span className="text-green-400">✓</span>}</td>)}</tr>
-            <tr><td className="text-sm">Bảng lương giảng viên theo bậc</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? '✕' : <span className="text-green-400">✓</span>}</td>)}</tr>
+            <tr><td className="text-sm">Quản lý học phí</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? <X className="w-4 h-4 inline-block mr-2" /> : <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span>}</td>)}</tr>
+            <tr><td className="text-sm">Bảng lương giảng viên theo bậc</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? <X className="w-4 h-4 inline-block mr-2" /> : <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span>}</td>)}</tr>
             
             <tr><td className="text-xs font-semibold py-2.5" style={{ color: 'var(--muted)' }}>NÂNG CAO</td>{plans.map(p => <td key={p.id}></td>)}</tr>
-            <tr><td className="text-sm">Báo cáo & Dashboard Analytics</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? '✕' : <span className="text-green-400">✓</span>}</td>)}</tr>
-            <tr><td className="text-sm">QR Code điểm danh</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? '✕' : <span className="text-green-400">✓</span>}</td>)}</tr>
-            <tr><td className="text-sm">SSO / Azure AD / Google Workspace</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400">✓</span> : '✕'}</td>)}</tr>
-            <tr><td className="text-sm">Open API tích hợp ERP</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400">✓</span> : '✕'}</td>)}</tr>
-            <tr><td className="text-sm">Audit Log đầy đủ + Export</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400">✓</span> : '✕'}</td>)}</tr>
-            <tr><td className="text-sm">SLA & Backup riêng</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400">✓</span> : '✕'}</td>)}</tr>
+            <tr><td className="text-sm">Báo cáo & Dashboard Analytics</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? <X className="w-4 h-4 inline-block mr-2" /> : <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span>}</td>)}</tr>
+            <tr><td className="text-sm">QR Code điểm danh</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'STARTER' ? { color: 'var(--muted)' } : {}}>{p.code?.toUpperCase() === 'STARTER' ? <X className="w-4 h-4 inline-block mr-2" /> : <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span>}</td>)}</tr>
+            <tr><td className="text-sm">SSO / Azure AD / Google Workspace</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span> : <X className="w-4 h-4 inline-block mr-2" />}</td>)}</tr>
+            <tr><td className="text-sm">Open API tích hợp ERP</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span> : <X className="w-4 h-4 inline-block mr-2" />}</td>)}</tr>
+            <tr><td className="text-sm">Audit Log đầy đủ + Export</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span> : <X className="w-4 h-4 inline-block mr-2" />}</td>)}</tr>
+            <tr><td className="text-sm">SLA & Backup riêng</td>{plans.map(p => <td key={p.id} className="text-center" style={p.code?.toUpperCase() === 'ENTERPRISE' ? {} : { color: 'var(--muted)' }}>{p.code?.toUpperCase() === 'ENTERPRISE' ? <span className="text-green-400"><Check className="w-4 h-4 inline-block mr-2" /></span> : <X className="w-4 h-4 inline-block mr-2" />}</td>)}</tr>
           </tbody>
         </table>
       </div>
+
+      {/* Modal Chỉnh Sửa Plan */}
+      {editPlan && (
+        <div className="modal-overlay open">
+          <div className="modal" style={{ width: '500px' }}>
+            <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--border)' }}>
+              <div>
+                <p className="font-syne font-bold text-base flex items-center gap-2">
+                  <Pencil className="w-4 h-4" /> Chỉnh sửa gói cước
+                </p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--muted)' }}>{editPlan.code}</p>
+              </div>
+              <button onClick={() => setEditPlan(null)} className="w-7 h-7 rounded-lg flex items-center justify-center text-lg" style={{ background: 'var(--surface2)', color: 'var(--muted)' }}>×</button>
+            </div>
+            
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="text-xs font-mono mb-1.5 block" style={{ color: 'var(--muted)' }}>TÊN GÓI CƯỚC</label>
+                <input className="inp" value={editForm.name} onChange={e => setEditForm({...editForm, name: e.target.value})} />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-mono mb-1.5 block" style={{ color: 'var(--muted)' }}>GIÁ THEO THÁNG (VNĐ)</label>
+                  <input type="number" className="inp" value={editForm.monthlyPrice} onChange={e => setEditForm({...editForm, monthlyPrice: Number(e.target.value)})} />
+                </div>
+                <div>
+                  <label className="text-xs font-mono mb-1.5 block" style={{ color: 'var(--muted)' }}>GIÁ THEO NĂM (VNĐ)</label>
+                  <input type="number" className="inp" value={editForm.yearlyPrice} onChange={e => setEditForm({...editForm, yearlyPrice: Number(e.target.value)})} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-mono mb-1.5 block" style={{ color: 'var(--muted)' }}>GIỚI HẠN SINH VIÊN (-1: Không giới hạn)</label>
+                  <input type="number" className="inp" value={editForm.maxStudents} onChange={e => setEditForm({...editForm, maxStudents: Number(e.target.value)})} />
+                </div>
+                <div>
+                  <label className="text-xs font-mono mb-1.5 block" style={{ color: 'var(--muted)' }}>GIỚI HẠN LƯU TRỮ (GB) (-1: Không giới hạn)</label>
+                  <input type="number" className="inp" value={editForm.maxStorageGb} onChange={e => setEditForm({...editForm, maxStorageGb: Number(e.target.value)})} />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 p-5 border-t" style={{ borderColor: 'var(--border)' }}>
+              <button className="btn btn-ghost" onClick={() => setEditPlan(null)}>Huỷ</button>
+              <button className="btn btn-primary flex items-center gap-2" onClick={handleUpdatePlan}>
+                <RefreshCw className="w-4 h-4" /> Lưu thay đổi
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

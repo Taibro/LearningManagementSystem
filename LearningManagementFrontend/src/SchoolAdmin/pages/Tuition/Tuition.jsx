@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { DollarSign, Save } from 'lucide-react';
 
 export default function Tuition() {
   const [invoices, setInvoices] = useState([]);
@@ -107,7 +108,7 @@ export default function Tuition() {
       <div className="card">
         {invoices.length === 0 ? (
           <div className="card-body" style={{textAlign:'center', padding:'50px', color:'var(--muted)'}}>
-            <div style={{fontSize:'48px', marginBottom:'12px'}}>💰</div>
+            <div style={{fontSize:'48px', marginBottom:'12px'}}><DollarSign className="w-4 h-4 inline-block mr-2" /></div>
             <div style={{fontSize:'16px', fontWeight:700, marginBottom:'8px'}}>Chưa có hóa đơn học phí</div>
             <div style={{fontSize:'13px'}}>Tạo hóa đơn mới cho sinh viên trong học kỳ hiện tại</div>
             <button className="btn btn-blue" style={{marginTop:'16px'}} onClick={() => openModal()}>+ Tạo hóa đơn đầu tiên</button>
@@ -155,7 +156,7 @@ export default function Tuition() {
         <div className="ov open">
           <div className="modal" style={{width:'460px'}}>
             <div className="modal-hd">
-              <span className="modal-title">{currentInvoice.id ? '💰 Sửa Hóa đơn học phí' : '💰 Tạo Hóa đơn học phí'}</span>
+              <span className="modal-title">{currentInvoice.id ? <><DollarSign className="w-4 h-4 inline-block mr-2" /> Sửa Hóa đơn học phí</> : <><DollarSign className="w-4 h-4 inline-block mr-2" /> Tạo Hóa đơn học phí</>}</span>
               <button className="close-btn" onClick={() => setIModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -189,7 +190,7 @@ export default function Tuition() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setIModal(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveInvoice}>💾 Lưu hóa đơn</button>
+              <button className="btn btn-blue" onClick={handleSaveInvoice}><Save className="w-4 h-4 inline-block mr-2" /> Lưu hóa đơn</button>
             </div>
           </div>
         </div>

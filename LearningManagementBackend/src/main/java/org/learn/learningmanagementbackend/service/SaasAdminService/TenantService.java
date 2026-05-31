@@ -24,16 +24,19 @@ public class TenantService {
     private final SaasSubscriptionRepository subscriptionRepository;
     private final SaasPlanRepository planRepository;
     private final PasswordEncoder passwordEncoder;
+    private final org.learn.learningmanagementbackend.service.EmailService emailService;
+
+    // Role IDs cố định theo thứ tự insert: 1=SAAS_ADMIN, 2=LECTURER, 3=STUDENT, 4=SCHOOL_ADMIN
+    private static final int ROLE_ID_LECTURER = 2;
+    private static final int ROLE_ID_STUDENT = 3;
+    private static final int ROLE_ID_SCHOOL_ADMIN = 4;
 
     public List<TenantResponse> getAllTenants() {
         List<School> schools = schoolRepository.findAll();
         List<TenantResponse> responses = new ArrayList<>();
-
         for (School school : schools) {
-            TenantResponse tr = mapToTenantResponse(school);
-            responses.add(tr);
+            responses.add(mapToTenantResponse(school));
         }
-
         return responses;
     }
 
@@ -45,14 +48,12 @@ public class TenantService {
 
     @Transactional
     public TenantResponse createTenant(CreateTenantRequest request) {
-        // 1. Tạo School
         School school = new School();
         school.setName(request.getSchoolName());
         school.setCode(request.getSchoolCode());
         school.setPhone(request.getPhone());
         school.setIsActive(true);
 
-        // Parse school type
         try {
             school.setType(SchoolType.valueOf(request.getSchoolType().toUpperCase()));
         } catch (Exception e) {
@@ -61,7 +62,6 @@ public class TenantService {
 
         school = schoolRepository.save(school);
 
-        // 2. Tạo User Admin cho trường
         Users adminUser = new Users();
         adminUser.setSchool(school);
         adminUser.setCode("ADM-" + request.getSchoolCode() + "-01");
@@ -74,7 +74,6 @@ public class TenantService {
         school.addUser(adminUser);
         schoolRepository.save(school);
 
-        // 3. Tạo Subscription
         SaasPlan plan = planRepository.findById(request.getPlanId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy gói cước với ID: " + request.getPlanId()));
 
@@ -90,8 +89,16 @@ public class TenantService {
             subscription.setEndDate(LocalDate.now().plusMonths(1));
         }
         subscription.setStatus("ACTIVE");
-
         subscriptionRepository.save(subscription);
+
+        // Gửi email thông báo cho School Admin
+        emailService.sendTenantWelcomeEmail(
+            adminUser.getEmail(), 
+            school.getName(), 
+            adminUser.getFullName(), 
+            "Admin@123", 
+            "http://localhost:5173/login" // Link đến Frontend của School Admin
+        );
 
         return mapToTenantResponse(school);
     }
@@ -104,6 +111,53 @@ public class TenantService {
         schoolRepository.save(school);
     }
 
+    @Transactional
+    public TenantResponse updateTenant(Integer schoolId, Map<String, Object> updates) {
+        School school = schoolRepository.findById(schoolId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy trường với ID: " + schoolId));
+
+        if (updates.containsKey("name") && updates.get("name") != null) {
+            school.setName(updates.get("name").toString());
+        }
+        if (updates.containsKey("phone")) {
+            school.setPhone(updates.get("phone") != null ? updates.get("phone").toString() : null);
+        }
+        schoolRepository.save(school);
+
+        // Gia hạn hoặc đặt ngày hết hạn mới
+        if (updates.containsKey("extendMonths") || updates.containsKey("extendYears") || updates.containsKey("newEndDate")) {
+            Optional<SaasSubscription> activeSubOpt = subscriptionRepository.findBySchool_IdAndStatus(schoolId, "ACTIVE");
+            if (activeSubOpt.isPresent()) {
+                SaasSubscription sub = activeSubOpt.get();
+                LocalDate baseDate = sub.getEndDate().isAfter(LocalDate.now()) ? sub.getEndDate() : LocalDate.now();
+
+                if (updates.containsKey("newEndDate") && updates.get("newEndDate") != null) {
+                    sub.setEndDate(LocalDate.parse(updates.get("newEndDate").toString()));
+                } else if (updates.containsKey("extendYears")) {
+                    sub.setEndDate(baseDate.plusYears(Integer.parseInt(updates.get("extendYears").toString())));
+                } else if (updates.containsKey("extendMonths")) {
+                    sub.setEndDate(baseDate.plusMonths(Integer.parseInt(updates.get("extendMonths").toString())));
+                }
+                sub.setStatus("ACTIVE");
+                subscriptionRepository.save(sub);
+            }
+        }
+
+        // Đổi gói cước
+        if (updates.containsKey("planId") && updates.get("planId") != null) {
+            Integer newPlanId = Integer.parseInt(updates.get("planId").toString());
+            SaasPlan newPlan = planRepository.findById(newPlanId)
+                    .orElseThrow(() -> new RuntimeException("Không tìm thấy gói cước với ID: " + newPlanId));
+            Optional<SaasSubscription> activeSubOpt = subscriptionRepository.findBySchool_IdAndStatus(schoolId, "ACTIVE");
+            if (activeSubOpt.isPresent()) {
+                activeSubOpt.get().setPlan(newPlan);
+                subscriptionRepository.save(activeSubOpt.get());
+            }
+        }
+
+        return mapToTenantResponse(school);
+    }
+
     private TenantResponse mapToTenantResponse(School school) {
         TenantResponse tr = new TenantResponse();
         tr.setId(school.getId());
@@ -114,13 +168,15 @@ public class TenantService {
         tr.setEmail(school.getEmail());
         tr.setPhone(school.getPhone());
 
-        // User counts
-        long students = userRepository.countBySchoolIdAndRoleName(school.getId(), "STUDENT");
-        long teachers = userRepository.countBySchoolIdAndRoleName(school.getId(), "LECTURER");
+        // Đếm user theo role_id (tránh vấn đề case-sensitive)
+        long students = userRepository.countBySchoolIdAndRoleId(school.getId(), ROLE_ID_STUDENT);
+        long teachers = userRepository.countBySchoolIdAndRoleId(school.getId(), ROLE_ID_LECTURER);
+        long admins = userRepository.countBySchoolIdAndRoleId(school.getId(), ROLE_ID_SCHOOL_ADMIN);
         tr.setStudents(students);
         tr.setTeachers(teachers);
+        tr.setAdmins(admins);
 
-        // Subscription info
+        // Thông tin gói cước
         Optional<SaasSubscription> activeSub = subscriptionRepository.findBySchool_IdAndStatus(school.getId(), "ACTIVE");
         if (activeSub.isPresent()) {
             SaasSubscription sub = activeSub.get();
@@ -133,8 +189,8 @@ public class TenantService {
             tr.setDaysLeft(0);
         }
 
-        // Storage (placeholder — would integrate with cloud storage API)
-        tr.setStorage(String.format("%.1fGB", students * 0.05 + teachers * 0.1));
+        // Storage (placeholder)
+        tr.setStorage(String.format("%.1fGB", students * 0.05 + teachers * 0.1 + admins * 0.01));
 
         return tr;
     }

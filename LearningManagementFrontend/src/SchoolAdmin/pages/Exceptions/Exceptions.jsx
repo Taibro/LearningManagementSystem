@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { AlertTriangle, Save } from 'lucide-react';
 
 export default function Exceptions() {
   const [exceptions, setExceptions] = useState([]);
@@ -177,7 +178,7 @@ export default function Exceptions() {
         <div className="ov open">
           <div className="modal" style={{width:'500px'}}>
             <div className="modal-hd">
-              <span className="modal-title">{currentEx.id ? '⚠️ Sửa Ngoại lệ' : '⚠️ Thêm Ngoại lệ Lịch học'}</span>
+              <span className="modal-title">{currentEx.id ? <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> Sửa Ngoại lệ</> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> Thêm Ngoại lệ Lịch học</>}</span>
               <button className="close-btn" onClick={() => setEModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -220,7 +221,7 @@ export default function Exceptions() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setEModal(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveEx}>💾 Lưu</button>
+              <button className="btn btn-blue" onClick={handleSaveEx}><Save className="w-4 h-4 inline-block mr-2" /> Lưu</button>
             </div>
           </div>
         </div>

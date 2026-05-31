@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { CheckCircle2, AlertTriangle } from 'lucide-react';
 
 const QRCodeAttendance = () => {
   const [isGenerated, setIsGenerated] = useState(false);
@@ -71,7 +72,7 @@ const QRCodeAttendance = () => {
           color: 'white', padding: '14px 24px', borderRadius: 8,
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
         </div>
       )}
 

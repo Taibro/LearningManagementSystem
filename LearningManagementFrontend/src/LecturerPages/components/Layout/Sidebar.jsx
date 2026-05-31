@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import SimpleBar from 'simplebar-react';
+import { BarChart, Users, CalendarDays, FileText, Settings, User, DollarSign, FolderOpen, Check, ChevronDown, LineChart, Calendar, StopCircle, RefreshCw, TrendingDown, ClipboardList } from 'lucide-react';
 
 const Sidebar = () => {
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(true);
+  const rawSchoolName = localStorage.getItem('schoolName') || 'Ho Chi Minh City University of Industry and Trade';
+  const schoolName = rawSchoolName.replace(/\n/g, ' ');
+  const schoolShort = schoolName.split(' ').map(w => w[0]).join('').substring(0, 4).toUpperCase() || 'HUIT';
 
   const navClass = ({ isActive }) =>
     `px-4 py-2.5 text-white text-[13px] flex items-center gap-3 transition-all no-underline font-medium mx-2 my-0 rounded-lg outline-none ${
@@ -22,10 +26,16 @@ const Sidebar = () => {
     >
       <div className="p-4 pb-2 border-b border-white/15 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center font-bold text-[#6B4FA0] text-lg shadow-inner">HUIT</div>
-          <div>
-            <div className="font-bold text-[13px] leading-tight text-white uppercase tracking-tighter">HO CHI MINH CITY</div>
-            <div className="text-[10px] text-purple-200 opacity-80 mt-0.5 font-medium">University of Industry and Trade</div>
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center font-bold text-[#6B4FA0] text-sm shadow-inner text-center leading-none tracking-tighter shrink-0">
+            {schoolShort}
+          </div>
+          <div className="overflow-hidden">
+            <div 
+              className="font-bold text-[12px] leading-tight text-white uppercase tracking-tighter"
+              style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+            >
+              {schoolName}
+            </div>
           </div>
         </div>
       </div>
@@ -35,10 +45,10 @@ const Sidebar = () => {
 
         <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-2 pb-1 font-black">CÔNG TÁC GIẢNG DẠY</div>
 
-        <NavLink to="/profile" className={navClass}>👤 Hồ sơ cá nhân</NavLink>
-        <NavLink to="/salary" className={navClass}>💰 Thông tin lương</NavLink>
-        <NavLink to="/declaration" className={navClass}>📝 Khai báo thông tin</NavLink>
-        <NavLink to="/documents" className={navClass}>📁 Quản lý tài liệu</NavLink>
+        <NavLink to="/profile" className={navClass}><User className="w-4 h-4 inline-block mr-2" /> Hồ sơ cá nhân</NavLink>
+        <NavLink to="/salary" className={navClass}><DollarSign className="w-4 h-4 inline-block mr-2" /> Thông tin lương</NavLink>
+        <NavLink to="/declaration" className={navClass}><FileText className="w-4 h-4 inline-block mr-2" /> Khai báo thông tin</NavLink>
+        <NavLink to="/documents" className={navClass}><FolderOpen className="w-4 h-4 inline-block mr-2" /> Quản lý tài liệu</NavLink>
 
         <div className="mt-0">
           <div
@@ -46,10 +56,10 @@ const Sidebar = () => {
             onClick={() => setIsAttendanceOpen(!isAttendanceOpen)}
           >
             <div className="flex items-center gap-3">
-              <span className="text-gray-100 opacity-80">✓</span>
+              <span className="text-gray-100 opacity-80"><Check className="w-4 h-4 inline-block mr-2" /></span>
               <span>Chuyên cần - Rèn luyện</span>
             </div>
-            <span className={`transition-transform duration-300 text-[10px] ${isAttendanceOpen ? 'rotate-180' : ''}`}>▼</span>
+            <span className={`transition-transform duration-300 text-[10px] ${isAttendanceOpen ? 'rotate-180' : ''}`}><ChevronDown className="w-4 h-4 inline-block mr-2" /></span>
           </div>
 
           <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isAttendanceOpen ? 'max-h-64 bg-black/10' : 'max-h-0'}`}>
@@ -59,24 +69,21 @@ const Sidebar = () => {
           </div>
         </div>
 
-        <NavLink to="/results" className={navClass}>📊 Quản lý kết quả</NavLink>
-        <NavLink to="/progress-schedule" className={navClass}>📈 Lịch theo tiến độ</NavLink>
-        <NavLink to="/weekly-schedule" className={navClass}>📅 Lịch theo tuần</NavLink>
+        <NavLink to="/results" className={navClass}><BarChart className="w-4 h-4 inline-block mr-2" /> Quản lý kết quả</NavLink>
+        <NavLink to="/progress-schedule" className={navClass}><LineChart className="w-4 h-4 inline-block mr-2" /> Lịch theo tiến độ</NavLink>
+        <NavLink to="/weekly-schedule" className={navClass}><Calendar className="w-4 h-4 inline-block mr-2" /> Lịch theo tuần</NavLink>
 
         <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">ĐỀ XUẤT</div>
-        <NavLink to="/stop-teaching" className={navClass}>🛑 Tạm ngừng dạy</NavLink>
-        <NavLink to="/makeup-teaching" className={navClass}>🔄 Dạy bù</NavLink>
-        <NavLink to="/substitute-teaching" className={navClass}>👥 Dạy thay</NavLink>
+        <NavLink to="/stop-teaching" className={navClass}><StopCircle className="w-4 h-4 inline-block mr-2" /> Tạm ngừng dạy</NavLink>
+        <NavLink to="/makeup-teaching" className={navClass}><RefreshCw className="w-4 h-4 inline-block mr-2" /> Dạy bù</NavLink>
+        <NavLink to="/substitute-teaching" className={navClass}><Users className="w-4 h-4 inline-block mr-2" /> Dạy thay</NavLink>
 
         <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">BÁO CÁO</div>
-        <NavLink to="/statistics" className={navClass}>📉 Thống kê thực giảng</NavLink>
-        <NavLink to="/survey" className={navClass}>📋 Khảo sát</NavLink>
+        <NavLink to="/statistics" className={navClass}><TrendingDown className="w-4 h-4 inline-block mr-2" /> Thống kê thực giảng</NavLink>
+        <NavLink to="/survey" className={navClass}><ClipboardList className="w-4 h-4 inline-block mr-2" /> Khảo sát</NavLink>
 
         <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">HỆ THỐNG</div>
-        <NavLink to="/settings" className={navClass}>⚙️ Cài đặt hệ thống</NavLink>
-
-        {/* <div className="text-[10px] tracking-[1.5px] uppercase text-white/40 px-6 pt-3 pb-1 font-black">THỜI KHÓA BIỂU</div>
-        <NavLink to="/view-schedule" className={navClass}>🗓️ Xem thời khóa biểu</NavLink> */}
+        <NavLink to="/settings" className={navClass}><Settings className="w-4 h-4 inline-block mr-2" /> Cài đặt hệ thống</NavLink>
 
       </SimpleBar>
     </aside>

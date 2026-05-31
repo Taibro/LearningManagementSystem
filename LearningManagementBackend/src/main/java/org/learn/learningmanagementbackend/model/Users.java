@@ -75,7 +75,12 @@ public class Users extends BaseEntity {
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
+    // 2FA Auth fields
+    @Column(name = "mfa_secret", length = 32)
+    private String mfaSecret;
 
+    @Column(name = "is_mfa_enabled")
+    private Boolean isMfaEnabled = false;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Teacher teacher;

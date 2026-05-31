@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Plus, Edit, CheckCircle2, XCircle, AlertTriangle, Save } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8080/api/auth/school-admin';
 
@@ -108,7 +109,7 @@ export default function Departments() {
       {/* Table */}
       <div className="card">
         {loading && <p style={{ padding: 20 }}>⏳ Đang tải dữ liệu...</p>}
-        {error && <p style={{ padding: 20, color: 'red' }}>❌ Lỗi: {error} — Hãy kiểm tra Backend có đang chạy không!</p>}
+        {error && <p style={{ padding: 20, color: 'red' }}><XCircle className="w-4 h-4 inline-block mr-2" /> Lỗi: {error} — Hãy kiểm tra Backend có đang chạy không!</p>}
         {!loading && !error && departments.length === 0 && (
           <p style={{ padding: 20 }}>Chưa có khoa nào trong hệ thống.</p>
         )}
@@ -158,7 +159,7 @@ export default function Departments() {
             boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
           }}>
             <h3 style={{ marginTop: 0, marginBottom: 20, fontSize: 18, fontWeight: 700 }}>
-              {isEditMode ? '✏️ Sửa thông tin Khoa' : '➕ Thêm Khoa mới'}
+              {isEditMode ? <><Edit className="w-4 h-4 inline-block mr-2" /> Sửa thông tin Khoa</> : <><Plus className="w-4 h-4 inline-block mr-2" /> Thêm Khoa mới</>}
             </h3>
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: 14 }}>
@@ -195,7 +196,7 @@ export default function Departments() {
                 </button>
                 <button type="submit"
                   style={{ padding: '8px 18px', borderRadius: 6, border: 'none', background: '#2563eb', color: '#fff', cursor: 'pointer', fontWeight: 700, fontSize: 14 }}>
-                  💾 Lưu dữ liệu
+                  <Save className="w-4 h-4 inline-block mr-2" /> Lưu dữ liệu
                 </button>
               </div>
             </form>
@@ -211,7 +212,7 @@ export default function Departments() {
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14,
           transition: 'all 0.3s ease-out'
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
         </div>
       )}
     </div>

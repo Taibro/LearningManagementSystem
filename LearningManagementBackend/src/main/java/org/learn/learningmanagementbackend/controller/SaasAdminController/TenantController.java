@@ -41,4 +41,11 @@ public class TenantController {
         String message = request.getIsActive() ? "Đã mở khoá tenant" : "Đã khoá tenant";
         return ResponseEntity.ok(Map.of("message", message));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<TenantResponse> updateTenant(
+            @PathVariable Integer id,
+            @RequestBody Map<String, Object> updates) {
+        return ResponseEntity.ok(tenantService.updateTenant(id, updates));
+    }
 }

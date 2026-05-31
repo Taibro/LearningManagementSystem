@@ -19,6 +19,8 @@ public class ScheduleService {
 
     private final ClassRepository classRepository;
 
+    private final org.learn.learningmanagementbackend.repository.LecturerRepository.SemesterRepository semesterRepository;
+
     public List<WeeklyScheduleDto> getTeacherWeeklySchedule(String teacherCode, LocalDate targetDate) {
         if (targetDate == null) {
             targetDate = LocalDate.now();
@@ -43,5 +45,28 @@ public class ScheduleService {
             academicYearId = 0;
         }
         return classRepository.getTeacherClassProgress(teacherCode, semesterId, courseId, academicYearId);
+    }
+
+    public List<org.learn.learningmanagementbackend.dto.response.ActiveClassScheduleDto> getActiveClassesWithSchedules(String teacherCode) {
+        List<org.learn.learningmanagementbackend.model.Classes> classes = classRepository.findActiveClassesWithSchedulesByTeacher(teacherCode);
+        
+        return classes.stream().map(cls -> {
+            List<org.learn.learningmanagementbackend.dto.response.ActiveClassScheduleDto.ScheduleDetail> scheduleDetails = cls.getSchedules().stream()
+                .map(s -> org.learn.learningmanagementbackend.dto.response.ActiveClassScheduleDto.ScheduleDetail.builder()
+                    .scheduleId(s.getId())
+                    .dayOfWeek(s.getDayOfWeek())
+                    .startPeriod(s.getStartPeriod())
+                    .endPeriod(s.getEndPeriod())
+                    .roomName(s.getRoom().getBuilding() + "-" + s.getRoom().getRoomNumber())
+                    .build())
+                .toList();
+
+            return org.learn.learningmanagementbackend.dto.response.ActiveClassScheduleDto.builder()
+                .classId(cls.getId())
+                .classCode(cls.getCode())
+                .courseName(cls.getCourse().getName())
+                .schedules(scheduleDetails)
+                .build();
+        }).toList();
     }
 }

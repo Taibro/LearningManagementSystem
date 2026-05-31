@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getSurveys } from '../../studentApi';
 import SurveyDetail from './SurveyDetail';
 import './Surveys.css';
+import { Check, ClipboardList, CheckCircle2, PartyPopper } from 'lucide-react';
 
 export default function Surveys() {
   const [tab, setTab] = useState('chua');
@@ -49,7 +50,7 @@ export default function Surveys() {
           className={`tab-btn ${tab === 'chua' ? 'active' : ''}`}
           onClick={() => setTab('chua')}
         >
-          📋 Danh sách phiếu chưa khảo sát
+          <ClipboardList className="w-4 h-4 inline-block mr-2" /> Danh sách phiếu chưa khảo sát
           {pending.length > 0 && (
             <span className="tab-count">{pending.length}</span>
           )}
@@ -58,7 +59,7 @@ export default function Surveys() {
           className={`tab-btn ${tab === 'da' ? 'active' : ''}`}
           onClick={() => setTab('da')}
         >
-          ✅ Danh sách phiếu đã khảo sát
+          <CheckCircle2 className="w-4 h-4 inline-block mr-2" /> Danh sách phiếu đã khảo sát
         </div>
       </div>
 
@@ -70,7 +71,7 @@ export default function Surveys() {
         {!loading && list.length === 0 && (
           <div className="survey-empty">
             {tab === 'chua'
-              ? '🎉 Bạn đã hoàn thành tất cả phiếu khảo sát!'
+              ? <><PartyPopper className="w-4 h-4 inline-block mr-2" /> Bạn đã hoàn thành tất cả phiếu khảo sát!</>
               : 'Chưa có phiếu khảo sát nào được hoàn thành.'}
           </div>
         )}
@@ -108,7 +109,7 @@ export default function Surveys() {
             </div>
             <div className="survey-item-action">
               {s.isCompleted ? (
-                <span className="survey-status-done">✓ Đã hoàn thành</span>
+                <span className="survey-status-done"><Check className="w-4 h-4 inline-block mr-2" /> Đã hoàn thành</span>
               ) : (
                 <button className="btn btn-blue btn-sm">Làm khảo sát →</button>
               )}

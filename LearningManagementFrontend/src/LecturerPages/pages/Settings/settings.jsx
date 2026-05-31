@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { CheckCircle2, AlertTriangle, Save } from 'lucide-react';
 
 const Settings = () => {
   const [profile, setProfile] = useState({ fullName: '', email: '', departmentName: '', phone: '', avatarUrl: '' });
@@ -132,7 +133,7 @@ const Settings = () => {
           color: 'white', padding: '14px 24px', borderRadius: 8,
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
         </div>
       )}
 
@@ -195,7 +196,7 @@ const Settings = () => {
                 disabled={savingProfile}
                 className={`text-white rounded-lg px-8 py-2.5 text-sm font-bold shadow-md transition-all uppercase tracking-widest ${savingProfile ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-[#6B4FA0] to-[#8B6BBF] hover:translate-y-[-1px] active:scale-95'}`}
               >
-                {savingProfile ? '⏳ Đang lưu...' : '💾 Cập nhật hồ sơ'}
+                {savingProfile ? '⏳ Đang lưu...' : <><Save className="w-4 h-4 inline-block mr-2" /> Cập nhật hồ sơ</>}
               </button>
             </div>
           </div>

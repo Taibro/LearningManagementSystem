@@ -42,11 +42,30 @@ public class SystemErrorLogService {
         errorLogRepository.save(log);
     }
 
+    /**
+     * Ghi lỗi thủ công từ bất kỳ service nào trong hệ thống.
+     * Sử dụng khi muốn log lỗi nhưng không throw exception.
+     */
+    public void logError(String endpoint, String errorMessage, String stackTrace) {
+        try {
+            SystemErrorLog log = new SystemErrorLog();
+            log.setEndpoint(endpoint);
+            log.setErrorMessage(errorMessage);
+            log.setStackTrace(stackTrace);
+            log.setIsResolved(false);
+            errorLogRepository.save(log);
+        } catch (Exception ignored) {
+            System.err.println("[MANUAL ERROR LOG FAILED] " + ignored.getMessage());
+        }
+    }
+
     private SystemErrorLogResponse mapToResponse(SystemErrorLog log) {
         SystemErrorLogResponse res = new SystemErrorLogResponse();
         res.setId(log.getId());
         res.setEndpoint(log.getEndpoint());
         res.setErrorMessage(log.getErrorMessage());
+        res.setStackTrace(log.getStackTrace());
+        res.setUserAgent(log.getUserAgent());
         res.setSchoolName(log.getSchool() != null ? log.getSchool().getName() : "System");
         res.setIsResolved(log.getIsResolved());
         res.setCreatedAt(log.getCreatedAt());
