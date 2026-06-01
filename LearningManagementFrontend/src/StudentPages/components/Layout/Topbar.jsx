@@ -12,6 +12,24 @@ export default function Topbar() {
   const schoolName = rawSchoolName.replace(/\n/g, ' ');
   const schoolShort = localStorage.getItem('schoolShortName') || 'HUIT';
 
+  const userStr = localStorage.getItem('user');
+  let fullName = 'Phan Sĩ Thịnh';
+  let shortName = 'PT';
+  if (userStr) {
+    try {
+      const userObj = JSON.parse(userStr);
+      if (userObj.fullName) {
+        fullName = userObj.fullName;
+        const words = fullName.trim().split(' ');
+        if (words.length >= 2) {
+          shortName = words[0][0].toUpperCase() + words[words.length - 1][0].toUpperCase();
+        } else {
+          shortName = fullName.substring(0, 2).toUpperCase();
+        }
+      }
+    } catch (e) {}
+  }
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -54,9 +72,9 @@ export default function Topbar() {
             onClick={() => setShowDropdown(!showDropdown)}
           >
             <div style={{width:'32px',height:'32px',borderRadius:'50%',background:'linear-gradient(135deg,#1a6fb5,#60a5fa)',display:'flex',alignItems:'center',justifyContent:'center',color:'white',fontSize:'13px',fontWeight:700}}>
-              PT
+              {shortName}
             </div>
-            <span style={{fontSize:'13px',fontWeight:500}}>Phan Sĩ Thịnh ▾</span>
+            <span style={{fontSize:'13px',fontWeight:500}}>{fullName} ▾</span>
           </div>
 
           {showDropdown && (

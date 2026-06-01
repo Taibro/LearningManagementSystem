@@ -168,7 +168,7 @@ INSERT INTO users (id, school_id, code, citizen_id_number, full_name, email, pas
 (10, 1, 'USR010', '079001000010', 'Hồ Điện Tử', 'gv9@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
 (11, 1, 'USR011', '079001000011', 'Ngô Quản Trị', 'gv10@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
 (12, 1, 'USR012', '079001000012', 'Dương Kế Toán', 'gv11@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
-(13, 1, 'USR013', '079001000013', 'Nguyễn Thanh Tài', 'tai.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(13, 1, 'USR013', '079001000013', 'Phan Sĩ Thịnh', 'thinh.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
 (14, 1, 'USR014', '079001000014', 'Nguyễn Minh Dũng', 'dung.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
 (15, 1, 'USR015', '079001000015', 'Lê Hoàng Anh', 'anh.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
 (16, 1, 'USR016', '079001000016', 'Phạm Thị Cúc', 'cuc.sv@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
@@ -271,7 +271,7 @@ INSERT INTO teachers (id, user_id, teacher_code, department_id, degree) VALUES
 
 -- 10. BẢNG STUDENT (12 dòng)
 INSERT INTO students (id, user_id, student_code, department_id, enrollment_year, class_name) VALUES
-(1, 13, '2001230773', 1, 2023, '12DHTH01'),
+(1, 13, '2001216301', 1, 2023, '12DHTH01'),
 (2, 14, '2001216302', 1, 2023, '12DHTH01'),
 (3, 15, '2001216303', 1, 2023, '12DHTH02'),
 (4, 16, '2001216304', 2, 2023, '12DHKT01'),
