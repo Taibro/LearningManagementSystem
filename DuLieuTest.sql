@@ -271,7 +271,7 @@ INSERT INTO teachers (id, user_id, teacher_code, department_id, degree) VALUES
 
 -- 10. BẢNG STUDENT (12 dòng)
 INSERT INTO students (id, user_id, student_code, department_id, enrollment_year, class_name) VALUES
-(1, 13, '2001216301', 1, 2023, '12DHTH01'),
+(1, 13, '2001230773', 1, 2023, '12DHTH01'),
 (2, 14, '2001216302', 1, 2023, '12DHTH01'),
 (3, 15, '2001216303', 1, 2023, '12DHTH02'),
 (4, 16, '2001216304', 2, 2023, '12DHKT01'),

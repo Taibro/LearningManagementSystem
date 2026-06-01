@@ -27,7 +27,7 @@ export default function Semesters() {
 
   const fetchAcademicYears = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/academic-years/school/${SCHOOL_ID}`);
+      const res = await fetch(`http://localhost:8080/api/school-admin/academic-years/school/${SCHOOL_ID}`);
       if (res.ok) {
         const data = await res.json();
         setAcademicYears(data);
@@ -42,7 +42,7 @@ export default function Semesters() {
     let allSems = [];
     for (let year of years) {
       try {
-        const res = await fetch(`http://localhost:8080/api/auth/school-admin/semesters/academic-year/${year.id}`);
+        const res = await fetch(`http://localhost:8080/api/school-admin/semesters/academic-year/${year.id}`);
         if (res.ok) {
           const data = await res.json();
           allSems = [...allSems, ...data];
@@ -58,9 +58,9 @@ export default function Semesters() {
   const handleSaveAy = async () => {
     const payload = { ...currentAy, schoolId: SCHOOL_ID };
     const method = currentAy.id ? 'PUT' : 'POST';
-    const url = currentAy.id 
-      ? `http://localhost:8080/api/auth/school-admin/academic-years/${currentAy.id}`
-      : 'http://localhost:8080/api/auth/school-admin/academic-years';
+    const url = currentAy.id
+      ? `http://localhost:8080/api/school-admin/academic-years/${currentAy.id}`
+      : 'http://localhost:8080/api/school-admin/academic-years';
 
     try {
       const res = await fetch(url, {
@@ -81,9 +81,9 @@ export default function Semesters() {
   };
 
   const handleDeleteAy = async (id) => {
-    if(!window.confirm("Bạn có chắc muốn xóa năm học này? Các học kỳ liên quan có thể bị ảnh hưởng.")) return;
+    if (!window.confirm("Bạn có chắc muốn xóa năm học này? Các học kỳ liên quan có thể bị ảnh hưởng.")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/academic-years/${id}`, { method: 'DELETE' });
+      const res = await fetch(`http://localhost:8080/api/school-admin/academic-years/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Đã xóa năm học!');
         fetchAcademicYears();
@@ -101,9 +101,9 @@ export default function Semesters() {
   // --- SEMESTER LOGIC ---
   const handleSaveSem = async () => {
     const method = currentSem.id ? 'PUT' : 'POST';
-    const url = currentSem.id 
-      ? `http://localhost:8080/api/auth/school-admin/semesters/${currentSem.id}`
-      : 'http://localhost:8080/api/auth/school-admin/semesters';
+    const url = currentSem.id
+      ? `http://localhost:8080/api/school-admin/semesters/${currentSem.id}`
+      : 'http://localhost:8080/api/school-admin/semesters';
 
     try {
       const res = await fetch(url, {
@@ -124,9 +124,9 @@ export default function Semesters() {
   };
 
   const handleDeleteSem = async (id) => {
-    if(!window.confirm("Bạn có chắc muốn xóa học kỳ này?")) return;
+    if (!window.confirm("Bạn có chắc muốn xóa học kỳ này?")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/semesters/${id}`, { method: 'DELETE' });
+      const res = await fetch(`http://localhost:8080/api/school-admin/semesters/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Đã xóa học kỳ!');
         fetchAcademicYears();
@@ -143,7 +143,7 @@ export default function Semesters() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
-      
+
       {/* TOAST NOTIFICATION */}
       {toast && (
         <div style={{
@@ -186,8 +186,8 @@ export default function Semesters() {
                   <td style={{ fontWeight: 700 }}>{ay.name}</td>
                   <td style={{ fontSize: '12px' }}>{ay.startDate} đến {ay.endDate}</td>
                   <td>
-                    {ay.isActive 
-                      ? <span className="badge b-green"><span className="dot-on"></span> Active</span> 
+                    {ay.isActive
+                      ? <span className="badge b-green"><span className="dot-on"></span> Active</span>
                       : <span className="badge b-gray"><span className="dot-off"></span> Inactive</span>}
                   </td>
                   <td>
@@ -198,7 +198,7 @@ export default function Semesters() {
                   </td>
                 </tr>
               ))}
-              {academicYears.length === 0 && <tr><td colSpan="4" style={{textAlign:'center'}}>Chưa có dữ liệu</td></tr>}
+              {academicYears.length === 0 && <tr><td colSpan="4" style={{ textAlign: 'center' }}>Chưa có dữ liệu</td></tr>}
             </tbody>
           </table>
         </div>
@@ -223,8 +223,8 @@ export default function Semesters() {
                   <td>{sem.academicYearName}</td>
                   <td style={{ fontSize: '12px' }}>{sem.startDate} đến {sem.endDate}</td>
                   <td>
-                    {sem.isActive 
-                      ? <span className="badge b-blue"><span className="dot-on"></span> Active</span> 
+                    {sem.isActive
+                      ? <span className="badge b-blue"><span className="dot-on"></span> Active</span>
                       : <span className="badge b-gray"><span className="dot-off"></span> Inactive</span>}
                   </td>
                   <td>
@@ -235,7 +235,7 @@ export default function Semesters() {
                   </td>
                 </tr>
               ))}
-              {semesters.length === 0 && <tr><td colSpan="5" style={{textAlign:'center'}}>Chưa có dữ liệu</td></tr>}
+              {semesters.length === 0 && <tr><td colSpan="5" style={{ textAlign: 'center' }}>Chưa có dữ liệu</td></tr>}
             </tbody>
           </table>
         </div>
@@ -252,20 +252,20 @@ export default function Semesters() {
             <div className="modal-body">
               <div className="fg">
                 <label className="fl">Tên năm học</label>
-                <input className="fc" value={currentAy.name} onChange={e => setCurrentAy({...currentAy, name: e.target.value})} placeholder="VD: 2024-2025" />
+                <input className="fc" value={currentAy.name} onChange={e => setCurrentAy({ ...currentAy, name: e.target.value })} placeholder="VD: 2024-2025" />
               </div>
               <div className="grid2">
                 <div className="fg">
                   <label className="fl">Ngày bắt đầu</label>
-                  <input type="date" className="fc" value={currentAy.startDate} onChange={e => setCurrentAy({...currentAy, startDate: e.target.value})} />
+                  <input type="date" className="fc" value={currentAy.startDate} onChange={e => setCurrentAy({ ...currentAy, startDate: e.target.value })} />
                 </div>
                 <div className="fg">
                   <label className="fl">Ngày kết thúc</label>
-                  <input type="date" className="fc" value={currentAy.endDate} onChange={e => setCurrentAy({...currentAy, endDate: e.target.value})} />
+                  <input type="date" className="fc" value={currentAy.endDate} onChange={e => setCurrentAy({ ...currentAy, endDate: e.target.value })} />
                 </div>
               </div>
               <div className="fg" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <input type="checkbox" checked={currentAy.isActive} onChange={e => setCurrentAy({...currentAy, isActive: e.target.checked})} />
+                <input type="checkbox" checked={currentAy.isActive} onChange={e => setCurrentAy({ ...currentAy, isActive: e.target.checked })} />
                 <label>Đang hoạt động</label>
               </div>
             </div>
@@ -288,7 +288,7 @@ export default function Semesters() {
             <div className="modal-body">
               <div className="fg">
                 <label className="fl">Năm học</label>
-                <select className="fc" value={currentSem.academicYearId} onChange={e => setCurrentSem({...currentSem, academicYearId: e.target.value})}>
+                <select className="fc" value={currentSem.academicYearId} onChange={e => setCurrentSem({ ...currentSem, academicYearId: e.target.value })}>
                   <option value="">-- Chọn năm học --</option>
                   {academicYears.map(ay => (
                     <option key={ay.id} value={ay.id}>{ay.name}</option>
@@ -297,20 +297,20 @@ export default function Semesters() {
               </div>
               <div className="fg">
                 <label className="fl">Tên học kỳ</label>
-                <input className="fc" value={currentSem.name} onChange={e => setCurrentSem({...currentSem, name: e.target.value})} placeholder="VD: Học kỳ 1" />
+                <input className="fc" value={currentSem.name} onChange={e => setCurrentSem({ ...currentSem, name: e.target.value })} placeholder="VD: Học kỳ 1" />
               </div>
               <div className="grid2">
                 <div className="fg">
                   <label className="fl">Ngày bắt đầu</label>
-                  <input type="date" className="fc" value={currentSem.startDate} onChange={e => setCurrentSem({...currentSem, startDate: e.target.value})} />
+                  <input type="date" className="fc" value={currentSem.startDate} onChange={e => setCurrentSem({ ...currentSem, startDate: e.target.value })} />
                 </div>
                 <div className="fg">
                   <label className="fl">Ngày kết thúc</label>
-                  <input type="date" className="fc" value={currentSem.endDate} onChange={e => setCurrentSem({...currentSem, endDate: e.target.value})} />
+                  <input type="date" className="fc" value={currentSem.endDate} onChange={e => setCurrentSem({ ...currentSem, endDate: e.target.value })} />
                 </div>
               </div>
               <div className="fg" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <input type="checkbox" checked={currentSem.isActive} onChange={e => setCurrentSem({...currentSem, isActive: e.target.checked})} />
+                <input type="checkbox" checked={currentSem.isActive} onChange={e => setCurrentSem({ ...currentSem, isActive: e.target.checked })} />
                 <label>Đang hoạt động</label>
               </div>
             </div>

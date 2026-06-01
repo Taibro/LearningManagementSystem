@@ -21,8 +21,8 @@ export default function Payments() {
 
   const fetchPayments = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/payments', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      const res = await fetch('http://localhost:8080/api/school-admin/payments', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
         const data = await res.json();
@@ -36,8 +36,8 @@ export default function Payments() {
   const handleSavePayment = async () => {
     const method = currentPayment.id ? 'PUT' : 'POST';
     const url = currentPayment.id 
-      ? `http://localhost:8080/api/auth/school-admin/payments/${currentPayment.id}`
-      : `http://localhost:8080/api/auth/school-admin/payments`;
+      ? `http://localhost:8080/api/school-admin/payments/${currentPayment.id}`
+      : `http://localhost:8080/api/school-admin/payments`;
 
     const payload = {
       invoiceId: parseInt(currentPayment.invoiceId),
@@ -54,7 +54,7 @@ export default function Payments() {
         method,
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         },
         body: JSON.stringify(payload)
       });

@@ -13,5 +13,6 @@ public class UserProfileResponse {
     private String token;
     private Boolean require2fa;
     private Boolean requireSetup;
+    private Integer schoolId;
 
 }

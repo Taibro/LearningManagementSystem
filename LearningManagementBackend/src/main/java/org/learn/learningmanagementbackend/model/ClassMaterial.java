@@ -47,7 +47,6 @@ public class ClassMaterial {
     @Column(name = "doc_type", nullable = false)
     private String docType;
 
-    @CreationTimestamp
-    @Column(name = "created_at", insertable = false, updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 }

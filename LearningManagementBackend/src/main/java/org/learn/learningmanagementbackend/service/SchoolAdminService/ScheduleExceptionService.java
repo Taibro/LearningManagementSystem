@@ -7,6 +7,7 @@ import org.learn.learningmanagementbackend.model.Room;
 import org.learn.learningmanagementbackend.model.Schedule;
 import org.learn.learningmanagementbackend.model.ScheduleException;
 import org.learn.learningmanagementbackend.model.Teacher;
+import org.learn.learningmanagementbackend.model.Classes;
 import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.RoomRepository;
 import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.ScheduleExceptionRepository;
 import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.ScheduleRepository;
@@ -184,6 +185,89 @@ public class ScheduleExceptionService {
         exceptionRepository.deleteById(id);
     }
 
+    public List<ScheduleExceptionResponse> getPendingSuspensions() {
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer userId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+                    .setParameter("userId", userId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<ScheduleException> exceptions = exceptionRepository.findBySchoolIdAndApprovalStatus(schoolId, ApprovalStatus.PENDING);
+        return exceptions.stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public ScheduleExceptionResponse approveException(Integer id) {
+        ScheduleException ex = exceptionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đề xuất"));
+
+        ex.setApprovalStatus(ApprovalStatus.APPROVED);
+        ScheduleException saved = exceptionRepository.save(ex);
+
+        // Notify students
+        List<Enrollment> enrollments = enrollmentRepository.getEnrolledStudentsByClassId(saved.getSchedule().getClasses().getId());
+        for (Enrollment e : enrollments) {
+            Notification notif = new Notification();
+            notif.setUser(e.getStudent().getUser());
+            notif.setType(NotificationType.SCHEDULE_CHANGE);
+            notif.setTitle("Thông báo nghỉ học");
+            notif.setBody("Lớp học phần " + saved.getSchedule().getClasses().getCode() + " vào ngày " +
+                    (saved.getExceptionDate() != null ? saved.getExceptionDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "") +
+                    " đã được thông báo nghỉ.");
+            notificationRepository.save(notif);
+        }
+
+        // Notify lecturer (find teacher via ClassTeacher)
+        try {
+            saved.getSchedule().getClasses().getTeacherLecturings().forEach(ct -> {
+                Notification notif = new Notification();
+                notif.setUser(ct.getTeacher().getUser());
+                notif.setType(NotificationType.SYSTEM);
+                notif.setTitle("Yêu cầu nghỉ dạy đã được duyệt");
+                notif.setBody("Yêu cầu nghỉ dạy của bạn cho lớp " + saved.getSchedule().getClasses().getCode() +
+                        " vào ngày " + (saved.getExceptionDate() != null ? saved.getExceptionDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "") +
+                        " đã được nhà trường chấp thuận.");
+                notificationRepository.save(notif);
+            });
+        } catch (Exception ignored) {}
+
+        return mapToResponse(saved);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public ScheduleExceptionResponse rejectException(Integer id, String adminNote) {
+        ScheduleException ex = exceptionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đề xuất"));
+
+        ex.setApprovalStatus(ApprovalStatus.REJECTED);
+        ex.setAdminNote(adminNote);
+        ScheduleException saved = exceptionRepository.save(ex);
+
+        // Notify lecturer
+        try {
+            saved.getSchedule().getClasses().getTeacherLecturings().forEach(ct -> {
+                Notification notif = new Notification();
+                notif.setUser(ct.getTeacher().getUser());
+                notif.setType(NotificationType.SYSTEM);
+                notif.setTitle("Yêu cầu nghỉ dạy bị từ chối");
+                notif.setBody("Yêu cầu nghỉ dạy của bạn cho lớp " + saved.getSchedule().getClasses().getCode() +
+                        " vào ngày " + (saved.getExceptionDate() != null ? saved.getExceptionDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "") +
+                        " đã bị từ chối. Lý do: " + (adminNote != null ? adminNote : "Không có") + ".");
+                notificationRepository.save(notif);
+            });
+        } catch (Exception ignored) {}
+
+        return mapToResponse(saved);
+    }
+
     private ScheduleExceptionResponse mapToResponse(ScheduleException ex) {
         ScheduleExceptionResponse response = new ScheduleExceptionResponse();
         response.setId(ex.getId());
@@ -208,6 +292,24 @@ public class ScheduleExceptionService {
         response.setSubstituteStatus(ex.getSubstituteStatus());
         response.setReplacementRoomId(ex.getReplacementRoom() != null ? ex.getReplacementRoom().getId() : null);
         response.setReplacementRoomNumber(ex.getReplacementRoom() != null ? ex.getReplacementRoom().getRoomNumber() : null);
+        response.setAdminNote(ex.getAdminNote());
+        // Tìm teacher từ ClassTeacher
+        try {
+            if (ex.getSchedule() != null && ex.getSchedule().getClasses() != null) {
+                Classes cls = ex.getSchedule().getClasses();
+                response.setClassCode(cls.getCode());
+                if (cls.getCourse() != null) {
+                    response.setCourseName(cls.getCourse().getName());
+                }
+                if (!cls.getTeacherLecturings().isEmpty()) {
+                    Teacher t = cls.getTeacherLecturings().get(0).getTeacher();
+                    response.setTeacherCode(t.getTeacherCode());
+                    if (t.getUser() != null) {
+                        response.setTeacherName(t.getUser().getFullName());
+                    }
+                }
+            }
+        } catch (Exception ignored) {}
         return response;
     }
 }

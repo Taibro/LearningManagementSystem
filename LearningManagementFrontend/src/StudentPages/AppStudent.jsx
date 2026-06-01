@@ -33,11 +33,12 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-export default function AppStudent() {
+export default function AppStudent({ schoolName }) {
+  const basename = schoolName ? `/${schoolName}/student` : '/student';
   return (
-    <Router basename="/student">
+    <Router basename={basename}>
       <Routes>
-        <Route path="/login" element={<StudentLogin />} />
+        <Route path="/login" element={<StudentLogin initialSchool={schoolName} />} />
         
         <Route path="/" element={
           <ProtectedRoute>

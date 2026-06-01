@@ -8,5 +8,6 @@ public class AuthRequest {
     private String loginCode;
     private String password;
     private String userType;
+    private String school;
 
 }

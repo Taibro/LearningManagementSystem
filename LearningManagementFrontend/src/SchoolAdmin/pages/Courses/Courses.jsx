@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, CheckCircle2, XCircle, AlertTriangle, Save } from 'lucide-react';
 
-const API_COURSE = 'http://localhost:8080/api/auth/school-admin/courses';
-const API_DEPT = 'http://localhost:8080/api/auth/school-admin'; // Để lấy danh sách khoa
+const API_COURSE = 'http://localhost:8080/api/school-admin/courses';
+const API_DEPT = 'http://localhost:8080/api/school-admin'; // Để lấy danh sách khoa
 
 export default function Courses() {
   const [courses, setCourses] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [currentCourse, setCurrentCourse] = useState({ 
-    id: null, code: '', name: '', credits: 3, theorySessions: 30, practicalSessions: 15, description: '', departmentId: '' 
+  const [currentCourse, setCurrentCourse] = useState({
+    id: null, code: '', name: '', credits: 3, theorySessions: 30, practicalSessions: 15, description: '', departmentId: ''
   });
 
   // Toast State
@@ -36,10 +36,10 @@ export default function Courses() {
       ]);
 
       if (!resCourses.ok || !resDepts.ok) throw new Error('Lỗi khi tải dữ liệu từ Server');
-      
+
       const dataCourses = await resCourses.json();
       const dataDepts = await resDepts.json();
-      
+
       setCourses(dataCourses);
       setDepartments(dataDepts);
     } catch (err) {
@@ -94,7 +94,7 @@ export default function Courses() {
           departmentId: parseInt(currentCourse.departmentId),
         }),
       });
-      
+
       if (!res.ok) {
         const txt = await res.text();
         throw new Error(txt || 'Có lỗi xảy ra');
@@ -133,11 +133,11 @@ export default function Courses() {
       <div className="card">
         {loading && <p style={{ padding: 20 }}>⏳ Đang tải dữ liệu môn học...</p>}
         {error && <p style={{ padding: 20, color: 'red' }}><XCircle className="w-4 h-4 inline-block mr-2" /> Lỗi: {error} — (Hãy kiểm tra DB và Backend)</p>}
-        
+
         {!loading && !error && courses.length === 0 && (
           <p style={{ padding: 20 }}>Chưa có môn học nào. Hãy bấm "Thêm môn học" để tạo mới.</p>
         )}
-        
+
         {!loading && !error && courses.length > 0 && (
           <table className="tbl">
             <thead>
@@ -186,7 +186,7 @@ export default function Courses() {
             <h3 style={{ marginTop: 0, marginBottom: 20, fontSize: 18, fontWeight: 700 }}>
               {isEditMode ? <><Edit className="w-4 h-4 inline-block mr-2" /> Sửa thông tin Môn học</> : <><Plus className="w-4 h-4 inline-block mr-2" /> Thêm Môn học mới</>}
             </h3>
-            
+
             <form onSubmit={handleSubmit}>
               <div style={{ display: 'flex', gap: 15, marginBottom: 14 }}>
                 <div style={{ flex: 1 }}>
@@ -211,8 +211,8 @@ export default function Courses() {
 
               <div style={{ marginBottom: 14 }}>
                 <label style={{ display: 'block', marginBottom: 5, fontSize: 13, fontWeight: 600 }}>Thuộc Khoa / Bộ môn (*)</label>
-                <select 
-                  name="departmentId" value={currentCourse.departmentId} 
+                <select
+                  name="departmentId" value={currentCourse.departmentId}
                   onChange={handleInputChange} required
                   style={{ width: '100%', padding: '8px 10px', borderRadius: 6, border: '1px solid #d1d5db', fontSize: 14 }}
                 >

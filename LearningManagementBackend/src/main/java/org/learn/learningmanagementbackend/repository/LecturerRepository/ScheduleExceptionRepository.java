@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface ScheduleExceptionRepository extends JpaRepository<ScheduleException, Integer> {
 
-    @Query("SELECT se FROM ScheduleException se " +
+    @Query("SELECT DISTINCT se FROM ScheduleException se " +
             "JOIN FETCH se.schedule s " +
             "JOIN FETCH s.classes c " +
             "JOIN c.teacherLecturings ct " +

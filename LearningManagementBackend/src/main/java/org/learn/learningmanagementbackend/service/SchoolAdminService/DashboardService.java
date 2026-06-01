@@ -28,12 +28,16 @@ public class DashboardService {
 
         // 2. Tra cứu ID Trường mà Admin này đang quản lý
         Integer schoolId;
+        String schoolName;
         try {
-            schoolId = entityManager.createQuery(
-                    "SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+            Object[] result = (Object[]) entityManager.createQuery(
+                    "SELECT u.school.id, u.school.name FROM Users u WHERE u.id = :userId")
                     .setParameter("userId", userId)
                     .setMaxResults(1)
                     .getSingleResult();
+            schoolId = (Integer) result[0];
+            schoolName = (String) result[1];
+            stats.setSchoolName(schoolName);
         } catch (Exception e) {
             // Nếu không tìm thấy quyền quản lý trường nào, trả về 0 hết
             return stats;

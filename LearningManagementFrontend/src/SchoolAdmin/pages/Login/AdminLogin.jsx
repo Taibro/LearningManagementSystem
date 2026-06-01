@@ -4,18 +4,21 @@ import SearchableSelect from '../../../components/SearchableSelect';
 import './AdminLogin.css';
 import { BarChart, Check, CheckCircle2, XCircle, GraduationCap, School, AlertTriangle, Info, PartyPopper, Rocket, Globe, Mail, Lock, EyeOff, Eye, Circle, Upload, Hand, Shield, Zap } from 'lucide-react';
 
-export default function AdminLogin() {
+export default function AdminLogin({ initialSchool }) {
   const navigate = useNavigate();
 
   // Screen States
   const [activeScreen, setActiveScreen] = useState('school'); // 'school' | 'saas'
-  const [schoolView, setSchoolView] = useState('main'); // 'main' | 'forgot' | 'otp'
+  const [schoolView, setSchoolView] = useState('main'); // 'main' | 'forgot' | 'otp' | 'setup'
   const [saasView, setSaasView] = useState('main'); // 'main' | 'otp'
+  
+  const [tempToken, setTempToken] = useState('');
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
 
   // Input States
   const [sEmail, setSEmail] = useState('admin@hcmut.edu.vn');
   const [sPass, setSPass] = useState('Admin@123');
-  const [school, setSchool] = useState('');
+  const [school, setSchool] = useState(initialSchool || '');
   const [sShowPass, setSShowPass] = useState(false);
   const [sLoading, setSLoading] = useState(false);
   const [sError, setSError] = useState('');
@@ -30,6 +33,14 @@ export default function AdminLogin() {
 
   // Toast State
   const [toasts, setToasts] = useState([]);
+  const [schoolOptions, setSchoolOptions] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/schools/active')
+      .then(res => res.json())
+      .then(data => setSchoolOptions(data))
+      .catch(err => console.error("Failed to fetch schools", err));
+  }, []);
 
   const addToast = (msg, type = 'blue') => {
     const id = Date.now();
@@ -49,30 +60,33 @@ export default function AdminLogin() {
       const res = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ loginCode: sEmail, password: sPass, userType: 'SCHOOL_ADMIN' })
+        body: JSON.stringify({ loginCode: sEmail, password: sPass, userType: 'SCHOOL_ADMIN', school: school })
       });
       setSLoading(false);
 
       if (res.ok) {
         const data = await res.json();
         // Lấy tên thật từ Backend bỏ vô túi áo
-        localStorage.setItem('token', data.token); // QUAN TRỌNG: LƯU TOKEN
+        localStorage.setItem('adminToken', data.token); // QUAN TRỌNG: LƯU TOKEN
         localStorage.setItem('adminName', data.fullName || 'Admin');
         localStorage.setItem('adminEmail', data.email || '');
 
-        const schoolOptions = [
-          { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
-          { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
-          { value: 'FPT', label: 'CĐ FPT Polytechnic' },
-          { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
-          { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
-        ];
         const selectedSchool = schoolOptions.find(s => s.value === school);
         if (selectedSchool) localStorage.setItem('schoolName', selectedSchool.label);
-
-
-        setSchoolView('otp');
-        addToast(`Đăng nhập thành công, đang chuyển hướng...`, 'green');
+        localStorage.setItem('schoolShortName', school);
+        if (data.requireSetup) {
+          setTempToken(data.token);
+          fetchQrCode(sEmail);
+          setSchoolView('setup');
+          addToast('Vui lòng thiết lập Xác thực 2 bước', 'blue');
+        } else if (data.require2fa) {
+          setTempToken(data.token);
+          setSchoolView('otp');
+          addToast(`Mã OTP đã gửi đến thiết bị xác thực`, 'blue');
+        } else {
+          addToast(`Đăng nhập thành công, đang chuyển hướng...`, 'green');
+          setTimeout(() => navigate('/dashboard'), 1000);
+        }
       } else {
         setSError('Email hoặc mật khẩu không đúng!');
         setShake(true);
@@ -108,10 +122,88 @@ export default function AdminLogin() {
     }, 1600);
   };
 
-  const handleVerifySchoolOtp = () => {
-    addToast(<><PartyPopper className="w-4 h-4 inline-block mr-2" /> Đăng nhập thành công! Chào mừng Admin!</>, 'green');
-    setTimeout(() => navigate('/dashboard'), 1000); // Đổi hướng đến trang Admin Dashboard
+  const fetchQrCode = async (email) => {
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/2fa/setup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setQrCodeUrl(data.qrCodeImageUri);
+      }
+    } catch (error) {
+      console.error('Error fetching QR code', error);
+    }
   };
+
+  const handleVerifySchoolOtp = async (codeOverride) => {
+    const inputs = document.querySelectorAll('.school-bg .otp-input');
+    const code = typeof codeOverride === 'string' ? codeOverride : Array.from(inputs).map(inp => inp.value).join('');
+    
+    if (code.length !== 6) {
+      return addToast('Vui lòng nhập đủ 6 số OTP', 'red');
+    }
+
+    try {
+      if (schoolView === 'setup') {
+        const response = await fetch('http://localhost:8080/api/auth/2fa/verify-setup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: sEmail, code })
+        });
+        if (response.ok) {
+          const isValid = await response.json();
+          if (isValid) {
+            // Setup thành công, gọi luôn login verify
+            const loginResp = await fetch('http://localhost:8080/api/auth/login/verify-2fa', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${tempToken}`
+              },
+              body: JSON.stringify({ email: sEmail, code })
+            });
+            if (loginResp.ok) {
+              const data = await loginResp.json();
+              localStorage.setItem('adminToken', data.token);
+              addToast(<><PartyPopper className="w-4 h-4 inline-block mr-2" /> Thiết lập 2FA & Đăng nhập thành công!</>, 'green');
+              setTimeout(() => navigate('/dashboard'), 1000);
+            } else {
+              addToast('Có lỗi xảy ra khi xác thực token thật', 'red');
+            }
+          } else {
+            addToast('Mã OTP không đúng, vui lòng thử lại', 'red');
+            setShake(true); setTimeout(() => setShake(false), 400);
+          }
+        }
+      } else {
+        const res = await fetch('http://localhost:8080/api/auth/login/verify-2fa', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${tempToken}`
+          },
+          body: JSON.stringify({ email: sEmail, code })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          localStorage.setItem('adminToken', data.token); // Lưu token thật
+          addToast(<><PartyPopper className="w-4 h-4 inline-block mr-2" /> Đăng nhập thành công! Chào mừng Admin!</>, 'green');
+          setTimeout(() => navigate('/dashboard'), 1000);
+        } else {
+          addToast('Mã OTP không chính xác!', 'red');
+          setShake(true);
+          setTimeout(() => setShake(false), 400);
+        }
+      }
+    } catch (err) {
+      addToast('Lỗi kết nối máy chủ', 'red');
+    }
+  };
+
 
   const handleVerifySaasOtp = () => {
     addToast(<><Rocket className="w-4 h-4 inline-block mr-2" /> Super Admin đã xác thực thành công!</>, 'green');
@@ -172,14 +264,8 @@ export default function AdminLogin() {
             <div className="school-body">
               <div style={{ position: 'relative', zIndex: 10, marginBottom: 14 }}>
                 <label className="fl text-[#64748b] mb-1.5">Trường / Trung tâm</label>
-                <SearchableSelect 
-                  options={[
-                    { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
-                    { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
-                    { value: 'FPT', label: 'CĐ FPT Polytechnic' },
-                    { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
-                    { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
-                  ]}
+                <SearchableSelect
+                  options={schoolOptions}
                   value={school}
                   onChange={setSchool}
                   icon={<School className="w-4 h-4 inline-block mr-2" />}
@@ -270,12 +356,39 @@ export default function AdminLogin() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 20 }}>
                 {[0, 1, 2, 3, 4, 5].map(idx => (
-                  <input key={idx} className="otp-input" maxLength="1" onInput={e => handleOtpInput(e, idx + 1, handleVerifySchoolOtp)} onKeyDown={e => handleOtpKey(e, idx - 1)} />
+                  <input key={idx} className="otp-input" maxLength="1" onInput={e => handleOtpInput(e, idx + 1, () => handleVerifySchoolOtp())} onKeyDown={e => handleOtpKey(e, idx - 1)} />
                 ))}
               </div>
-              <button className="btn-login school-btn" onClick={handleVerifySchoolOtp}><Check className="w-4 h-4 inline-block mr-2" /> Xác nhận OTP</button>
+              <button className="btn-login school-btn" onClick={() => handleVerifySchoolOtp()}><Check className="w-4 h-4 inline-block mr-2" /> Xác nhận OTP</button>
               <div style={{ textAlign: 'center', marginTop: 14 }}>
                 <span onClick={() => setSchoolView('main')} style={{ fontSize: 13, color: '#94a3b8', cursor: 'pointer' }}>← Quay lại</span>
+              </div>
+            </div>
+          )}
+
+          {schoolView === 'setup' && (
+            <div className="school-body">
+              <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                <h3 style={{ fontSize: 18, fontWeight: 900, color: '#0f172a' }}>Thiết lập Token 2FA</h3>
+                <p style={{ fontSize: 12.5, color: '#64748b', marginTop: 4 }}>Dùng Authenticator App quét mã QR này</p>
+              </div>
+              {qrCodeUrl ? (
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+                  <img src={qrCodeUrl} alt="QR Code" style={{ width: 160, height: 160, borderRadius: 8, border: '2px solid #e2e8f0' }} />
+                </div>
+              ) : (
+                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20, height: 160, alignItems: 'center' }}>
+                  <span className="spinner" style={{ borderColor: '#6366f1', borderRightColor: 'transparent' }}></span>
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: 10, marginBottom: 20 }}>
+                {[0, 1, 2, 3, 4, 5].map(idx => (
+                  <input key={idx} className="otp-input" maxLength="1" onInput={e => handleOtpInput(e, idx + 1, () => handleVerifySchoolOtp())} onKeyDown={e => handleOtpKey(e, idx - 1)} />
+                ))}
+              </div>
+              <button className="btn-login school-btn" onClick={() => handleVerifySchoolOtp()}><Check className="w-4 h-4 inline-block mr-2" /> Xác nhận thiết lập</button>
+              <div style={{ textAlign: 'center', marginTop: 14 }}>
+                <span onClick={() => setSchoolView('main')} style={{ fontSize: 13, color: '#94a3b8', cursor: 'pointer' }}>← Hủy</span>
               </div>
             </div>
           )}

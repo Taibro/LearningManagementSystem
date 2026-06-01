@@ -23,8 +23,8 @@ export default function Schedule() {
 
   const fetchSchedules = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/schedules', {
+      const token = localStorage.getItem('adminToken');
+      const res = await fetch('http://localhost:8080/api/school-admin/schedules', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -39,8 +39,8 @@ export default function Schedule() {
   const handleSaveSc = async () => {
     const method = currentSc.id ? 'PUT' : 'POST';
     const url = currentSc.id 
-      ? `http://localhost:8080/api/auth/school-admin/schedules/${currentSc.id}`
-      : 'http://localhost:8080/api/auth/school-admin/schedules';
+      ? `http://localhost:8080/api/school-admin/schedules/${currentSc.id}`
+      : 'http://localhost:8080/api/school-admin/schedules';
 
     // Đảm bảo startTime / endTime có format hh:mm:ss nếu Backend đòi (nếu chỉ type="time" thì nó chỉ có hh:mm)
     const payload = { 
@@ -70,7 +70,7 @@ export default function Schedule() {
   const handleDeleteSc = async (id) => {
     if(!window.confirm("Bạn có chắc muốn xóa lịch học này?")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/schedules/${id}`, { method: 'DELETE' });
+      const res = await fetch(`http://localhost:8080/api/school-admin/schedules/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Đã xóa!');
         fetchSchedules();

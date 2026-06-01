@@ -25,18 +25,19 @@ import Notifications from './pages/Notifications/Notifications';
 import Settings from './pages/Settings/Settings';
 
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('adminToken');
   if (!token) {
     return <Navigate to="/login" replace />;
   }
   return children;
 };
 
-export default function AppAdmin() {
+export default function AppAdmin({ schoolName, roleName }) {
+  const basename = schoolName ? `/${schoolName}/${roleName}` : `/${roleName}`;
   return (
-    <Router basename="/admin">
+    <Router basename={basename}>
       <Routes>
-        <Route path="/login" element={<AdminLogin />} />
+        <Route path="/login" element={<AdminLogin initialSchool={schoolName} />} />
         
         <Route path="/" element={
           <ProtectedRoute>

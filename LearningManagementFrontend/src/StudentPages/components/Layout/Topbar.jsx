@@ -8,9 +8,9 @@ export default function Topbar() {
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  const rawSchoolName = localStorage.getItem('schoolName') || 'Ho Chi Minh City University of Industry and Trade';
+  const rawSchoolName = localStorage.getItem('schoolName') || 'Đại học Công Thương TP.HCM';
   const schoolName = rawSchoolName.replace(/\n/g, ' ');
-  const schoolShort = schoolName.split(' ').map(w => w[0]).join('').substring(0, 4).toUpperCase() || 'HUIT';
+  const schoolShort = localStorage.getItem('schoolShortName') || 'HUIT';
 
   useEffect(() => {
     const handleClickOutside = (event) => {

@@ -22,8 +22,8 @@ export default function Attendance() {
 
   const fetchRecords = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/attendance', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      const res = await fetch('http://localhost:8080/api/school-admin/attendance', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
         const data = await res.json();
@@ -37,8 +37,8 @@ export default function Attendance() {
   const handleSaveRecord = async () => {
     const method = currentRecord.id ? 'PUT' : 'POST';
     const url = currentRecord.id 
-      ? `http://localhost:8080/api/auth/school-admin/attendance/${currentRecord.id}`
-      : `http://localhost:8080/api/auth/school-admin/attendance`;
+      ? `http://localhost:8080/api/school-admin/attendance/${currentRecord.id}`
+      : `http://localhost:8080/api/school-admin/attendance`;
 
     const payload = {
       scheduleId: parseInt(currentRecord.scheduleId),
@@ -53,7 +53,7 @@ export default function Attendance() {
         method,
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         },
         body: JSON.stringify(payload)
       });

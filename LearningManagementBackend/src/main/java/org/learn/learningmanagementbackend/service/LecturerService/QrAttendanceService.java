@@ -43,7 +43,8 @@ public class QrAttendanceService {
     public QrGenerateResponse generateQrToken(QrGenerateRequest request) {
         LocalDate today = LocalDate.now();
 
-        int currentDayOfWeek = today.getDayOfWeek().getValue();
+        int javaDay = today.getDayOfWeek().getValue(); // 1 = Mon, 7 = Sun
+        int currentDayOfWeek = javaDay == 7 ? 8 : javaDay + 1;
 
         Schedule todaySchedule = scheduleRepository.findTodayScheduleForClass(
                 request.getClassId(), today, currentDayOfWeek

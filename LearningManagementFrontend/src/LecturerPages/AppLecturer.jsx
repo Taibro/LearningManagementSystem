@@ -36,11 +36,12 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-function AppLecturer() {
+function AppLecturer({ schoolName }) {
+  const basename = schoolName ? `/${schoolName}/lecturer` : '/lecturer';
   return (
-    <Router basename="/lecturer">
+    <Router basename={basename}>
       <Routes>
-        <Route path="/login" element={<LecturerLogin />} />
+        <Route path="/login" element={<LecturerLogin initialSchool={schoolName} />} />
         
         {/* Bọc MainLayout trong Bảo vệ và Provider */}
         <Route path="/" element={

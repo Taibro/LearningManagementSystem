@@ -22,8 +22,8 @@ export default function Classes() {
 
   const fetchClasses = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/classes', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      const res = await fetch('http://localhost:8080/api/school-admin/classes', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
         const data = await res.json();
@@ -37,8 +37,8 @@ export default function Classes() {
   const handleSaveClass = async () => {
     const method = currentClass.id ? 'PUT' : 'POST';
     const url = currentClass.id 
-      ? `http://localhost:8080/api/auth/school-admin/classes/${currentClass.id}`
-      : `http://localhost:8080/api/auth/school-admin/classes`;
+      ? `http://localhost:8080/api/school-admin/classes/${currentClass.id}`
+      : `http://localhost:8080/api/school-admin/classes`;
 
     const payload = {
       code: currentClass.code,
@@ -54,7 +54,7 @@ export default function Classes() {
         method,
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         },
         body: JSON.stringify(payload)
       });

@@ -31,4 +31,9 @@ public class ScheduleExceptionResponse {
     private ApprovalStatus substituteStatus;
     private Integer replacementRoomId;
     private String replacementRoomNumber;
+    private String adminNote;       // Lý do từ chối
+    private String teacherCode;     // Mã giảng viên gửi đề xuất
+    private String teacherName;     // Tên giảng viên
+    private String classCode;       // Mã lớp học phần
+    private String courseName;      // Tên môn học
 }
