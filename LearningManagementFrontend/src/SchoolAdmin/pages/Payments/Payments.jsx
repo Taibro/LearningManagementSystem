@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Receipt, Save } from 'lucide-react';
 
 export default function Payments() {
   const [payments, setPayments] = useState([]);
@@ -119,7 +120,7 @@ export default function Payments() {
       <div className="card">
         {payments.length === 0 ? (
           <div className="card-body" style={{textAlign:'center', padding:'50px', color:'var(--muted)'}}>
-            <div style={{fontSize:'48px', marginBottom:'12px'}}>🧾</div>
+            <div style={{fontSize:'48px', marginBottom:'12px'}}><Receipt className="w-4 h-4 inline-block mr-2" /></div>
             <div>Chưa có giao dịch thanh toán nào</div>
           </div>
         ) : (
@@ -162,7 +163,7 @@ export default function Payments() {
         <div className="ov open">
           <div className="modal" style={{width:'460px'}}>
             <div className="modal-hd">
-              <span className="modal-title">{currentPayment.id ? '🧾 Sửa Phiếu thu' : '🧾 Ghi nhận Phiếu thu'}</span>
+              <span className="modal-title">{currentPayment.id ? <><Receipt className="w-4 h-4 inline-block mr-2" /> Sửa Phiếu thu</> : <><Receipt className="w-4 h-4 inline-block mr-2" /> Ghi nhận Phiếu thu</>}</span>
               <button className="close-btn" onClick={() => setPModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -212,7 +213,7 @@ export default function Payments() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setPModal(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSavePayment}>💾 Xác nhận thu tiền</button>
+              <button className="btn btn-blue" onClick={handleSavePayment}><Save className="w-4 h-4 inline-block mr-2" /> Xác nhận thu tiền</button>
             </div>
           </div>
         </div>

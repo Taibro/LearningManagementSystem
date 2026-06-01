@@ -5,6 +5,7 @@ import './saas.css';
 // Import cấu trúc Layout đã tách rời
 import MainLayout from './components/Layout/MainLayout';
 import SaaSAdminLogin from './pages/Login/SaaSAdminLogin';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Import Pages
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -24,15 +25,18 @@ export default function AppSaaS() {
         {/* Trang Login độc lập */}
         <Route path="/saas/login" element={<SaaSAdminLogin />} />
 
-        {/* Khung giao diện chính chứa Sidebar và Topbar */}
-        <Route path="/saas" element={<MainLayout />}>
-          <Route index element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="tenants" element={<Tenants />} />
-          <Route path="subscriptions" element={<Subscriptions />} />
-          <Route path="plans" element={<Plans />} />
-          <Route path="logs" element={<SystemLogs />} />
-          <Route path="audit" element={<Audit />} />
+        {/* Các trang quản trị được bảo vệ */}
+        <Route element={<ProtectedRoute />}>
+          {/* Khung giao diện chính chứa Sidebar và Topbar */}
+          <Route path="/saas" element={<MainLayout />}>
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="tenants" element={<Tenants />} />
+            <Route path="subscriptions" element={<Subscriptions />} />
+            <Route path="plans" element={<Plans />} />
+            <Route path="logs" element={<SystemLogs />} />
+            <Route path="audit" element={<Audit />} />
+          </Route>
         </Route>
         
         {/* Bắt lỗi URL gõ sai */}

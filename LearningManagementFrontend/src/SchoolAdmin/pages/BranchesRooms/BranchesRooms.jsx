@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Building, Save } from 'lucide-react';
 
 export default function BranchesRooms() {
   const [branches, setBranches] = useState([]);
@@ -190,7 +191,7 @@ export default function BranchesRooms() {
         {branches.map((branch, index) => (
           <div className="stat" style={{cursor:'pointer'}} key={branch.id} onClick={() => openBranchModal(branch)}>
             <div className="stat-top" style={{background: gradients[index % gradients.length]}}></div>
-            <div className="stat-icon">🏢</div>
+            <div className="stat-icon"><Building className="w-4 h-4 inline-block mr-2" /></div>
             <div className="stat-label">{branch.name}</div>
             <div style={{fontSize:'11px', color:'var(--muted)', marginTop:'6px'}}>{branch.address}, {branch.district}, {branch.city}</div>
             <div style={{marginTop:'8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -306,7 +307,7 @@ export default function BranchesRooms() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setBranchModalOpen(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveBranch}>💾 Lưu</button>
+              <button className="btn btn-blue" onClick={handleSaveBranch}><Save className="w-4 h-4 inline-block mr-2" /> Lưu</button>
             </div>
           </div>
         </div>
@@ -367,7 +368,7 @@ export default function BranchesRooms() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setRoomModalOpen(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveRoom}>💾 Lưu</button>
+              <button className="btn btn-blue" onClick={handleSaveRoom}><Save className="w-4 h-4 inline-block mr-2" /> Lưu</button>
             </div>
           </div>
         </div>

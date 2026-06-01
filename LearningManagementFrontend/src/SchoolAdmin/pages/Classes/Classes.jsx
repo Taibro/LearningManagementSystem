@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { GraduationCap, Save } from 'lucide-react';
 
 export default function Classes() {
   const [classes, setClasses] = useState([]);
@@ -110,7 +111,7 @@ export default function Classes() {
       <div className="card">
         {classes.length === 0 ? (
           <div className="card-body" style={{textAlign:'center', padding:'50px', color:'var(--muted)'}}>
-            <div style={{fontSize:'48px', marginBottom:'12px'}}>🎓</div>
+            <div style={{fontSize:'48px', marginBottom:'12px'}}><GraduationCap className="w-4 h-4 inline-block mr-2" /></div>
             <div style={{fontSize:'16px', fontWeight:700, marginBottom:'8px'}}>Chưa có lớp học nào</div>
             <button className="btn btn-blue" style={{marginTop:'16px'}} onClick={() => openModal()}>+ Tạo lớp đầu tiên</button>
           </div>
@@ -164,7 +165,7 @@ export default function Classes() {
         <div className="ov open">
           <div className="modal">
             <div className="modal-hd">
-              <span className="modal-title">{currentClass.id ? '🎓 Sửa Lớp học' : '🎓 Tạo Lớp học'}</span>
+              <span className="modal-title">{currentClass.id ? <><GraduationCap className="w-4 h-4 inline-block mr-2" /> Sửa Lớp học</> : <><GraduationCap className="w-4 h-4 inline-block mr-2" /> Tạo Lớp học</>}</span>
               <button className="close-btn" onClick={() => setCModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -205,7 +206,7 @@ export default function Classes() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setCModal(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveClass}>💾 Lưu lớp học</button>
+              <button className="btn btn-blue" onClick={handleSaveClass}><Save className="w-4 h-4 inline-block mr-2" /> Lưu lớp học</button>
             </div>
           </div>
         </div>

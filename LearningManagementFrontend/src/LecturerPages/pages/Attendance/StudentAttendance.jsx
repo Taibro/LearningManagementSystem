@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLecturerContext } from '../../context/LecturerContext';
+import { BarChart, Calendar, RefreshCw, CheckCircle2, AlertTriangle, Save } from 'lucide-react';
 
 const StudentAttendance = () => {
   const today = new Date().toISOString().split('T')[0];
@@ -104,7 +105,7 @@ const StudentAttendance = () => {
           color: 'white', padding: '14px 24px', borderRadius: 8,
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
         </div>
       )}
 
@@ -114,7 +115,7 @@ const StudentAttendance = () => {
           <p className="text-gray-400 text-sm mt-1">Quản lý chuyên cần buổi học</p>
         </div>
         <div className="bg-white border-[1.5px] border-[#6B4FA0] px-3 py-1.5 rounded-xl shadow-sm flex items-center gap-2">
-          <span className="text-[#6B4FA0] font-black text-xs">📅 Ngày:</span>
+          <span className="text-[#6B4FA0] font-black text-xs"><Calendar className="w-4 h-4 inline-block mr-2" /> Ngày:</span>
           <input 
             type="date" 
             value={date} 
@@ -149,8 +150,8 @@ const StudentAttendance = () => {
             Danh sách điểm danh {loading && '(Đang tải...)'}
           </h3>
           <div className="flex gap-2">
-             <button className="btn-outline text-[10px] py-1.5 px-4 font-bold">📊 Excel</button>
-             <button onClick={fetchAttendance} className="bg-[#E85D75] text-white rounded-lg text-[10px] py-1.5 px-4 font-bold hover:opacity-90">🔄 Tải lại</button>
+             <button className="btn-outline text-[10px] py-1.5 px-4 font-bold"><BarChart className="w-4 h-4 inline-block mr-2" /> Excel</button>
+             <button onClick={fetchAttendance} className="bg-[#E85D75] text-white rounded-lg text-[10px] py-1.5 px-4 font-bold hover:opacity-90"><RefreshCw className="w-4 h-4 inline-block mr-2" /> Tải lại</button>
           </div>
         </div>
         
@@ -207,7 +208,7 @@ const StudentAttendance = () => {
               disabled={saving || !data || data.students.length === 0}
               className={`px-10 py-3 font-bold uppercase text-xs tracking-widest shadow-xl rounded-lg text-white ${saving ? 'bg-gray-400' : 'bg-gradient-to-r from-[#6B4FA0] to-[#8B6BBF] hover:opacity-90 shadow-purple-200'}`}
            >
-              {saving ? '⏳ Đang lưu...' : '💾 Lưu dữ liệu điểm danh'}
+              {saving ? '⏳ Đang lưu...' : <><Save className="w-4 h-4 inline-block mr-2" /> Lưu dữ liệu điểm danh</>}
            </button>
         </div>
       </div>

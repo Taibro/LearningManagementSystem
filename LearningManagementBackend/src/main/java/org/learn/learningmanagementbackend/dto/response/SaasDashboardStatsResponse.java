@@ -10,16 +10,24 @@ import java.util.List;
 @Setter
 public class SaasDashboardStatsResponse {
 
-    private BigDecimal mrr;
+    private BigDecimal mrr; //Monthly Recurring Revenue
     private String mrrGrowthPercent;
     private long totalSchools;
     private long newSchoolsThisMonth;
     private long totalStudents;
     private long totalTeachers;
+    private long totalSchoolAdmins;
     private String storageUsed;
     private String storageQuota;
     private int storagePercent;
     private long unresolvedErrors;
+    
+    // System Health Metrics
+    private int apiResponseTime;
+    private int cpuLoad;
+    private int dbConnectionsActive;
+    private int dbConnectionsMax;
+    private double uptime;
 
     // Phân bổ gói cước
     private List<PlanDistribution> planDistribution;

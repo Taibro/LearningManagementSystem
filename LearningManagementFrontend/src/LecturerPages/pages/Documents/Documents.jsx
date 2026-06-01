@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { X, UploadCloud, FileText, Download, Trash2, Eye } from 'lucide-react';
+import { X, UploadCloud, FileText, Download, Trash2, Eye, BarChart, ClipboardList, CheckCircle2, Search, AlertTriangle, Save } from 'lucide-react';
 
 const Documents = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -102,9 +102,9 @@ const Documents = () => {
   };
 
   const getIconForType = (type) => {
-    if (type?.includes('Slide')) return { icon: '📊', color: 'text-red-500', bg: 'bg-red-100' };
-    if (type?.includes('Bài tập')) return { icon: '📝', color: 'text-blue-500', bg: 'bg-blue-100' };
-    return { icon: '📋', color: 'text-green-500', bg: 'bg-green-100' };
+    if (type?.includes('Slide')) return { icon: <BarChart className="w-4 h-4 inline-block mr-2" />, color: 'text-red-500', bg: 'bg-red-100' };
+    if (type?.includes('Bài tập')) return { icon: <FileText className="w-4 h-4 inline-block mr-2" />, color: 'text-blue-500', bg: 'bg-blue-100' };
+    return { icon: <ClipboardList className="w-4 h-4 inline-block mr-2" />, color: 'text-green-500', bg: 'bg-green-100' };
   };
 
   // Format bytes to human readable size
@@ -126,7 +126,7 @@ const Documents = () => {
             color: 'white', padding: '14px 24px', borderRadius: 8,
             boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14
           }}>
-            {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+            {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
           </div>
         )}
 
@@ -162,7 +162,7 @@ const Documents = () => {
             </div>
             <div className="flex items-end">
               <button onClick={fetchMaterials} className="btn-primary w-full shadow-md hover:shadow-lg">
-                {loading ? '⏳ Đang tải...' : '🔍 Tìm kiếm'}
+                {loading ? '⏳ Đang tải...' : <><Search className="w-4 h-4 inline-block mr-2" /> Tìm kiếm</>}
               </button>
             </div>
           </div>
@@ -290,7 +290,7 @@ const Documents = () => {
                 disabled={uploading}
                 className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-[#6B4FA0] to-[#8B6BBF] rounded-lg hover:shadow-md active:scale-95 transition-all shadow-purple-200"
               >
-                {uploading ? '⏳ Đang tải lên mây...' : '💾 Lưu tài liệu'}
+                {uploading ? '⏳ Đang tải lên mây...' : <><Save className="w-4 h-4 inline-block mr-2" /> Lưu tài liệu</>}
               </button>
             </div>
           </div>

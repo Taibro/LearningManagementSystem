@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLecturerContext } from '../../context/LecturerContext';
+import { BarChart, CheckCircle2, Search, AlertTriangle, Lock, Save } from 'lucide-react';
 
 const Results = () => {
   const [data, setData] = useState(null);
@@ -134,7 +135,7 @@ const Results = () => {
           color: 'white', padding: '14px 24px', borderRadius: 8,
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
         </div>
       )}
 
@@ -145,7 +146,7 @@ const Results = () => {
         </div>
         {data?.isLocked && (
           <div className="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-xl font-bold text-sm shadow-sm flex items-center gap-2">
-            🔒 BẢNG ĐIỂM ĐÃ KHÓA SỔ
+            <Lock className="w-4 h-4 inline-block mr-2" /> BẢNG ĐIỂM ĐÃ KHÓA SỔ
           </div>
         )}
       </div>
@@ -166,9 +167,9 @@ const Results = () => {
           </div>
           <div className="flex items-end gap-2">
             <button onClick={fetchGrades} className="btn-primary flex-1 shadow-md shadow-purple-200">
-              {loading ? '⏳...' : '🔍 Tải bảng điểm'}
+              {loading ? '⏳...' : <><Search className="w-4 h-4 inline-block mr-2" /> Tải bảng điểm</>}
             </button>
-            <button className="btn-outline font-bold shadow-sm">📊 Xuất Excel</button>
+            <button className="btn-outline font-bold shadow-sm"><BarChart className="w-4 h-4 inline-block mr-2" /> Xuất Excel</button>
           </div>
         </div>
       </div>
@@ -201,7 +202,7 @@ const Results = () => {
                 <th className="px-4 py-4 text-center font-black text-gray-500 w-16">STT</th>
                 <th className="px-4 py-4 text-left font-black text-gray-500">Họ tên sinh viên</th>
                 <th className="px-4 py-4 text-center font-black text-gray-500 w-32">MSSV</th>
-                <th className="px-2 py-4 text-center font-black text-blue-500 w-24" title="Tự động tính từ Điểm danh">CC (10%) 🔒</th>
+                <th className="px-2 py-4 text-center font-black text-blue-500 w-24" title="Tự động tính từ Điểm danh">CC (10%) <Lock className="w-4 h-4 inline-block mr-2" /></th>
                 <th className="px-2 py-4 text-center font-black text-[#6B4FA0] w-24">GK (30%)</th>
                 <th className="px-2 py-4 text-center font-black text-[#6B4FA0] w-24">CK (60%)</th>
                 <th className="px-4 py-4 text-center font-black text-green-600 w-24">Tổng</th>
@@ -272,14 +273,14 @@ const Results = () => {
             disabled={!data || data.isLocked || locking}
             className={`px-6 py-2.5 rounded-lg text-sm font-bold shadow-sm transition-all flex items-center gap-2 ${!data || data.isLocked ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-white border-2 border-red-200 text-red-600 hover:bg-red-50 active:scale-95'}`}
           >
-            {locking ? '⏳ Đang xử lý...' : '🔒 Khóa sổ điểm'}
+            {locking ? '⏳ Đang xử lý...' : <><Lock className="w-4 h-4 inline-block mr-2" /> Khóa sổ điểm</>}
           </button>
           <button 
             onClick={handleSave}
             disabled={!data || data.isLocked || saving}
             className={`px-8 py-2.5 rounded-lg text-sm font-bold shadow-lg transition-all flex items-center gap-2 ${!data || data.isLocked ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-gradient-to-r from-[#6B4FA0] to-[#8B6BBF] text-white hover:shadow-xl hover:opacity-90 active:scale-95 shadow-purple-200'}`}
           >
-            {saving ? '⏳ Đang lưu...' : '💾 Lưu bảng điểm'}
+            {saving ? '⏳ Đang lưu...' : <><Save className="w-4 h-4 inline-block mr-2" /> Lưu bảng điểm</>}
           </button>
         </div>
       </div>

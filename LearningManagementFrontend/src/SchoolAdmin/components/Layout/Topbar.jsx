@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Settings, ChevronDown, School, Bell, Search } from 'lucide-react';
 
 export default function Topbar() {
   const [open, setOpen] = useState(false);
@@ -23,18 +24,18 @@ export default function Topbar() {
   return (
     <header className="admin-topbar">
       <div className="breadcrumb">
-        <span className="bc-root">🏫 {localStorage.getItem('schoolId') === 'huit' ? 'HUIT' : 'HCMUT'}</span>
+        <span className="bc-root"><School className="w-4 h-4 inline-block mr-2" /> {localStorage.getItem('schoolName') || 'Trường học'}</span>
         <span className="bc-sep">/</span>
         <span className="bc-cur">Dashboard</span>
       </div>
       <div className="topbar-right">
         <div className="search-wrap">
-          <span style={{color:'var(--muted2)', fontSize:'13px'}}>🔍</span>
+          <span style={{color:'var(--muted2)', fontSize:'13px'}}><Search className="w-4 h-4 inline-block mr-2" /></span>
           <input placeholder="Tìm kiếm..." />
         </div>
-        <div className="school-chip">🏫 HK2 · 2024-2025</div>
-        <div className="top-btn" onClick={() => alert('Không có thông báo mới')}>🔔<span className="dot"></span></div>
-        <div className="top-btn">⚙️</div>
+        <div className="school-chip"><School className="w-4 h-4 inline-block mr-2" /> HK2 · 2024-2025</div>
+        <div className="top-btn" onClick={() => alert('Không có thông báo mới')}><Bell className="w-4 h-4 inline-block mr-2" /><span className="dot"></span></div>
+        <div className="top-btn"><Settings className="w-4 h-4 inline-block mr-2" /></div>
 
         {/* Profile + Dropdown - Click based */}
         <div ref={ref} style={{position: 'relative'}}>
@@ -52,7 +53,7 @@ export default function Topbar() {
             <span style={{fontSize:'12.5px', fontWeight:700, color:'var(--blue)'}}>
               {localStorage.getItem('adminName') || 'Admin'}
             </span>
-            <span style={{fontSize:'10px', color:'var(--blue)', marginLeft:'2px'}}>{open ? '▲' : '▼'}</span>
+            <span style={{fontSize:'10px', color:'var(--blue)', marginLeft:'2px'}}>{open ? '▲' : <ChevronDown className="w-4 h-4 inline-block mr-2" />}</span>
           </div>
 
           {open && (

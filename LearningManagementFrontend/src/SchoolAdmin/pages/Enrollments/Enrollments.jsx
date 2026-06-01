@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BarChart, Check, CheckCircle2, Save } from 'lucide-react';
 
 export default function Enrollments() {
   const [enrollments, setEnrollments] = useState([]);
@@ -204,7 +205,7 @@ export default function Enrollments() {
         <div className="ov open">
           <div className="modal" style={{width:'440px'}}>
             <div className="modal-hd">
-              <span className="modal-title">✅ Đăng ký học phần thủ công</span>
+              <span className="modal-title"><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> Đăng ký học phần thủ công</span>
               <button className="close-btn" onClick={() => setEModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -229,7 +230,7 @@ export default function Enrollments() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setEModal(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveEnrollment}>✓ Đăng ký</button>
+              <button className="btn btn-blue" onClick={handleSaveEnrollment}><Check className="w-4 h-4 inline-block mr-2" /> Đăng ký</button>
             </div>
           </div>
         </div>
@@ -239,7 +240,7 @@ export default function Enrollments() {
         <div className="ov open">
           <div className="modal" style={{width:'440px'}}>
             <div className="modal-hd">
-              <span className="modal-title">📊 Nhập điểm</span>
+              <span className="modal-title"><BarChart className="w-4 h-4 inline-block mr-2" /> Nhập điểm</span>
               <button className="close-btn" onClick={() => setGModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -278,7 +279,7 @@ export default function Enrollments() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setGModal(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveGrades}>💾 Lưu điểm</button>
+              <button className="btn btn-blue" onClick={handleSaveGrades}><Save className="w-4 h-4 inline-block mr-2" /> Lưu điểm</button>
             </div>
           </div>
         </div>

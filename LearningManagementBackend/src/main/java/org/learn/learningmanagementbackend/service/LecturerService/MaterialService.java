@@ -28,6 +28,8 @@ public class MaterialService {
     @Transactional(rollbackFor = Exception.class)
     public void uploadMaterial(Integer classId, Integer teacherId, String title, String docType, MultipartFile file) {
 
+        fileStorageService.validateAcademicAndImageFiles(file);
+
         String cloudFileUrl = fileStorageService.uploadFileToCloud(file, AppConstants.CLOUD_ROOT_FOLDER);
 
         ClassMaterial material = new ClassMaterial();

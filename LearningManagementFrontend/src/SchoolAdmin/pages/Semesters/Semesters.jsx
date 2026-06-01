@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Save } from 'lucide-react';
 
 export default function Semesters() {
   const [academicYears, setAcademicYears] = useState([]);
@@ -270,7 +271,7 @@ export default function Semesters() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setAyModalOpen(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveAy}>💾 Lưu</button>
+              <button className="btn btn-blue" onClick={handleSaveAy}><Save className="w-4 h-4 inline-block mr-2" /> Lưu</button>
             </div>
           </div>
         </div>
@@ -315,7 +316,7 @@ export default function Semesters() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setSemModalOpen(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveSem}>💾 Lưu</button>
+              <button className="btn btn-blue" onClick={handleSaveSem}><Save className="w-4 h-4 inline-block mr-2" /> Lưu</button>
             </div>
           </div>
         </div>

@@ -26,13 +26,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
                                 s.type AS sessionType,
                                 s.start_period AS startPeriod,
                                 s.end_period AS endPeriod
-                            FROM Schedule s
-                            JOIN Class c ON s.class_id = c.id
-                            JOIN Course co ON c.course_id = co.id
-                            JOIN Class_Teacher ct ON c.id = ct.class_id
-                            JOIN Room r ON s.room_id = r.id
-                            JOIN School_branches sb on sb.id = r.branch_id
-                            WHERE ct.teacher_id = (SELECT id FROM Teacher WHERE teacher_code = :teacherCode)
+                            FROM schedules s
+                            JOIN classes c ON s.class_id = c.id
+                            JOIN courses co ON c.course_id = co.id
+                            JOIN class_teacher ct ON c.id = ct.class_id
+                            JOIN rooms r ON s.room_id = r.id
+                            JOIN school_branches sb on sb.id = r.branch_id
+                            WHERE ct.teacher_id = (SELECT id FROM teachers WHERE teacher_code = :teacherCode)
                             AND s.start_date <= :endDate
                             AND s.end_date >= :startDate
                             AND c.status != 'CANCELLED'

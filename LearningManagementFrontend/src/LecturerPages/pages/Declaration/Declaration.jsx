@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { RefreshCw, CheckCircle2, AlertTriangle, Save } from 'lucide-react';
 
 const Declaration = () => {
   const [profile, setProfile] = useState(null);
@@ -89,7 +90,7 @@ const Declaration = () => {
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14,
           transition: 'all 0.3s ease-out'
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
         </div>
       )}
 
@@ -138,9 +139,9 @@ const Declaration = () => {
             disabled={saving}
             className="btn-primary min-w-[150px] flex justify-center items-center font-semibold"
           >
-            {saving ? '⏳ Đang xử lý...' : '💾 Lưu khai báo'}
+            {saving ? '⏳ Đang xử lý...' : <><Save className="w-4 h-4 inline-block mr-2" /> Lưu khai báo</>}
           </button>
-          <button onClick={() => setFormData({ expectedSessions: 120, expectedClasses: 5, notes: '' })} className="btn-outline font-semibold">🔄 Đặt lại</button>
+          <button onClick={() => setFormData({ expectedSessions: 120, expectedClasses: 5, notes: '' })} className="btn-outline font-semibold"><RefreshCw className="w-4 h-4 inline-block mr-2" /> Đặt lại</button>
         </div>
       </div>
     </div>

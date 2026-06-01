@@ -12,6 +12,9 @@ import org.learn.learningmanagementbackend.repository.LecturerRepository.Attenda
 import org.learn.learningmanagementbackend.repository.LecturerRepository.ClassRepository;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.EnrollmentRepository;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.ScheduleRepository;
+import org.learn.learningmanagementbackend.repository.SchoolAdminRepository.NotificationRepository;
+import org.learn.learningmanagementbackend.model.Notification;
+import org.learn.learningmanagementbackend.enums.NotificationType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +32,7 @@ public class GradeService {
     private final ClassRepository classRepository;
     private final ScheduleRepository scheduleRepository;
     private final AttendanceRecordRepository attendanceRepository;
+    private final NotificationRepository notificationRepository;
 
 
     public GradeManagementResponse getClassGrades(Integer classId) {
@@ -138,6 +142,13 @@ public class GradeService {
             if (e.getGradeTotal() != null) {
                 e.setStatus(e.getGradeTotal() >= 5.0 ? EnrollmentStatus.COMPLETED : EnrollmentStatus.FAILED);
             }
+            
+            Notification notif = new Notification();
+            notif.setUser(e.getStudent().getUser());
+            notif.setType(NotificationType.GRADE);
+            notif.setTitle("Điểm thi đã được công bố");
+            notif.setBody("Giảng viên đã khóa bảng điểm lớp " + classObj.getCode() + ". Bạn có thể xem điểm tổng kết của mình ngay bây giờ.");
+            notificationRepository.save(notif);
         }
         enrollmentRepository.saveAll(enrollments);
     }

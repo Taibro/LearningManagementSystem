@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { CheckCircle2, School, Search, AlertTriangle, User, Save } from 'lucide-react';
 
 const API_TEACHER = 'http://localhost:8080/api/auth/school-admin/teachers';
 const API_DEPT = 'http://localhost:8080/api/auth/school-admin';
@@ -111,7 +112,7 @@ export default function Teachers() {
       </div>
 
       <div className="filter-bar">
-        <input className="fc" style={{maxWidth:'260px'}} placeholder="🔍 Tìm theo tên, mã GV..." />
+        <input className="fc" style={{maxWidth:'260px'}} placeholder="Tìm theo tên, mã GV..." />
         <select className="fc" style={{maxWidth:'160px'}}>
           <option value="">Tất cả khoa</option>
           {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
@@ -170,7 +171,7 @@ export default function Teachers() {
         <div className="ov open" style={{zIndex: 999}}>
           <div className="modal" style={{width: 600}}>
             <div className="modal-hd">
-              <span className="modal-title">{isEditMode ? '👨‍🏫 Sửa Giảng viên' : '👨‍🏫 Thêm Giảng viên'}</span>
+              <span className="modal-title">{isEditMode ? <><User className="w-4 h-4 inline-block mr-2" />‍<School className="w-4 h-4 inline-block mr-2" /> Sửa Giảng viên</> : <><User className="w-4 h-4 inline-block mr-2" />‍<School className="w-4 h-4 inline-block mr-2" /> Thêm Giảng viên</>}</span>
               <button className="close-btn" type="button" onClick={() => setTModal(false)}>×</button>
             </div>
             <form onSubmit={handleSubmit}>
@@ -223,7 +224,7 @@ export default function Teachers() {
               </div>
               <div className="modal-ft">
                 <button type="button" className="btn btn-ghost" onClick={() => setTModal(false)}>Hủy</button>
-                <button type="submit" className="btn btn-blue">💾 Lưu</button>
+                <button type="submit" className="btn btn-blue"><Save className="w-4 h-4 inline-block mr-2" /> Lưu</button>
               </div>
             </form>
           </div>
@@ -239,7 +240,7 @@ export default function Teachers() {
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14,
           transition: 'all 0.3s ease-out'
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
         </div>
       )}
     </div>

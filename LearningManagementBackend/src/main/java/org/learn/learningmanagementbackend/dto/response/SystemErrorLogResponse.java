@@ -12,6 +12,8 @@ public class SystemErrorLogResponse {
     private Long id;
     private String endpoint;
     private String errorMessage;
+    private String stackTrace;
+    private String userAgent;
     private String schoolName;
     private Boolean isResolved;
     private LocalDateTime createdAt;

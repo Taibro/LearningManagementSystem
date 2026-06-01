@@ -17,9 +17,6 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     @Query("SELECT s FROM Student s JOIN FETCH s.user WHERE s.studentCode = :code")
     Optional<Student> findByStudentCode(@Param("code") String code);
 
-    @Query("SELECT s FROM Student s JOIN FETCH s.user u WHERE s.studentCode = :code OR u.email = :code")
-    Optional<Student> findByStudentCodeOrEmail(@Param("code") String code);
-
     // ── PROFILE ──────────────────────────────────────────────
     @Query("""
             SELECT
@@ -65,7 +62,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             JOIN courses co      ON c.course_id = co.id
             JOIN schedules sch   ON sch.class_id = c.id
             JOIN rooms r         ON sch.room_id = r.id
-            LEFT JOIN class_teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
             LEFT JOIN teachers t ON t.id = ct.teacher_id
             LEFT JOIN users u   ON u.id = t.user_id
             WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
@@ -101,7 +98,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             JOIN courses co      ON c.course_id = co.id
             JOIN schedules sch   ON sch.class_id = c.id
             JOIN rooms r         ON sch.room_id = r.id
-            LEFT JOIN class_teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
             LEFT JOIN teachers t ON t.id = ct.teacher_id
             LEFT JOIN users u   ON u.id = t.user_id
             WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
@@ -290,7 +287,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             JOIN classes c        ON e.class_id = c.id
             JOIN courses co      ON c.course_id = co.id
             JOIN semesters sem   ON c.semester_id = sem.id
-            LEFT JOIN class_teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
             LEFT JOIN teachers t   ON t.id = ct.teacher_id
             LEFT JOIN users u     ON u.id = t.user_id
             WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)

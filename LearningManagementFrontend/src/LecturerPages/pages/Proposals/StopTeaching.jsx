@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { RefreshCw, CheckCircle2, AlertTriangle, Upload } from 'lucide-react';
 
 const StopTeaching = () => {
   const [history, setHistory] = useState([]);
+  const [activeClasses, setActiveClasses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   
   // Form states
+  const [selectedClassId, setSelectedClassId] = useState('');
+  const [selectedScheduleId, setSelectedScheduleId] = useState('');
   const [date, setDate] = useState('');
   const [reason, setReason] = useState('');
   const [file, setFile] = useState(null);
@@ -33,13 +37,26 @@ const StopTeaching = () => {
     }
   };
 
+  const fetchActiveClasses = async () => {
+    try {
+      const token = localStorage.getItem('lecturerToken');
+      const res = await axios.get('http://localhost:8080/api/lecturer/schedules/active-classes', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setActiveClasses(res.data);
+    } catch (err) {
+      console.error('Lỗi khi tải danh sách lớp:', err);
+    }
+  };
+
   useEffect(() => {
     fetchHistory();
+    fetchActiveClasses();
   }, []);
 
   const handleSubmit = async () => {
-    if (!date || !reason) {
-      showToast('Vui lòng chọn ngày và nhập lý do xin nghỉ', 'error');
+    if (!selectedClassId || !selectedScheduleId || !date || !reason) {
+      showToast('Vui lòng điền đầy đủ thông tin đề xuất', 'error');
       return;
     }
 
@@ -49,12 +66,12 @@ const StopTeaching = () => {
       const formData = new FormData();
       
       const dataPayload = {
-        scheduleId: 1, // Tạm fix cứng mã lịch học vì chưa có combobox thật
+        scheduleId: parseInt(selectedScheduleId),
         exceptionDate: date,
         reason: reason
       };
 
-      // Backend yêu cầu part "data" là một chuỗi JSON (hoặc Blob)
+      // Backend yêu cầu part "data" là một chuỗi JSON
       formData.append('data', new Blob([JSON.stringify(dataPayload)], { type: 'application/json' }));
       
       if (file) {
@@ -63,8 +80,7 @@ const StopTeaching = () => {
 
       const res = await axios.post('http://localhost:8080/api/lecturer/teaching-suspensions/submit', formData, {
         headers: { 
-          Authorization: `Bearer ${token}`,
-          // Không cần set Content-Type, axios sẽ tự gen boundary cho multipart
+          Authorization: `Bearer ${token}`
         }
       });
       
@@ -72,6 +88,8 @@ const StopTeaching = () => {
       setDate('');
       setReason('');
       setFile(null);
+      setSelectedClassId('');
+      setSelectedScheduleId('');
       fetchHistory(); // Reload lịch sử
     } catch (err) {
       console.error(err);
@@ -101,6 +119,9 @@ const StopTeaching = () => {
     return `${d.toLocaleDateString('vi-VN')} ${d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute:'2-digit' })}`;
   };
 
+  const selectedClass = activeClasses.find(c => c.classId === parseInt(selectedClassId));
+  const availableSchedules = selectedClass ? selectedClass.schedules : [];
+
   return (
     <div className="animate-fadeIn relative">
       {toast.show && (
@@ -110,7 +131,7 @@ const StopTeaching = () => {
           color: 'white', padding: '14px 24px', borderRadius: 8,
           boxShadow: '0 10px 25px rgba(0,0,0,0.2)', fontWeight: 600, fontSize: 14
         }}>
-          {toast.type === 'success' ? '✅ ' : '⚠️ '}{toast.msg}
+          {toast.type === 'success' ? <><CheckCircle2 className="w-4 h-4 inline-block mr-2" /> </> : <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </>}{toast.msg}
         </div>
       )}
 
@@ -125,11 +146,39 @@ const StopTeaching = () => {
           <div className="space-y-5">
             <div>
               <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Lớp học phần</label>
-              <select className="input-field bg-gray-50 text-sm">
-                <option>010110195604 - 14DHTH04 (Giả lập)</option>
+              <select 
+                className="input-field bg-gray-50 text-sm"
+                value={selectedClassId}
+                onChange={e => {
+                  setSelectedClassId(e.target.value);
+                  setSelectedScheduleId(''); // Reset schedule when class changes
+                }}
+              >
+                <option value="">-- Chọn lớp học phần --</option>
+                {activeClasses.map(cls => (
+                  <option key={cls.classId} value={cls.classId}>
+                    {cls.classCode} - {cls.courseName}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Ca học</label>
+                <select 
+                  className="input-field bg-gray-50 text-sm"
+                  value={selectedScheduleId}
+                  onChange={e => setSelectedScheduleId(e.target.value)}
+                  disabled={!selectedClassId}
+                >
+                  <option value="">-- Chọn ca học --</option>
+                  {availableSchedules.map(sch => (
+                    <option key={sch.scheduleId} value={sch.scheduleId}>
+                      Thứ {sch.dayOfWeek === 8 ? 'CN' : sch.dayOfWeek} (Tiết {sch.startPeriod}-{sch.endPeriod}) - P.{sch.roomName}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Ngày xin ngừng</label>
                 <input 
@@ -138,12 +187,6 @@ const StopTeaching = () => {
                   onChange={e => setDate(e.target.value)}
                   className="input-field text-sm font-bold text-[#6B4FA0]" 
                 />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Ca học</label>
-                <select className="input-field bg-gray-50 text-sm">
-                  <option>Sáng (Tiết 1-3)</option>
-                </select>
               </div>
             </div>
             <div>
@@ -169,7 +212,7 @@ const StopTeaching = () => {
               disabled={submitting}
               className="btn-primary w-full font-bold py-2.5 mt-2 shadow-lg shadow-purple-200 uppercase text-xs tracking-widest"
             >
-              {submitting ? '⏳ Đang gửi...' : '📤 Gửi đề xuất'}
+              {submitting ? '⏳ Đang gửi...' : <><Upload className="w-4 h-4 inline-block mr-2" /> Gửi đề xuất</>}
             </button>
           </div>
         </div>
@@ -177,7 +220,7 @@ const StopTeaching = () => {
         <div className="card p-6 shadow-sm border border-gray-100 h-fit max-h-[600px] flex flex-col">
           <div className="flex justify-between items-center mb-5 border-b pb-2">
             <h3 className="font-bold text-gray-700 uppercase text-[11px] tracking-widest">Lịch sử đề xuất</h3>
-            <button onClick={fetchHistory} className="text-xs text-[#6B4FA0] font-bold hover:underline">🔄 Làm mới</button>
+            <button onClick={fetchHistory} className="text-xs text-[#6B4FA0] font-bold hover:underline"><RefreshCw className="w-4 h-4 inline-block mr-2" /> Làm mới</button>
           </div>
           
           <div className="space-y-3 overflow-y-auto pr-2 custom-scrollbar flex-1">

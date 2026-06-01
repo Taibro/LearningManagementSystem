@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { XCircle, Search, AlertTriangle } from 'lucide-react';
 
 const Salary = () => {
   const currentDate = new Date();
@@ -79,7 +80,7 @@ const Salary = () => {
               disabled={loading}
               className="w-full bg-gradient-to-r from-[#6B4FA0] to-[#8B6BBF] text-white rounded-lg px-5 py-2.5 font-medium transition-all hover:translate-y-[-1px] hover:shadow-lg hover:shadow-purple-200 active:scale-95 flex items-center justify-center gap-2"
             >
-              {loading ? '⏳ Đang tra cứu...' : '🔍 Xem bảng lương'}
+              {loading ? '⏳ Đang tra cứu...' : <><Search className="w-4 h-4 inline-block mr-2" /> Xem bảng lương</>}
             </button>
           </div>
         </div>
@@ -88,7 +89,7 @@ const Salary = () => {
       {/* Hiển thị thông báo */}
       {message.text && (
         <div className={`p-4 mb-5 rounded-lg text-sm font-semibold border ${message.type === 'warning' ? 'bg-orange-50 text-orange-600 border-orange-200' : 'bg-red-50 text-red-600 border-red-200'}`}>
-          {message.type === 'warning' ? '⚠️ ' : '❌ '} {message.text}
+          {message.type === 'warning' ? <><AlertTriangle className="w-4 h-4 inline-block mr-2" /> </> : <><XCircle className="w-4 h-4 inline-block mr-2" /> </>} {message.text}
         </div>
       )}
 

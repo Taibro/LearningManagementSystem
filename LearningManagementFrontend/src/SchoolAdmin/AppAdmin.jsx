@@ -24,14 +24,26 @@ import Payments from './pages/Payments/Payments';
 import Notifications from './pages/Notifications/Notifications';
 import Settings from './pages/Settings/Settings';
 
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
+
 export default function AppAdmin() {
   return (
-    <Router>
+    <Router basename="/admin">
       <Routes>
         <Route path="/login" element={<AdminLogin />} />
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/" element={<MainLayout />}>
-          
+        
+        <Route path="/" element={
+          <ProtectedRoute>
+            <MainLayout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="branches" element={<BranchesRooms />} />
           <Route path="departments" element={<Departments />} />
@@ -51,8 +63,6 @@ export default function AppAdmin() {
           <Route path="notifications" element={<Notifications />} />
           <Route path="settings" element={<Settings />} />
         </Route>
-
-        <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );

@@ -14,6 +14,14 @@ public interface SaasUserRepository extends JpaRepository<Users, Integer> {
     @Query("SELECT COUNT(u) FROM Users u JOIN u.roles r WHERE r.name = :roleName")
     long countByRoleName(@Param("roleName") String roleName);
 
-    @Query("SELECT COUNT(u) FROM Users u JOIN u.roles r WHERE u.school.id = :schoolId AND r.name = :roleName")
-    long countBySchoolIdAndRoleName(@Param("schoolId") Integer schoolId, @Param("roleName") String roleName);
+    @Query(value = "SELECT COUNT(u.id) FROM users u " +
+            "JOIN user_roles ur ON u.id = ur.user_id " +
+            "JOIN role r ON r.id = ur.role_id " +
+            "WHERE u.school_id = :schoolId AND UPPER(r.name) = UPPER(:roleName)", nativeQuery = true)
+    long countBySchoolIdAndRoleNameNative(@Param("schoolId") Integer schoolId, @Param("roleName") String roleName);
+
+    @Query(value = "SELECT COUNT(u.id) FROM users u " +
+            "JOIN user_roles ur ON u.id = ur.user_id " +
+            "WHERE u.school_id = :schoolId AND ur.role_id = :roleId", nativeQuery = true)
+    long countBySchoolIdAndRoleId(@Param("schoolId") Integer schoolId, @Param("roleId") Integer roleId);
 }

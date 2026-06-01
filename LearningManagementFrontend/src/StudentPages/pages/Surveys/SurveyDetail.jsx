@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { submitSurvey } from '../../studentApi';
+import { AlertTriangle } from 'lucide-react';
 
 // 5 mức đánh giá
 const SCALE_5 = [
@@ -193,7 +194,7 @@ export default function SurveyDetail({ survey, onBack, onSuccess }) {
         {/* Lỗi */}
         {error && (
           <div style={{ margin: '0 20px 16px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '10px 14px', color: '#b91c1c', fontSize: 13 }}>
-            ⚠️ {error}
+            <AlertTriangle className="w-4 h-4 inline-block mr-2" /> {error}
           </div>
         )}
 

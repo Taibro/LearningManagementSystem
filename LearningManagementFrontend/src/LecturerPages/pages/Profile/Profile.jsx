@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Save } from 'lucide-react';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -148,7 +149,7 @@ const Profile = () => {
               disabled={saving}
               className="btn-primary text-sm min-w-[160px] flex items-center justify-center"
             >
-              {saving ? '⏳ Đang lưu...' : '💾 Cập nhật thông tin'}
+              {saving ? '⏳ Đang lưu...' : <><Save className="w-4 h-4 inline-block mr-2" /> Cập nhật thông tin</>}
             </button>
           </div>
         </div>

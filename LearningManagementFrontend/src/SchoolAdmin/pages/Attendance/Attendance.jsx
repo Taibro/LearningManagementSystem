@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BarChart, FileText, Check, ClipboardList, CheckCircle2, XCircle, Search, X } from 'lucide-react';
 
 export default function Attendance() {
   const [records, setRecords] = useState([]);
@@ -82,9 +83,9 @@ export default function Attendance() {
   const countTotal = records.length;
 
   const renderStatusBadge = (status) => {
-    if (status === 'PRESENT') return <span className="badge b-green">✓ PRESENT</span>;
+    if (status === 'PRESENT') return <span className="badge b-green"><Check className="w-4 h-4 inline-block mr-2" /> PRESENT</span>;
     if (status === 'LATE') return <span className="badge b-amber">⏰ LATE</span>;
-    if (status === 'ABSENT') return <span className="badge b-red">✗ ABSENT</span>;
+    if (status === 'ABSENT') return <span className="badge b-red"><X className="w-4 h-4 inline-block mr-2" /> ABSENT</span>;
     if (status === 'EXCUSED') return <span className="badge b-blue">EXCUSED</span>;
     return <span className="badge b-gray">{status}</span>;
   };
@@ -120,15 +121,15 @@ export default function Attendance() {
         <div className="filter-bar">
           <select className="fc" style={{maxWidth:'240px'}}><option>Tất cả lớp</option></select>
           <input type="date" className="fc" style={{maxWidth:'150px'}} />
-          <button className="btn btn-blue btn-sm">🔍 Tìm</button>
-          <button className="btn btn-ghost btn-sm">📊 Xuất Excel</button>
+          <button className="btn btn-blue btn-sm"><Search className="w-4 h-4 inline-block mr-2" /> Tìm</button>
+          <button className="btn btn-ghost btn-sm"><BarChart className="w-4 h-4 inline-block mr-2" /> Xuất Excel</button>
         </div>
       </div>
 
       <div className="grid4 mb4">
         <div className="stat" style={{cursor:'default'}}>
           <div className="stat-top" style={{background:'var(--green)'}}></div>
-          <div className="stat-icon">✅</div><div className="stat-label">Có mặt</div><div className="stat-num">{countPresent}</div>
+          <div className="stat-icon"><CheckCircle2 className="w-4 h-4 inline-block mr-2" /></div><div className="stat-label">Có mặt</div><div className="stat-num">{countPresent}</div>
         </div>
         <div className="stat" style={{cursor:'default'}}>
           <div className="stat-top" style={{background:'var(--amber)'}}></div>
@@ -136,11 +137,11 @@ export default function Attendance() {
         </div>
         <div className="stat" style={{cursor:'default'}}>
           <div className="stat-top" style={{background:'var(--red)'}}></div>
-          <div className="stat-icon">❌</div><div className="stat-label">Vắng mặt</div><div className="stat-num">{countAbsent}</div>
+          <div className="stat-icon"><XCircle className="w-4 h-4 inline-block mr-2" /></div><div className="stat-label">Vắng mặt</div><div className="stat-num">{countAbsent}</div>
         </div>
         <div className="stat" style={{cursor:'default'}}>
           <div className="stat-top" style={{background:'var(--blue-lt)'}}></div>
-          <div className="stat-icon">📝</div><div className="stat-label">Tổng bản ghi</div><div className="stat-num">{countTotal}</div>
+          <div className="stat-icon"><FileText className="w-4 h-4 inline-block mr-2" /></div><div className="stat-label">Tổng bản ghi</div><div className="stat-num">{countTotal}</div>
         </div>
       </div>
 
@@ -187,7 +188,7 @@ export default function Attendance() {
         <div className="ov open">
           <div className="modal" style={{width:'440px'}}>
             <div className="modal-hd">
-              <span className="modal-title">{currentRecord.id ? '📋 Chỉnh sửa Điểm danh' : '📋 Thêm Điểm danh'}</span>
+              <span className="modal-title">{currentRecord.id ? <><ClipboardList className="w-4 h-4 inline-block mr-2" /> Chỉnh sửa Điểm danh</> : <><ClipboardList className="w-4 h-4 inline-block mr-2" /> Thêm Điểm danh</>}</span>
               <button className="close-btn" onClick={() => setAModal(false)}>×</button>
             </div>
             <div className="modal-body">
@@ -223,7 +224,7 @@ export default function Attendance() {
             </div>
             <div className="modal-ft">
               <button className="btn btn-ghost" onClick={() => setAModal(false)}>Hủy</button>
-              <button className="btn btn-blue" onClick={handleSaveRecord}>✓ Cập nhật</button>
+              <button className="btn btn-blue" onClick={handleSaveRecord}><Check className="w-4 h-4 inline-block mr-2" /> Cập nhật</button>
             </div>
           </div>
         </div>

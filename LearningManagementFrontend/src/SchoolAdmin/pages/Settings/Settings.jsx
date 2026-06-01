@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Settings as SettingsIcon, Calendar, School, Lock, Save } from 'lucide-react';
 
 export default function Settings() {
   const [stats, setStats] = useState({
@@ -22,16 +23,16 @@ export default function Settings() {
         const data = await res.json();
         setStats(data);
       }
-    } catch (err) {}
+    } catch (err) { }
   };
 
   return (
     <div className="page" style={{ position: 'relative' }}>
-      
+
       {/* HEADER TÙY CHỈNH */}
       <div className="ph" style={{ marginBottom: '24px', background: 'linear-gradient(135deg, #0f172a, #1e293b)', padding: '30px', borderRadius: '16px', color: 'white', boxShadow: '0 10px 25px rgba(0,0,0,0.1)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <div style={{ width: '60px', height: '60px', background: 'rgba(255,255,255,0.1)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', border: '1px solid rgba(255,255,255,0.2)' }}>⚙️</div>
+          <div style={{ width: '60px', height: '60px', background: 'rgba(255,255,255,0.1)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '28px', border: '1px solid rgba(255,255,255,0.2)' }}><SettingsIcon className="w-4 h-4 inline-block mr-2" /></div>
           <div>
             <div style={{ fontSize: '24px', fontWeight: '800', letterSpacing: '-0.5px' }}>Cấu hình Hệ thống</div>
             <div style={{ fontSize: '14px', color: '#94a3b8', marginTop: '4px' }}>Trường Đại học Bách Khoa TP.HCM (HCMUT)</div>
@@ -40,40 +41,40 @@ export default function Settings() {
       </div>
 
       <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start' }}>
-        
+
         {/* SIDEBAR TABS */}
         <div style={{ width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          <button 
+          <button
             onClick={() => setActiveTab('general')}
             style={{ textAlign: 'left', padding: '12px 16px', borderRadius: '10px', background: activeTab === 'general' ? '#eff6ff' : 'transparent', color: activeTab === 'general' ? '#1d4ed8' : '#64748b', fontWeight: activeTab === 'general' ? '700' : '600', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', transition: 'all 0.2s' }}>
-            <span>🏫</span> Thông tin chung
+            <span><School className="w-4 h-4 inline-block mr-2" /></span> Thông tin chung
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('academic')}
             style={{ textAlign: 'left', padding: '12px 16px', borderRadius: '10px', background: activeTab === 'academic' ? '#eff6ff' : 'transparent', color: activeTab === 'academic' ? '#1d4ed8' : '#64748b', fontWeight: activeTab === 'academic' ? '700' : '600', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', transition: 'all 0.2s' }}>
-            <span>📅</span> Năm học & Học kỳ
+            <span><Calendar className="w-4 h-4 inline-block mr-2" /></span> Năm học & Học kỳ
           </button>
-          <button 
+          <button
             onClick={() => setActiveTab('security')}
             style={{ textAlign: 'left', padding: '12px 16px', borderRadius: '10px', background: activeTab === 'security' ? '#eff6ff' : 'transparent', color: activeTab === 'security' ? '#1d4ed8' : '#64748b', fontWeight: activeTab === 'security' ? '700' : '600', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '10px', transition: 'all 0.2s' }}>
-            <span>🔒</span> Bảo mật & API
+            <span><Lock className="w-4 h-4 inline-block mr-2" /></span> Bảo mật & API
           </button>
-          
+
           <div className="card" style={{ marginTop: '20px', padding: '16px', background: 'linear-gradient(135deg, #2563eb, #3b82f6)', color: 'white', border: 'none' }}>
             <div style={{ fontSize: '13px', fontWeight: '700', marginBottom: '12px', color: 'rgba(255,255,255,0.9)' }}>HIỆU SUẤT HỆ THỐNG</div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}><span>CPU Usage</span><strong>12%</strong></div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '12px' }}><span>RAM</span><strong>2.4 GB</strong></div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}><span>Database</span><strong style={{color: '#a7f3d0'}}>Healthy</strong></div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}><span>Database</span><strong style={{ color: '#a7f3d0' }}>Healthy</strong></div>
           </div>
         </div>
 
         {/* MAIN CONTENT AREA */}
         <div style={{ flex: 1 }}>
-          
+
           {activeTab === 'general' && (
             <div className="card anim-fadeup" style={{ padding: '24px' }}>
               <div style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>Thông tin Cơ sở đào tạo</div>
-              
+
               <div className="grid2" style={{ gap: '20px' }}>
                 <div className="fg">
                   <label className="fl" style={{ fontSize: '13px', color: '#64748b' }}>Mã trường / Định danh</label>
@@ -102,7 +103,7 @@ export default function Settings() {
               </div>
 
               <div style={{ marginTop: '30px', display: 'flex', justifyContent: 'flex-end' }}>
-                <button className="btn btn-blue" style={{ padding: '10px 24px', fontSize: '14px' }}>💾 Lưu thay đổi</button>
+                <button className="btn btn-blue" style={{ padding: '10px 24px', fontSize: '14px' }}><Save className="w-4 h-4 inline-block mr-2" /> Lưu thay đổi</button>
               </div>
             </div>
           )}
@@ -110,7 +111,7 @@ export default function Settings() {
           {activeTab === 'academic' && (
             <div className="card anim-fadeup" style={{ padding: '24px' }}>
               <div style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>Thiết lập Học kỳ</div>
-              
+
               <div style={{ background: '#f8fafc', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '24px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                   <div style={{ width: '40px', height: '40px', background: '#3b82f6', color: 'white', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px' }}>🕒</div>
@@ -166,7 +167,7 @@ export default function Settings() {
           {activeTab === 'security' && (
             <div className="card anim-fadeup" style={{ padding: '24px' }}>
               <div style={{ fontSize: '18px', fontWeight: '700', color: '#0f172a', marginBottom: '24px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>Bảo mật & Tích hợp</div>
-              
+
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', border: '1px solid #e2e8f0', borderRadius: '10px', marginBottom: '16px' }}>
                 <div>
                   <div style={{ fontSize: '15px', fontWeight: '600', color: '#0f172a' }}>Xác thực 2 Bước (2FA)</div>

@@ -1,18 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Lock, User, GraduationCap, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import SearchableSelect from '../../../components/SearchableSelect';
+import { BookOpen, Lock, User, GraduationCap, AlertCircle, ArrowRight, Loader2, School } from 'lucide-react';
 
 const LecturerLogin = () => {
   const [loginCode, setLoginCode] = useState('');
   const [password, setPassword] = useState('');
+  const [school, setSchool] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     setError('');
+    
+    if (!school) {
+      setError('Vui lòng chọn trường học!');
+      return;
+    }
+    
+    setIsLoading(true);
 
     try {
       const res = await fetch('http://localhost:8080/api/auth/login', {
@@ -30,6 +38,17 @@ const LecturerLogin = () => {
         // Lưu Token và Tên của Giảng viên
         if (data.token) localStorage.setItem('lecturerToken', data.token);
         localStorage.setItem('lecturerName', data.fullName || 'Giảng viên');
+
+        const schoolOptions = [
+          { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
+          { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
+          { value: 'FPT', label: 'CĐ FPT Polytechnic' },
+          { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
+          { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
+        ];
+        const selectedSchool = schoolOptions.find(s => s.value === school);
+        if (selectedSchool) localStorage.setItem('schoolName', selectedSchool.label);
+
         
         // Chuyển hướng vào E-Office
         navigate('/weekly-schedule');
@@ -94,6 +113,26 @@ const LecturerLogin = () => {
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
+            <div className="relative z-10">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Trường / Trung tâm
+              </label>
+              <SearchableSelect 
+                options={[
+                  { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
+                  { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
+                  { value: 'FPT', label: 'CĐ FPT Polytechnic' },
+                  { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
+                  { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
+                ]}
+                value={school}
+                onChange={setSchool}
+                icon={<School className="w-5 h-5" />}
+                triggerClassName="w-full border border-gray-200 rounded-xl text-sm transition-all"
+                triggerStyle={{ background: '#F9FAFB', height: '48px', padding: '0 16px' }}
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Mã giảng viên / Email
