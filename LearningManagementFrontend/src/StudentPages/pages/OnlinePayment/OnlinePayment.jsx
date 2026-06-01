@@ -5,8 +5,6 @@ import { getDebtDetail, getSemesters, createPayment, getPayments } from '../../s
 const fmt = (n) => n != null ? Number(n).toLocaleString('vi-VN') : '0';
 
 const BANKS = [
-  { id: 'pvcom', name: 'PVcomBank', logo: 'https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-PVcomBank.png' },
-  { id: 'namabank', name: 'Nam A Bank', logo: 'https://cdn.haitrieu.com/wp-content/uploads/2022/02/Logo-Nam-A-Bank-V.png' },
   { id: 'sacombank', name: 'Sacombank', logo: 'https://cdn.haitrieu.com/wp-content/uploads/2022/01/Logo-Sacombank.png' },
   { id: 'agri', name: 'Agribank', logo: 'https://cdn.haitrieu.com/wp-content/uploads/2022/01/Logo-Agribank-V.png' },
   { id: 'vcb', name: 'Vietcombank', logo: 'https://cdn.haitrieu.com/wp-content/uploads/2022/02/Logo-Vietcombank.png' },
