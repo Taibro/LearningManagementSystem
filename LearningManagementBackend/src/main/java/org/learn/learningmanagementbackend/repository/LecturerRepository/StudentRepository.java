@@ -66,7 +66,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             LEFT JOIN teachers t ON t.id = ct.teacher_id
             LEFT JOIN users u   ON u.id = t.user_id
             WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
-              AND e.status = 'ENROLLED'
+              AND e.status IN ('ENROLLED', 'COMPLETED', 'FAILED')
               AND sch.start_date <= :endDate
               AND sch.end_date   >= :startDate
               AND c.status != 'CANCELLED'
@@ -102,7 +102,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             LEFT JOIN teachers t ON t.id = ct.teacher_id
             LEFT JOIN users u   ON u.id = t.user_id
             WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
-              AND e.status = 'ENROLLED'
+              AND e.status IN ('ENROLLED', 'COMPLETED', 'FAILED')
               AND (:semesterId = 0 OR c.semester_id = :semesterId)
               AND c.status != 'CANCELLED'
             ORDER BY sch.start_date, sch.day_of_week
