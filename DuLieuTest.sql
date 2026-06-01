@@ -125,18 +125,18 @@ INSERT INTO academic_years (id, school_id, name, start_date, end_date) VALUES
 
 -- 5. BẢNG SEMESTER (12 dòng)
 INSERT INTO semesters (id, academic_year_id, name, start_date, end_date) VALUES
-(1, 1, 'Học kỳ 1', '2024-08-15', '2024-12-31'),
-(2, 1, 'Học kỳ 2', '2025-01-15', '2025-05-31'),
-(3, 2, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(4, 2, 'Học kỳ 2', '2026-01-15', '2026-05-31'),
-(5, 4, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(6, 5, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(7, 6, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(8, 7, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(9, 8, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(10, 9, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(11, 10, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(12, 11, 'Học kỳ 1', '2025-08-15', '2025-12-31');
+(1, 1, 'Học kỳ 1 (Năm 1)', '2023-08-15', '2023-12-31'),
+(2, 1, 'Học kỳ 2 (Năm 1)', '2024-01-15', '2024-05-31'),
+(3, 2, 'Học kỳ 1 (Năm 2)', '2024-08-15', '2024-12-31'),
+(4, 2, 'Học kỳ 2 (Năm 2)', '2025-01-15', '2025-05-31'),
+(5, 4, 'Học kỳ 1 (Trường khác)', '2025-08-15', '2025-12-31'),
+(6, 5, 'Học kỳ 1 (Trường khác)', '2025-08-15', '2025-12-31'),
+(7, 6, 'Học kỳ 1 (Trường khác)', '2025-08-15', '2025-12-31'),
+(8, 7, 'Học kỳ 1 (Trường khác)', '2025-08-15', '2025-12-31'),
+(9, 8, 'Học kỳ 1 (Trường khác)', '2025-08-15', '2025-12-31'),
+(10, 9, 'Học kỳ 1 (Trường khác)', '2025-08-15', '2025-12-31'),
+(11, 10, 'Học kỳ 1 (Trường khác)', '2025-08-15', '2025-12-31'),
+(12, 11, 'Học kỳ 1 (Trường khác)', '2025-08-15', '2025-12-31');
 
 -- 6. BẢNG DEPARTMENT (12 dòng)
 INSERT INTO departments (id, school_id, code, name) VALUES
@@ -317,58 +317,56 @@ INSERT INTO rooms (id, branch_id, building, room_number, capacity, type) VALUES
 (11, 7, 'F', 'F601', 100, 'LECTURE_HALL'),
 (12, 1, 'A', 'A205', 40, 'SEMINAR');
 
--- 13. BẢNG CLASS (16 dòng)
+-- 13. BẢNG CLASS (20 dòng)
 INSERT INTO classes (id, code, course_id, semester_id, max_students, status) VALUES
-(1, 'INT201-HK2-01A', 13, 2, 40, 'OPEN'),
-(2, 'INT201-HK2-01B', 13, 2, 40, 'OPEN'),
-(3, 'INT201-HK2-01C', 13, 2, 40, 'OPEN'),
-(4, 'INT103-HK2-01', 3, 2, 40, 'OPEN'),
-(5, 'INT101-HK2-01', 1, 2, 40, 'OPEN'),
-(6, 'ACC101-HK2-01', 6, 2, 50, 'OPEN'),
-(7, 'ACC102-HK2-01', 7, 2, 50, 'OPEN'),
-(8, 'BUS101-HK2-01', 8, 2, 60, 'OPEN'),
-(9, 'BUS102-HK2-01', 9, 2, 60, 'OPEN'),
-(10, 'ELE101-HK2-01', 10, 2, 40, 'OPEN'),
-(11, 'ELE102-HK2-01', 11, 2, 40, 'OPEN'),
-(12, 'INT104-HK2-01', 12, 2, 40, 'OPEN'),
-(13, 'INT101-HK1-01', 1, 1, 40, 'COMPLETED'),
-(14, 'INT102-HK1-01', 2, 1, 40, 'COMPLETED'),
-(15, 'INT103-HK1-01', 3, 1, 40, 'COMPLETED'),
-(16, 'INT104-HK1-01', 12, 1, 40, 'COMPLETED');
+(1, 'INT101-HK1-01', 1, 1, 40, 'COMPLETED'),
+(2, 'INT103-HK1-01', 3, 1, 40, 'COMPLETED'),
+(3, 'ENG101-HK1-01', 4, 1, 40, 'COMPLETED'),
+(4, 'INT102-HK2-01', 2, 2, 40, 'COMPLETED'),
+(5, 'INT104-HK2-01', 12, 2, 40, 'COMPLETED'),
+(6, 'ACC101-HK2-01', 6, 2, 40, 'COMPLETED'),
+(7, 'ELE101-HK2-01', 10, 2, 40, 'COMPLETED'),
+(8, 'BUS101-HK2-01', 8, 2, 40, 'COMPLETED'),
+(9, 'INT201-HK3-01A', 13, 3, 40, 'OPEN'),
+(10, 'INT201-HK3-01B', 13, 3, 40, 'OPEN'),
+(11, 'INT201-HK3-01C', 13, 3, 40, 'OPEN'),
+(12, 'INT103-HK3-01', 3, 3, 40, 'OPEN'),
+(13, 'INT101-HK3-01', 1, 3, 40, 'OPEN'),
+(14, 'INT202-HK3-01', 14, 3, 40, 'OPEN');
 
--- 14. BẢNG CLASS_TEACHER (16 dòng)
+-- 14. BẢNG CLASS_TEACHER (20 dòng)
 INSERT INTO Class_Teacher (class_id, teacher_id, role) VALUES
 (1, 1, 'main'),
-(2, 1, 'main'),
-(3, 2, 'main'),
-(4, 3, 'main'),
-(5, 3, 'main'),
+(2, 2, 'main'),
+(3, 3, 'main'),
+(4, 1, 'main'),
+(5, 1, 'main'),
 (6, 8, 'main'),
-(7, 11, 'main'),
+(7, 9, 'main'),
 (8, 10, 'main'),
-(9, 10, 'main'),
-(10, 9, 'main'),
-(11, 9, 'assistant'),
-(12, 1, 'main'),
+(9, 1, 'main'),
+(10, 1, 'main'),
+(11, 1, 'main'),
+(12, 2, 'main'),
 (13, 1, 'main'),
-(14, 2, 'main'),
-(15, 3, 'main'),
-(16, 1, 'main');
+(14, 1, 'main');
 
--- 15. BẢNG SCHEDULE (12 dòng)
+-- 15. BẢNG SCHEDULE (20 dòng)
 INSERT INTO schedules (id, class_id, room_id, day_of_week, start_time, end_time, start_date, end_date, start_period, end_period, type) VALUES
-(1, 1, 3, 2, '07:00:00', '09:30:00', '2025-01-15', '2025-05-31', 1, 3, 'REGULAR'),
-(2, 2, 4, 3, '09:40:00', '12:10:00', '2025-01-15', '2025-05-31', 4, 6, 'REGULAR'),
-(3, 3, 1, 2, '07:50:00', '10:25:00', '2025-01-15', '2025-05-31', 2, 4, 'REGULAR'),
-(4, 4, 2, 4, '07:00:00', '09:30:00', '2025-01-15', '2025-05-31', 1, 3, 'REGULAR'),
-(5, 5, 2, 5, '07:00:00', '09:30:00', '2025-01-15', '2025-05-31', 1, 3, 'REGULAR'),
-(6, 6, 5, 2, '13:00:00', '15:30:00', '2025-01-15', '2025-05-31', 7, 9, 'REGULAR'),
-(7, 7, 1, 3, '07:00:00', '09:30:00', '2025-01-15', '2025-05-31', 1, 3, 'REGULAR'),
-(8, 8, 5, 4, '09:40:00', '12:10:00', '2025-01-15', '2025-05-31', 4, 6, 'REGULAR'),
-(9, 9, 1, 5, '13:00:00', '15:30:00', '2025-01-15', '2025-05-31', 7, 9, 'REGULAR'),
-(10, 10, 4, 6, '07:00:00', '09:30:00', '2025-01-15', '2025-05-31', 1, 3, 'REGULAR'),
-(11, 11, 3, 7, '09:40:00', '12:10:00', '2025-01-15', '2025-05-31', 4, 6, 'REGULAR'),
-(12, 12, 4, 2, '15:40:00', '18:10:00', '2025-01-15', '2025-05-31', 10, 12, 'REGULAR');
+(1, 1, 3, 2, '07:00:00', '09:30:00', '2023-08-15', '2023-12-31', 1, 3, 'REGULAR'),
+(2, 2, 4, 3, '07:00:00', '09:30:00', '2023-08-15', '2023-12-31', 1, 3, 'REGULAR'),
+(3, 3, 1, 4, '07:00:00', '09:30:00', '2023-08-15', '2023-12-31', 1, 3, 'REGULAR'),
+(4, 4, 2, 2, '07:00:00', '09:30:00', '2024-01-15', '2024-05-31', 1, 3, 'REGULAR'),
+(5, 5, 2, 3, '07:00:00', '09:30:00', '2024-01-15', '2024-05-31', 1, 3, 'REGULAR'),
+(6, 6, 5, 4, '07:00:00', '09:30:00', '2024-01-15', '2024-05-31', 1, 3, 'REGULAR'),
+(7, 7, 1, 5, '07:00:00', '09:30:00', '2024-01-15', '2024-05-31', 1, 3, 'REGULAR'),
+(8, 8, 5, 6, '07:00:00', '09:30:00', '2024-01-15', '2024-05-31', 1, 3, 'REGULAR'),
+(9, 9, 1, 2, '07:00:00', '09:30:00', '2024-08-15', '2024-12-31', 1, 3, 'REGULAR'),
+(10, 10, 4, 3, '09:40:00', '12:10:00', '2024-08-15', '2024-12-31', 4, 6, 'REGULAR'),
+(11, 11, 3, 2, '07:50:00', '10:25:00', '2024-08-15', '2024-12-31', 2, 4, 'REGULAR'),
+(12, 12, 4, 4, '07:00:00', '09:30:00', '2024-08-15', '2024-12-31', 1, 3, 'REGULAR'),
+(13, 13, 1, 5, '07:00:00', '09:30:00', '2024-08-15', '2024-12-31', 1, 3, 'REGULAR'),
+(14, 14, 2, 6, '07:00:00', '09:30:00', '2024-08-15', '2024-12-31', 1, 3, 'REGULAR');
 
 -- 16. BẢNG SCHEDULE_EXCEPTION (12 dòng)
 INSERT INTO schedule_exceptions (id, schedule_id, exception_date, reason, exception_type) VALUES
@@ -385,20 +383,20 @@ INSERT INTO schedule_exceptions (id, schedule_id, exception_date, reason, except
 (11, 11, '2026-03-14', 'Nghỉ hè', 'cancelled'),
 (12, 12, '2026-03-16', 'Họp Bộ môn', 'cancelled');
 
--- 17. BẢNG ENROLLMENT (12 dòng)
+-- 17. BẢNG ENROLLMENT (20 dòng)
 INSERT INTO enrollments (id, student_id, class_id, status, grade_total) VALUES
-(1, 1, 13, 'COMPLETED', 8.5),
-(2, 1, 14, 'COMPLETED', 9.0),
-(3, 1, 15, 'FAILED', 3.5),
-(4, 1, 16, 'COMPLETED', 7.0),
-(5, 2, 13, 'COMPLETED', 8.0),
-(6, 4, 13, 'COMPLETED', 7.5),
-(7, 5, 13, 'COMPLETED', 9.5),
-(8, 6, 13, 'COMPLETED', 6.0),
-(9, 7, 13, 'COMPLETED', 8.5),
-(10, 8, 13, 'COMPLETED', 7.0),
-(11, 9, 13, 'COMPLETED', 6.5),
-(12, 12, 13, 'COMPLETED', 8.0);
+(1, 1, 1, 'COMPLETED', 8.0),
+(2, 1, 2, 'FAILED', 3.5),
+(3, 1, 3, 'COMPLETED', 7.0),
+(4, 1, 4, 'COMPLETED', 9.0),
+(5, 1, 5, 'COMPLETED', 8.5),
+(6, 1, 6, 'COMPLETED', 9.0),
+(7, 1, 7, 'COMPLETED', 8.0),
+(8, 1, 8, 'COMPLETED', 8.5),
+(9, 2, 1, 'COMPLETED', 8.0),
+(10, 3, 1, 'COMPLETED', 7.0),
+(11, 4, 4, 'COMPLETED', 7.5),
+(12, 5, 4, 'COMPLETED', 9.5);
 
 -- 18. BẢNG ATTENDANCE_RECORD (12 dòng)
 INSERT INTO attendance_records (id, schedule_id, student_id, attendance_date, status, checked_by, checked_at) VALUES
@@ -432,44 +430,22 @@ INSERT INTO notifications (id, user_id, title, body, type, is_read) VALUES
 
 -- 20. BẢNG TUITION_INVOICE (12 dòng)
 INSERT INTO tuition_invoices (id, student_id, semester_id, total_amount, paid_amount, due_date, status) VALUES
-(1, 1, 1, 15000000.00, 10000000.00, '2024-12-30', 'PARTIAL'),
-(2, 2, 1, 15000000.00, 15000000.00, '2024-12-30', 'PAID'),
-(3, 3, 1, 15000000.00, 0.00, '2024-12-30', 'UNPAID'),
-(4, 4, 1, 14000000.00, 14000000.00, '2024-12-30', 'PAID'),
-(5, 5, 1, 14000000.00, 0.00, '2024-12-30', 'UNPAID'),
-(6, 6, 1, 12000000.00, 12000000.00, '2024-12-30', 'PAID'),
-(7, 7, 1, 12000000.00, 12000000.00, '2024-12-30', 'PAID'),
-(8, 8, 1, 13000000.00, 0.00, '2024-12-30', 'UNPAID'),
-(9, 9, 1, 13000000.00, 0.00, '2024-12-30', 'UNPAID'),
-(10, 10, 1, 16000000.00, 8000000.00, '2024-12-30', 'PARTIAL'),
-(11, 11, 1, 16000000.00, 16000000.00, '2024-12-30', 'PAID'),
-(12, 12, 1, 15000000.00, 15000000.00, '2024-12-30', 'PAID');
+(1, 1, 1, 10000000.00, 10000000.00, '2023-12-30', 'PAID'),
+(2, 1, 2, 15000000.00, 10000000.00, '2024-05-30', 'PARTIAL'),
+(3, 2, 2, 15000000.00, 15000000.00, '2024-05-30', 'PAID'),
+(4, 3, 2, 15000000.00, 0.00, '2024-05-30', 'UNPAID');
 
 -- 21. BẢNG TUITION_PAYMENT (12 dòng)
 INSERT INTO tuition_payments (id, invoice_id, amount, payment_method, transaction_code, status, payment_date) VALUES
-(1, 1, 10000000.00, 'BANK_TRANSFER', 'VN123456', 'SUCCESS', '2024-09-30 12:00:00'),
-(2, 2, 15000000.00, 'MOMO', 'MM98765', 'SUCCESS', '2024-09-30 12:00:00'),
-(3, 4, 14000000.00, 'VNPAY', 'VNP1122', 'SUCCESS', '2024-09-30 12:00:00'),
-(4, 6, 12000000.00, 'CASH', 'CASH001', 'SUCCESS', '2024-09-30 12:00:00'),
-(5, 7, 12000000.00, 'BANK_TRANSFER', 'VN223344', 'SUCCESS', '2024-09-30 12:00:00'),
-(6, 10, 8000000.00, 'VISA', 'VS9988', 'SUCCESS', '2024-09-30 12:00:00'),
-(7, 11, 16000000.00, 'MOMO', 'MM7766', 'SUCCESS', '2024-09-30 12:00:00'),
-(8, 12, 15000000.00, 'BANK_TRANSFER', 'VN445566', 'SUCCESS', '2024-09-30 12:00:00');
+(1, 1, 10000000.00, 'BANK_TRANSFER', 'VN123', 'SUCCESS', '2023-09-30 12:00:00'),
+(2, 2, 10000000.00, 'MOMO', 'MM123', 'SUCCESS', '2024-02-15 12:00:00'),
+(3, 3, 15000000.00, 'VNPAY', 'VN456', 'SUCCESS', '2024-02-15 12:00:00');
 
 -- 22. BẢNG STUDENT_SEMESTER_SUMMARY (12 dòng)
 INSERT INTO student_semester_summaries (id, student_id, semester_id, gpa, credits_earned, conduct_score, conduct_grade) VALUES
-(1, 1, 1, 7.00, 10, 90, 'Xuất sắc'),
-(2, 2, 1, 8.20, 15, 85, 'Tốt'),
-(3, 3, 1, 6.80, 15, 75, 'Khá'),
-(4, 4, 1, 8.80, 18, 95, 'Xuất sắc'),
-(5, 5, 1, 5.50, 12, 65, 'Trung bình'),
-(6, 6, 1, 7.10, 16, 80, 'Tốt'),
-(7, 7, 1, 8.90, 20, 98, 'Xuất sắc'),
-(8, 8, 1, 6.90, 15, 78, 'Khá'),
-(9, 9, 1, 7.00, 15, 82, 'Tốt'),
-(10, 10, 1, 7.60, 18, 88, 'Tốt'),
-(11, 11, 1, 5.20, 10, 60, 'Trung bình'),
-(12, 12, 1, 7.51, 15, 92, 'Xuất sắc');
+(1, 1, 1, 6.06, 5, 80, 'Khá'),
+(2, 1, 2, 8.59, 16, 95, 'Xuất sắc'),
+(3, 2, 2, 8.20, 15, 85, 'Tốt');
 
 -- 23. BẢNG SALARY_GRADE (12 dòng)
 INSERT INTO Salary_grade (id, school_id, degree, coefficient, rate_per_session, effective_from, is_active) VALUES
