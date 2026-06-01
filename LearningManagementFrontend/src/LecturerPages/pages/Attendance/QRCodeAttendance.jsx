@@ -9,6 +9,8 @@ const QRCodeAttendance = () => {
   const [qrToken, setQrToken] = useState('');
   const [loading, setLoading] = useState(false);
   const [duration, setDuration] = useState(15);
+  const [classesToday, setClassesToday] = useState([]);
+  const [selectedClassId, setSelectedClassId] = useState('');
   const [toast, setToast] = useState({ show: false, msg: '', type: '' });
 
   const showToast = (msg, type = 'success') => {
@@ -26,6 +28,34 @@ const QRCodeAttendance = () => {
     return () => clearInterval(timer);
   }, [isGenerated, timeLeft]);
 
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const token = localStorage.getItem('lecturerToken');
+        const res = await axios.get('http://localhost:8080/api/lecturer/schedules/active-classes', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        // Map JS getDay() (0=Sun, 1=Mon) to System dayOfWeek (2=Mon..8=Sun)
+        const currentJsDay = new Date().getDay();
+        const systemDayOfWeek = currentJsDay === 0 ? 8 : currentJsDay + 1;
+
+        // Filter classes that have a schedule matching today
+        const todayClasses = res.data.filter(cls => 
+          cls.schedules && cls.schedules.some(sch => sch.dayOfWeek === systemDayOfWeek)
+        );
+
+        setClassesToday(todayClasses);
+        if (todayClasses.length > 0) {
+          setSelectedClassId(todayClasses[0].classId);
+        }
+      } catch (err) {
+        console.error('Lỗi khi tải danh sách lớp:', err);
+      }
+    };
+    fetchClasses();
+  }, []);
+
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
@@ -33,6 +63,11 @@ const QRCodeAttendance = () => {
   };
 
   const handleGenerateQR = async () => {
+    if (!selectedClassId) {
+      showToast('Vui lòng chọn lớp học phần', 'error');
+      return;
+    }
+
     setLoading(true);
     setIsGenerated(false);
     setIsExpired(false);
@@ -40,7 +75,7 @@ const QRCodeAttendance = () => {
     try {
       const token = localStorage.getItem('lecturerToken');
       const payload = {
-        classId: 1, // Tạm fix cứng mã lớp vì chưa có api danh sách lớp
+        classId: parseInt(selectedClassId),
         validDurationMinutes: parseInt(duration)
       };
 
@@ -86,9 +121,21 @@ const QRCodeAttendance = () => {
           <h3 className="font-bold text-gray-700 mb-5 uppercase text-[11px] tracking-widest border-b pb-2">Cấu hình mã QR</h3>
           <div className="space-y-5">
             <div>
-              <label className="block text-xs font-bold text-gray-500 mb-2 ml-1">Lớp học phần</label>
-              <select className="input-field text-sm bg-gray-50">
-                <option>010110195604 - 14DHTH04 (Giả lập)</option>
+              <label className="block text-xs font-bold text-gray-500 mb-2 ml-1">Lớp học phần (Lịch hôm nay)</label>
+              <select 
+                className="input-field text-sm bg-gray-50"
+                value={selectedClassId}
+                onChange={e => setSelectedClassId(e.target.value)}
+              >
+                {classesToday.length === 0 ? (
+                  <option value="">-- Không có lịch dạy hôm nay --</option>
+                ) : (
+                  classesToday.map(cls => (
+                    <option key={cls.classId} value={cls.classId}>
+                      {cls.classCode} - {cls.courseName}
+                    </option>
+                  ))
+                )}
               </select>
             </div>
             <div>

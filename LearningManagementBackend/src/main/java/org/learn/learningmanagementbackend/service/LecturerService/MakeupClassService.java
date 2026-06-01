@@ -67,7 +67,7 @@ public class MakeupClassService {
         try {
             Integer schoolId = savedException.getSchedule().getClasses().getCourse().getDepartment().getSchool().getId();
             List<Users> admins = entityManager.createQuery(
-                "SELECT us.user FROM UserSchool us JOIN us.user.roles r WHERE us.school.id = :schoolId AND r.name = 'ROLE_SCHOOL_ADMIN'", Users.class)
+                "SELECT u FROM Users u JOIN u.roles r WHERE u.school.id = :schoolId AND r.name = 'ROLE_SCHOOL_ADMIN'", Users.class)
                 .setParameter("schoolId", schoolId)
                 .getResultList();
 

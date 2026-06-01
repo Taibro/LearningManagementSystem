@@ -13,4 +13,5 @@ public class DashboardStatsResponse {
     private long totalClasses;
     private long todayAbsences;
     private BigDecimal totalTuitionDebt;
+    private String schoolName;
 }

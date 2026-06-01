@@ -16,8 +16,8 @@ export default function Grades() {
 
   const fetchGrades = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/grades', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      const res = await fetch('http://localhost:8080/api/school-admin/grades', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
         const data = await res.json();

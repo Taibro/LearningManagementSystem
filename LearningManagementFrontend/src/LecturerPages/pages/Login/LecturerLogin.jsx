@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchableSelect from '../../../components/SearchableSelect';
 import { BookOpen, Lock, User, GraduationCap, AlertCircle, ArrowRight, Loader2, School } from 'lucide-react';
 
-const LecturerLogin = () => {
+const LecturerLogin = ({ initialSchool }) => {
   const [loginCode, setLoginCode] = useState('');
   const [password, setPassword] = useState('');
-  const [school, setSchool] = useState('');
+  const [school, setSchool] = useState(initialSchool || '');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [schoolOptions, setSchoolOptions] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch('http://localhost:8080/api/schools/active')
+      .then(res => res.json())
+      .then(data => setSchoolOptions(data))
+      .catch(err => console.error("Failed to fetch schools", err));
+  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,7 +37,8 @@ const LecturerLogin = () => {
         body: JSON.stringify({ 
           loginCode, 
           password, 
-          userType: 'LECTURER' 
+          userType: 'LECTURER',
+          school 
         })
       });
 
@@ -39,15 +48,9 @@ const LecturerLogin = () => {
         if (data.token) localStorage.setItem('lecturerToken', data.token);
         localStorage.setItem('lecturerName', data.fullName || 'Giảng viên');
 
-        const schoolOptions = [
-          { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
-          { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
-          { value: 'FPT', label: 'CĐ FPT Polytechnic' },
-          { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
-          { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
-        ];
         const selectedSchool = schoolOptions.find(s => s.value === school);
         if (selectedSchool) localStorage.setItem('schoolName', selectedSchool.label);
+        localStorage.setItem('schoolShortName', school);
 
         
         // Chuyển hướng vào E-Office
@@ -118,13 +121,7 @@ const LecturerLogin = () => {
                 Trường / Trung tâm
               </label>
               <SearchableSelect 
-                options={[
-                  { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
-                  { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
-                  { value: 'FPT', label: 'CĐ FPT Polytechnic' },
-                  { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
-                  { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
-                ]}
+                options={schoolOptions}
                 value={school}
                 onChange={setSchool}
                 icon={<School className="w-5 h-5" />}

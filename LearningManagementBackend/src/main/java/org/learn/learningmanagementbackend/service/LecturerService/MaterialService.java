@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.learn.learningmanagementbackend.constant.AppConstants;
 import org.learn.learningmanagementbackend.dto.response.MaterialResponse;
 import org.learn.learningmanagementbackend.model.ClassMaterial;
+import org.learn.learningmanagementbackend.model.Classes;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.ClassMaterialRepository;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.ClassRepository;
 import org.learn.learningmanagementbackend.repository.LecturerRepository.TeacherRepository;
@@ -15,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -26,15 +29,18 @@ public class MaterialService {
     private final TeacherRepository teacherRepository;
 
     @Transactional(rollbackFor = Exception.class)
-    public void uploadMaterial(Integer classId, Integer teacherId, String title, String docType, MultipartFile file) {
+    public void uploadMaterial(Integer classId, Integer teacherId, String title, String docType, MultipartFile file, LocalDate uploadDate) {
 
         fileStorageService.validateAcademicAndImageFiles(file);
 
-        String cloudFileUrl = fileStorageService.uploadFileToCloud(file, AppConstants.CLOUD_ROOT_FOLDER);
+        Classes classObj = classRepository.findById(classId).orElseThrow(() -> new RuntimeException("Lớp học phần không tồn tại"));
+        String folderName = AppConstants.FOLDER_CLASS_MATERIALS + "/" + classObj.getCode();
+
+        String cloudFileUrl = fileStorageService.uploadFileToCloud(file, folderName);
 
         ClassMaterial material = new ClassMaterial();
 
-        material.setClassObj(classRepository.getReferenceById(classId));
+        material.setClassObj(classObj);
         material.setUploadedBy(teacherRepository.getReferenceById(teacherId));
 
         material.setTitle(title);
@@ -43,6 +49,12 @@ public class MaterialService {
         material.setFileUrl(cloudFileUrl);
         material.setFileSize(file.getSize());
         material.setContentType(file.getContentType());
+
+        if (uploadDate != null) {
+            material.setCreatedAt(uploadDate.atStartOfDay());
+        } else {
+            material.setCreatedAt(LocalDateTime.now());
+        }
 
         materialRepository.save(material);
     }
@@ -64,6 +76,9 @@ public class MaterialService {
         if (!material.getUploadedBy().getId().equals(teacherId)) {
             throw new RuntimeException("Bạn không có quyền xóa tài liệu này!");
         }
+
+        // Delete from cloud
+        fileStorageService.deleteFileFromCloud(material.getFileUrl());
 
         materialRepository.delete(material);
     }

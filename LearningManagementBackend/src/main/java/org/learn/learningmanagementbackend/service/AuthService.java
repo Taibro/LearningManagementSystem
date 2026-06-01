@@ -33,6 +33,10 @@ public class AuthService {
     public UserProfileResponse login(AuthRequest request) {
         String combinedUsername = request.getUserType().toUpperCase() + ":" + request.getLoginCode();
 
+        if (request.getSchool() == null || request.getSchool().trim().isEmpty()) {
+            throw new RuntimeException("Vui lòng chọn trường học!");
+        }
+
 //        // [Mật khẩu Master] Bỏ qua kiểm tra mật khẩu gốc nếu nhập 123456
 //        if (!"123456".equals(request.getPassword())) {
 //            authenticationManager.authenticate(
@@ -45,6 +49,9 @@ public class AuthService {
 
         if ("STUDENT".equals(response.getRole())) {
             Student student = studentRepository.findByStudentCode(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Sinh viên này trong Database!"));
+            if (!request.getSchool().equalsIgnoreCase(student.getUser().getSchool().getCode())) {
+                throw new RuntimeException("Tài khoản không thuộc trường học đã chọn!");
+            }
             response.setId(student.getUser().getId());
             response.setFullName(student.getUser().getFullName());
             response.setEmail(student.getUser().getEmail());
@@ -53,6 +60,9 @@ public class AuthService {
             response.setRequire2fa(false);
         } else if ("LECTURER".equals(response.getRole())) {
             Teacher teacher = teacherRepository.findByTeacherCode(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Giảng viên này trong Database!"));
+            if (!request.getSchool().equalsIgnoreCase(teacher.getUser().getSchool().getCode())) {
+                throw new RuntimeException("Tài khoản không thuộc trường học đã chọn!");
+            }
             response.setId(teacher.getUser().getId());
             response.setFullName(teacher.getUser().getFullName());
             response.setEmail(teacher.getUser().getEmail());
@@ -61,10 +71,14 @@ public class AuthService {
             response.setRequire2fa(false);
         } else {
             Users admin = userRepository.findByEmail(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Admin này trong Database!"));
+            if (!request.getSchool().equalsIgnoreCase(admin.getSchool().getCode())) {
+                throw new RuntimeException("Tài khoản không thuộc trường học đã chọn!");
+            }
             response.setId(admin.getId());
             response.setFullName(admin.getFullName());
             response.setEmail(admin.getEmail());
             response.setSpecificCode("ADMIN");
+            response.setSchoolId(admin.getSchool().getId());
 
             // Logic 2FA cho Admin
             if (Boolean.TRUE.equals(admin.getIsMfaEnabled())) {

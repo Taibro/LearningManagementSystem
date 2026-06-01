@@ -47,4 +47,22 @@ public class ScheduleExceptionController {
         exceptionService.deleteException(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/pending")
+    public ResponseEntity<List<ScheduleExceptionResponse>> getPendingSuspensions() {
+        return ResponseEntity.ok(exceptionService.getPendingSuspensions());
+    }
+
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<ScheduleExceptionResponse> approveException(@PathVariable Integer id) {
+        return ResponseEntity.ok(exceptionService.approveException(id));
+    }
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<ScheduleExceptionResponse> rejectException(
+            @PathVariable Integer id,
+            @RequestBody java.util.Map<String, String> body) {
+        String adminNote = body.getOrDefault("adminNote", "");
+        return ResponseEntity.ok(exceptionService.rejectException(id, adminNote));
+    }
 }

@@ -27,7 +27,7 @@ export default function BranchesRooms() {
 
   const fetchBranches = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/branches/school/${SCHOOL_ID}`);
+      const res = await fetch(`http://localhost:8080/api/school-admin/branches/school/${SCHOOL_ID}`);
       if (res.ok) {
         const data = await res.json();
         setBranches(data);
@@ -42,7 +42,7 @@ export default function BranchesRooms() {
     let allRooms = [];
     for (let branch of branchesList) {
       try {
-        const res = await fetch(`http://localhost:8080/api/auth/school-admin/rooms/branch/${branch.id}`);
+        const res = await fetch(`http://localhost:8080/api/school-admin/rooms/branch/${branch.id}`);
         if (res.ok) {
           const data = await res.json();
           allRooms = [...allRooms, ...data];
@@ -58,9 +58,9 @@ export default function BranchesRooms() {
   const handleSaveBranch = async () => {
     const payload = { ...currentBranch, schoolId: SCHOOL_ID };
     const method = currentBranch.id ? 'PUT' : 'POST';
-    const url = currentBranch.id 
-      ? `http://localhost:8080/api/auth/school-admin/branches/${currentBranch.id}`
-      : 'http://localhost:8080/api/auth/school-admin/branches';
+    const url = currentBranch.id
+      ? `http://localhost:8080/api/school-admin/branches/${currentBranch.id}`
+      : 'http://localhost:8080/api/school-admin/branches';
 
     try {
       const res = await fetch(url, {
@@ -81,9 +81,9 @@ export default function BranchesRooms() {
   };
 
   const handleDeleteBranch = async (id) => {
-    if(!window.confirm("Bạn có chắc muốn xóa cơ sở này?")) return;
+    if (!window.confirm("Bạn có chắc muốn xóa cơ sở này?")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/branches/${id}`, { method: 'DELETE' });
+      const res = await fetch(`http://localhost:8080/api/school-admin/branches/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Đã xóa cơ sở!');
         fetchBranches();
@@ -100,7 +100,7 @@ export default function BranchesRooms() {
 
   // --- ROOM LOGIC ---
   const handleSaveRoom = async () => {
-    const equipmentArray = currentRoom.equipments 
+    const equipmentArray = currentRoom.equipments
       ? currentRoom.equipments.split(',').map(e => e.trim()).filter(e => e !== '')
       : [];
 
@@ -108,11 +108,11 @@ export default function BranchesRooms() {
       ...currentRoom,
       equipment: equipmentArray
     };
-    
+
     const method = currentRoom.id ? 'PUT' : 'POST';
-    const url = currentRoom.id 
-      ? `http://localhost:8080/api/auth/school-admin/rooms/${currentRoom.id}`
-      : 'http://localhost:8080/api/auth/school-admin/rooms';
+    const url = currentRoom.id
+      ? `http://localhost:8080/api/school-admin/rooms/${currentRoom.id}`
+      : 'http://localhost:8080/api/school-admin/rooms';
 
     try {
       const res = await fetch(url, {
@@ -133,9 +133,9 @@ export default function BranchesRooms() {
   };
 
   const handleDeleteRoom = async (id) => {
-    if(!window.confirm("Bạn có chắc muốn xóa phòng học này?")) return;
+    if (!window.confirm("Bạn có chắc muốn xóa phòng học này?")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/auth/school-admin/rooms/${id}`, { method: 'DELETE' });
+      const res = await fetch(`http://localhost:8080/api/school-admin/rooms/${id}`, { method: 'DELETE' });
       if (res.ok) {
         showToast('Đã xóa phòng học!');
         fetchBranches();
@@ -146,10 +146,10 @@ export default function BranchesRooms() {
   };
 
   const openRoomModal = (room = null) => {
-    setCurrentRoom(room ? { 
-        ...room, 
-        equipments: room.equipment ? room.equipment.join(', ') : '' 
-      } : { id: null, schoolBranchId: branches[0]?.id || '', roomNumber: '', building: '', roomType: 'CLASSROOM', capacity: 40, equipments: '', isActive: true });
+    setCurrentRoom(room ? {
+      ...room,
+      equipments: room.equipment ? room.equipment.join(', ') : ''
+    } : { id: null, schoolBranchId: branches[0]?.id || '', roomNumber: '', building: '', roomType: 'CLASSROOM', capacity: 40, equipments: '', isActive: true });
     setRoomModalOpen(true);
   };
 
@@ -162,7 +162,7 @@ export default function BranchesRooms() {
 
   return (
     <div className="page" style={{ position: 'relative' }}>
-      
+
       {/* TOAST NOTIFICATION */}
       {toast && (
         <div style={{
@@ -189,12 +189,12 @@ export default function BranchesRooms() {
       {/* DANH SÁCH CƠ SỞ (THẺ) */}
       <div className="grid4 mb4">
         {branches.map((branch, index) => (
-          <div className="stat" style={{cursor:'pointer'}} key={branch.id} onClick={() => openBranchModal(branch)}>
-            <div className="stat-top" style={{background: gradients[index % gradients.length]}}></div>
+          <div className="stat" style={{ cursor: 'pointer' }} key={branch.id} onClick={() => openBranchModal(branch)}>
+            <div className="stat-top" style={{ background: gradients[index % gradients.length] }}></div>
             <div className="stat-icon"><Building className="w-4 h-4 inline-block mr-2" /></div>
             <div className="stat-label">{branch.name}</div>
-            <div style={{fontSize:'11px', color:'var(--muted)', marginTop:'6px'}}>{branch.address}, {branch.district}, {branch.city}</div>
-            <div style={{marginTop:'8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '6px' }}>{branch.address}, {branch.district}, {branch.city}</div>
+            <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               {branch.isMain ? <span className="badge b-green">Cơ sở chính</span> : <span className="badge b-gray">Cơ sở phụ</span>}
               <button className="btn btn-danger btn-xs" onClick={(e) => { e.stopPropagation(); handleDeleteBranch(branch.id); }}>Xóa</button>
             </div>
@@ -223,30 +223,30 @@ export default function BranchesRooms() {
           <tbody>
             {rooms.map(room => (
               <tr key={room.id}>
-                <td style={{fontWeight:700}}>{room.roomNumber}</td>
+                <td style={{ fontWeight: 700 }}>{room.roomNumber}</td>
                 <td>{room.building}</td>
                 <td>{room.schoolBranchName}</td>
                 <td><span className="badge b-blue">{room.roomType}</span></td>
                 <td><strong>{room.capacity}</strong></td>
                 <td>
                   {room.equipment && room.equipment.map((eq, i) => (
-                    <span key={i} className="badge b-gray" style={{marginRight: '4px'}}>{eq}</span>
+                    <span key={i} className="badge b-gray" style={{ marginRight: '4px' }}>{eq}</span>
                   ))}
                 </td>
                 <td>
-                  {room.isActive 
-                    ? <span className="badge b-green"><span className="dot-on"></span> Active</span> 
+                  {room.isActive
+                    ? <span className="badge b-green"><span className="dot-on"></span> Active</span>
                     : <span className="badge b-gray"><span className="dot-off"></span> Inactive</span>}
                 </td>
                 <td>
-                  <div style={{display:'flex', gap:'4px'}}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
                     <button className="btn btn-ghost btn-xs" onClick={() => openRoomModal(room)}>Sửa</button>
                     <button className="btn btn-danger btn-xs" onClick={() => handleDeleteRoom(room.id)}>Xóa</button>
                   </div>
                 </td>
               </tr>
             ))}
-            {rooms.length === 0 && <tr><td colSpan="8" style={{textAlign:'center'}}>Chưa có phòng học nào</td></tr>}
+            {rooms.length === 0 && <tr><td colSpan="8" style={{ textAlign: 'center' }}>Chưa có phòng học nào</td></tr>}
           </tbody>
         </table>
       </div>
@@ -263,44 +263,44 @@ export default function BranchesRooms() {
               <div className="grid2">
                 <div className="fg">
                   <label className="fl">Mã cơ sở</label>
-                  <input className="fc" value={currentBranch.code} onChange={e => setCurrentBranch({...currentBranch, code: e.target.value})} placeholder="VD: CS1" />
+                  <input className="fc" value={currentBranch.code} onChange={e => setCurrentBranch({ ...currentBranch, code: e.target.value })} placeholder="VD: CS1" />
                 </div>
                 <div className="fg">
                   <label className="fl">Tên cơ sở</label>
-                  <input className="fc" value={currentBranch.name} onChange={e => setCurrentBranch({...currentBranch, name: e.target.value})} placeholder="VD: Lý Thường Kiệt" />
+                  <input className="fc" value={currentBranch.name} onChange={e => setCurrentBranch({ ...currentBranch, name: e.target.value })} placeholder="VD: Lý Thường Kiệt" />
                 </div>
               </div>
               <div className="fg">
                 <label className="fl">Địa chỉ</label>
-                <input className="fc" value={currentBranch.address} onChange={e => setCurrentBranch({...currentBranch, address: e.target.value})} />
+                <input className="fc" value={currentBranch.address} onChange={e => setCurrentBranch({ ...currentBranch, address: e.target.value })} />
               </div>
               <div className="grid2">
                 <div className="fg">
                   <label className="fl">Quận/Huyện</label>
-                  <input className="fc" value={currentBranch.district} onChange={e => setCurrentBranch({...currentBranch, district: e.target.value})} />
+                  <input className="fc" value={currentBranch.district} onChange={e => setCurrentBranch({ ...currentBranch, district: e.target.value })} />
                 </div>
                 <div className="fg">
                   <label className="fl">Tỉnh/Thành phố</label>
-                  <input className="fc" value={currentBranch.city} onChange={e => setCurrentBranch({...currentBranch, city: e.target.value})} />
+                  <input className="fc" value={currentBranch.city} onChange={e => setCurrentBranch({ ...currentBranch, city: e.target.value })} />
                 </div>
               </div>
               <div className="grid2">
                 <div className="fg">
                   <label className="fl">Điện thoại</label>
-                  <input className="fc" value={currentBranch.phone} onChange={e => setCurrentBranch({...currentBranch, phone: e.target.value})} />
+                  <input className="fc" value={currentBranch.phone} onChange={e => setCurrentBranch({ ...currentBranch, phone: e.target.value })} />
                 </div>
                 <div className="fg">
                   <label className="fl">Email</label>
-                  <input className="fc" value={currentBranch.email} onChange={e => setCurrentBranch({...currentBranch, email: e.target.value})} />
+                  <input className="fc" value={currentBranch.email} onChange={e => setCurrentBranch({ ...currentBranch, email: e.target.value })} />
                 </div>
               </div>
               <div className="grid2">
                 <div className="fg" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <input type="checkbox" checked={currentBranch.isMain} onChange={e => setCurrentBranch({...currentBranch, isMain: e.target.checked})} />
+                  <input type="checkbox" checked={currentBranch.isMain} onChange={e => setCurrentBranch({ ...currentBranch, isMain: e.target.checked })} />
                   <label>Là cơ sở chính</label>
                 </div>
                 <div className="fg" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <input type="checkbox" checked={currentBranch.isActive} onChange={e => setCurrentBranch({...currentBranch, isActive: e.target.checked})} />
+                  <input type="checkbox" checked={currentBranch.isActive} onChange={e => setCurrentBranch({ ...currentBranch, isActive: e.target.checked })} />
                   <label>Đang hoạt động</label>
                 </div>
               </div>
@@ -325,7 +325,7 @@ export default function BranchesRooms() {
               <div className="grid2">
                 <div className="fg">
                   <label className="fl">Cơ sở</label>
-                  <select className="fc" value={currentRoom.schoolBranchId} onChange={e => setCurrentRoom({...currentRoom, schoolBranchId: e.target.value})}>
+                  <select className="fc" value={currentRoom.schoolBranchId} onChange={e => setCurrentRoom({ ...currentRoom, schoolBranchId: e.target.value })}>
                     <option value="">-- Chọn cơ sở --</option>
                     {branches.map(br => (
                       <option key={br.id} value={br.id}>{br.name}</option>
@@ -334,22 +334,22 @@ export default function BranchesRooms() {
                 </div>
                 <div className="fg">
                   <label className="fl">Tòa nhà</label>
-                  <input className="fc" value={currentRoom.building} onChange={e => setCurrentRoom({...currentRoom, building: e.target.value})} placeholder="A, B, C..." />
+                  <input className="fc" value={currentRoom.building} onChange={e => setCurrentRoom({ ...currentRoom, building: e.target.value })} placeholder="A, B, C..." />
                 </div>
               </div>
               <div className="grid2">
                 <div className="fg">
                   <label className="fl">Số phòng</label>
-                  <input className="fc" value={currentRoom.roomNumber} onChange={e => setCurrentRoom({...currentRoom, roomNumber: e.target.value})} placeholder="101, 301..." />
+                  <input className="fc" value={currentRoom.roomNumber} onChange={e => setCurrentRoom({ ...currentRoom, roomNumber: e.target.value })} placeholder="101, 301..." />
                 </div>
                 <div className="fg">
                   <label className="fl">Sức chứa (người)</label>
-                  <input type="number" className="fc" value={currentRoom.capacity} onChange={e => setCurrentRoom({...currentRoom, capacity: parseInt(e.target.value) || 0})} placeholder="40" />
+                  <input type="number" className="fc" value={currentRoom.capacity} onChange={e => setCurrentRoom({ ...currentRoom, capacity: parseInt(e.target.value) || 0 })} placeholder="40" />
                 </div>
               </div>
               <div className="fg">
                 <label className="fl">Loại phòng</label>
-                <select className="fc" value={currentRoom.roomType} onChange={e => setCurrentRoom({...currentRoom, roomType: e.target.value})}>
+                <select className="fc" value={currentRoom.roomType} onChange={e => setCurrentRoom({ ...currentRoom, roomType: e.target.value })}>
                   <option value="CLASSROOM">Classroom</option>
                   <option value="LAB">Lab</option>
                   <option value="SEMINAR">Seminar</option>
@@ -359,10 +359,10 @@ export default function BranchesRooms() {
               </div>
               <div className="fg">
                 <label className="fl">Thiết bị (phân cách bằng dấu phẩy)</label>
-                <input className="fc" value={currentRoom.equipments} onChange={e => setCurrentRoom({...currentRoom, equipments: e.target.value})} placeholder="projector, ac, whiteboard..." />
+                <input className="fc" value={currentRoom.equipments} onChange={e => setCurrentRoom({ ...currentRoom, equipments: e.target.value })} placeholder="projector, ac, whiteboard..." />
               </div>
               <div className="fg" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <input type="checkbox" checked={currentRoom.isActive} onChange={e => setCurrentRoom({...currentRoom, isActive: e.target.checked})} />
+                <input type="checkbox" checked={currentRoom.isActive} onChange={e => setCurrentRoom({ ...currentRoom, isActive: e.target.checked })} />
                 <label>Đang hoạt động</label>
               </div>
             </div>

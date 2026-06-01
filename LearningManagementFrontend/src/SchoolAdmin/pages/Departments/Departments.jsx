@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, CheckCircle2, XCircle, AlertTriangle, Save } from 'lucide-react';
 
-const API_BASE = 'http://localhost:8080/api/auth/school-admin';
+const API_BASE = 'http://localhost:8080/api/school-admin';
 
 export default function Departments() {
   const [departments, setDepartments] = useState([]);
@@ -10,7 +10,7 @@ export default function Departments() {
   const [showModal, setShowModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentDept, setCurrentDept] = useState({ id: null, code: '', name: '', description: '' });
-  
+
   // Toast State
   const [toast, setToast] = useState({ show: false, msg: '', type: 'success' });
   const showToast = (msg, type = 'success') => {
@@ -204,7 +204,7 @@ export default function Departments() {
           </div>
         </div>
       )}
-    {/* Toast */}
+      {/* Toast */}
       {toast.show && (
         <div style={{
           position: 'fixed', top: 24, right: 24, zIndex: 10000,

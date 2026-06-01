@@ -4,9 +4,9 @@ import { Bell } from 'lucide-react';
 import { FaHome } from "react-icons/fa";
 
 export default function Topbar() {
-  const rawSchoolName = localStorage.getItem('schoolName') || 'Ho Chi Minh City University of Industry and Trade';
+  const rawSchoolName = localStorage.getItem('schoolName') || 'Đại học Công Thương TP.HCM';
   const schoolName = rawSchoolName.replace(/\n/g, ' ');
-  const schoolShort = schoolName.split(' ').map(w => w[0]).join('').substring(0, 4).toUpperCase() || 'HUIT';
+  const schoolShort = localStorage.getItem('schoolShortName') || 'HUIT';
 
   return (
     <div className="topbar">

@@ -5,9 +5,9 @@ import { BarChart, Users, CalendarDays, FileText, Settings, User, DollarSign, Fo
 
 const Sidebar = () => {
   const [isAttendanceOpen, setIsAttendanceOpen] = useState(true);
-  const rawSchoolName = localStorage.getItem('schoolName') || 'Ho Chi Minh City University of Industry and Trade';
+  const rawSchoolName = localStorage.getItem('schoolName') || 'Đại học Công Thương TP.HCM';
   const schoolName = rawSchoolName.replace(/\n/g, ' ');
-  const schoolShort = schoolName.split(' ').map(w => w[0]).join('').substring(0, 4).toUpperCase() || 'HUIT';
+  const schoolShort = localStorage.getItem('schoolShortName') || 'HUIT';
 
   const navClass = ({ isActive }) =>
     `px-4 py-2.5 text-white text-[13px] flex items-center gap-3 transition-all no-underline font-medium mx-2 my-0 rounded-lg outline-none ${

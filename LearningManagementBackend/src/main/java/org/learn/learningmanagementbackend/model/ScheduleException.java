@@ -43,6 +43,9 @@ public class ScheduleException extends BaseEntity {
     @Column(name = "approval_status")
     private ApprovalStatus approvalStatus;
 
+    @Column(name = "admin_note", length = 500)
+    private String adminNote;
+
     @Column(name = "proof_file_url")
     private String ProofFileUrl;
 

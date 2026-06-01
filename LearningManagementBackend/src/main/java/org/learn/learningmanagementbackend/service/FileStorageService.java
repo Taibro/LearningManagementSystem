@@ -35,6 +35,33 @@ public class FileStorageService {
         }
     }
 
+    public void deleteFileFromCloud(String fileUrl) {
+        try {
+            if (fileUrl != null && fileUrl.contains("/")) {
+                int uploadIndex = fileUrl.indexOf("upload/");
+                if (uploadIndex != -1) {
+                    String afterUpload = fileUrl.substring(uploadIndex + 7);
+                    int versionEndIndex = afterUpload.indexOf('/');
+                    if (versionEndIndex != -1) {
+                        String fullPath = afterUpload.substring(versionEndIndex + 1);
+                        int lastDotIndex = fullPath.lastIndexOf('.');
+                        String publicId = (lastDotIndex != -1) ? fullPath.substring(0, lastDotIndex) : fullPath;
+                        
+                        Map result = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                        if (!"ok".equals(result.get("result"))) {
+                            result = cloudinary.uploader().destroy(publicId, ObjectUtils.asMap("resource_type", "raw"));
+                            if (!"ok".equals(result.get("result"))) {
+                                cloudinary.uploader().destroy(publicId, ObjectUtils.asMap("resource_type", "video"));
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("Không thể xóa file từ Cloudinary: ", e);
+        }
+    }
+
     public Map getCloudinaryUsage() {
         try {
             return cloudinary.api().usage(ObjectUtils.emptyMap());

@@ -37,7 +37,8 @@ public class MaterialController {
                 request.getTeacherId(),
                 request.getTitle(),
                 request.getDocType(),
-                request.getFile()
+                request.getFile(),
+                request.getUploadDate()
         );
 
         return ResponseEntity.ok("Tài liệu đã được tải lên và đồng bộ đám mây thành công!");

@@ -16,11 +16,34 @@ const Documents = () => {
 
   // Filters
   const [filterType, setFilterType] = useState('');
+  const [classes, setClasses] = useState([]);
+  const [selectedClassId, setSelectedClassId] = useState('');
+  const [uploadClassId, setUploadClassId] = useState('');
+  const getToday = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const [uploadDate, setUploadDate] = useState(getToday());
 
   const [toast, setToast] = useState({ show: false, msg: '', type: 'success' });
 
   const teacherId = 1; // Tạm cứng cho Giảng viên số 1
-  const classId = 1; // Tạm cứng cho Lớp 1
+
+  useEffect(() => {
+    const fetchClasses = async () => {
+      try {
+        const token = localStorage.getItem('lecturerToken');
+        const res = await axios.get('http://localhost:8080/api/lecturer/schedules/active-classes', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setClasses(res.data);
+        if (res.data && res.data.length > 0) {
+          setSelectedClassId(res.data[0].classId);
+          setUploadClassId(res.data[0].classId);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchClasses();
+  }, []);
 
   const showToast = (msg, type = 'success') => {
     setToast({ show: true, msg, type });
@@ -28,10 +51,11 @@ const Documents = () => {
   };
 
   const fetchMaterials = async () => {
+    if (!selectedClassId) return;
     setLoading(true);
     try {
       const token = localStorage.getItem('lecturerToken');
-      let url = `http://localhost:8080/api/lecturer/materials?teacherId=${teacherId}`;
+      let url = `http://localhost:8080/api/lecturer/materials?teacherId=${teacherId}&classId=${selectedClassId}`;
       if (filterType && filterType !== 'Tất cả') {
         url += `&docType=${encodeURIComponent(filterType)}`;
       }
@@ -47,8 +71,10 @@ const Documents = () => {
   };
 
   useEffect(() => {
-    fetchMaterials();
-  }, [filterType]);
+    if (selectedClassId) {
+      fetchMaterials();
+    }
+  }, [filterType, selectedClassId]);
 
   const handleUpload = async () => {
     if (!file || !title) {
@@ -62,8 +88,11 @@ const Documents = () => {
     formData.append('file', file);
     formData.append('title', title);
     formData.append('docType', docType);
-    formData.append('classId', classId);
+    formData.append('classId', uploadClassId);
     formData.append('teacherId', teacherId);
+    if (uploadDate) {
+      formData.append('uploadDate', uploadDate);
+    }
 
     try {
       const res = await axios.post('http://localhost:8080/api/lecturer/materials/upload', formData, {
@@ -107,7 +136,7 @@ const Documents = () => {
     return { icon: <ClipboardList className="w-4 h-4 inline-block mr-2" />, color: 'text-green-500', bg: 'bg-green-100' };
   };
 
-  // Format bytes to human readable size
+  // Format bytes to human readable size for file selection
   const formatSize = (bytes) => {
     if (!bytes || bytes === 0) return '0 B';
     const k = 1024;
@@ -147,8 +176,10 @@ const Documents = () => {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-600 mb-1.5">Lớp học phần</label>
-              <select className="input-field font-medium">
-                <option>014DHTH04 (Giả lập)</option>
+              <select className="input-field font-medium" value={selectedClassId} onChange={e => setSelectedClassId(e.target.value)}>
+                {classes.map(cls => (
+                  <option key={cls.classId} value={cls.classId}>{cls.classCode} - {cls.courseName}</option>
+                ))}
               </select>
             </div>
             <div>
@@ -182,9 +213,9 @@ const Documents = () => {
                       <h4 className="font-bold text-gray-800 text-sm truncate" title={mat.title}>{mat.title}</h4>
                       <p className="text-xs font-bold text-purple-600 mt-1 uppercase tracking-wider">{mat.docType || 'Tài liệu'}</p>
                       <div className="flex items-center gap-2 mt-2 font-medium">
-                        <span className="text-xs text-gray-500">{formatSize(mat.fileSize)}</span>
+                        <span className="text-xs text-gray-500">{mat.fileSize || '0 KB'}</span>
                         <span className="text-xs text-gray-300">•</span>
-                        <span className="text-xs text-gray-500">{mat.uploadDate ? new Date(mat.uploadDate).toLocaleDateString('vi-VN') : 'Mới'}</span>
+                        <span className="text-xs text-gray-500">{mat.uploadDate || 'Mới'}</span>
                       </div>
                     </div>
                   </div>
@@ -227,6 +258,19 @@ const Documents = () => {
 
             <div className="p-6 space-y-5">
               <div>
+                <label className="block text-[12px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Lớp học phần</label>
+                <select 
+                  value={uploadClassId}
+                  onChange={(e) => setUploadClassId(e.target.value)}
+                  className="w-full border-[1.5px] border-[#E0D8F0] rounded-lg px-4 py-2.5 focus:outline-none focus:border-[#8B6BBF] bg-gray-50/50 text-sm font-medium"
+                >
+                  {classes.map(cls => (
+                    <option key={cls.classId} value={cls.classId}>{cls.classCode} - {cls.courseName}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
                 <label className="block text-[12px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Tên tài liệu</label>
                 <input
                   type="text"
@@ -248,6 +292,16 @@ const Documents = () => {
                   <option value="Bài tập">Bài tập</option>
                   <option value="Đề thi">Đề thi</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-[12px] font-black text-gray-500 uppercase tracking-widest mb-2 ml-1">Ngày áp dụng</label>
+                <input
+                  type="date"
+                  value={uploadDate}
+                  readOnly
+                  className="w-full border-[1.5px] border-[#E0D8F0] rounded-lg px-4 py-2.5 bg-gray-100 text-gray-500 text-sm font-medium cursor-not-allowed focus:outline-none"
+                />
               </div>
 
               <div>

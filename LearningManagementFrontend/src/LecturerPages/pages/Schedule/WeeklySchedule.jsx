@@ -137,7 +137,7 @@ const WeeklySchedule = () => {
 
             {/* Buổi Sáng */}
             <div className="week-cell session-label text-xs font-semibold text-purple-600">SÁNG</div>
-            {[1, 2, 3, 4, 5, 6, 7].map(day => (
+            {[2, 3, 4, 5, 6, 7, 8].map(day => (
               <div key={`sang-${day}`} className="week-cell">
                 {getSchedulesForSlot('SANG', day).map((sch, i) => renderScheduleCard(sch, i))}
               </div>
@@ -145,7 +145,7 @@ const WeeklySchedule = () => {
 
             {/* Buổi Chiều */}
             <div className="week-cell session-label text-xs font-semibold text-purple-600">CHIỀU</div>
-            {[1, 2, 3, 4, 5, 6, 7].map(day => (
+            {[2, 3, 4, 5, 6, 7, 8].map(day => (
               <div key={`chieu-${day}`} className="week-cell">
                 {getSchedulesForSlot('CHIEU', day).map((sch, i) => renderScheduleCard(sch, i))}
               </div>
@@ -153,7 +153,7 @@ const WeeklySchedule = () => {
 
             {/* Buổi Tối */}
             <div className="week-cell session-label text-xs font-semibold text-purple-600">TỐI</div>
-            {[1, 2, 3, 4, 5, 6, 7].map(day => (
+            {[2, 3, 4, 5, 6, 7, 8].map(day => (
               <div key={`toi-${day}`} className="week-cell">
                 {getSchedulesForSlot('TOI', day).map((sch, i) => renderScheduleCard(sch, i))}
               </div>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, School, Search, AlertTriangle, User, Save } from 'lucide-react';
 
-const API_TEACHER = 'http://localhost:8080/api/auth/school-admin/teachers';
-const API_DEPT = 'http://localhost:8080/api/auth/school-admin';
+const API_TEACHER = 'http://localhost:8080/api/school-admin/teachers';
+const API_DEPT = 'http://localhost:8080/api/school-admin';
 
 export default function Teachers() {
   const [teachers, setTeachers] = useState([]);
@@ -10,9 +10,9 @@ export default function Teachers() {
   const [loading, setLoading] = useState(true);
   const [tModal, setTModal] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  
+
   const [currentTeacher, setCurrentTeacher] = useState({
-    id: null, fullName: '', teacherCode: '', email: '', phone: '', citizenIdNumber: '000000000000', 
+    id: null, fullName: '', teacherCode: '', email: '', phone: '', citizenIdNumber: '000000000000',
     departmentId: '', degree: 'Cử nhân', specialization: '', joinedDate: '', bio: ''
   });
 
@@ -27,7 +27,7 @@ export default function Teachers() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('adminToken');
       const headers = { 'Authorization': `Bearer ${token}` };
 
       const [resTeachers, resDepts] = await Promise.all([
@@ -50,7 +50,7 @@ export default function Teachers() {
   const openAddModal = () => {
     setIsEditMode(false);
     setCurrentTeacher({
-      id: null, fullName: '', teacherCode: '', email: '', phone: '', citizenIdNumber: '000000000000', 
+      id: null, fullName: '', teacherCode: '', email: '', phone: '', citizenIdNumber: '000000000000',
       departmentId: departments.length > 0 ? departments[0].id : '', degree: 'Thạc sĩ', specialization: '', joinedDate: '', bio: ''
     });
     setTModal(true);
@@ -59,8 +59,8 @@ export default function Teachers() {
   const openEditModal = (t) => {
     setIsEditMode(true);
     setCurrentTeacher({
-      id: t.id, fullName: t.fullName, teacherCode: t.teacherCode, email: t.email, phone: t.phone, 
-      citizenIdNumber: '000000000000', departmentId: t.departmentId, degree: t.degree, 
+      id: t.id, fullName: t.fullName, teacherCode: t.teacherCode, email: t.email, phone: t.phone,
+      citizenIdNumber: '000000000000', departmentId: t.departmentId, degree: t.degree,
       specialization: t.specialization, joinedDate: t.joinedDate || '', bio: t.bio || ''
     });
     setTModal(true);
@@ -112,19 +112,19 @@ export default function Teachers() {
       </div>
 
       <div className="filter-bar">
-        <input className="fc" style={{maxWidth:'260px'}} placeholder="Tìm theo tên, mã GV..." />
-        <select className="fc" style={{maxWidth:'160px'}}>
+        <input className="fc" style={{ maxWidth: '260px' }} placeholder="Tìm theo tên, mã GV..." />
+        <select className="fc" style={{ maxWidth: '160px' }}>
           <option value="">Tất cả khoa</option>
           {departments.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
         </select>
-        <select className="fc" style={{maxWidth:'140px'}}>
+        <select className="fc" style={{ maxWidth: '140px' }}>
           <option>Tất cả học vị</option>
           <option>Tiến sĩ</option>
           <option>Thạc sĩ</option>
         </select>
       </div>
 
-      <table className="tbl" style={{background:'white'}}>
+      <table className="tbl" style={{ background: 'white' }}>
         <thead>
           <tr>
             <th>Mã GV</th><th>Giảng viên</th><th>Khoa</th><th>Học vị</th><th>Chuyên ngành</th><th>Thao tác</th>
@@ -132,19 +132,19 @@ export default function Teachers() {
         </thead>
         <tbody>
           {loading ? (
-            <tr><td colSpan="6" style={{textAlign:'center', padding:20}}>Đang tải...</td></tr>
+            <tr><td colSpan="6" style={{ textAlign: 'center', padding: 20 }}>Đang tải...</td></tr>
           ) : teachers.length === 0 ? (
-            <tr><td colSpan="6" style={{textAlign:'center', padding:20}}>Chưa có giảng viên nào</td></tr>
+            <tr><td colSpan="6" style={{ textAlign: 'center', padding: 20 }}>Chưa có giảng viên nào</td></tr>
           ) : (
             teachers.map(t => (
               <tr key={t.id}>
-                <td style={{fontWeight:700, color:'var(--blue)'}}>{t.teacherCode}</td>
+                <td style={{ fontWeight: 700, color: 'var(--blue)' }}>{t.teacherCode}</td>
                 <td>
-                  <div style={{display:'flex', alignItems:'center', gap:'9px'}}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
                     <div className={`av av-${t.id % 2 === 0 ? 'blue' : 'pink'} av-lg`}>{getInitials(t.fullName)}</div>
                     <div>
-                      <div style={{fontWeight:700}}>{t.fullName}</div>
-                      <div style={{fontSize:'11px', color:'var(--muted)'}}>{t.email}</div>
+                      <div style={{ fontWeight: 700 }}>{t.fullName}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{t.email}</div>
                     </div>
                   </div>
                 </td>
@@ -154,9 +154,9 @@ export default function Teachers() {
                     {t.degree || 'Chưa rõ'}
                   </span>
                 </td>
-                <td style={{fontSize:'12px', color:'var(--muted)'}}>{t.specialization}</td>
+                <td style={{ fontSize: '12px', color: 'var(--muted)' }}>{t.specialization}</td>
                 <td>
-                  <div style={{display:'flex', gap:'4px'}}>
+                  <div style={{ display: 'flex', gap: '4px' }}>
                     <button className="btn btn-ghost btn-xs" onClick={() => openEditModal(t)}>Sửa</button>
                     <button className="btn btn-teal btn-xs">Phân công</button>
                   </div>
@@ -168,8 +168,8 @@ export default function Teachers() {
       </table>
 
       {tModal && (
-        <div className="ov open" style={{zIndex: 999}}>
-          <div className="modal" style={{width: 600}}>
+        <div className="ov open" style={{ zIndex: 999 }}>
+          <div className="modal" style={{ width: 600 }}>
             <div className="modal-hd">
               <span className="modal-title">{isEditMode ? <><User className="w-4 h-4 inline-block mr-2" />‍<School className="w-4 h-4 inline-block mr-2" /> Sửa Giảng viên</> : <><User className="w-4 h-4 inline-block mr-2" />‍<School className="w-4 h-4 inline-block mr-2" /> Thêm Giảng viên</>}</span>
               <button className="close-btn" type="button" onClick={() => setTModal(false)}>×</button>

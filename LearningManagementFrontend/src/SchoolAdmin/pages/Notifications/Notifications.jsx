@@ -21,8 +21,8 @@ export default function Notifications() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/notifications', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      const res = await fetch('http://localhost:8080/api/school-admin/notifications', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
         const data = await res.json();
@@ -42,11 +42,11 @@ export default function Notifications() {
     };
 
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/notifications', {
+      const res = await fetch('http://localhost:8080/api/school-admin/notifications', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         },
         body: JSON.stringify(payload)
       });
@@ -64,9 +64,9 @@ export default function Notifications() {
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:8080/api/auth/school-admin/notifications/${id}`, { 
+      await fetch(`http://localhost:8080/api/school-admin/notifications/${id}`, { 
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       showToast('Đã xóa thông báo!');
       fetchNotifications();
@@ -77,9 +77,9 @@ export default function Notifications() {
 
   const handleMarkRead = async (id) => {
     try {
-      await fetch(`http://localhost:8080/api/auth/school-admin/notifications/${id}/read`, { 
+      await fetch(`http://localhost:8080/api/school-admin/notifications/${id}/read`, { 
         method: 'PUT',
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       fetchNotifications();
     } catch (err) {}

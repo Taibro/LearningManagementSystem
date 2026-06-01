@@ -21,8 +21,8 @@ export default function Tuition() {
 
   const fetchInvoices = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/tuition-invoices', {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      const res = await fetch('http://localhost:8080/api/school-admin/tuition-invoices', {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
         const data = await res.json();
@@ -36,8 +36,8 @@ export default function Tuition() {
   const handleSaveInvoice = async () => {
     const method = currentInvoice.id ? 'PUT' : 'POST';
     const url = currentInvoice.id 
-      ? `http://localhost:8080/api/auth/school-admin/tuition-invoices/${currentInvoice.id}`
-      : `http://localhost:8080/api/auth/school-admin/tuition-invoices`;
+      ? `http://localhost:8080/api/school-admin/tuition-invoices/${currentInvoice.id}`
+      : `http://localhost:8080/api/school-admin/tuition-invoices`;
 
     const payload = {
       studentId: parseInt(currentInvoice.studentId),
@@ -52,7 +52,7 @@ export default function Tuition() {
         method,
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         },
         body: JSON.stringify(payload)
       });

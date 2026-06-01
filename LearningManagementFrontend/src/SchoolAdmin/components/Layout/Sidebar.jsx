@@ -6,23 +6,23 @@ export default function Sidebar() {
   const navClass = ({ isActive }) => `nav-item ${isActive ? 'active' : ''}`;
   
   // Lấy dữ liệu từ LocalStorage
-  const schoolId = localStorage.getItem('schoolId') || 'hcmut';
   const adminName = localStorage.getItem('adminName') || 'Quản trị viên';
-  const adminEmail = localStorage.getItem('adminEmail') || 'admin@hcmut.edu.vn';
+  const adminEmail = localStorage.getItem('adminEmail') || 'admin@huit.edu.vn';
   
   // Xác định thông tin trường
-  const isHuit = schoolId === 'huit';
-  const schoolName = isHuit ? 'ĐH Công Thương TP.HCM' : 'ĐH Bách Khoa HCM';
-  const schoolBadge = isHuit ? 'HUIT' : 'BK';
+  const schoolShort = localStorage.getItem('schoolShortName') || 'HUIT';
+  const rawSchoolName = localStorage.getItem('schoolName') || 'Đại học Công Thương TP.HCM';
+  const schoolName = rawSchoolName.replace(/\n/g, ' ');
   
   // Nhuộm màu Sidebar thành Xanh HUIT đặc trưng nếu là HUIT
+  const isHuit = schoolShort.toUpperCase() === 'HUIT';
   const sidebarStyle = isHuit ? { backgroundColor: '#0d3a82' } : {};
   const badgeStyle = isHuit ? { backgroundColor: '#ff9800', color: '#fff' } : {};
 
   return (
     <aside className="admin-sidebar" style={sidebarStyle}>
       <div className="logo-zone">
-        <div className="logo-badge" style={badgeStyle}>{schoolBadge}</div>
+        <div className="logo-badge" style={badgeStyle}>{schoolShort}</div>
         <div>
           <div className="admin-logo-text">{schoolName}</div>
           <div className="logo-sub">Quản trị cơ sở đào tạo</div>

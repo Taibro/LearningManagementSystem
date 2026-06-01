@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.format.annotation.DateTimeFormat;
+import java.time.LocalDate;
 
 @Data
 public class MaterialUploadRequest {
@@ -22,4 +24,7 @@ public class MaterialUploadRequest {
 
     @NotNull(message = "Vui lòng đính kèm tệp tin")
     private MultipartFile file;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate uploadDate;
 }

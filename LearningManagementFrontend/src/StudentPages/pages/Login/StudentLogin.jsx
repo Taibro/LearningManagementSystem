@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import SearchableSelect from '../../../components/SearchableSelect';
 import './StudentLogin.css';
 
-export default function StudentLogin() {
+export default function StudentLogin({ initialSchool }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [school, setSchool] = useState('');
+  const [school, setSchool] = useState(initialSchool || '');
   
   const [errorEmail, setErrorEmail] = useState(false);
   const [errorPass, setErrorPass] = useState(false);
@@ -20,6 +20,19 @@ export default function StudentLogin() {
   const [shake, setShake] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [progressWidth, setProgressWidth] = useState('0%');
+  const [schoolOptions, setSchoolOptions] = useState([]);
+
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        const res = await axios.get('http://localhost:8080/api/schools/active');
+        setSchoolOptions(res.data);
+      } catch (error) {
+        console.error("Failed to fetch schools", error);
+      }
+    };
+    fetchSchools();
+  }, []);
 
   const navigate = useNavigate();
 
@@ -44,22 +57,17 @@ export default function StudentLogin() {
       const res = await axios.post('http://localhost:8080/api/auth/login', {
         userType: 'STUDENT',
         loginCode: email.trim(),
-        password: password
+        password: password,
+        school: school
       });
 
       if (res.data && res.data.token) {
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data));
         
-        const schoolOptions = [
-          { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
-          { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
-          { value: 'FPT', label: 'CĐ FPT Polytechnic' },
-          { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
-          { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
-        ];
         const selectedSchool = schoolOptions.find(s => s.value === school);
         if (selectedSchool) localStorage.setItem('schoolName', selectedSchool.label);
+        localStorage.setItem('schoolShortName', school);
         
         setShowSuccess(true);
         setTimeout(() => setProgressWidth('100%'), 50);
@@ -200,13 +208,7 @@ export default function StudentLogin() {
             <div className="sl-fu d3" style={{ position: 'relative', zIndex: 10 }}>
               <label className="lbl">Trường / Trung tâm</label>
               <SearchableSelect 
-                options={[
-                  { value: 'HUIT', label: 'ĐH Bách Khoa TP.HCM' },
-                  { value: 'NEU', label: 'ĐH Kinh tế Quốc dân' },
-                  { value: 'FPT', label: 'CĐ FPT Polytechnic' },
-                  { value: 'IELTS', label: 'TT Ngoại ngữ IELTS Pro' },
-                  { value: 'LHP', label: 'THPT Chuyên Lê Hồng Phong' }
-                ]}
+                options={schoolOptions}
                 value={school}
                 onChange={(val) => { setSchool(val); setErrorSchool(false); }}
                 hasError={errorSchool}

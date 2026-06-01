@@ -8,7 +8,8 @@ export default function Dashboard() {
     totalTeachers: 0,
     totalClasses: 0,
     todayAbsences: 0,
-    totalTuitionDebt: 0
+    totalTuitionDebt: 0,
+    schoolName: ''
   });
 
   useEffect(() => {
@@ -17,8 +18,8 @@ export default function Dashboard() {
 
   const fetchStats = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8080/api/auth/school-admin/dashboard/stats', {
+      const token = localStorage.getItem('adminToken');
+      const res = await fetch('http://localhost:8080/api/school-admin/dashboard/stats', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -38,7 +39,7 @@ export default function Dashboard() {
     <div className="page">
       <div className="ph mb6">
         <div>
-          <div className="ph-title">Tổng quan · {localStorage.getItem('schoolId') === 'huit' ? 'Trường ĐH Công Thương TP.HCM' : 'Trường ĐH Bách Khoa TP.HCM'}</div>
+          <div className="ph-title">Tổng quan · {stats.schoolName || 'Đang tải...'}</div>
           <div className="ph-sub">Cập nhật lúc: {new Date().toLocaleTimeString('vi-VN')} · Thống kê thời gian thực</div>
         </div>
         <button className="btn btn-blue" onClick={() => alert('Đã xuất báo cáo tổng hợp PDF')}><File className="w-4 h-4 inline-block mr-2" /> Xuất báo cáo</button>
