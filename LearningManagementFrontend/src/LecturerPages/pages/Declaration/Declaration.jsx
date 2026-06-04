@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { RefreshCw, CheckCircle2, AlertTriangle, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const Declaration = () => {
   const [profile, setProfile] = useState(null);
@@ -25,7 +27,7 @@ const Declaration = () => {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('lecturerToken');
-      const res = await axios.get('http://localhost:8080/api/lecturer/profile', {
+      const res = await axios.get(`${API_BASE_URL}/lecturer/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProfile(res.data);
@@ -62,7 +64,7 @@ const Declaration = () => {
         notes: formData.notes
       };
 
-      const res = await axios.post('http://localhost:8080/api/lecturer/teacher-declarations', payload, {
+      const res = await axios.post(`${API_BASE_URL}/lecturer/teacher-declarations`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

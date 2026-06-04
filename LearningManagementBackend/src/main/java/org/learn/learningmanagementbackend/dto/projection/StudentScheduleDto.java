@@ -19,4 +19,13 @@ public interface StudentScheduleDto {
     LocalDate getEndDate();
     String getTeacherName();
     Integer getCredits();
+    String getExceptionType();
+    String getSubstituteStatus();
+    String getSubstituteTeacherName();
+    String getMakeupStatus();
+    LocalDate getExceptionDate();
+    LocalDate getReplacementDate();
+    Integer getReplacementStartPeriod();
+    Integer getReplacementEndPeriod();
+    String getReplacementRoomName();
 }

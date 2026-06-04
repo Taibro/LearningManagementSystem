@@ -21,4 +21,6 @@ public class ClassRequest {
     private Integer maxStudents;
     private ClassStatus status;
     private String notes;
+    private java.time.LocalDate startDate;
+    private java.time.LocalDate endDate;
 }

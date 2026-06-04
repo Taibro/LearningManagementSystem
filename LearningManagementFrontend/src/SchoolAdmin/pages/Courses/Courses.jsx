@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, CheckCircle2, XCircle, AlertTriangle, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
 
-const API_COURSE = 'http://localhost:8080/api/school-admin/courses';
-const API_DEPT = 'http://localhost:8080/api/school-admin'; // Để lấy danh sách khoa
+
+const API_COURSE = `${API_BASE_URL}/school-admin/courses`;
+const API_DEPT = `${API_BASE_URL}/school-admin`; // Để lấy danh sách khoa
 
 export default function Courses() {
   const [courses, setCourses] = useState([]);
@@ -23,16 +25,18 @@ export default function Courses() {
     setTimeout(() => setToast({ show: false, msg: '', type: 'success' }), 3000);
   };
 
-  const schoolId = 1; // Fix tạm cứng schoolId cho trang Admin
+  const schoolId = localStorage.getItem('schoolId') || 1;
+  const token = localStorage.getItem('adminToken');
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
       // Gọi cả 2 API cùng lúc cho nhanh
+      const headers = { 'Authorization': `Bearer ${token}` };
       const [resCourses, resDepts] = await Promise.all([
-        fetch(`${API_COURSE}/get-all`),
-        fetch(`${API_DEPT}/get-all-departments?schoolId=${schoolId}`)
+        fetch(`${API_COURSE}/get-all`, { headers }),
+        fetch(`${API_DEPT}/get-all-departments?schoolId=${schoolId}`, { headers })
       ]);
 
       if (!resCourses.ok || !resDepts.ok) throw new Error('Lỗi khi tải dữ liệu từ Server');
@@ -82,8 +86,12 @@ export default function Courses() {
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           code: currentCourse.code,
           name: currentCourse.name,
@@ -110,7 +118,11 @@ export default function Courses() {
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn có chắc muốn xóa môn học này không? Tất cả các Lớp Học Phần thuộc môn này cũng sẽ bị xóa!')) return;
     try {
-      const res = await fetch(`${API_COURSE}/delete-course/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_COURSE}/delete-course/${id}`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (!res.ok) throw new Error('Xóa thất bại');
       showToast('Xóa môn học thành công!', 'success');
       fetchData();

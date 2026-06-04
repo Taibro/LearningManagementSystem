@@ -18,8 +18,13 @@ public class SemesterController {
     private final SemesterService semesterService;
 
     @GetMapping("/academic-year/{academicYearId}")
-    public ResponseEntity<List<SemesterResponse>> getAllSemesters(@PathVariable Integer academicYearId) {
+    public ResponseEntity<List<SemesterResponse>> getAllSemestersByAcademicYear(@PathVariable Integer academicYearId) {
         return ResponseEntity.ok(semesterService.getAllSemestersByAcademicYear(academicYearId));
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<List<SemesterResponse>> getAllSemesters() {
+        return ResponseEntity.ok(semesterService.getAllSemesters());
     }
 
     @GetMapping("/{id}")

@@ -28,13 +28,13 @@ public class UserService {
 
         Integer schoolId;
         try {
-            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+            schoolId = entityManager.createQuery("SELECT u.school.id FROM Users u WHERE u.id = :userId", Integer.class)
                     .setParameter("userId", currentUserId).setMaxResults(1).getSingleResult();
         } catch (Exception e) {
             return java.util.Collections.emptyList();
         }
 
-        List<Users> users = entityManager.createQuery("SELECT us.user FROM UserSchool us WHERE us.school.id = :schoolId", Users.class)
+        List<Users> users = entityManager.createQuery("SELECT u FROM Users u WHERE u.school.id = :schoolId", Users.class)
                 .setParameter("schoolId", schoolId).getResultList();
 
         return users.stream().map(this::mapToResponse).collect(Collectors.toList());

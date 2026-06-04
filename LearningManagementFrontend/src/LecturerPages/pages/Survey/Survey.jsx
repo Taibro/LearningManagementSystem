@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const Survey = () => {
   const [data, setData] = useState(null);
@@ -9,7 +11,7 @@ const Survey = () => {
     const fetchSurvey = async () => {
       try {
         const token = localStorage.getItem('lecturerToken');
-        const res = await axios.get('http://localhost:8080/api/lecturer/evaluations/dashboard', {
+        const res = await axios.get(`${API_BASE_URL}/lecturer/evaluations/dashboard`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setData(res.data);

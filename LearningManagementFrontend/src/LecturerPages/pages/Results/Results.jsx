@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLecturerContext } from '../../context/LecturerContext';
 import { BarChart, CheckCircle2, Search, AlertTriangle, Lock, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const Results = () => {
   const [data, setData] = useState(null);
@@ -22,7 +24,7 @@ const Results = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('lecturerToken');
-      const res = await axios.get(`http://localhost:8080/api/lecturer/grades?classId=${classId}`, {
+      const res = await axios.get(`${API_BASE_URL}/lecturer/grades?classId=${classId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setData(res.data);
@@ -92,7 +94,7 @@ const Results = () => {
         }))
       };
 
-      const res = await axios.post('http://localhost:8080/api/lecturer/grades/save', payload, {
+      const res = await axios.post(`${API_BASE_URL}/lecturer/grades/save`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       showToast(res.data || 'Lưu điểm thành công!');
@@ -112,7 +114,7 @@ const Results = () => {
     setLocking(true);
     try {
       const token = localStorage.getItem('lecturerToken');
-      const res = await axios.post(`http://localhost:8080/api/lecturer/grades/lock/${classId}`, {}, {
+      const res = await axios.post(`${API_BASE_URL}/lecturer/grades/lock/${classId}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
       showToast(res.data || 'Đã khóa sổ bảng điểm!');

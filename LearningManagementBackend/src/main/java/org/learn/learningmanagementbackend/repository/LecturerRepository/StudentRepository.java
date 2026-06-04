@@ -56,7 +56,16 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 sch.start_date  AS startDate,
                 sch.end_date    AS endDate,
                 u.full_name     AS teacherName,
-                co.credits      AS credits
+                co.credits      AS credits,
+                se.exception_type AS exceptionType,
+                se.substitute_status AS substituteStatus,
+                (SELECT su.full_name FROM teachers st JOIN users su ON st.user_id = su.id WHERE st.id = se.substitute_teacher_id) AS substituteTeacherName,
+                se.makeup_status AS makeupStatus,
+                se.exception_date AS exceptionDate,
+                se.replacement_date AS replacementDate,
+                se.replacement_start_period AS replacementStartPeriod,
+                se.replacement_end_period AS replacementEndPeriod,
+                (SELECT CONCAT(rr.building, '-', rr.room_number) FROM rooms rr WHERE rr.id = se.replacement_room_id) AS replacementRoomName
             FROM enrollments e
             JOIN classes c        ON e.class_id = c.id
             JOIN courses co      ON c.course_id = co.id
@@ -65,6 +74,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
             LEFT JOIN teachers t ON t.id = ct.teacher_id
             LEFT JOIN users u   ON u.id = t.user_id
+            LEFT JOIN schedule_exceptions se ON se.schedule_id = sch.id AND se.approval_status = 'APPROVED' AND ((se.exception_date >= :startDate AND se.exception_date <= :endDate) OR (se.replacement_date >= :startDate AND se.replacement_date <= :endDate))
             WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
               AND e.status = 'ENROLLED'
               AND sch.start_date <= :endDate
@@ -318,27 +328,29 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 sch.end_period      AS endPeriod,
                 r.room_number       AS roomNumber,
                 r.building          AS building,
-                CASE WHEN EXISTS (
+                CASE WHEN c.id IS NOT NULL AND EXISTS (
                     SELECT 1 FROM enrollments ex
                     WHERE ex.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                       AND ex.class_id = c.id AND ex.status IN ('ENROLLED','PENDING')
                 ) THEN 1 ELSE 0 END AS alreadyEnrolled
-            FROM classes c
-            JOIN courses co ON co.id = c.course_id
-            JOIN semesters sem ON sem.id = c.semester_id
+            FROM courses co
+            LEFT JOIN classes c ON co.id = c.course_id 
+                               AND c.status = 'OPEN' 
+                               AND (:semesterId = 0 OR c.semester_id = :semesterId)
+            LEFT JOIN semesters sem ON sem.id = c.semester_id
             LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
             LEFT JOIN teachers t ON t.id = ct.teacher_id
             LEFT JOIN users u ON u.id = t.user_id
             LEFT JOIN schedules sch ON sch.class_id = c.id
             LEFT JOIN rooms r ON r.id = sch.room_id
-            WHERE c.status = 'OPEN'
-              AND (:semesterId = 0 OR sem.id = :semesterId)
+            WHERE co.department_id = (SELECT department_id FROM students WHERE student_code = :studentCode)
               AND co.id NOT IN (
                   SELECT c2.course_id FROM enrollments e2
                   JOIN classes c2 ON c2.id = e2.class_id
                   WHERE e2.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                     AND e2.status IN ('ENROLLED','PENDING','COMPLETED')
               )
+              AND (:semesterId = 0 OR c.id IS NOT NULL)
             ORDER BY co.name, c.code
             """, nativeQuery = true)
     List<StudentCourseRegDto> getAvailableClasses(
@@ -367,27 +379,29 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 sch.end_period      AS endPeriod,
                 r.room_number       AS roomNumber,
                 r.building          AS building,
-                CASE WHEN EXISTS (
+                CASE WHEN c.id IS NOT NULL AND EXISTS (
                     SELECT 1 FROM enrollments ex
                     WHERE ex.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                       AND ex.class_id = c.id AND ex.status IN ('ENROLLED','PENDING')
                 ) THEN 1 ELSE 0 END AS alreadyEnrolled
-            FROM classes c
-            JOIN courses co ON co.id = c.course_id
-            JOIN semesters sem ON sem.id = c.semester_id
+            FROM courses co
+            LEFT JOIN classes c ON co.id = c.course_id 
+                               AND c.status = 'OPEN' 
+                               AND (:semesterId = 0 OR c.semester_id = :semesterId)
+            LEFT JOIN semesters sem ON sem.id = c.semester_id
             LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
             LEFT JOIN teachers t ON t.id = ct.teacher_id
             LEFT JOIN users u ON u.id = t.user_id
             LEFT JOIN schedules sch ON sch.class_id = c.id
             LEFT JOIN rooms r ON r.id = sch.room_id
-            WHERE c.status = 'OPEN'
-              AND (:semesterId = 0 OR sem.id = :semesterId)
+            WHERE co.department_id = (SELECT department_id FROM students WHERE student_code = :studentCode)
               AND co.id IN (
                   SELECT c2.course_id FROM enrollments e2
                   JOIN classes c2 ON c2.id = e2.class_id
                   WHERE e2.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                     AND e2.status = 'FAILED'
               )
+              AND (:semesterId = 0 OR c.id IS NOT NULL)
             ORDER BY co.name, c.code
             """, nativeQuery = true)
     List<StudentCourseRegDto> getRetakeClasses(
@@ -416,27 +430,29 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 sch.end_period      AS endPeriod,
                 r.room_number       AS roomNumber,
                 r.building          AS building,
-                CASE WHEN EXISTS (
+                CASE WHEN c.id IS NOT NULL AND EXISTS (
                     SELECT 1 FROM enrollments ex
                     WHERE ex.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                       AND ex.class_id = c.id AND ex.status IN ('ENROLLED','PENDING')
                 ) THEN 1 ELSE 0 END AS alreadyEnrolled
-            FROM classes c
-            JOIN courses co ON co.id = c.course_id
-            JOIN semesters sem ON sem.id = c.semester_id
+            FROM courses co
+            LEFT JOIN classes c ON co.id = c.course_id 
+                               AND c.status = 'OPEN' 
+                               AND (:semesterId = 0 OR c.semester_id = :semesterId)
+            LEFT JOIN semesters sem ON sem.id = c.semester_id
             LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
             LEFT JOIN teachers t ON t.id = ct.teacher_id
             LEFT JOIN users u ON u.id = t.user_id
             LEFT JOIN schedules sch ON sch.class_id = c.id
             LEFT JOIN rooms r ON r.id = sch.room_id
-            WHERE c.status = 'OPEN'
-              AND (:semesterId = 0 OR sem.id = :semesterId)
+            WHERE co.department_id = (SELECT department_id FROM students WHERE student_code = :studentCode)
               AND co.id IN (
                   SELECT c2.course_id FROM enrollments e2
                   JOIN classes c2 ON c2.id = e2.class_id
                   WHERE e2.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
                     AND e2.status = 'COMPLETED'
               )
+              AND (:semesterId = 0 OR c.id IS NOT NULL)
             ORDER BY co.name, c.code
             """, nativeQuery = true)
     List<StudentCourseRegDto> getImproveClasses(

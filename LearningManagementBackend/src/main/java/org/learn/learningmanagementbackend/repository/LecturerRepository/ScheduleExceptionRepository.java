@@ -59,4 +59,16 @@ public interface ScheduleExceptionRepository extends JpaRepository<ScheduleExcep
             "AND se.exceptionType = 'SUBSTITUTED' " +
             "ORDER BY se.createdAt DESC")
     List<ScheduleException> findSubstituteHistoryByTeacherCode(@Param("teacherCode") String teacherCode);
+
+    @Query("SELECT se FROM ScheduleException se " +
+            "JOIN FETCH se.schedule s " +
+            "JOIN FETCH s.classes c " +
+            "WHERE se.substituteTeacher.id = :teacherId " +
+            "AND se.substituteStatus = 'APPROVED' " +
+            "AND MONTH(se.exceptionDate) = :month " +
+            "AND YEAR(se.exceptionDate) = :year")
+    List<ScheduleException> findApprovedSubstitutionsInMonth(
+            @Param("teacherId") Integer teacherId,
+            @Param("month") int month,
+            @Param("year") int year);
 }

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import SearchableSelect from '../../../components/SearchableSelect';
 import './AdminLogin.css';
 import { BarChart, Check, CheckCircle2, XCircle, GraduationCap, School, AlertTriangle, Info, PartyPopper, Rocket, Globe, Mail, Lock, EyeOff, Eye, Circle, Upload, Hand, Shield, Zap } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function AdminLogin({ initialSchool }) {
   const navigate = useNavigate();
@@ -36,7 +38,7 @@ export default function AdminLogin({ initialSchool }) {
   const [schoolOptions, setSchoolOptions] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/schools/active')
+    fetch(`${API_BASE_URL}/schools/active`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` } })
       .then(res => res.json())
       .then(data => setSchoolOptions(data))
       .catch(err => console.error("Failed to fetch schools", err));
@@ -57,9 +59,10 @@ export default function AdminLogin({ initialSchool }) {
 
     setSLoading(true);
     try {
-      const res = await fetch('http://localhost:8080/api/auth/login', {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         body: JSON.stringify({ loginCode: sEmail, password: sPass, userType: 'SCHOOL_ADMIN', school: school })
       });
       setSLoading(false);
@@ -124,9 +127,10 @@ export default function AdminLogin({ initialSchool }) {
 
   const fetchQrCode = async (email) => {
     try {
-      const response = await fetch('http://localhost:8080/api/auth/2fa/setup', {
+      const response = await fetch(`${API_BASE_URL}/auth/2fa/setup`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         body: JSON.stringify({ email })
       });
       if (response.ok) {
@@ -148,17 +152,19 @@ export default function AdminLogin({ initialSchool }) {
 
     try {
       if (schoolView === 'setup') {
-        const response = await fetch('http://localhost:8080/api/auth/2fa/verify-setup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        const response = await fetch(`${API_BASE_URL}/auth/2fa/verify-setup`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
           body: JSON.stringify({ email: sEmail, code })
         });
         if (response.ok) {
           const isValid = await response.json();
           if (isValid) {
             // Setup thành công, gọi luôn login verify
-            const loginResp = await fetch('http://localhost:8080/api/auth/login/verify-2fa', {
-              method: 'POST',
+            const loginResp = await fetch(`${API_BASE_URL}/auth/login/verify-2fa`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${tempToken}`
@@ -168,6 +174,7 @@ export default function AdminLogin({ initialSchool }) {
             if (loginResp.ok) {
               const data = await loginResp.json();
               localStorage.setItem('adminToken', data.token);
+              if (data.schoolId) localStorage.setItem('schoolId', data.schoolId);
               addToast(<><PartyPopper className="w-4 h-4 inline-block mr-2" /> Thiết lập 2FA & Đăng nhập thành công!</>, 'green');
               setTimeout(() => navigate('/dashboard'), 1000);
             } else {
@@ -179,8 +186,9 @@ export default function AdminLogin({ initialSchool }) {
           }
         }
       } else {
-        const res = await fetch('http://localhost:8080/api/auth/login/verify-2fa', {
-          method: 'POST',
+        const res = await fetch(`${API_BASE_URL}/auth/login/verify-2fa`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        method: 'POST',
           headers: { 
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${tempToken}`
@@ -191,6 +199,7 @@ export default function AdminLogin({ initialSchool }) {
         if (res.ok) {
           const data = await res.json();
           localStorage.setItem('adminToken', data.token); // Lưu token thật
+          if (data.schoolId) localStorage.setItem('schoolId', data.schoolId);
           addToast(<><PartyPopper className="w-4 h-4 inline-block mr-2" /> Đăng nhập thành công! Chào mừng Admin!</>, 'green');
           setTimeout(() => navigate('/dashboard'), 1000);
         } else {

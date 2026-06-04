@@ -34,7 +34,7 @@ public class ClassesService {
 
         Integer schoolId;
         try {
-            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+            schoolId = entityManager.createQuery("SELECT u.school.id FROM Users u WHERE u.id = :userId", Integer.class)
                     .setParameter("userId", userId).setMaxResults(1).getSingleResult();
         } catch (Exception e) {
             return java.util.Collections.emptyList();
@@ -64,6 +64,8 @@ public class ClassesService {
         classes.setMaxStudents(request.getMaxStudents() != null ? request.getMaxStudents() : 40);
         classes.setStatus(request.getStatus());
         classes.setNotes(request.getNotes());
+        classes.setStartDate(request.getStartDate());
+        classes.setEndDate(request.getEndDate());
 
         return mapToResponse(classesRepository.save(classes));
     }
@@ -87,6 +89,8 @@ public class ClassesService {
         classes.setMaxStudents(request.getMaxStudents() != null ? request.getMaxStudents() : 40);
         classes.setStatus(request.getStatus());
         classes.setNotes(request.getNotes());
+        classes.setStartDate(request.getStartDate());
+        classes.setEndDate(request.getEndDate());
 
         return mapToResponse(classesRepository.save(classes));
     }
@@ -113,6 +117,8 @@ public class ClassesService {
         response.setMaxStudents(classes.getMaxStudents());
         response.setStatus(classes.getStatus());
         response.setNotes(classes.getNotes());
+        response.setStartDate(classes.getStartDate());
+        response.setEndDate(classes.getEndDate());
         
         // Count enrolled students securely
         int enrolled = 0;

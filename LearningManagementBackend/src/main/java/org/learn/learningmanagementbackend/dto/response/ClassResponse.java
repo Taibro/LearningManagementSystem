@@ -19,5 +19,7 @@ public class ClassResponse {
     private Integer enrolledStudents;
     private ClassStatus status;
     private String notes;
+    private java.time.LocalDate startDate;
+    private java.time.LocalDate endDate;
     private List<String> teachers; // e.g. "main: Nguyễn Văn An"
 }

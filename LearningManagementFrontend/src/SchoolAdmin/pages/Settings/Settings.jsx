@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, Calendar, School, Lock, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function Settings() {
   const [stats, setStats] = useState({
@@ -16,7 +18,7 @@ export default function Settings() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/dashboard/stats', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/dashboard/stats`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {

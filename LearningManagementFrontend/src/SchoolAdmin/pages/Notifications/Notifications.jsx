@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Upload } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
@@ -21,7 +23,7 @@ export default function Notifications() {
 
   const fetchNotifications = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/notifications', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/notifications`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
@@ -42,7 +44,8 @@ export default function Notifications() {
     };
 
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/notifications', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/notifications`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -64,7 +67,8 @@ export default function Notifications() {
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:8080/api/school-admin/notifications/${id}`, { 
+      await fetch(`${API_BASE_URL}/school-admin/notifications/${id}`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
@@ -77,7 +81,8 @@ export default function Notifications() {
 
   const handleMarkRead = async (id) => {
     try {
-      await fetch(`http://localhost:8080/api/school-admin/notifications/${id}/read`, { 
+      await fetch(`${API_BASE_URL}/school-admin/notifications/${id}/read`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });

@@ -24,6 +24,30 @@ public class SemesterService {
         return semesterRepository.findByAcademicYearId(academicYearId).stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
+    public List<SemesterResponse> getAllSemesters() {
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer userId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT u.school.id FROM Users u WHERE u.id = :userId", Integer.class)
+                    .setParameter("userId", userId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<Semester> semesters = entityManager.createQuery("SELECT s FROM Semester s WHERE s.academicYear.school.id = :schoolId", Semester.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        return semesters.stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
     public SemesterResponse getSemesterById(Integer id) {
         Semester semester = semesterRepository.findById(id).orElseThrow(() -> new RuntimeException("Semester not found"));
         return mapToResponse(semester);

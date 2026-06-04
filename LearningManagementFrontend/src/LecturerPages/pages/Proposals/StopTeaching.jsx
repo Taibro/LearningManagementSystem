@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { RefreshCw, CheckCircle2, AlertTriangle, Upload } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const StopTeaching = () => {
   const [history, setHistory] = useState([]);
@@ -26,7 +28,7 @@ const StopTeaching = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('lecturerToken');
-      const res = await axios.get('http://localhost:8080/api/lecturer/teaching-suspensions/history', {
+      const res = await axios.get(`${API_BASE_URL}/lecturer/teaching-suspensions/history`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setHistory(res.data);
@@ -40,7 +42,7 @@ const StopTeaching = () => {
   const fetchActiveClasses = async () => {
     try {
       const token = localStorage.getItem('lecturerToken');
-      const res = await axios.get('http://localhost:8080/api/lecturer/schedules/active-classes', {
+      const res = await axios.get(`${API_BASE_URL}/lecturer/schedules/active-classes`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setActiveClasses(res.data);
@@ -78,7 +80,7 @@ const StopTeaching = () => {
         formData.append('proofFile', file);
       }
 
-      const res = await axios.post('http://localhost:8080/api/lecturer/teaching-suspensions/submit', formData, {
+      const res = await axios.post(`${API_BASE_URL}/lecturer/teaching-suspensions/submit`, formData, {
         headers: { 
           Authorization: `Bearer ${token}`
         }

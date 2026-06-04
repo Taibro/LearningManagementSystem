@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AlertTriangle, Save, CheckCircle2, XCircle, RefreshCw } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const getAdminToken = () => localStorage.getItem('adminToken');
 
@@ -14,11 +16,13 @@ export default function Exceptions() {
   const [eModal, setEModal] = useState(false);
   const [currentEx, setCurrentEx] = useState({
     id: null, scheduleId: '', exceptionDate: '', reason: '', exceptionType: 'CANCELLED',
-    replacementDate: '', replacementRoomId: '', approvalStatus: 'PENDING'
+    replacementDate: '', replacementRoomId: '', approvalStatus: 'APPROVED'
   });
 
-  // Reject modal
   const [rejectModal, setRejectModal] = useState({ open: false, id: null, note: '' });
+
+  // Searchable Dropdown state
+  const [searchSc, setSearchSc] = useState('');
 
   useEffect(() => {
     fetchPendingSuspensions();
@@ -33,7 +37,7 @@ export default function Exceptions() {
 
   const fetchPendingSuspensions = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/schedule-exceptions/pending', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/schedule-exceptions/pending`, {
         headers: { 'Authorization': `Bearer ${getAdminToken()}` }
       });
       if (res.ok) {
@@ -47,7 +51,7 @@ export default function Exceptions() {
 
   const fetchExceptions = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/schedule-exceptions', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/schedule-exceptions`, {
         headers: { 'Authorization': `Bearer ${getAdminToken()}` }
       });
       if (res.ok) {
@@ -61,7 +65,7 @@ export default function Exceptions() {
 
   const fetchSchedules = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/schedules/class/1', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/schedules`, {
         headers: { 'Authorization': `Bearer ${getAdminToken()}` }
       });
       if (res.ok) {
@@ -75,7 +79,8 @@ export default function Exceptions() {
 
   const handleApprove = async (id) => {
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/schedule-exceptions/${id}/approve`, {
+      const res = await fetch(`${API_BASE_URL}/school-admin/schedule-exceptions/${id}/approve`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${getAdminToken()}` }
       });
@@ -101,7 +106,8 @@ export default function Exceptions() {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/schedule-exceptions/${rejectModal.id}/reject`, {
+      const res = await fetch(`${API_BASE_URL}/school-admin/schedule-exceptions/${rejectModal.id}/reject`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -129,11 +135,12 @@ export default function Exceptions() {
 
     const method = currentEx.id ? 'PUT' : 'POST';
     const url = currentEx.id
-      ? `http://localhost:8080/api/school-admin/schedule-exceptions/${currentEx.id}`
-      : 'http://localhost:8080/api/school-admin/schedule-exceptions';
+      ? `${API_BASE_URL}/school-admin/schedule-exceptions/${currentEx.id}`
+      : `${API_BASE_URL}/school-admin/schedule-exceptions`;
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -156,7 +163,8 @@ export default function Exceptions() {
   const handleDeleteEx = async (id) => {
     if (!window.confirm('Bạn có chắc muốn xóa ngoại lệ này?')) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/schedule-exceptions/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/school-admin/schedule-exceptions/${id}`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${getAdminToken()}` }
       });
@@ -171,9 +179,10 @@ export default function Exceptions() {
 
   const openExModal = (ex = null) => {
     setCurrentEx(ex ? { ...ex } : {
-      id: null, scheduleId: schedules[0]?.id || '', exceptionDate: '', reason: '',
-      exceptionType: 'CANCELLED', replacementDate: '', replacementRoomId: '', approvalStatus: 'PENDING'
+      id: null, scheduleId: '', exceptionDate: '', reason: '',
+      exceptionType: 'CANCELLED', replacementDate: '', replacementRoomId: '', approvalStatus: 'APPROVED'
     });
+    setSearchSc(ex && schedules.find(s => s.id === ex.scheduleId) ? `Sch#${ex.scheduleId} – ${schedules.find(s => s.id === ex.scheduleId).classCode}` : '');
     setEModal(true);
   };
 
@@ -378,14 +387,53 @@ export default function Exceptions() {
               <button className="close-btn" onClick={() => setEModal(false)}>×</button>
             </div>
             <div className="modal-body">
-              <div className="fg">
-                <label className="fl">Ca học</label>
-                <select className="fc" value={currentEx.scheduleId} onChange={e => setCurrentEx({ ...currentEx, scheduleId: e.target.value })}>
-                  <option value="">-- Chọn lịch học --</option>
-                  {schedules.map(sc => (
-                    <option key={sc.id} value={sc.id}>Sch#{sc.id} – {sc.classCode} (Thứ {sc.dayOfWeek} · {sc.startTime})</option>
-                  ))}
-                </select>
+              <div className="fg relative">
+                <label className="fl">Ca học (Tìm kiếm)</label>
+                <div style={{ position: 'relative' }}>
+                  <input 
+                    type="text" 
+                    className="fc" 
+                    placeholder="Gõ mã lớp, thứ, ca học để tìm..." 
+                    onChange={e => {
+                      setSearchSc(e.target.value);
+                      const val = e.target.value.toLowerCase();
+                      const options = document.querySelectorAll('.schedule-option');
+                      options.forEach(opt => {
+                        const text = opt.innerText.toLowerCase();
+                        opt.style.display = text.includes(val) ? 'block' : 'none';
+                      });
+                    }}
+                    onFocus={() => document.getElementById('schedule-dropdown').style.display = 'block'}
+                    onBlur={() => setTimeout(() => document.getElementById('schedule-dropdown').style.display = 'none', 200)}
+                    value={searchSc}
+                  />
+                  <div 
+                    id="schedule-dropdown" 
+                    style={{
+                      display: 'none', position: 'absolute', top: '100%', left: 0, right: 0, 
+                      maxHeight: '200px', overflowY: 'auto', background: '#fff', 
+                      border: '1px solid #ccc', borderRadius: '4px', zIndex: 100, 
+                      boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                    }}
+                  >
+                    {schedules.map(sc => (
+                      <div 
+                        key={sc.id} 
+                        className="schedule-option"
+                        style={{ padding: '8px 12px', cursor: 'pointer', borderBottom: '1px solid #eee', fontSize: '13px' }}
+                        onMouseDown={() => {
+                          setCurrentEx({ ...currentEx, scheduleId: sc.id });
+                          setSearchSc(`Sch#${sc.id} – ${sc.classCode} (Thứ ${sc.dayOfWeek} · ${sc.startTime} - ${sc.endTime})`);
+                          document.getElementById('schedule-dropdown').style.display = 'none';
+                        }}
+                        onMouseEnter={e => e.target.style.background = '#f1f5f9'}
+                        onMouseLeave={e => e.target.style.background = 'transparent'}
+                      >
+                        Sch#{sc.id} – {sc.classCode} (Thứ {sc.dayOfWeek} · {sc.startTime} - {sc.endTime})
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
               <div className="fg">
                 <label className="fl">Ngày ngoại lệ</label>

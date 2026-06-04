@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Receipt, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function Payments() {
   const [payments, setPayments] = useState([]);
@@ -21,7 +23,7 @@ export default function Payments() {
 
   const fetchPayments = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/payments', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/payments`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
@@ -36,8 +38,8 @@ export default function Payments() {
   const handleSavePayment = async () => {
     const method = currentPayment.id ? 'PUT' : 'POST';
     const url = currentPayment.id 
-      ? `http://localhost:8080/api/school-admin/payments/${currentPayment.id}`
-      : `http://localhost:8080/api/school-admin/payments`;
+      ? `${API_BASE_URL}/school-admin/payments/${currentPayment.id}`
+      : `${API_BASE_URL}/school-admin/payments`;
 
     const payload = {
       invoiceId: parseInt(currentPayment.invoiceId),
@@ -51,6 +53,7 @@ export default function Payments() {
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
         headers: { 
           'Content-Type': 'application/json',

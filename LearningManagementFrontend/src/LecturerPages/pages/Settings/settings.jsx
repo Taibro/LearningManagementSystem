@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { CheckCircle2, AlertTriangle, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const Settings = () => {
   const [profile, setProfile] = useState({ fullName: '', email: '', departmentName: '', phone: '', avatarUrl: '' });
@@ -24,7 +26,7 @@ const Settings = () => {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('lecturerToken');
-      const res = await axios.get('http://localhost:8080/api/lecturer/settings/profile', {
+      const res = await axios.get(`${API_BASE_URL}/lecturer/settings/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProfile(res.data);
@@ -44,7 +46,7 @@ const Settings = () => {
     setSavingProfile(true);
     try {
       const token = localStorage.getItem('lecturerToken');
-      const res = await axios.put('http://localhost:8080/api/lecturer/settings/profile', { phone: profile.phone }, {
+      const res = await axios.put(`${API_BASE_URL}/lecturer/settings/profile`, { phone: profile.phone }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       showToast(res.data || 'Cập nhật số điện thoại thành công!');
@@ -70,7 +72,7 @@ const Settings = () => {
     try {
       const token = localStorage.getItem('lecturerToken');
       const payload = { currentPassword, newPassword, confirmPassword };
-      const res = await axios.put('http://localhost:8080/api/lecturer/settings/password', payload, {
+      const res = await axios.put(`${API_BASE_URL}/lecturer/settings/password`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       showToast(res.data || 'Đổi mật khẩu thành công!');
@@ -94,7 +96,7 @@ const Settings = () => {
       const formData = new FormData();
       formData.append('file', file);
       
-      const res = await axios.post('http://localhost:8080/api/lecturer/settings/avatar', formData, {
+      const res = await axios.post(`${API_BASE_URL}/lecturer/settings/avatar`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

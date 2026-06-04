@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, CheckCircle2, XCircle, AlertTriangle, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
 
-const API_BASE = 'http://localhost:8080/api/school-admin';
+
+const API_BASE = `${API_BASE_URL}/school-admin`;
 
 export default function Departments() {
   const [departments, setDepartments] = useState([]);
@@ -18,14 +20,17 @@ export default function Departments() {
     setTimeout(() => setToast({ show: false, msg: '', type: 'success' }), 3000);
   };
 
-  // schoolId tạm fix = 1, sau khi có JWT sẽ lấy từ token
-  const schoolId = 1;
+  // Lấy schoolId và token từ localStorage
+  const schoolId = localStorage.getItem('schoolId') || 1;
+  const token = localStorage.getItem('adminToken');
 
   const fetchDepartments = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${API_BASE}/get-all-departments?schoolId=${schoolId}`);
+      const res = await fetch(`${API_BASE}/get-all-departments?schoolId=${schoolId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (!res.ok) throw new Error(`Lỗi server: ${res.status}`);
       const data = await res.json();
       setDepartments(data);
@@ -64,8 +69,12 @@ export default function Departments() {
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({
           code: currentDept.code,
           name: currentDept.name,
@@ -88,7 +97,11 @@ export default function Departments() {
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn có chắc muốn xóa khoa này không?')) return;
     try {
-      const res = await fetch(`${API_BASE}/delete-department/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE}/delete-department/${id}`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (!res.ok) throw new Error('Xóa thất bại');
       showToast('Xóa khoa thành công!', 'success');
       fetchDepartments();

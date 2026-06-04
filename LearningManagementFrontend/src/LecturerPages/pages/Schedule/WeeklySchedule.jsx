@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Input from '../../components/Layout/Input';
 import axios from 'axios';
 import { MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const WeeklySchedule = () => {
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -13,7 +15,7 @@ const WeeklySchedule = () => {
     try {
       const token = localStorage.getItem('lecturerToken');
       // Gọi API của Backend, tự động hiểu GV001 thông qua Token
-      const response = await axios.get(`http://localhost:8080/api/lecturer/schedules/weekly-schedule?date=${selectedDate}`, {
+      const response = await axios.get(`${API_BASE_URL}/lecturer/schedules/weekly-schedule?date=${selectedDate}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSchedules(response.data);

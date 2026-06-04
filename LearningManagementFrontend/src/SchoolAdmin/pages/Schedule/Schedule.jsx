@@ -1,7 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { CalendarDays, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function Schedule() {
+  function getMondayOf(date) {
+    const d = new Date(date);
+    const day = d.getDay(); // 0=CN
+    const diff = (day === 0) ? -6 : 1 - day;
+    d.setDate(d.getDate() + diff);
+    return d;
+  }
+
+  function toLocalIso(d) {
+    return d.toISOString().split('T')[0];
+  }
+
+  const [selectedDate, setSelectedDate] = useState(toLocalIso(new Date()));
+  const days = [2, 3, 4, 5, 6, 7, 1]; // Thứ 2 đến Chủ nhật (Chủ nhật là 1)
+
+  const monday = getMondayOf(selectedDate);
+  const weekDates = days.map((_, i) => {
+    const d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    return d;
+  });
+
+  const goWeek = (delta) => {
+    const d = new Date(selectedDate);
+    d.setDate(d.getDate() + delta * 7);
+    setSelectedDate(toLocalIso(d));
+  };
+
   const [sModal, setSModal] = useState(false);
   const [schedules, setSchedules] = useState([]);
   const [toast, setToast] = useState(null);
@@ -10,6 +40,13 @@ export default function Schedule() {
   const [currentSc, setCurrentSc] = useState({ 
     id: null, classId: 1, roomId: 1, dayOfWeek: 2, type: 'REGULAR', 
     startTime: '07:30', endTime: '09:30', startDate: '', endDate: '' 
+  });
+
+  // Exception Modal state
+  const [eModal, setEModal] = useState(false);
+  const [currentEx, setCurrentEx] = useState({
+    scheduleId: '', exceptionDate: '', reason: '', exceptionType: 'CANCELLED',
+    replacementDate: '', replacementRoomId: '', approvalStatus: 'APPROVED'
   });
 
   useEffect(() => {
@@ -24,7 +61,7 @@ export default function Schedule() {
   const fetchSchedules = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const res = await fetch('http://localhost:8080/api/school-admin/schedules', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/schedules`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -39,8 +76,8 @@ export default function Schedule() {
   const handleSaveSc = async () => {
     const method = currentSc.id ? 'PUT' : 'POST';
     const url = currentSc.id 
-      ? `http://localhost:8080/api/school-admin/schedules/${currentSc.id}`
-      : 'http://localhost:8080/api/school-admin/schedules';
+      ? `${API_BASE_URL}/school-admin/schedules/${currentSc.id}`
+      : `${API_BASE_URL}/school-admin/schedules`;
 
     // Đảm bảo startTime / endTime có format hh:mm:ss nếu Backend đòi (nếu chỉ type="time" thì nó chỉ có hh:mm)
     const payload = { 
@@ -52,7 +89,10 @@ export default function Schedule() {
     try {
       const res = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
         body: JSON.stringify(payload)
       });
       if (res.ok) {
@@ -70,7 +110,10 @@ export default function Schedule() {
   const handleDeleteSc = async (id) => {
     if(!window.confirm("Bạn có chắc muốn xóa lịch học này?")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/schedules/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/school-admin/schedules/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
+      });
       if (res.ok) {
         showToast('Đã xóa!');
         fetchSchedules();
@@ -78,6 +121,42 @@ export default function Schedule() {
     } catch (err) {
       showToast('Lỗi khi xóa!', 'error');
     }
+  };
+
+  const handleSaveEx = async () => {
+    const payload = { ...currentEx };
+    if (!payload.replacementDate) payload.replacementDate = null;
+    if (!payload.replacementRoomId) payload.replacementRoomId = null;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/school-admin/schedule-exceptions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+        },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        showToast('Tạo ngoại lệ thành công! Thông báo đã được gửi.');
+        setEModal(false);
+        // fetchSchedules() if we need to see changes, but exceptions might not change schedule grid unless we fetch exceptions too.
+        // For now, just show toast.
+      } else {
+        showToast('Lỗi khi tạo ngoại lệ!', 'error');
+      }
+    } catch (err) {
+      showToast('Lỗi kết nối mạng!', 'error');
+    }
+  };
+
+  const openExModal = (scheduleId) => {
+    setCurrentEx({
+      scheduleId: scheduleId, exceptionDate: '', reason: '', exceptionType: 'CANCELLED',
+      replacementDate: '', replacementRoomId: '', approvalStatus: 'APPROVED'
+    });
+    setSModal(false); // Close schedule modal
+    setEModal(true);
   };
 
   const openModal = (sc = null) => {
@@ -93,6 +172,15 @@ export default function Schedule() {
     // shift: 'morning', 'afternoon', 'evening'
     const found = schedules.find(sc => {
       if (sc.dayOfWeek !== day) return false;
+      
+      if (sc.startDate && sc.endDate) {
+         const dIndex = day === 1 ? 6 : day - 2;
+         const currentDayDate = toLocalIso(weekDates[dIndex]);
+         if (currentDayDate < sc.startDate || currentDayDate > sc.endDate) {
+           return false;
+         }
+      }
+
       const hour = parseInt(sc.startTime?.split(':')[0] || 0);
       if (shift === 'morning' && hour < 12) return true;
       if (shift === 'afternoon' && hour >= 12 && hour < 17) return true;
@@ -112,13 +200,14 @@ export default function Schedule() {
         <div className={`sc-card ${cardClass}`} onClick={() => openModal(found)} style={{cursor: 'pointer'}} title="Nhấn để sửa">
           <strong>{found.classCode || `Lớp ${found.classId}`} {found.type === 'MAKEUP' && '(Bù)'}</strong><br/>
           {found.startTime?.substring(0,5)}–{found.endTime?.substring(0,5)}<br/>
-          Phòng {found.roomNumber || `ID:${found.roomId}`}
+          Phòng {found.roomNumber || `ID:${found.roomId}`}<br/>
+          GV: {found.teacherName || '—'}
         </div>
       </div>
     );
   };
 
-  const days = [2, 3, 4, 5, 6, 7, 1]; // Thứ 2 đến Chủ nhật (Chủ nhật là 1)
+
 
   return (
     <div className="page" style={{ position: 'relative' }}>
@@ -139,10 +228,13 @@ export default function Schedule() {
           <div className="ph-title">Lịch học theo tuần</div>
           <div className="ph-sub">Quản lý thời khóa biểu trực quan</div>
         </div>
-        <div style={{display:'flex', gap:'8px'}}>
-          <button className="btn btn-ghost btn-sm">‹ Tuần trước</button>
-          <button className="btn btn-blue btn-sm">Hôm nay</button>
-          <button className="btn btn-ghost btn-sm">Tuần sau ›</button>
+        <div style={{display:'flex', gap:'8px', alignItems:'center'}}>
+          <input type="date" className="form-ctrl" style={{width:'130px', padding:'4px', fontSize:'13px', borderRadius:'4px', border:'1px solid #ccc'}}
+            value={selectedDate}
+            onChange={e => setSelectedDate(e.target.value)} />
+          <button className="btn btn-ghost btn-sm" onClick={() => goWeek(-1)}>‹ Tuần trước</button>
+          <button className="btn btn-blue btn-sm" onClick={() => setSelectedDate(toLocalIso(new Date()))}>Hôm nay</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => goWeek(1)}>Tuần sau ›</button>
           <button className="btn btn-blue" onClick={() => openModal()}>+ Tạo lịch</button>
         </div>
       </div>
@@ -151,13 +243,14 @@ export default function Schedule() {
         {/* --- GIỮ NGUYÊN CSS GRID VÀ CẤU TRÚC HTML GỐC --- */}
         <div className="wk-grid">
           <div className="wk-head" style={{fontSize:'10px'}}>Ca học</div>
-          <div className="wk-head"><div>Thứ 2</div><div style={{fontSize:'10px', opacity:'.75'}}>21/04</div></div>
-          <div className="wk-head"><div>Thứ 3</div><div style={{fontSize:'10px', opacity:'.75'}}>22/04</div></div>
-          <div className="wk-head"><div>Thứ 4</div><div style={{fontSize:'10px', opacity:'.75'}}>23/04</div></div>
-          <div className="wk-head"><div>Thứ 5</div><div style={{fontSize:'10px', opacity:'.75'}}>24/04</div></div>
-          <div className="wk-head"><div>Thứ 6</div><div style={{fontSize:'10px', opacity:'.75'}}>25/04</div></div>
-          <div className="wk-head"><div>Thứ 7</div><div style={{fontSize:'10px', opacity:'.75'}}>26/04</div></div>
-          <div className="wk-head"><div>CN</div><div style={{fontSize:'10px', opacity:'.75'}}>27/04</div></div>
+          {days.map((dow, i) => (
+            <div key={dow} className="wk-head">
+              <div>{dow === 1 ? 'CN' : `Thứ ${dow}`}</div>
+              <div style={{fontSize:'10px', opacity:'.75'}}>
+                {weekDates[i].toLocaleDateString('vi-VN')}
+              </div>
+            </div>
+          ))}
 
           {/* HÀNG SÁNG */}
           <div className="wk-cell ca">SÁNG</div>
@@ -245,10 +338,58 @@ export default function Schedule() {
             </div>
             <div className="modal-ft">
               {currentSc.id && (
-                <button className="btn btn-danger" style={{marginRight: 'auto'}} onClick={() => handleDeleteSc(currentSc.id)}>Xóa</button>
+                <>
+                  <button className="btn btn-danger" style={{marginRight: 'auto'}} onClick={() => handleDeleteSc(currentSc.id)}>Xóa</button>
+                  <button className="btn btn-outline" style={{borderColor: '#ef4444', color: '#ef4444'}} onClick={() => openExModal(currentSc.id)}>Thêm ngoại lệ</button>
+                </>
               )}
               <button className="btn btn-ghost" onClick={() => setSModal(false)}>Hủy</button>
               <button className="btn btn-blue" onClick={handleSaveSc}><Save className="w-4 h-4 inline-block mr-2" /> Lưu</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Thêm Ngoại lệ Nhanh */}
+      {eModal && (
+        <div className="ov open">
+          <div className="modal" style={{ width: '500px' }}>
+            <div className="modal-hd">
+              <span className="modal-title">Thêm Ngoại lệ cho Lịch học #{currentEx.scheduleId}</span>
+              <button className="close-btn" onClick={() => setEModal(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="fg">
+                <label className="fl">Ngày ngoại lệ</label>
+                <input type="date" className="fc" value={currentEx.exceptionDate} onChange={e => setCurrentEx({ ...currentEx, exceptionDate: e.target.value })} />
+              </div>
+              <div className="fg">
+                <label className="fl">Lý do</label>
+                <input className="fc" value={currentEx.reason} onChange={e => setCurrentEx({ ...currentEx, reason: e.target.value })} placeholder="Nghỉ Quốc khánh, GV ốm, Sự kiện..." />
+              </div>
+              <div className="fg">
+                <label className="fl">Loại ngoại lệ</label>
+                <select className="fc" value={currentEx.exceptionType} onChange={e => setCurrentEx({ ...currentEx, exceptionType: e.target.value })}>
+                  <option value="CANCELLED">cancelled – Hủy buổi học</option>
+                  <option value="RESCHEDULED">rescheduled – Dời sang ngày khác</option>
+                  <option value="ROOM_CHANGE">room_change – Đổi phòng học</option>
+                  <option value="SUBSTITUTED">substituted – Giáo viên dạy thay</option>
+                </select>
+              </div>
+              <div className="grid2">
+                <div className="fg">
+                  <label className="fl">Ngày dạy bù (nếu có)</label>
+                  <input type="date" className="fc" value={currentEx.replacementDate || ''} onChange={e => setCurrentEx({ ...currentEx, replacementDate: e.target.value })} />
+                </div>
+                <div className="fg">
+                  <label className="fl">Phòng ID thay thế</label>
+                  <input type="number" className="fc" value={currentEx.replacementRoomId || ''} onChange={e => setCurrentEx({ ...currentEx, replacementRoomId: e.target.value })} placeholder="Nhập ID phòng..." />
+                </div>
+              </div>
+            </div>
+            <div className="modal-ft">
+              <button className="btn btn-ghost" onClick={() => setEModal(false)}>Hủy</button>
+              <button className="btn btn-blue" onClick={handleSaveEx}><Save className="w-4 h-4 inline-block mr-2" /> Tạo Ngoại lệ</button>
             </div>
           </div>
         </div>

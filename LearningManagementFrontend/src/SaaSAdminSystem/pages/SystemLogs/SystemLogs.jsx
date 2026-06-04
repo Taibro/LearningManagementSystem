@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Check, CheckCircle2, XCircle } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
 
-const API_BASE = 'http://localhost:8080/api/saas-admin';
+
+const API_BASE = `${API_BASE_URL}/saas-admin`;
 
 const getAuthHeaders = () => ({
   'Content-Type': 'application/json',

@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import { useLecturerContext } from '../../context/LecturerContext';
+import NotificationDropdown from '../../../components/NotificationDropdown';
 
 const MainLayout = () => {
   const { classes, activeClass, setActiveClass } = useLecturerContext();
@@ -48,6 +49,10 @@ const MainLayout = () => {
                   </div>
                   <div className="text-xs text-gray-400">Giảng viên</div>
                 </div>
+                
+                {/* NOTIFICATIONS */}
+                <NotificationDropdown tokenKey="lecturerToken" />
+                
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-sm">
                   {localStorage.getItem('lecturerName') ? localStorage.getItem('lecturerName').charAt(0).toUpperCase() : 'GV'}
                 </div>

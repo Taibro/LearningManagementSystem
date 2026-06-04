@@ -33,16 +33,16 @@ public class AuthService {
     public UserProfileResponse login(AuthRequest request) {
         String combinedUsername = request.getUserType().toUpperCase() + ":" + request.getLoginCode();
 
-        if (request.getSchool() == null || request.getSchool().trim().isEmpty()) {
-            throw new RuntimeException("Vui lòng chọn trường học!");
-        }
+        // Kích hoạt Spring Security kiểm tra mật khẩu
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(combinedUsername, request.getPassword())
+        );
 
-//        // [Mật khẩu Master] Bỏ qua kiểm tra mật khẩu gốc nếu nhập 123456
-//        if (!"123456".equals(request.getPassword())) {
-//            authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(combinedUsername, request.getPassword())
-//            );
-//        }
+        if (!"SAAS_ADMIN".equals(request.getUserType().toUpperCase())) {
+            if (request.getSchool() == null || request.getSchool().trim().isEmpty()) {
+                throw new RuntimeException("Vui lòng chọn trường học!");
+            }
+        }
 
         UserProfileResponse response = new UserProfileResponse();
         response.setRole(request.getUserType().toUpperCase());
@@ -71,14 +71,18 @@ public class AuthService {
             response.setRequire2fa(false);
         } else {
             Users admin = userRepository.findByEmail(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Admin này trong Database!"));
-            if (!request.getSchool().equalsIgnoreCase(admin.getSchool().getCode())) {
-                throw new RuntimeException("Tài khoản không thuộc trường học đã chọn!");
+            if (!"SAAS_ADMIN".equals(response.getRole())) {
+                if (admin.getSchool() == null || !request.getSchool().equalsIgnoreCase(admin.getSchool().getCode())) {
+                    throw new RuntimeException("Tài khoản không thuộc trường học đã chọn!");
+                }
             }
             response.setId(admin.getId());
             response.setFullName(admin.getFullName());
             response.setEmail(admin.getEmail());
             response.setSpecificCode("ADMIN");
-            response.setSchoolId(admin.getSchool().getId());
+            if (admin.getSchool() != null) {
+                response.setSchoolId(admin.getSchool().getId());
+            }
 
             // Logic 2FA cho Admin
             if (Boolean.TRUE.equals(admin.getIsMfaEnabled())) {
@@ -133,11 +137,20 @@ public class AuthService {
         response.setId(admin.getId());
         response.setFullName(admin.getFullName());
         response.setEmail(admin.getEmail());
-        response.setRole("SAAS_ADMIN");
+
+        String userType = combinedUsername.split(":")[0];
+        response.setRole(userType);
+
         response.setSpecificCode("ADMIN");
+        if ("SCHOOL_ADMIN".equals(userType)) {
+            response.setSchoolId(admin.getSchool() != null ? admin.getSchool().getId() : null);
+        }
+
         response.setRequire2fa(false);
         response.setToken(jwtService.generateToken(combinedUsername));
 
         return response;
     }
+
+    
 }

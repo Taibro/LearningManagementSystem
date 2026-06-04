@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Building, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function BranchesRooms() {
   const [branches, setBranches] = useState([]);
@@ -14,7 +16,8 @@ export default function BranchesRooms() {
   const [currentBranch, setCurrentBranch] = useState({ id: null, code: '', name: '', address: '', city: '', district: '', phone: '', email: '', isMain: false, isActive: true });
   const [currentRoom, setCurrentRoom] = useState({ id: null, schoolBranchId: '', roomNumber: '', building: '', roomType: 'CLASSROOM', capacity: 40, equipments: '', isActive: true });
 
-  const SCHOOL_ID = 1; // Giả định ID trường học hiện tại
+  const SCHOOL_ID = localStorage.getItem('schoolId') || 1;
+  const token = localStorage.getItem('adminToken');
 
   useEffect(() => {
     fetchBranches();
@@ -27,7 +30,9 @@ export default function BranchesRooms() {
 
   const fetchBranches = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/branches/school/${SCHOOL_ID}`);
+      const res = await fetch(`${API_BASE_URL}/school-admin/branches/school/${SCHOOL_ID}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setBranches(data);
@@ -42,7 +47,9 @@ export default function BranchesRooms() {
     let allRooms = [];
     for (let branch of branchesList) {
       try {
-        const res = await fetch(`http://localhost:8080/api/school-admin/rooms/branch/${branch.id}`);
+        const res = await fetch(`${API_BASE_URL}/school-admin/rooms/branch/${branch.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         if (res.ok) {
           const data = await res.json();
           allRooms = [...allRooms, ...data];
@@ -59,13 +66,17 @@ export default function BranchesRooms() {
     const payload = { ...currentBranch, schoolId: SCHOOL_ID };
     const method = currentBranch.id ? 'PUT' : 'POST';
     const url = currentBranch.id
-      ? `http://localhost:8080/api/school-admin/branches/${currentBranch.id}`
-      : 'http://localhost:8080/api/school-admin/branches';
+      ? `${API_BASE_URL}/school-admin/branches/${currentBranch.id}`
+      : `${API_BASE_URL}/school-admin/branches`;
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       });
       if (res.ok) {
@@ -83,7 +94,11 @@ export default function BranchesRooms() {
   const handleDeleteBranch = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa cơ sở này?")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/branches/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/school-admin/branches/${id}`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (res.ok) {
         showToast('Đã xóa cơ sở!');
         fetchBranches();
@@ -111,13 +126,17 @@ export default function BranchesRooms() {
 
     const method = currentRoom.id ? 'PUT' : 'POST';
     const url = currentRoom.id
-      ? `http://localhost:8080/api/school-admin/rooms/${currentRoom.id}`
-      : 'http://localhost:8080/api/school-admin/rooms';
+      ? `${API_BASE_URL}/school-admin/rooms/${currentRoom.id}`
+      : `${API_BASE_URL}/school-admin/rooms`;
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       });
       if (res.ok) {
@@ -135,7 +154,11 @@ export default function BranchesRooms() {
   const handleDeleteRoom = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa phòng học này?")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/rooms/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/school-admin/rooms/${id}`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (res.ok) {
         showToast('Đã xóa phòng học!');
         fetchBranches();
@@ -263,7 +286,7 @@ export default function BranchesRooms() {
               <div className="grid2">
                 <div className="fg">
                   <label className="fl">Mã cơ sở</label>
-                  <input className="fc" value={currentBranch.code} onChange={e => setCurrentBranch({ ...currentBranch, code: e.target.value })} placeholder="VD: CS1" />
+                  <input className="fc" maxLength="20" value={currentBranch.code} onChange={e => setCurrentBranch({ ...currentBranch, code: e.target.value })} placeholder="VD: CS1" />
                 </div>
                 <div className="fg">
                   <label className="fl">Tên cơ sở</label>

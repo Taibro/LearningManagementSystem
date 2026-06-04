@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, FileText, Check, ClipboardList, CheckCircle2, XCircle, Search, X } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function Attendance() {
   const [records, setRecords] = useState([]);
@@ -22,7 +24,7 @@ export default function Attendance() {
 
   const fetchRecords = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/attendance', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/attendance`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
@@ -37,8 +39,8 @@ export default function Attendance() {
   const handleSaveRecord = async () => {
     const method = currentRecord.id ? 'PUT' : 'POST';
     const url = currentRecord.id 
-      ? `http://localhost:8080/api/school-admin/attendance/${currentRecord.id}`
-      : `http://localhost:8080/api/school-admin/attendance`;
+      ? `${API_BASE_URL}/school-admin/attendance/${currentRecord.id}`
+      : `${API_BASE_URL}/school-admin/attendance`;
 
     const payload = {
       scheduleId: parseInt(currentRecord.scheduleId),
@@ -50,6 +52,7 @@ export default function Attendance() {
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
         headers: { 
           'Content-Type': 'application/json',

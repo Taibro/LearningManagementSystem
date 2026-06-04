@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLecturerContext } from '../../context/LecturerContext';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const ProgressSchedule = () => {
   const [schedules, setSchedules] = useState([]);
@@ -11,7 +13,7 @@ const ProgressSchedule = () => {
     const fetchProgress = async () => {
       try {
         const token = localStorage.getItem('lecturerToken');
-        const res = await axios.get('http://localhost:8080/api/lecturer/schedules/progress-schedule', {
+        const res = await axios.get(`${API_BASE_URL}/lecturer/schedules/progress-schedule`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setSchedules(res.data);

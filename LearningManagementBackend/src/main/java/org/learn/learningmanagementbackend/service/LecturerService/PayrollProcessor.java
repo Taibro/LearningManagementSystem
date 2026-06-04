@@ -25,6 +25,7 @@ public class PayrollProcessor {
     private final AttendanceRecordRepository attendanceRecordRepository;
     private final SalaryConfigRepository salaryConfigRepository;
     private final TeacherSalaryDetailRepository salaryDetailRepository;
+    private final ScheduleExceptionRepository scheduleExceptionRepository;
 
     private final ClassRepository classRepository;
     private final ScheduleRepository scheduleRepository;
@@ -48,7 +49,13 @@ public class PayrollProcessor {
                 teacher.getUser().getId(), month, year
         );
 
+        List<ScheduleException> substituteSessions = scheduleExceptionRepository.findApprovedSubstitutionsInMonth(
+                teacher.getId(), month, year
+        );
+
         int totalActualSessions = taughtSessions.stream().mapToInt(TaughtSessionDto::getSessionCount).sum();
+        int totalSubstituteSessions = substituteSessions.stream().mapToInt(se -> se.getSchedule().getEndPeriod() - se.getSchedule().getStartPeriod() + 1).sum();
+        totalActualSessions += totalSubstituteSessions;
 
         TeacherSalarySheet sheet = new TeacherSalarySheet();
         sheet.setTeacher(teacher);
@@ -95,6 +102,25 @@ public class PayrollProcessor {
             salaryDetailRepository.save(detail);
 
         }
+
+        for (ScheduleException se : substituteSessions) {
+            TeacherSalaryDetail detail = new TeacherSalaryDetail();
+            detail.setTeacherSalarySheet(savedSheet);
+            detail.setTeacher(teacher);
+
+            detail.setClasses(se.getSchedule().getClasses());
+            detail.setSchedule(se.getSchedule());
+
+            detail.setSessionDate(se.getExceptionDate());
+            int sessionCount = se.getSchedule().getEndPeriod() - se.getSchedule().getStartPeriod() + 1;
+            detail.setSessionCount(sessionCount);
+            detail.setTeacherRole(TeacherRole.SUBSTITUTE);
+            detail.setRateSnapshot(grade.getRatePerSession());
+            detail.setAmount(grade.getRatePerSession().multiply(BigDecimal.valueOf(sessionCount)));
+
+            salaryDetailRepository.save(detail);
+        }
+
         log.info("Da tao xong phieu luong DRAT cho GV: {}", teacher.getTeacherCode());
     }
 }

@@ -23,6 +23,30 @@ public class RoomService {
         return roomRepository.findBySchoolBranchId(branchId).stream().map(this::mapToResponse).collect(Collectors.toList());
     }
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private jakarta.persistence.EntityManager entityManager;
+
+    public List<RoomResponse> getAllRooms() {
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            return java.util.Collections.emptyList();
+        }
+        Integer userId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId;
+        try {
+            schoolId = entityManager.createQuery("SELECT u.school.id FROM Users u WHERE u.id = :userId", Integer.class)
+                    .setParameter("userId", userId).setMaxResults(1).getSingleResult();
+        } catch (Exception e) {
+            return java.util.Collections.emptyList();
+        }
+
+        List<Room> rooms = entityManager.createQuery("SELECT r FROM Room r WHERE r.schoolBranch.school.id = :schoolId", Room.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        return rooms.stream().map(this::mapToResponse).collect(Collectors.toList());
+    }
+
     public RoomResponse getRoomById(Integer id) {
         Room room = roomRepository.findById(id).orElseThrow(() -> new RuntimeException("Room not found"));
         return mapToResponse(room);

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './SaaSAdminLogin.css';
 import { CheckCircle2, XCircle, GraduationCap, School, Key, AlertTriangle, Info, Mail, Lock, EyeOff, Eye, Shield } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function SaaSAdminLogin() {
   // Không dùng useNavigate nữa, vì ta cần nhảy hẳn sang App khác
@@ -52,7 +54,7 @@ export default function SaaSAdminLogin() {
 
     setSLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -103,7 +105,7 @@ export default function SaaSAdminLogin() {
 
     setSaLoading(true);
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -148,7 +150,7 @@ export default function SaaSAdminLogin() {
 
   const fetchQrCode = async (email) => {
     try {
-      const response = await fetch('http://localhost:8080/api/auth/2fa/setup', {
+      const response = await fetch(`${API_BASE_URL}/auth/2fa/setup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -170,7 +172,7 @@ export default function SaaSAdminLogin() {
 
     try {
       if (saasView === 'setup') {
-        const response = await fetch('http://localhost:8080/api/auth/2fa/verify-setup', {
+        const response = await fetch(`${API_BASE_URL}/auth/2fa/verify-setup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: saEmail, code })
@@ -179,7 +181,7 @@ export default function SaaSAdminLogin() {
           const isValid = await response.json();
           if (isValid) {
             // Setup thành công, gọi luôn login verify
-            const loginResp = await fetch('http://localhost:8080/api/auth/login/verify-2fa', {
+            const loginResp = await fetch(`${API_BASE_URL}/auth/login/verify-2fa`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -204,7 +206,7 @@ export default function SaaSAdminLogin() {
           }
         }
       } else {
-        const response = await fetch('http://localhost:8080/api/auth/login/verify-2fa', {
+        const response = await fetch(`${API_BASE_URL}/auth/login/verify-2fa`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

@@ -44,12 +44,12 @@ export default function CourseRegistration() {
 
   // 2. Fetch Classes and Enrolled whenever semId or type changes
   const loadData = useCallback(() => {
-    if (!semId) return;
+    if (semId === null || semId === undefined) return;
     setLoading(true);
     
     Promise.all([
-      getCourseRegList(semId, type),
-      getEnrolledClasses(semId)
+      getCourseRegList(semId === '0' ? 0 : semId, type),
+      getEnrolledClasses(semId === '0' ? 0 : semId)
     ]).then(([classesRes, enrolledRes]) => {
       setFlatClasses(classesRes || []);
       setEnrolled(enrolledRes || []);
@@ -83,7 +83,9 @@ export default function CourseRegistration() {
           classes: []
         });
       }
-      map.get(c.courseId).classes.push(c);
+      if (c.classId) {
+        map.get(c.courseId).classes.push(c);
+      }
     });
     return Array.from(map.values());
   }, [flatClasses]);
@@ -241,6 +243,7 @@ export default function CourseRegistration() {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <b style={{ color: '#334155' }}>Đợt đăng ký</b>
                     <select className="form-ctrl" value={semId} onChange={e => setSemId(e.target.value)} style={{ padding: '6px 12px', minWidth: 150 }}>
+                      <option value="0">Tất cả đợt (Không có học kỳ)</option>
                       {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
                   </div>
@@ -285,7 +288,7 @@ export default function CourseRegistration() {
                               <td style={{ padding: 10, borderTop: '1px solid #e2e8f0', fontWeight: 500 }}>{crs.courseName}</td>
                               <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>{crs.credits}</td>
                               <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0', color: '#ef4444' }}>✖</td>
-                              <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>{semId}</td>
+                              <td style={{ padding: 10, textAlign: 'center', borderTop: '1px solid #e2e8f0' }}>{semId === '0' ? '-' : semId}</td>
                             </tr>
                           ))}
                           {courses.length === 0 && <tr><td colSpan="6" style={{ padding: 30, textAlign: 'center', color: '#94a3b8' }}>Không tìm thấy dữ liệu</td></tr>}

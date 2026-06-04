@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { CheckCircle2, School, Search, AlertTriangle, User, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
 
-const API_TEACHER = 'http://localhost:8080/api/school-admin/teachers';
-const API_DEPT = 'http://localhost:8080/api/school-admin';
+
+const API_TEACHER = `${API_BASE_URL}/school-admin/teachers`;
+const API_DEPT = `${API_BASE_URL}/school-admin`;
 
 export default function Teachers() {
   const [teachers, setTeachers] = useState([]);
@@ -22,7 +24,7 @@ export default function Teachers() {
     setTimeout(() => setToast({ show: false, msg: '', type: 'success' }), 3000);
   };
 
-  const schoolId = 1;
+  const schoolId = localStorage.getItem('schoolId') || 1;
 
   const fetchData = async () => {
     setLoading(true);
@@ -77,9 +79,14 @@ export default function Teachers() {
     const method = isEditMode ? 'PUT' : 'POST';
 
     try {
+      const token = localStorage.getItem('adminToken');
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify({ ...currentTeacher, departmentId: parseInt(currentTeacher.departmentId) }),
       });
       if (!res.ok) {
