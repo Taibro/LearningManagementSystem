@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DollarSign, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function Tuition() {
   const [invoices, setInvoices] = useState([]);
@@ -21,7 +23,7 @@ export default function Tuition() {
 
   const fetchInvoices = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/tuition-invoices', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/tuition-invoices`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
@@ -36,8 +38,8 @@ export default function Tuition() {
   const handleSaveInvoice = async () => {
     const method = currentInvoice.id ? 'PUT' : 'POST';
     const url = currentInvoice.id 
-      ? `http://localhost:8080/api/school-admin/tuition-invoices/${currentInvoice.id}`
-      : `http://localhost:8080/api/school-admin/tuition-invoices`;
+      ? `${API_BASE_URL}/school-admin/tuition-invoices/${currentInvoice.id}`
+      : `${API_BASE_URL}/school-admin/tuition-invoices`;
 
     const payload = {
       studentId: parseInt(currentInvoice.studentId),
@@ -49,6 +51,7 @@ export default function Tuition() {
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
         headers: { 
           'Content-Type': 'application/json',

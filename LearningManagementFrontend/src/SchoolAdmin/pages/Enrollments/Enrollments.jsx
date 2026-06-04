@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Check, CheckCircle2, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function Enrollments() {
   const [enrollments, setEnrollments] = useState([]);
@@ -26,7 +28,7 @@ export default function Enrollments() {
 
   const fetchEnrollments = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/enrollments', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/enrollments`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
@@ -41,8 +43,8 @@ export default function Enrollments() {
   const handleSaveEnrollment = async () => {
     const method = currentEnrollment.id ? 'PUT' : 'POST';
     const url = currentEnrollment.id 
-      ? `http://localhost:8080/api/school-admin/enrollments/${currentEnrollment.id}`
-      : `http://localhost:8080/api/school-admin/enrollments`;
+      ? `${API_BASE_URL}/school-admin/enrollments/${currentEnrollment.id}`
+      : `${API_BASE_URL}/school-admin/enrollments`;
 
     const payload = {
       studentId: parseInt(currentEnrollment.studentId),
@@ -53,6 +55,7 @@ export default function Enrollments() {
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -90,7 +93,8 @@ export default function Enrollments() {
     };
 
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/enrollments/${currentGrades.id}`, {
+      const res = await fetch(`${API_BASE_URL}/school-admin/enrollments/${currentGrades.id}`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',

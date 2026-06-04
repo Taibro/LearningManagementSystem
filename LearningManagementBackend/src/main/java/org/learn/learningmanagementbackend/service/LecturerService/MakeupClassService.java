@@ -17,6 +17,8 @@ import jakarta.persistence.EntityManager;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -108,6 +110,31 @@ public class MakeupClassService {
                     .makeupDetails(details)
                     .status(ex.getMakeupStatus().name())
                     .build();
+        }).collect(Collectors.toList());
+    }
+
+    public List<Map<String, Object>> getAvailableRooms(java.time.LocalDate date, Integer startPeriod, Integer endPeriod) {
+        int dayOfWeek = date.getDayOfWeek().getValue() + 1; // 1=Mon->2, 7=Sun->8 (or 1 in our DB? Let's assume 2=Mon...8=Sun)
+        if (dayOfWeek == 8) dayOfWeek = 1;
+
+        List<Object[]> rooms = entityManager.createNativeQuery(
+                "SELECT r.id, r.room_number, r.building FROM rooms r " +
+                "WHERE r.id NOT IN (" +
+                "  SELECT sch.room_id FROM schedules sch " +
+                "  WHERE sch.day_of_week = :dayOfWeek " +
+                "    AND sch.room_id IS NOT NULL " +
+                "    AND (sch.start_period <= :endPeriod AND sch.end_period >= :startPeriod) " +
+                ") AND r.is_active = true"
+        ).setParameter("dayOfWeek", dayOfWeek)
+         .setParameter("startPeriod", startPeriod)
+         .setParameter("endPeriod", endPeriod)
+         .getResultList();
+
+        return rooms.stream().map(row -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", row[0]);
+            map.put("name", row[2] + "-" + row[1]);
+            return map;
         }).collect(Collectors.toList());
     }
 }

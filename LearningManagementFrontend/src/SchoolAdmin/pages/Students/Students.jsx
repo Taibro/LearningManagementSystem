@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { GraduationCap, Search, User, Save, Download } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function Students() {
   const [students, setStudents] = useState([]);
@@ -22,7 +24,7 @@ export default function Students() {
 
   const fetchStudents = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/students', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/students`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {
@@ -37,8 +39,8 @@ export default function Students() {
   const handleSaveStudent = async () => {
     const method = currentStudent.id ? 'PUT' : 'POST';
     const url = currentStudent.id 
-      ? `http://localhost:8080/api/school-admin/students/${currentStudent.id}`
-      : `http://localhost:8080/api/school-admin/students`;
+      ? `${API_BASE_URL}/school-admin/students/${currentStudent.id}`
+      : `${API_BASE_URL}/school-admin/students`;
 
     const payload = {
       userId: parseInt(currentStudent.userId) || 0,
@@ -51,6 +53,7 @@ export default function Students() {
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -73,7 +76,8 @@ export default function Students() {
   const handleDeleteStudent = async (id) => {
     if(!window.confirm("Bạn có chắc muốn xóa sinh viên này?")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/students/${id}`, { 
+      const res = await fetch(`${API_BASE_URL}/school-admin/students/${id}`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });

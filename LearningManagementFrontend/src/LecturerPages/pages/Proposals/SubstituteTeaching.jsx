@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { CheckCircle2, AlertTriangle } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const SubstituteTeaching = () => {
   const [teachers, setTeachers] = useState([]);
@@ -28,14 +30,14 @@ const SubstituteTeaching = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       // Fetch eligible substitute teachers
-      const resTeachers = await axios.get('http://localhost:8080/api/lecturer/substitute-teaching/eligible-teachers', { headers });
+      const resTeachers = await axios.get(`${API_BASE_URL}/lecturer/substitute-teaching/eligible-teachers`, { headers });
       setTeachers(resTeachers.data);
       if (resTeachers.data.length > 0 && !substituteTeacherId) {
         setSubstituteTeacherId(resTeachers.data[0].teacherId);
       }
 
       // Fetch history
-      const resHistory = await axios.get('http://localhost:8080/api/lecturer/substitute-teaching/history', { headers });
+      const resHistory = await axios.get(`${API_BASE_URL}/lecturer/substitute-teaching/history`, { headers });
       setHistory(resHistory.data);
     } catch (err) {
       console.error(err);
@@ -65,7 +67,7 @@ const SubstituteTeaching = () => {
         reason: reason
       };
 
-      const res = await axios.post('http://localhost:8080/api/lecturer/substitute-teaching/submit', payload, {
+      const res = await axios.post(`${API_BASE_URL}/lecturer/substitute-teaching/submit`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

@@ -12,6 +12,7 @@ import java.util.Collection;
 public class CustomUserDetails implements UserDetails {
 
     private Integer userId;
+    private Integer schoolId;
     private String fullName;
     private String email;
     private String specificCode;

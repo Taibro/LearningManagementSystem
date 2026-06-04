@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Check, RefreshCw, CheckCircle2, AlertTriangle, Upload, X } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const MakeupTeaching = () => {
   const [history, setHistory] = useState([]);
@@ -13,6 +15,7 @@ const MakeupTeaching = () => {
   const [makeupDate, setMakeupDate] = useState('');
   const [shift, setShift] = useState('morning'); // morning, afternoon, evening
   const [room, setRoom] = useState('');
+  const [availableRooms, setAvailableRooms] = useState([]);
   const [notes, setNotes] = useState('');
 
   const [toast, setToast] = useState({ show: false, msg: '', type: 'success' });
@@ -29,14 +32,14 @@ const MakeupTeaching = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       // Fetch cancelled sessions for dropdown
-      const resSessions = await axios.get('http://localhost:8080/api/lecturer/makeup-classes/cancelled-sessions', { headers });
+      const resSessions = await axios.get(`${API_BASE_URL}/lecturer/makeup-classes/cancelled-sessions`, { headers });
       setCancelledSessions(resSessions.data);
       if (resSessions.data.length > 0 && !exceptionId) {
         setExceptionId(resSessions.data[0].exceptionId);
       }
 
       // Fetch history
-      const resHistory = await axios.get('http://localhost:8080/api/lecturer/makeup-classes/history', { headers });
+      const resHistory = await axios.get(`${API_BASE_URL}/lecturer/makeup-classes/history`, { headers });
       setHistory(resHistory.data);
     } catch (err) {
       console.error(err);
@@ -48,6 +51,30 @@ const MakeupTeaching = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (makeupDate && shift) {
+      let start = 1, end = 3;
+      if (shift === 'afternoon') { start = 7; end = 9; }
+      if (shift === 'evening') { start = 13; end = 15; }
+
+      const fetchRooms = async () => {
+        try {
+          const token = localStorage.getItem('lecturerToken');
+          const res = await axios.get(`${API_BASE_URL}/lecturer/makeup-classes/available-rooms`, {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { date: makeupDate, startPeriod: start, endPeriod: end }
+          });
+          setAvailableRooms(res.data);
+          if (res.data.length > 0) setRoom(res.data[0].name);
+          else setRoom('');
+        } catch (e) {
+          console.error('Error fetching available rooms', e);
+        }
+      };
+      fetchRooms();
+    }
+  }, [makeupDate, shift]);
 
   const handleSubmit = async () => {
     if (!exceptionId || !makeupDate) {
@@ -71,7 +98,7 @@ const MakeupTeaching = () => {
         makeupNotes: notes
       };
 
-      const res = await axios.post('http://localhost:8080/api/lecturer/makeup-classes/submit', payload, {
+      const res = await axios.post(`${API_BASE_URL}/lecturer/makeup-classes/submit`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -162,13 +189,25 @@ const MakeupTeaching = () => {
 
             <div>
               <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Phòng học đề xuất</label>
-              <input 
-                type="text"
-                value={room}
-                onChange={e => setRoom(e.target.value)}
-                className="input-field text-sm" 
-                placeholder="VD: A401, X11..." 
-              />
+              {availableRooms.length > 0 ? (
+                <select 
+                  value={room}
+                  onChange={e => setRoom(e.target.value)}
+                  className="input-field bg-gray-50 text-sm font-bold text-[#6B4FA0]"
+                >
+                  {availableRooms.map(r => (
+                    <option key={r.id} value={r.name}>{r.name}</option>
+                  ))}
+                </select>
+              ) : (
+                <input 
+                  type="text"
+                  value={room}
+                  onChange={e => setRoom(e.target.value)}
+                  className="input-field text-sm bg-gray-100" 
+                  placeholder={makeupDate ? "Không có phòng trống, nhập tay..." : "Vui lòng chọn ngày và ca"} 
+                />
+              )}
             </div>
             <div>
               <label className="block text-xs font-bold text-gray-500 mb-1.5 ml-1">Ghi chú</label>

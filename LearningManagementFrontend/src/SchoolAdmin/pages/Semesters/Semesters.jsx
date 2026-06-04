@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function Semesters() {
   const [academicYears, setAcademicYears] = useState([]);
@@ -14,7 +16,8 @@ export default function Semesters() {
   const [currentAy, setCurrentAy] = useState({ id: null, name: '', startDate: '', endDate: '', isActive: true });
   const [currentSem, setCurrentSem] = useState({ id: null, academicYearId: '', name: '', startDate: '', endDate: '', isActive: true });
 
-  const SCHOOL_ID = 1; // Giả định ID trường học hiện tại
+  const SCHOOL_ID = localStorage.getItem('schoolId') || 1;
+  const token = localStorage.getItem('adminToken');
 
   useEffect(() => {
     fetchAcademicYears();
@@ -27,7 +30,9 @@ export default function Semesters() {
 
   const fetchAcademicYears = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/academic-years/school/${SCHOOL_ID}`);
+      const res = await fetch(`${API_BASE_URL}/school-admin/academic-years/school/${SCHOOL_ID}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (res.ok) {
         const data = await res.json();
         setAcademicYears(data);
@@ -42,7 +47,9 @@ export default function Semesters() {
     let allSems = [];
     for (let year of years) {
       try {
-        const res = await fetch(`http://localhost:8080/api/school-admin/semesters/academic-year/${year.id}`);
+        const res = await fetch(`${API_BASE_URL}/school-admin/semesters/academic-year/${year.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
         if (res.ok) {
           const data = await res.json();
           allSems = [...allSems, ...data];
@@ -59,13 +66,17 @@ export default function Semesters() {
     const payload = { ...currentAy, schoolId: SCHOOL_ID };
     const method = currentAy.id ? 'PUT' : 'POST';
     const url = currentAy.id
-      ? `http://localhost:8080/api/school-admin/academic-years/${currentAy.id}`
-      : 'http://localhost:8080/api/school-admin/academic-years';
+      ? `${API_BASE_URL}/school-admin/academic-years/${currentAy.id}`
+      : `${API_BASE_URL}/school-admin/academic-years`;
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(payload)
       });
       if (res.ok) {
@@ -83,7 +94,11 @@ export default function Semesters() {
   const handleDeleteAy = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa năm học này? Các học kỳ liên quan có thể bị ảnh hưởng.")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/academic-years/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/school-admin/academic-years/${id}`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (res.ok) {
         showToast('Đã xóa năm học!');
         fetchAcademicYears();
@@ -102,13 +117,17 @@ export default function Semesters() {
   const handleSaveSem = async () => {
     const method = currentSem.id ? 'PUT' : 'POST';
     const url = currentSem.id
-      ? `http://localhost:8080/api/school-admin/semesters/${currentSem.id}`
-      : 'http://localhost:8080/api/school-admin/semesters';
+      ? `${API_BASE_URL}/school-admin/semesters/${currentSem.id}`
+      : `${API_BASE_URL}/school-admin/semesters`;
 
     try {
       const res = await fetch(url, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(currentSem)
       });
       if (res.ok) {
@@ -126,7 +145,11 @@ export default function Semesters() {
   const handleDeleteSem = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa học kỳ này?")) return;
     try {
-      const res = await fetch(`http://localhost:8080/api/school-admin/semesters/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API_BASE_URL}/school-admin/semesters/${id}`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
       if (res.ok) {
         showToast('Đã xóa học kỳ!');
         fetchAcademicYears();

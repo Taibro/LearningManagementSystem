@@ -2,12 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Bell } from 'lucide-react';
 import { FaHome } from "react-icons/fa";
+import useNotifications from '../../../hooks/useNotifications';
 
 export default function Topbar() {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-
+  const { unreadCount } = useNotifications('token');
   const rawSchoolName = localStorage.getItem('schoolName') || 'Đại học Công Thương TP.HCM';
   const schoolName = rawSchoolName.replace(/\n/g, ' ');
   const schoolShort = localStorage.getItem('schoolShortName') || 'HUIT';
@@ -62,7 +63,8 @@ export default function Topbar() {
         <Link className="topbar-link" to="/dashboard"><FaHome />
  Trang chủ</Link>
         <Link className="topbar-link" to="/notifications">
-          <Bell className="w-4 h-4 inline-block mr-2" /> Tin tức <span className="notif-badge">812</span>
+          <Bell className="w-4 h-4 inline-block mr-2" /> Tin tức 
+          {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
         </Link>
         
         <div className="user-chip-container" ref={dropdownRef} style={{position: 'relative'}}>

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
@@ -15,7 +17,7 @@ const Profile = () => {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('lecturerToken');
-      const res = await axios.get('http://localhost:8080/api/lecturer/profile', {
+      const res = await axios.get(`${API_BASE_URL}/lecturer/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProfile(res.data);
@@ -38,7 +40,7 @@ const Profile = () => {
     try {
       const token = localStorage.getItem('lecturerToken');
       // Gửi dữ liệu cập nhật
-      await axios.put('http://localhost:8080/api/lecturer/profile', profile, {
+      await axios.put(`${API_BASE_URL}/lecturer/profile`, profile, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessage({ text: 'Cập nhật hồ sơ thành công!', type: 'success' });

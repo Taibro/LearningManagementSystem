@@ -11,7 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/lecturer/makeup-classes")
@@ -39,5 +41,13 @@ public class MakeupClassController {
 
         makeupClassService.submitMakeupRequest(userDetails.getSpecificCode(), request);
         return ResponseEntity.ok("Đề xuất lịch dạy bù đã được gửi thành công và đang chờ xét duyệt!");
+    }
+
+    @GetMapping("/available-rooms")
+    public ResponseEntity<List<Map<String, Object>>> getAvailableRooms(
+            @RequestParam LocalDate date,
+            @RequestParam Integer startPeriod,
+            @RequestParam Integer endPeriod) {
+        return ResponseEntity.ok(makeupClassService.getAvailableRooms(date, startPeriod, endPeriod));
     }
 }

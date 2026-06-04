@@ -18,8 +18,13 @@ public class RoomController {
     private final RoomService roomService;
 
     @GetMapping("/branch/{branchId}")
-    public ResponseEntity<List<RoomResponse>> getAllRooms(@PathVariable Integer branchId) {
+    public ResponseEntity<List<RoomResponse>> getAllRoomsByBranch(@PathVariable Integer branchId) {
         return ResponseEntity.ok(roomService.getAllRoomsByBranch(branchId));
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<List<RoomResponse>> getAllRooms() {
+        return ResponseEntity.ok(roomService.getAllRooms());
     }
 
     @GetMapping("/{id}")

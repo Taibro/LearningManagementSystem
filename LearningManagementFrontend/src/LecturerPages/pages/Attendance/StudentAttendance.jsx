@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLecturerContext } from '../../context/LecturerContext';
 import { BarChart, Calendar, RefreshCw, CheckCircle2, AlertTriangle, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const StudentAttendance = () => {
   const today = new Date().toISOString().split('T')[0];
@@ -26,7 +28,7 @@ const StudentAttendance = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('lecturerToken');
-      const res = await axios.get(`http://localhost:8080/api/lecturer/attendance?classId=${classId}&scheduleId=${scheduleId}&date=${date}`, {
+      const res = await axios.get(`${API_BASE_URL}/lecturer/attendance?classId=${classId}&scheduleId=${scheduleId}&date=${date}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setData(res.data);
@@ -83,7 +85,7 @@ const StudentAttendance = () => {
         }))
       };
 
-      const res = await axios.post('http://localhost:8080/api/lecturer/attendance/save', payload, {
+      const res = await axios.post(`${API_BASE_URL}/lecturer/attendance/save`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       showToast(res.data || 'Đã lưu điểm danh thành công!');

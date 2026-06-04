@@ -2,18 +2,21 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import SearchableSelect from '../../../components/SearchableSelect';
+import { Loader2 } from 'lucide-react';
 import './StudentLogin.css';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function StudentLogin({ initialSchool }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [school, setSchool] = useState(initialSchool || '');
-  
+
   const [errorEmail, setErrorEmail] = useState(false);
   const [errorPass, setErrorPass] = useState(false);
   const [errorSchool, setErrorSchool] = useState(false);
   const [generalError, setGeneralError] = useState('');
-  
+
   const [showPass, setShowPass] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,7 +28,7 @@ export default function StudentLogin({ initialSchool }) {
   useEffect(() => {
     const fetchSchools = async () => {
       try {
-        const res = await axios.get('http://localhost:8080/api/schools/active');
+        const res = await axios.get(`${API_BASE_URL}/schools/active`);
         setSchoolOptions(res.data);
       } catch (error) {
         console.error("Failed to fetch schools", error);
@@ -38,11 +41,11 @@ export default function StudentLogin({ initialSchool }) {
 
   const handleLogin = async () => {
     let hasError = false;
-    
+
     if (!email.trim()) { setErrorEmail(true); hasError = true; } else { setErrorEmail(false); }
     if (!password) { setErrorPass(true); hasError = true; } else { setErrorPass(false); }
     if (!school) { setErrorSchool(true); hasError = true; } else { setErrorSchool(false); }
-    
+
     setGeneralError('');
 
     if (hasError) {
@@ -54,7 +57,7 @@ export default function StudentLogin({ initialSchool }) {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:8080/api/auth/login', {
+      const res = await axios.post(`${API_BASE_URL}/auth/login`, {
         userType: 'STUDENT',
         loginCode: email.trim(),
         password: password,
@@ -64,14 +67,14 @@ export default function StudentLogin({ initialSchool }) {
       if (res.data && res.data.token) {
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data));
-        
+
         const selectedSchool = schoolOptions.find(s => s.value === school);
         if (selectedSchool) localStorage.setItem('schoolName', selectedSchool.label);
         localStorage.setItem('schoolShortName', school);
-        
+
         setShowSuccess(true);
         setTimeout(() => setProgressWidth('100%'), 50);
-        
+
         setTimeout(() => {
           navigate('/dashboard');
         }, 2500);
@@ -207,7 +210,7 @@ export default function StudentLogin({ initialSchool }) {
             {/* Chọn trường */}
             <div className="sl-fu d3" style={{ position: 'relative', zIndex: 10 }}>
               <label className="lbl">Trường / Trung tâm</label>
-              <SearchableSelect 
+              <SearchableSelect
                 options={schoolOptions}
                 value={school}
                 onChange={(val) => { setSchool(val); setErrorSchool(false); }}
@@ -234,8 +237,8 @@ export default function StudentLogin({ initialSchool }) {
             {/* Submit */}
             <button className={`btn-login sl-fu d4 ${loading ? 'loading' : ''} ${shake ? 'shake' : ''}`} onClick={handleLogin} disabled={loading}>
               <span className="btn-txt">Đăng nhập ngay</span>
-              <div className="spinner">
-                <div className="spin"></div>
+              <div className="sl-spinner-container">
+                <Loader2 className="lucide-spin" size={18} />
                 <span style={{ fontSize: '13px' }}>Đang xác thực...</span>
               </div>
             </button>

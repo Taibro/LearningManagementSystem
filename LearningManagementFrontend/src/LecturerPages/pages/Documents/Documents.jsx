@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { X, UploadCloud, FileText, Download, Trash2, Eye, BarChart, ClipboardList, CheckCircle2, Search, AlertTriangle, Save } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const Documents = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -30,7 +32,7 @@ const Documents = () => {
     const fetchClasses = async () => {
       try {
         const token = localStorage.getItem('lecturerToken');
-        const res = await axios.get('http://localhost:8080/api/lecturer/schedules/active-classes', {
+        const res = await axios.get(`${API_BASE_URL}/lecturer/schedules/active-classes`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setClasses(res.data);
@@ -55,7 +57,7 @@ const Documents = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('lecturerToken');
-      let url = `http://localhost:8080/api/lecturer/materials?teacherId=${teacherId}&classId=${selectedClassId}`;
+      let url = `${API_BASE_URL}/lecturer/materials?teacherId=${teacherId}&classId=${selectedClassId}`;
       if (filterType && filterType !== 'Tất cả') {
         url += `&docType=${encodeURIComponent(filterType)}`;
       }
@@ -95,7 +97,7 @@ const Documents = () => {
     }
 
     try {
-      const res = await axios.post('http://localhost:8080/api/lecturer/materials/upload', formData, {
+      const res = await axios.post(`${API_BASE_URL}/lecturer/materials/upload`, formData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -119,7 +121,7 @@ const Documents = () => {
     
     try {
       const token = localStorage.getItem('lecturerToken');
-      await axios.delete(`http://localhost:8080/api/lecturer/materials/${id}?teacherId=${teacherId}`, {
+      await axios.delete(`${API_BASE_URL}/lecturer/materials/${id}?teacherId=${teacherId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       showToast('Đã xóa tài liệu!');
@@ -220,10 +222,10 @@ const Documents = () => {
                     </div>
                   </div>
                   <div className="flex gap-2 mt-5 pt-4 border-t border-gray-50">
-                    <a href={`http://localhost:8080/api/lecturer/materials/${mat.id}/view`} target="_blank" rel="noreferrer" className="flex-1 text-xs px-2 py-2 bg-purple-50 text-purple-700 font-bold rounded-lg hover:bg-purple-100 flex items-center justify-center gap-1 transition-colors">
+                    <a href={`${API_BASE_URL}/lecturer/materials/${mat.id}/view`} target="_blank" rel="noreferrer" className="flex-1 text-xs px-2 py-2 bg-purple-50 text-purple-700 font-bold rounded-lg hover:bg-purple-100 flex items-center justify-center gap-1 transition-colors">
                       <Eye className="w-3 h-3" /> Xem
                     </a>
-                    <a href={`http://localhost:8080/api/lecturer/materials/${mat.id}/download`} className="flex-1 text-xs px-2 py-2 bg-blue-50 text-blue-700 font-bold rounded-lg hover:bg-blue-100 flex items-center justify-center gap-1 transition-colors">
+                    <a href={`${API_BASE_URL}/lecturer/materials/${mat.id}/download`} className="flex-1 text-xs px-2 py-2 bg-blue-50 text-blue-700 font-bold rounded-lg hover:bg-blue-100 flex items-center justify-center gap-1 transition-colors">
                       <Download className="w-3 h-3" /> Tải về
                     </a>
                     <button onClick={() => handleDelete(mat.id)} className="flex-1 text-xs px-2 py-2 bg-red-50 text-red-600 font-bold rounded-lg hover:bg-red-100 flex items-center justify-center gap-1 transition-colors">

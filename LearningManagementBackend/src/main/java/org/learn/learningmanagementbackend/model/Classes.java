@@ -34,6 +34,12 @@ public class Classes extends BaseEntity{
     @Column(name = "notes")
     private String notes;
 
+    @Column(name = "start_date")
+    private java.time.LocalDate startDate;
+
+    @Column(name = "end_date")
+    private java.time.LocalDate endDate;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     private Course course;

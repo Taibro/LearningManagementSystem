@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { CheckCircle2, AlertTriangle } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const QRCodeAttendance = () => {
   const [isGenerated, setIsGenerated] = useState(false);
@@ -32,7 +34,7 @@ const QRCodeAttendance = () => {
     const fetchClasses = async () => {
       try {
         const token = localStorage.getItem('lecturerToken');
-        const res = await axios.get('http://localhost:8080/api/lecturer/schedules/active-classes', {
+        const res = await axios.get(`${API_BASE_URL}/lecturer/schedules/active-classes`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -79,7 +81,7 @@ const QRCodeAttendance = () => {
         validDurationMinutes: parseInt(duration)
       };
 
-      const res = await axios.post('http://localhost:8080/api/lecturer/attendance/qr/generate', payload, {
+      const res = await axios.post(`${API_BASE_URL}/lecturer/attendance/qr/generate`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

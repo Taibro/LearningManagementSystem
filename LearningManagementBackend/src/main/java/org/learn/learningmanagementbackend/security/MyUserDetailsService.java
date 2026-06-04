@@ -76,6 +76,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
         return new CustomUserDetails(
                 user.getId(),
+                user.getSchool() != null ? user.getSchool().getId() : null,
                 user.getFullName(),
                 user.getEmail(),
                 loginCode,

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchableSelect from '../../../components/SearchableSelect';
 import { BookOpen, Lock, User, GraduationCap, AlertCircle, ArrowRight, Loader2, School } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 const LecturerLogin = ({ initialSchool }) => {
   const [loginCode, setLoginCode] = useState('');
@@ -13,7 +15,7 @@ const LecturerLogin = ({ initialSchool }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:8080/api/schools/active')
+    fetch(`${API_BASE_URL}/schools/active`)
       .then(res => res.json())
       .then(data => setSchoolOptions(data))
       .catch(err => console.error("Failed to fetch schools", err));
@@ -31,7 +33,7 @@ const LecturerLogin = ({ initialSchool }) => {
     setIsLoading(true);
 
     try {
-      const res = await fetch('http://localhost:8080/api/auth/login', {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

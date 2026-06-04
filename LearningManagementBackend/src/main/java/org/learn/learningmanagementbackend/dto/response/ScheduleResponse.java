@@ -25,4 +25,5 @@ public class ScheduleResponse {
     private String notes;
     private Integer startPeriod;
     private Integer endPeriod;
+    private String teacherName;
 }

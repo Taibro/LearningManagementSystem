@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Info, Star } from 'lucide-react';
+import { API_BASE_URL } from '../../../config/apiConfig';
+
 
 export default function Grades() {
   const [grades, setGrades] = useState([]);
@@ -16,7 +18,7 @@ export default function Grades() {
 
   const fetchGrades = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/school-admin/grades', {
+      const res = await fetch(`${API_BASE_URL}/school-admin/grades`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
       if (res.ok) {

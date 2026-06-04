@@ -47,7 +47,7 @@ public class ScheduleExceptionService {
 
         Integer schoolId;
         try {
-            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+            schoolId = entityManager.createQuery("SELECT u.school.id FROM Users u WHERE u.id = :userId", Integer.class)
                     .setParameter("userId", userId).setMaxResults(1).getSingleResult();
         } catch (Exception e) {
             return java.util.Collections.emptyList();
@@ -100,7 +100,52 @@ public class ScheduleExceptionService {
             ex.setReplacementRoom(room);
         }
 
-        return mapToResponse(exceptionRepository.save(ex));
+        ScheduleException savedEx = exceptionRepository.save(ex);
+
+        // Notify students and lecturer upon Creation of an Approved Exception
+        if (request.getApprovalStatus() == ApprovalStatus.APPROVED) {
+            List<Enrollment> enrollments = enrollmentRepository.getEnrolledStudentsByClassId(savedEx.getSchedule().getClasses().getId());
+            for (Enrollment e : enrollments) {
+                Notification notif = new Notification();
+                notif.setUser(e.getStudent().getUser());
+                notif.setType(NotificationType.SCHEDULE_CHANGE);
+                notif.setTitle("Thông báo nghỉ học");
+                notif.setBody("Lớp học phần " + savedEx.getSchedule().getClasses().getCode() + " vào ngày " + 
+                              (savedEx.getExceptionDate() != null ? savedEx.getExceptionDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "") + 
+                              " đã được thông báo nghỉ.");
+                notificationRepository.save(notif);
+            }
+
+            try {
+                savedEx.getSchedule().getClasses().getTeacherLecturings().forEach(ct -> {
+                    Notification notif = new Notification();
+                    notif.setUser(ct.getTeacher().getUser());
+                    notif.setType(NotificationType.SYSTEM);
+                    notif.setTitle("Thông báo nghỉ dạy");
+                    notif.setBody("Lớp " + savedEx.getSchedule().getClasses().getCode() +
+                            " vào ngày " + (savedEx.getExceptionDate() != null ? savedEx.getExceptionDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "") +
+                            " đã được xếp lịch nghỉ.");
+                    notificationRepository.save(notif);
+                });
+            } catch (Exception ignored) {}
+        }
+
+        if (request.getMakeupStatus() == MakeupStatus.APPROVED) {
+            List<Enrollment> enrollments = enrollmentRepository.getEnrolledStudentsByClassId(savedEx.getSchedule().getClasses().getId());
+            for (Enrollment e : enrollments) {
+                Notification notif = new Notification();
+                notif.setUser(e.getStudent().getUser());
+                notif.setType(NotificationType.SCHEDULE_CHANGE);
+                notif.setTitle("Thông báo học bù");
+                notif.setBody("Lớp học phần " + savedEx.getSchedule().getClasses().getCode() + " có lịch học bù vào ngày " + 
+                              (savedEx.getReplacementDate() != null ? savedEx.getReplacementDate().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) : "") + 
+                              ", tiết " + savedEx.getReplacementStartPeriod() + "-" + savedEx.getReplacementEndPeriod() +
+                              (savedEx.getReplacementRoom() != null ? ", phòng " + savedEx.getReplacementRoom().getRoomNumber() : "") + ".");
+                notificationRepository.save(notif);
+            }
+        }
+
+        return mapToResponse(savedEx);
     }
 
     public ScheduleExceptionResponse updateException(Integer id, ScheduleExceptionRequest request) {
@@ -194,7 +239,7 @@ public class ScheduleExceptionService {
 
         Integer schoolId;
         try {
-            schoolId = entityManager.createQuery("SELECT us.school.id FROM UserSchool us WHERE us.user.id = :userId", Integer.class)
+            schoolId = entityManager.createQuery("SELECT u.school.id FROM Users u WHERE u.id = :userId", Integer.class)
                     .setParameter("userId", userId).setMaxResults(1).getSingleResult();
         } catch (Exception e) {
             return java.util.Collections.emptyList();

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Settings, ChevronDown, School, Bell, Search } from 'lucide-react';
+import { Settings, ChevronDown, School, Search } from 'lucide-react';
+import NotificationDropdown from '../../../components/NotificationDropdown';
 
 export default function Topbar() {
   const [open, setOpen] = useState(false);
@@ -34,7 +35,7 @@ export default function Topbar() {
           <input placeholder="Tìm kiếm..." />
         </div>
         <div className="school-chip"><School className="w-4 h-4 inline-block mr-2" /> HK2 · 2024-2025</div>
-        <div className="top-btn" onClick={() => alert('Không có thông báo mới')}><Bell className="w-4 h-4 inline-block mr-2" /><span className="dot"></span></div>
+        <NotificationDropdown tokenKey="adminToken" />
         <div className="top-btn"><Settings className="w-4 h-4 inline-block mr-2" /></div>
 
         {/* Profile + Dropdown - Click based */}
