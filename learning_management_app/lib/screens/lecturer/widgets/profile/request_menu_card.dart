@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'bottom_sheets/request_sheet.dart';
+import '../../features/request_pause_screen.dart';
+import '../../features/request_substitute_screen.dart';
+import '../../features/request_makeup_screen.dart';
 
 class RequestMenuCard extends StatelessWidget {
   const RequestMenuCard({super.key});
 
-  void _showRequestSheet(BuildContext context, String type) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => RequestSheet(type: type),
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
     );
   }
 
@@ -64,7 +64,7 @@ class RequestMenuCard extends StatelessWidget {
             iconColor: const Color(0xFFF5A623),
             label: 'Đề xuất tạm ngừng lịch dạy',
             subtitle: '2 đề xuất gần đây',
-            onTap: () => _showRequestSheet(context, 'tamNgung'),
+            onTap: () => _navigateTo(context, const RequestPauseScreen()),
             badge: null,
           ),
           _buildDivider(),
@@ -74,7 +74,7 @@ class RequestMenuCard extends StatelessWidget {
             iconColor: const Color(0xFF4CAF50),
             label: 'Đề xuất dạy bù',
             subtitle: '1 chờ duyệt · 1 đã hoàn thành',
-            onTap: () => _showRequestSheet(context, 'dayBu'),
+            onTap: () => _navigateTo(context, const RequestMakeupScreen()),
             badge: '1',
           ),
           _buildDivider(),
@@ -84,7 +84,7 @@ class RequestMenuCard extends StatelessWidget {
             iconColor: const Color(0xFF1565C0),
             label: 'Đề xuất dạy thay',
             subtitle: 'Không có đề xuất mới',
-            onTap: () => _showRequestSheet(context, 'dayThay'),
+            onTap: () => _navigateTo(context, const RequestSubstituteScreen()),
           ),
         ],
       ),

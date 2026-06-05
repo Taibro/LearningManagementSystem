@@ -5,6 +5,12 @@ import 'widgets/home/semester_progress_card.dart';
 import 'widgets/home/pending_requests_card.dart';
 import 'widgets/home/quick_actions_card.dart';
 import 'widgets/home/activity_feed_card.dart';
+import 'quick_actions/add_student_screen.dart';
+import 'quick_actions/add_lecturer_screen.dart';
+import 'quick_actions/add_class_screen.dart';
+import 'quick_actions/admin_notifications_screen.dart';
+import 'quick_actions/update_schedule_screen.dart';
+import 'quick_actions/backup_data_screen.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -37,7 +43,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   ),
                   const SizedBox(height: 20),
                   QuickActionsCard(
-                    onAction: (action) => _snack(action),
+                    onAction: _handleQuickAction,
                   ),
                   const SizedBox(height: 20),
                   const ActivityFeedCard(),
@@ -48,6 +54,41 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  void _handleQuickAction(String action) {
+    // Remove newline characters for easier matching
+    final cleanAction = action.replaceAll('\n', ' ').trim();
+    
+    Widget targetScreen;
+    switch (cleanAction) {
+      case 'Thêm sinh viên':
+        targetScreen = const AddStudentScreen();
+        break;
+      case 'Thêm giảng viên':
+        targetScreen = const AddLecturerScreen();
+        break;
+      case 'Thêm lớp học':
+        targetScreen = const AddClassScreen();
+        break;
+      case 'Thông báo':
+        targetScreen = const AdminNotificationsScreen();
+        break;
+      case 'Cập nhật lịch':
+        targetScreen = const UpdateScheduleScreen();
+        break;
+      case 'Sao lưu DL':
+        targetScreen = const BackupDataScreen();
+        break;
+      default:
+        _snack('Tính năng đang phát triển');
+        return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => targetScreen),
     );
   }
 

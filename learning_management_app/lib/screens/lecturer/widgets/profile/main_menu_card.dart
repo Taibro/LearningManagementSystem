@@ -1,46 +1,32 @@
 import 'package:flutter/material.dart';
-import 'bottom_sheets/salary_sheet.dart';
+import '../../features/profile_detail_screen.dart';
+import '../../features/salary_info_screen.dart';
+import '../../features/teaching_stats_screen.dart';
+import '../../features/lecture_materials_screen.dart';
+import '../../features/survey_screen.dart';
 import 'bottom_sheets/declaration_sheet.dart';
-import 'bottom_sheets/statistics_sheet.dart';
 
 class MainMenuCard extends StatelessWidget {
   const MainMenuCard({super.key});
 
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature - Sắp ra mắt'),
-        backgroundColor: const Color(0xFF6B4FA0),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
     );
   }
 
-  void _showSalarySheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => SalarySheet(),
-    );
-  }
-
+  // Khai báo thông tin (Declaration) still uses the bottom sheet if no screen was requested, 
+  // but to be uniform, the user wanted to sync perfectly. 
+  // Let's keep Declaration as bottom sheet for now or create a screen? 
+  // The user requested to "hoàn thành giao diện" for ones in home. 
+  // Khai báo thông tin is not in the Home quick actions list that user gave.
   void _showDeclarationSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const DeclarationSheet(),
-    );
-  }
-
-  void _showStatisticsSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const StatisticsSheet(),
+      builder: (_) => DeclarationSheet(),
     );
   }
 
@@ -67,7 +53,7 @@ class MainMenuCard extends StatelessWidget {
             iconColor: const Color(0xFF5C6BC0),
             label: 'Hồ sơ cá nhân',
             subtitle: 'Thông tin giảng viên',
-            onTap: () => _showComingSoon(context, 'Hồ sơ cá nhân'),
+            onTap: () => _navigateTo(context, const ProfileDetailScreen()),
           ),
           _buildDivider(),
           _buildMenuItem(
@@ -76,7 +62,7 @@ class MainMenuCard extends StatelessWidget {
             iconColor: const Color(0xFF2E7D32),
             label: 'Thông tin lương',
             subtitle: 'Xem bảng lương theo tháng',
-            onTap: () => _showSalarySheet(context),
+            onTap: () => _navigateTo(context, const SalaryInfoScreen()),
           ),
           _buildDivider(),
           _buildMenuItem(
@@ -94,7 +80,7 @@ class MainMenuCard extends StatelessWidget {
             iconColor: const Color(0xFF6B4FA0),
             label: 'Quản lý tài liệu bài giảng',
             subtitle: 'Tải lên và quản lý giáo án',
-            onTap: () => _showComingSoon(context, 'Tài liệu bài giảng'),
+            onTap: () => _navigateTo(context, const LectureMaterialsScreen()),
           ),
           _buildDivider(),
           _buildMenuItem(
@@ -103,7 +89,7 @@ class MainMenuCard extends StatelessWidget {
             iconColor: const Color(0xFF4CAF50),
             label: 'Thống kê thực giảng, coi thi',
             subtitle: 'Tổng hợp giờ giảng, giờ coi thi',
-            onTap: () => _showStatisticsSheet(context),
+            onTap: () => _navigateTo(context, const TeachingStatsScreen()),
           ),
           _buildDivider(),
           _buildMenuItem(
@@ -112,7 +98,7 @@ class MainMenuCard extends StatelessWidget {
             iconColor: const Color(0xFFE85D75),
             label: 'Khảo sát',
             subtitle: 'Lấy ý kiến sinh viên về môn học',
-            onTap: () => _showComingSoon(context, 'Khảo sát'),
+            onTap: () => _navigateTo(context, const SurveyScreen()),
           ),
         ],
       ),

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../features/change_password_screen.dart';
+import '../../features/terms_screen.dart';
+import '../../features/feedback_screen.dart';
 
 class SettingsCard extends StatefulWidget {
   const SettingsCard({super.key});
@@ -10,14 +13,10 @@ class SettingsCard extends StatefulWidget {
 class _SettingsCardState extends State<SettingsCard> {
   bool _notificationEnabled = true;
 
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature - Sắp ra mắt'),
-        backgroundColor: const Color(0xFF6B4FA0),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
     );
   }
 
@@ -73,7 +72,7 @@ class _SettingsCardState extends State<SettingsCard> {
             iconBgColor: const Color(0xFFE8F5E9),
             iconColor: const Color(0xFF2E7D32),
             label: 'Đổi mật khẩu',
-            onTap: () => _showComingSoon(context, 'Đổi mật khẩu'),
+            onTap: () => _navigateTo(context, const ChangePasswordScreen()),
           ),
           _buildDivider(),
           _buildMenuItem(
@@ -81,7 +80,7 @@ class _SettingsCardState extends State<SettingsCard> {
             iconBgColor: const Color(0xFFEDE7F6),
             iconColor: const Color(0xFF6B4FA0),
             label: 'Điều khoản & chính sách',
-            onTap: () => _showComingSoon(context, 'Điều khoản'),
+            onTap: () => _navigateTo(context, const TermsScreen()),
           ),
           _buildDivider(),
           _buildMenuItem(
@@ -89,7 +88,7 @@ class _SettingsCardState extends State<SettingsCard> {
             iconBgColor: const Color(0xFFFFF3E0),
             iconColor: const Color(0xFFE65100),
             label: 'Góp ý ứng dụng',
-            onTap: () => _showComingSoon(context, 'Góp ý'),
+            onTap: () => _navigateTo(context, const FeedbackScreen()),
           ),
           _buildDivider(),
           // Notification toggle
