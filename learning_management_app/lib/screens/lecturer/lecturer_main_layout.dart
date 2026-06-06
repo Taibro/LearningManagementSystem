@@ -50,6 +50,20 @@ class _LecturerMainLayoutState extends State<LecturerMainLayout> {
         children: _screens,
       ),
       bottomNavigationBar: _buildFloatingBottomNavBar(),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 80.0),
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const LecturerChatbotScreen()),
+            );
+          },
+          backgroundColor: const Color(0xFF2E7D32), // Màu xanh rêu của Giảng viên
+          elevation: 4,
+          child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 28),
+        ),
+      ),
     );
   }
 

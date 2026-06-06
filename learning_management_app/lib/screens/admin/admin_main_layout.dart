@@ -4,6 +4,7 @@ import 'admin_schedule_screen.dart';
 import 'admin_users_screen.dart';
 import 'admin_reports_screen.dart';
 import 'admin_settings_screen.dart';
+import 'admin_chatbot_screen.dart';
 
 /// Thêm vào main.dart:
 ///   import 'views/admin/admin_main_layout.dart';
@@ -42,6 +43,17 @@ class _AdminMainLayoutState extends State<AdminMainLayout> {
     return Scaffold(
       body: IndexedStack(index: _selectedIndex, children: _screens),
       bottomNavigationBar: _buildNav(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminChatbotScreen()),
+          );
+        },
+        backgroundColor: const Color(0xFFC62828), // Màu đỏ đặc trưng cho Admin AI
+        elevation: 4,
+        child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 28),
+      ),
     );
   }
 

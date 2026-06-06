@@ -12,7 +12,7 @@ class TeacherRepository {
 
   Future<TeacherProfile> getProfile() async {
     try {
-      final response = await _dio.get('/api/lecturer/profile');
+      final response = await _dio.get('/lecturer/profile');
       return TeacherProfile.fromJson(response.data);
     } catch (e) {
       throw Exception('Lỗi khi tải thông tin giảng viên: $e');
@@ -22,18 +22,29 @@ class TeacherRepository {
   Future<MonthlySalary> getMonthlySalary(int year, int month) async {
     try {
       final response = await _dio.get(
-        '/api/lecturer/salaries/monthly',
+        '/lecturer/salaries/monthly',
         queryParameters: {'year': year, 'month': month},
       );
       return MonthlySalary.fromJson(response.data);
     } catch (e) {
+      if (e is DioException && e.response?.statusCode == 404) {
+        return MonthlySalary(
+          periodMonth: month,
+          periodYear: year,
+          baseAmount: 0,
+          sessionAmount: 0,
+          bonusAmount: 0,
+          deductionAmount: 0,
+          netAmount: 0,
+        );
+      }
       throw Exception('Lỗi khi tải bảng lương: $e');
     }
   }
 
   Future<TeachingStatistic> getDashboardStatistics() async {
     try {
-      final response = await _dio.get('/api/lecturer/statistics/dashboard');
+      final response = await _dio.get('/lecturer/statistics/dashboard');
       return TeachingStatistic.fromJson(response.data);
     } catch (e) {
       throw Exception('Lỗi khi tải thống kê giảng dạy: $e');
@@ -43,7 +54,7 @@ class TeacherRepository {
   Future<List<TeacherMaterial>> getMaterials(int teacherId) async {
     try {
       final response = await _dio.get(
-        '/api/lecturer/materials',
+        '/lecturer/materials',
         queryParameters: {'teacherId': teacherId},
       );
       
@@ -58,7 +69,7 @@ class TeacherRepository {
       int classId, int scheduleId, String date) async {
     try {
       final response = await _dio.get(
-        '/api/lecturer/attendance',
+        '/lecturer/attendance',
         queryParameters: {
           'classId': classId,
           'scheduleId': scheduleId,
@@ -73,7 +84,7 @@ class TeacherRepository {
 
   Future<void> saveAttendance(Map<String, dynamic> request) async {
     try {
-      await _dio.post('/api/lecturer/attendance/save', data: request);
+      await _dio.post('/lecturer/attendance/save', data: request);
     } catch (e) {
       throw Exception('Lỗi khi lưu điểm danh: $e');
     }

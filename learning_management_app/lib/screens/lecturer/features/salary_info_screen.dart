@@ -66,10 +66,10 @@ class SalaryInfoScreen extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: Colors.white.withOpacity(0.2)),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Column(
+                              const Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text('Lương cơ bản', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
@@ -78,7 +78,7 @@ class SalaryInfoScreen extends StatelessWidget {
                                 ],
                               ),
                               Container(height: 30, width: 1, color: Colors.white24),
-                              Column(
+                              const Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text('Phụ cấp', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),

@@ -12,89 +12,58 @@ class FunctionGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void navigateTo(Widget screen) {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+    }
+
     final features = [
       {
         'icon': Icons.how_to_reg_rounded,
         'label': 'Điểm danh',
         'color': const Color(0xFF6B4FA0),
-        'onTap': () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) =>
-                      const LecturerAttendanceScreen(initialTabIndex: 0)),
-            ),
+        'onTap': () => navigateTo(const LecturerAttendanceScreen(initialTabIndex: 0)),
       },
       {
         'icon': Icons.qr_code_2_rounded,
         'label': 'QR Code',
         'color': const Color(0xFF10B981),
-        'onTap': () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) =>
-                      const LecturerAttendanceScreen(initialTabIndex: 1)),
-            ),
+        'onTap': () => navigateTo(const LecturerAttendanceScreen(initialTabIndex: 1)),
       },
       {
         'icon': Icons.grade_rounded,
         'label': 'Kết quả\nhọc tập',
         'color': const Color(0xFF3B82F6),
-        'onTap': () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) =>
-                      const LecturerAttendanceScreen(initialTabIndex: 2)),
-            ),
+        'onTap': () => navigateTo(const LecturerAttendanceScreen(initialTabIndex: 2)),
       },
       {
         'icon': Icons.bar_chart_rounded,
         'label': 'Thống kê\ngiảng dạy',
         'color': const Color(0xFFF59E0B),
-        'onTap': () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const LecturerTeachingStatsScreen()),
-            ),
+        'onTap': () => navigateTo(const LecturerTeachingStatsScreen()),
       },
       {
         'icon': Icons.account_balance_wallet_rounded,
         'label': 'Thông tin\nlương',
         'color': const Color(0xFF2E7D32),
-        'onTap': () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const LecturerSalaryScreen()),
-            ),
+        'onTap': () => navigateTo(const LecturerSalaryScreen()),
       },
       {
         'icon': Icons.library_books_rounded,
         'label': 'Tài liệu\nbài giảng',
         'color': const Color(0xFF5C6BC0),
-        'onTap': () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const LecturerMaterialsScreen()),
-            ),
+        'onTap': () => navigateTo(const LecturerMaterialsScreen()),
       },
       {
         'icon': Icons.edit_document,
         'label': 'Đề xuất\nlịch dạy',
         'color': const Color(0xFFEC4899),
-        'onTap': () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const LecturerRequestScreen()),
-            ),
+        'onTap': () => navigateTo(const LecturerRequestScreen()),
       },
       {
         'icon': Icons.grid_view_rounded,
         'label': 'Tất cả',
         'color': const Color(0xFF6B4FA0),
-        'onTap': () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => const LecturerAllFeaturesScreen()),
-            ),
+        'onTap': () => navigateTo(const LecturerAllFeaturesScreen()),
       },
     ];
 
