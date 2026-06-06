@@ -13,8 +13,9 @@ class ScheduleLegend extends StatelessWidget {
       (kRed, 'Tạm ngưng'),
     ];
     return Container(
-      color: Colors.white,
+      color: Colors.transparent,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      alignment: Alignment.center,
       child: Wrap(
         spacing: 16,
         runSpacing: 6,

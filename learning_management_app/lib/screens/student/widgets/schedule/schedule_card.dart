@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:learning_management_app/core/enum/ScheduleType.dart';
 import 'package:learning_management_app/models/Schedule.dart';
 import '../../data/mock_schedule_data.dart';
 import '../../utils/schedule_utils.dart';
@@ -10,16 +13,23 @@ class ScheduleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = typeColor(item.type);
+    final baseColor = typeColor(item.type);
+    
+    // Create a gradient based on the base color
+    final colorHSL = HSLColor.fromColor(baseColor);
+    final lightColor = colorHSL.withLightness((colorHSL.lightness + 0.15).clamp(0.0, 1.0)).toColor();
+    final darkColor = colorHSL.withLightness((colorHSL.lightness - 0.1).clamp(0.0, 1.0)).toColor();
+
     return Container(
       decoration: BoxDecoration(
-        color: kCardBg,
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+            color: baseColor.withOpacity(0.12),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -28,32 +38,63 @@ class ScheduleCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Colored left accent
-            Container(width: 4, color: color),
+            // Colored gradient left accent
+            Container(
+              width: 8,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [lightColor, darkColor],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
             // Content
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
+                  horizontal: 16,
+                  vertical: 16,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      item.subjectName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: kTextMain,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            item.subjectName,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                              color: const Color(0xFF0F172A),
+                              height: 1.2,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: baseColor.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            item.type == ScheduleType.lichThi ? 'Lịch thi' : 'Lịch học',
+                            style: GoogleFonts.inter(
+                              color: darkColor,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    _infoRow('Tiết :', item.tiet),
-                    const SizedBox(height: 4),
-                    _infoRow('Phòng :', item.phong),
-                    const SizedBox(height: 4),
-                    _infoRow('Giảng viên :', item.giangVien),
+                    const SizedBox(height: 12),
+                    _infoRow(Icons.access_time_filled_rounded, 'Tiết:', item.tiet),
+                    const SizedBox(height: 6),
+                    _infoRow(Icons.meeting_room_rounded, 'Phòng:', item.phong),
+                    const SizedBox(height: 6),
+                    _infoRow(Icons.person_rounded, 'Giảng viên:', item.giangVien),
                   ],
                 ),
               ),
@@ -61,27 +102,29 @@ class ScheduleCard extends StatelessWidget {
           ],
         ),
       ),
-    );
+    ).animate().fade(duration: 400.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuart);
   }
 
-  Widget _infoRow(String label, String value) {
+  Widget _infoRow(IconData icon, String label, String value) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Icon(icon, size: 16, color: const Color(0xFF94A3B8)),
+        const SizedBox(width: 6),
         SizedBox(
-          width: 90,
+          width: 80,
           child: Text(
             label,
-            style: const TextStyle(fontSize: 13, color: kTextGrey),
+            style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B), fontWeight: FontWeight.w500),
           ),
         ),
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(
+            style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: kTextMain,
+              color: const Color(0xFF334155),
             ),
           ),
         ),

@@ -42,39 +42,7 @@ INSERT INTO role (name, description) VALUES
   ('STUDENT', 'Sinh viên / Học sinh'),
   ('SCHOOL_ADMIN', 'Admin nha truong');
 
-INSERT INTO users (
-    school_id,
-    code,
-    citizen_id_number,
-    full_name,
-    email,
-    password_hash,
-    phone,
-    address,
-    gender,
-    is_active,
-    created_at,
-    updated_at
-) VALUES (
-    1,
-    'ADM-HCMUT-01',
-    '079200000001',
-    'Admin Bách Khoa',
-    'admin@hcmut.edu.vn',
-    '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG', -- Đây là chuỗi Bcrypt hash của mật khẩu 'Admin@123'
-    '0909123456',
-    '268 Lý Thường Kiệt, Quận 10, TP.HCM',
-    'MALE',
-    true,
-    NOW(),
-    NOW()
-);
 
-INSERT INTO user_roles (user_id, role_id)
-VALUES (
-    (SELECT id FROM users WHERE email = 'admin@hcmut.edu.vn' LIMIT 1),
-    (SELECT id FROM role WHERE name = 'SCHOOL_ADMIN' LIMIT 1)
-);
 
 -- 2. BẢNG SCHOOL (12 dòng)
 INSERT INTO schools (id, code, name, short_name, type, email) VALUES
@@ -151,6 +119,7 @@ INSERT INTO departments (id, school_id, code, name) VALUES
 (11, 7, 'CK', 'Khoa Cơ Khí'),
 (12, 12, 'IELTS_ENG', 'Bộ môn IELTS');
 
+
 -- 7. BẢNG USERS (24 dòng: 12 GV, 12 SV để map cho thoải mái)
 INSERT INTO users (id, school_id, code, citizen_id_number, full_name, email, password_hash, gender, address) VALUES
 (99, 1, 'SAAS999', '079001000099', 'SaaS Super Admin', 'ntai8448@gmail.com', 'hash123', 'MALE', 'System'),
@@ -203,7 +172,7 @@ INSERT INTO users (
     '079200000001',
     'Admin Bách Khoa',
     'admin@hcmut.edu.vn',
-    '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG', -- Đây là chuỗi Bcrypt hash của mật khẩu '123456'
+    '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG', -- Đây là chuỗi Bcrypt hash của mật khẩu 'Admin@123'
     '0909123456',
     '268 Lý Thường Kiệt, Quận 10, TP.HCM',
     'MALE',
@@ -217,6 +186,8 @@ VALUES (
     (SELECT id FROM users WHERE email = 'admin@hcmut.edu.vn' LIMIT 1),
     (SELECT id FROM role WHERE name = 'SCHOOL_ADMIN' LIMIT 1)
 );
+
+
 
 -- 1. Tự động gán role LECTURER cho các user có trong bảng teachers nhưng chưa được map trong user_roles
 INSERT INTO user_roles (user_id, role_id)

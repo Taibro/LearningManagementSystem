@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:ui';
 import 'data/mock_school_data.dart';
 import 'role_selection_screen.dart';
+import '../student/widgets/shared/mesh_background.dart';
 
 /// Screen 2: Chọn trường
-/// Shows a searchable list of schools with dropdown filter.
 class ChooseSchoolScreen extends StatefulWidget {
   final String? initialCode;
   const ChooseSchoolScreen({super.key, this.initialCode});
@@ -79,204 +82,233 @@ class _ChooseSchoolScreenState extends State<ChooseSchoolScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1976D2),
-        foregroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: const Text(
-          'Chọn trường',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: true,
-      ),
-      body: Column(
-        children: [
-          // Search bar
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: TextField(
-              controller: _searchCtrl,
-              onChanged: _applySearch,
-              decoration: InputDecoration(
-                hintText: 'Nhập từ khoá để tìm kiếm ...',
-                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                prefixIcon: Icon(Icons.search, color: Colors.grey.shade400),
-                filled: true,
-                fillColor: const Color(0xFFF5F7FA),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ),
-
-          // Filter dropdown
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE0E6ED)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1976D2).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: MeshBackground(
+        child: SafeArea(
+          child: Column(
+            children: [
+              // Custom Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(12, 16, 16, 16),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A), size: 20),
+                      onPressed: () => Navigator.pop(context),
                     ),
-                    child: const Icon(
-                      Icons.account_balance_rounded,
-                      color: Color(0xFF1976D2),
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        value: _selectedFilter,
-                        isExpanded: true,
-                        icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF1A1A2E),
-                        ),
-                        items: _filterOptions
-                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                            .toList(),
-                        onChanged: (val) {
-                          if (val != null) setState(() => _selectedFilter = val);
-                        },
+                    const SizedBox(width: 8),
+                    Text(
+                      'Chọn trường',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: const Color(0xFF0F172A),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ),
 
-          const SizedBox(height: 4),
+              // Search bar
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4F46E5).withOpacity(0.05),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: _searchCtrl,
+                    onChanged: _applySearch,
+                    style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w500, color: const Color(0xFF0F172A)),
+                    decoration: InputDecoration(
+                      hintText: 'Nhập từ khoá để tìm kiếm ...',
+                      hintStyle: GoogleFonts.inter(color: const Color(0xFF94A3B8), fontSize: 15),
+                      prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF94A3B8)),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                  ),
+                ),
+              ).animate().fade(duration: 400.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOutQuart),
 
-          // School list
-          Expanded(
-            child: _filtered.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.search_off_rounded,
-                            size: 56, color: Colors.grey.shade300),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Không tìm thấy trường nào',
-                          style: TextStyle(
-                            color: Colors.grey.shade500,
-                            fontSize: 15,
+              const SizedBox(height: 12),
+
+              // Filter dropdown
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF4F46E5).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.account_balance_rounded,
+                          color: Color(0xFF4F46E5),
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedFilter,
+                            isExpanded: true,
+                            icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF64748B)),
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF334155),
+                            ),
+                            items: _filterOptions
+                                .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                                .toList(),
+                            onChanged: (val) {
+                              if (val != null) setState(() => _selectedFilter = val);
+                            },
                           ),
                         ),
-                      ],
-                    ),
-                  )
-                : ListView.separated(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    itemCount: _filtered.length,
-                    separatorBuilder: (_, __) =>
-                        Divider(height: 1, color: Colors.grey.shade200),
-                    itemBuilder: (context, i) {
-                      final school = _filtered[i];
-                      final isSelected = _selectedIndex == i;
-                      return _SchoolTile(
-                        school: school,
-                        isSelected: isSelected,
-                        onTap: () => setState(() => _selectedIndex = i),
-                      );
-                    },
+                      ),
+                    ],
                   ),
-          ),
-
-          // Bottom buttons
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  blurRadius: 10,
-                  offset: const Offset(0, -2),
                 ),
-              ],
-            ),
-            child: SafeArea(
-              top: false,
-              child: Row(
-                children: [
-                  // Cancel button
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF1A1A2E),
-                        side: const BorderSide(color: Color(0xFFE0E6ED)),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+              ).animate().fade(duration: 500.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOutQuart),
+
+              const SizedBox(height: 16),
+
+              // School list
+              Expanded(
+                child: _filtered.isEmpty
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.search_off_rounded,
+                                size: 64, color: Color(0xFFCBD5E1)),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Không tìm thấy trường nào',
+                              style: GoogleFonts.inter(
+                                color: const Color(0xFF64748B),
+                                fontSize: 15,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
+                      ).animate().fade()
+                    : ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                        itemCount: _filtered.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 12),
+                        itemBuilder: (context, i) {
+                          final school = _filtered[i];
+                          final isSelected = _selectedIndex == i;
+                          return _SchoolTile(
+                            school: school,
+                            isSelected: isSelected,
+                            onTap: () => setState(() => _selectedIndex = i),
+                          ).animate().fade(duration: 400.ms, delay: (40 * i).ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuart);
+                        },
                       ),
-                      child: const Text(
-                        'Huỷ',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  // Continue button
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: _onContinue,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF1976D2),
-                        foregroundColor: Colors.white,
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Tiếp tục',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
               ),
-            ),
+
+              // Bottom buttons
+              Container(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.9),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 16,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    // Cancel button
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          backgroundColor: const Color(0xFFF1F5F9),
+                        ),
+                        child: Text(
+                          'Huỷ',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF475569),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    // Continue button
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: _onContinue,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF4F46E5), Color(0xFF3B82F6)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF4F46E5).withOpacity(0.3),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            'Tiếp tục',
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ).animate().slideY(begin: 1.0, end: 0, duration: 600.ms, curve: Curves.easeOutCubic),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -298,41 +330,64 @@ class _SchoolTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(20),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFF1976D2).withOpacity(0.06)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-          border: isSelected
-              ? Border.all(color: const Color(0xFF1976D2).withOpacity(0.3))
-              : null,
+              ? const Color(0xFF4F46E5).withOpacity(0.05)
+              : Colors.white.withOpacity(0.85),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF4F46E5).withOpacity(0.5) : Colors.white,
+            width: 2,
+          ),
+          boxShadow: isSelected ? [] : [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
         ),
         child: Row(
           children: [
             // Logo placeholder
             Container(
-              width: 48,
-              height: 48,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
-                color: _colorForCode(school.code),
-                borderRadius: BorderRadius.circular(10),
+                gradient: LinearGradient(
+                  colors: [
+                    _colorForCode(school.code),
+                    _colorForCode(school.code).withOpacity(0.7),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: _colorForCode(school.code).withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  )
+                ],
               ),
               child: Center(
                 child: Text(
                   school.code.substring(0, school.code.length > 2 ? 2 : school.code.length),
-                  style: const TextStyle(
+                  style: GoogleFonts.plusJakartaSans(
                     color: Colors.white,
                     fontWeight: FontWeight.w800,
-                    fontSize: 14,
+                    fontSize: 16,
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 16),
             // Info
             Expanded(
               child: Column(
@@ -340,18 +395,19 @@ class _SchoolTile extends StatelessWidget {
                 children: [
                   Text(
                     school.name,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1A2E),
+                    style: GoogleFonts.inter(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF0F172A),
                     ),
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: 4),
                   Text(
                     'Mã đơn vị: ${school.code}',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade500,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF64748B),
                     ),
                   ),
                 ],
@@ -359,7 +415,8 @@ class _SchoolTile extends StatelessWidget {
             ),
             if (isSelected)
               const Icon(Icons.check_circle_rounded,
-                  color: Color(0xFF1976D2), size: 22),
+                  color: Color(0xFF4F46E5), size: 28)
+                  .animate().scale(curve: Curves.elasticOut, duration: 600.ms),
           ],
         ),
       ),
@@ -368,14 +425,14 @@ class _SchoolTile extends StatelessWidget {
 
   Color _colorForCode(String code) {
     final colors = [
-      const Color(0xFF1976D2),
-      const Color(0xFFE53935),
-      const Color(0xFF43A047),
-      const Color(0xFFFF8F00),
-      const Color(0xFF8E24AA),
-      const Color(0xFF00897B),
-      const Color(0xFF5C6BC0),
-      const Color(0xFFD81B60),
+      const Color(0xFF4F46E5),
+      const Color(0xFFE11D48),
+      const Color(0xFF059669),
+      const Color(0xFFD97706),
+      const Color(0xFF7C3AED),
+      const Color(0xFF0D9488),
+      const Color(0xFF2563EB),
+      const Color(0xFFDB2777),
     ];
     return colors[code.hashCode.abs() % colors.length];
   }

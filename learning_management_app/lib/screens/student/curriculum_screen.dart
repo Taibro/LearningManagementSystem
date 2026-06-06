@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:ui';
 import 'data/mock_extra_data.dart';
+import 'widgets/shared/custom_app_bar.dart';
+import 'widgets/shared/mesh_background.dart';
 
-const Color _kPrimary = Color(0xFF1565C0);
-const Color _kBg = Color(0xFFF0F4FF);
+const Color _kPrimary = Color(0xFF4F46E5);
 
 class CurriculumScreen extends StatefulWidget {
   const CurriculumScreen({super.key});
@@ -12,13 +16,11 @@ class CurriculumScreen extends StatefulWidget {
 }
 
 class _CurriculumScreenState extends State<CurriculumScreen> {
-  // Track which semester is expanded (-1 = none)
   int _expandedIndex = -1;
 
   @override
   void initState() {
     super.initState();
-    // Expand the current in-progress semester by default
     for (int i = 0; i < kCurriculum.semesters.length; i++) {
       final sem = kCurriculum.semesters[i];
       final hasInProgress = sem.categories.any((c) =>
@@ -33,73 +35,16 @@ class _CurriculumScreenState extends State<CurriculumScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBg,
-      body: Column(
-        children: [
-          _buildHeader(context),
-          _buildStudentInfo(),
-          _buildTableHeader(),
-          Expanded(child: _buildSemesterList()),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF1565C0), Color(0xFF1976D2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: MeshBackground(
+        child: Column(
+          children: [
+            const CustomAppBar(title: 'Chương trình khung'),
+            _buildStudentInfo(),
+            _buildTableHeader(),
+            Expanded(child: _buildSemesterList()),
+          ],
         ),
-      ),
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 8,
-        left: 16,
-        right: 16,
-        bottom: 24,
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-          const SizedBox(width: 12),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 8),
-                Text(
-                  'Chương trình khung',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: const Icon(
-              Icons.menu_book_rounded,
-              color: Colors.white,
-              size: 32,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -107,104 +52,139 @@ class _CurriculumScreenState extends State<CurriculumScreen> {
   Widget _buildStudentInfo() {
     final c = kCurriculum;
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Chuyên ngành',
-            style: TextStyle(fontSize: 12, color: Color(0xFF757575)),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            c.chuyenNganh,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF212121),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              const Text('Ngành : ', style: TextStyle(fontSize: 13, color: Color(0xFF757575))),
-              Text(c.nganh,
-                  style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF212121))),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Row(
-            children: [
-              const Text('Hệ đào tạo: ', style: TextStyle(fontSize: 13, color: Color(0xFF757575))),
-              Text(c.heDaoTao,
-                  style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF212121))),
-              const SizedBox(width: 24),
-              const Text('Loại đào tạo: ', style: TextStyle(fontSize: 13, color: Color(0xFF757575))),
-              Text(c.loaiDaoTao,
-                  style: const TextStyle(
-                      fontSize: 13, fontWeight: FontWeight.w500, color: Color(0xFF212121))),
-            ],
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.85),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF4F46E5).withOpacity(0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
-    );
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Chuyên ngành',
+                style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF64748B), fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                c.chuyenNganh,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: _kPrimary,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Text('Ngành: ', style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
+                  Expanded(
+                    child: Text(c.nganh,
+                        style: GoogleFonts.inter(
+                            fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A))),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Text('Hệ đào tạo: ', style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
+                  Text(c.heDaoTao,
+                      style: GoogleFonts.inter(
+                          fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A))),
+                  const SizedBox(width: 24),
+                  Text('Loại: ', style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
+                  Text(c.loaiDaoTao,
+                      style: GoogleFonts.inter(
+                          fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A))),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).animate().fade(duration: 400.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOutQuart);
   }
 
   Widget _buildTableHeader() {
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      child: Row(
-        children: [
-          const Expanded(
-            flex: 4,
-            child: Text('Tên học phần',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF616161))),
-          ),
-          SizedBox(
-            width: 80,
-            child: Center(
-              child: Text('Mã HP',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF616161))),
-            ),
-          ),
-          SizedBox(
-            width: 30,
-            child: Center(
-              child: Text('TC',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF616161))),
-            ),
-          ),
-          SizedBox(
-            width: 44,
-            child: Center(
-              child: Text('T.Thái',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF616161))),
-            ),
-          ),
-        ],
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.7),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white, width: 2),
       ),
-    );
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 4,
+                child: Text('Tên học phần',
+                    style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF475569))),
+              ),
+              SizedBox(
+                width: 80,
+                child: Center(
+                  child: Text('Mã HP',
+                      style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF475569))),
+                ),
+              ),
+              SizedBox(
+                width: 30,
+                child: Center(
+                  child: Text('TC',
+                      style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF475569))),
+                ),
+              ),
+              SizedBox(
+                width: 44,
+                child: Center(
+                  child: Text('T.Thái',
+                      style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w700, color: const Color(0xFF475569))),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).animate().fade(duration: 400.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOutQuart);
   }
 
   Widget _buildSemesterList() {
     return ListView.builder(
-      padding: EdgeInsets.zero,
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 32),
       itemCount: kCurriculum.semesters.length,
       itemBuilder: (_, i) {
         final sem = kCurriculum.semesters[i];
         final isExpanded = _expandedIndex == i;
-        return _SemesterBlock(
-          semester: sem,
-          isExpanded: isExpanded,
-          onToggle: () {
-            setState(() {
-              _expandedIndex = _expandedIndex == i ? -1 : i;
-            });
-          },
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 16),
+          child: _SemesterBlock(
+            semester: sem,
+            isExpanded: isExpanded,
+            onToggle: () {
+              setState(() {
+                _expandedIndex = _expandedIndex == i ? -1 : i;
+              });
+            },
+          ).animate().fade(duration: 400.ms, delay: (50 * i).ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart),
         );
       },
     );
@@ -224,82 +204,116 @@ class _SemesterBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Semester header
-        GestureDetector(
-          onTap: onToggle,
-          child: Container(
-            color: isExpanded ? _kPrimary : Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Icon(
-                  isExpanded
-                      ? Icons.arrow_drop_down_circle
-                      : Icons.arrow_right_rounded,
-                  color: isExpanded ? Colors.white : const Color(0xFF757575),
-                  size: 22,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    semester.label,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: isExpanded ? Colors.white : const Color(0xFF212121),
-                    ),
-                  ),
-                ),
-                Text(
-                  '${semester.totalTC}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: isExpanded ? Colors.white : _kPrimary,
-                  ),
-                ),
-              ],
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.85),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF4F46E5).withOpacity(0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
-        ),
-        const Divider(height: 1, color: Color(0xFFE0E0E0)),
-
-        // Expanded content
-        if (isExpanded)
-          ...semester.categories.expand((cat) => [
-                // Category header
-                Container(
-                  color: const Color(0xFFF5F8FF),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Column(
+            children: [
+              // Semester header
+              GestureDetector(
+                onTap: onToggle,
+                behavior: HitTestBehavior.opaque,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  color: isExpanded ? _kPrimary.withOpacity(0.1) : Colors.transparent,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                   child: Row(
                     children: [
+                      Icon(
+                        isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                        color: isExpanded ? _kPrimary : const Color(0xFF64748B),
+                        size: 24,
+                      ),
+                      const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          cat.label,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: _kPrimary,
+                          semester.label,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: isExpanded ? _kPrimary : const Color(0xFF0F172A),
                           ),
                         ),
                       ),
-                      Text(
-                        '${cat.totalTC}',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: _kPrimary,
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: isExpanded ? _kPrimary : const Color(0xFFE2E8F0),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${semester.totalTC} TC',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: isExpanded ? Colors.white : const Color(0xFF475569),
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                // Subject rows
-                ...cat.subjects.map((sub) => _SubjectRow(subject: sub)),
-              ]),
-      ],
+              ),
+              if (isExpanded)
+                const Divider(height: 1, color: Color(0xFFE2E8F0)),
+
+              // Expanded content
+              AnimatedCrossFade(
+                firstChild: const SizedBox(width: double.infinity),
+                secondChild: Column(
+                  children: semester.categories.expand((cat) => [
+                    // Category header
+                    Container(
+                      color: _kPrimary.withOpacity(0.05),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              cat.label,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: _kPrimary,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '${cat.totalTC} TC',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: _kPrimary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Subject rows
+                    ...cat.subjects.map((sub) => _SubjectRow(subject: sub)),
+                  ]).toList(),
+                ),
+                crossFadeState: isExpanded ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+                duration: const Duration(milliseconds: 300),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -311,15 +325,17 @@ class _SubjectRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: const Color(0xFFE2E8F0).withOpacity(0.5), width: 1)),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
           Expanded(
             flex: 4,
             child: Text(
               subject.tenHocPhan,
-              style: const TextStyle(fontSize: 12, color: Color(0xFF424242)),
+              style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF0F172A), fontWeight: FontWeight.w500),
             ),
           ),
           SizedBox(
@@ -327,7 +343,7 @@ class _SubjectRow extends StatelessWidget {
             child: Center(
               child: Text(
                 subject.maHP,
-                style: const TextStyle(fontSize: 11, color: Color(0xFF757575)),
+                style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF64748B)),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -337,7 +353,7 @@ class _SubjectRow extends StatelessWidget {
             child: Center(
               child: Text(
                 '${subject.tinChi}',
-                style: const TextStyle(fontSize: 12, color: Color(0xFF424242)),
+                style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF475569), fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -353,11 +369,11 @@ class _SubjectRow extends StatelessWidget {
   Widget _statusIcon(SubjectStatus status) {
     switch (status) {
       case SubjectStatus.completed:
-        return const Icon(Icons.check_circle, color: Color(0xFF43A047), size: 22);
+        return const Icon(Icons.check_circle_rounded, color: Color(0xFF10B981), size: 22);
       case SubjectStatus.inProgress:
-        return const Icon(Icons.access_time_filled, color: Color(0xFFFFA726), size: 22);
+        return const Icon(Icons.incomplete_circle_rounded, color: Color(0xFFF59E0B), size: 22);
       case SubjectStatus.notStarted:
-        return const Icon(Icons.radio_button_unchecked, color: Color(0xFFBDBDBD), size: 22);
+        return const Icon(Icons.radio_button_unchecked_rounded, color: Color(0xFFCBD5E1), size: 22);
     }
   }
 }

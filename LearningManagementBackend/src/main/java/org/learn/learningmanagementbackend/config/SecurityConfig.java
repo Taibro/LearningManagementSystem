@@ -54,8 +54,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:3000"));
-
+        // Cấu hình cho phép Flutter Web (cổng ngẫu nhiên) và các frontend khác
+        configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));

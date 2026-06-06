@@ -1,12 +1,21 @@
 import 'package:dio/dio.dart';
 import '../storage/secure_storage.dart';
+import 'dart:io' show Platform;
 
 class DioClient {
   late final Dio dio;
 
   // Sử dụng localhost:8080 cho máy ảo, hoặc cấu hình adb reverse tcp:8080 tcp:8080 cho máy thật.
   // Nếu dùng Android Emulator không có reverse, IP sẽ là 10.0.2.2.
-  static const String baseUrl = 'http://localhost:8080/api';
+  static String get baseUrl {
+    try {
+      if (Platform.isAndroid) return 'http://10.0.2.2:8080/api';
+      return 'http://localhost:8080/api';
+    } catch (e) {
+      // Dành cho Web
+      return 'http://localhost:8080/api';
+    }
+  }
 
   DioClient() {
     dio = Dio(BaseOptions(
