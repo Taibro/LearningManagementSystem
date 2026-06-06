@@ -10,6 +10,7 @@ export default function PaymentProcessing() {
   const [payment, setPayment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(600); // 10 mins
+  const [verifying, setVerifying] = useState(false);
 
   const fetchPayment = () => {
     getPayments().then(list => {
@@ -26,15 +27,22 @@ export default function PaymentProcessing() {
   useEffect(() => {
     let timer;
     if (payment?.status === 'PENDING' && timeLeft > 0) {
-      timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+      timer = setInterval(() => {
+        setTimeLeft(prev => prev - 1);
+      }, 1000);
     }
     return () => clearInterval(timer);
   }, [payment, timeLeft]);
 
-  const handleMockSuccess = () => {
-    if (window.confirm('Đây là tính năng Demo giả lập thanh toán thành công qua QR. Tiếp tục?')) {
+  const handleCheckPayment = () => {
+    if (window.confirm('Bạn xác nhận đã chuyển khoản thành công? (Tính năng Demo)')) {
+      setVerifying(true);
       mockPaymentSuccess(id).then(() => {
         fetchPayment();
+        setVerifying(false);
+      }).catch(err => {
+        setVerifying(false);
+        alert(err.response?.data?.message || 'Có lỗi xảy ra.');
       });
     }
   };
@@ -134,10 +142,22 @@ export default function PaymentProcessing() {
           {isPending && (
             <div style={{ marginTop: 16, textAlign: 'center' }}>
               <button 
-                onClick={handleMockSuccess}
-                style={{ background: 'transparent', border: '1px dashed #cbd5e1', padding: '6px 12px', fontSize: 12, color: '#64748b', cursor: 'pointer', borderRadius: 4 }}
+                onClick={handleCheckPayment}
+                disabled={verifying}
+                style={{ 
+                  background: verifying ? '#94a3b8' : '#22c55e', 
+                  color: 'white', 
+                  padding: '12px 0', 
+                  border: 'none', 
+                  borderRadius: 8, 
+                  fontWeight: 600, 
+                  fontSize: 15, 
+                  cursor: verifying ? 'wait' : 'pointer', 
+                  width: '100%', 
+                  boxShadow: '0 4px 12px #22c55e44' 
+                }}
               >
-                [Dev Only] Giả lập Quét QR thành công
+                {verifying ? 'Đang kiểm tra...' : 'Tôi đã chuyển khoản thành công'}
               </button>
             </div>
           )}

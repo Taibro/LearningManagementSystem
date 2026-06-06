@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:ui';
 import 'choose_school_screen.dart';
+import '../student/widgets/shared/mesh_background.dart'; // Ensure correct path or create a local mesh
 
 /// Screen 1: Nhập mã trường
-/// User enters a school code or taps the QR icon to search schools.
 class SchoolCodeScreen extends StatefulWidget {
   const SchoolCodeScreen({super.key});
 
@@ -10,32 +13,14 @@ class SchoolCodeScreen extends StatefulWidget {
   State<SchoolCodeScreen> createState() => _SchoolCodeScreenState();
 }
 
-class _SchoolCodeScreenState extends State<SchoolCodeScreen>
-    with SingleTickerProviderStateMixin {
+class _SchoolCodeScreenState extends State<SchoolCodeScreen> {
   final _codeController = TextEditingController();
-  late AnimationController _animCtrl;
-  late Animation<double> _fadeIn;
-  late Animation<Offset> _slideUp;
-
-  @override
-  void initState() {
-    super.initState();
-    _animCtrl = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    );
-    _fadeIn = CurvedAnimation(parent: _animCtrl, curve: Curves.easeOut);
-    _slideUp = Tween<Offset>(
-      begin: const Offset(0, 0.15),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: _animCtrl, curve: Curves.easeOutCubic));
-    _animCtrl.forward();
-  }
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void dispose() {
     _codeController.dispose();
-    _animCtrl.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -50,7 +35,6 @@ class _SchoolCodeScreenState extends State<SchoolCodeScreen>
       );
       return;
     }
-    // Navigate to role selection directly with the code
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -71,19 +55,58 @@ class _SchoolCodeScreenState extends State<SchoolCodeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          // ── Blue header with illustration ──
-          _buildHeader(context),
-
-          // ── White bottom card ──
-          Expanded(
-            child: FadeTransition(
-              opacity: _fadeIn,
-              child: SlideTransition(
-                position: _slideUp,
-                child: _buildFormCard(),
+          // Background Gradient instead of full Mesh (for auth flow premium look)
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF4F46E5), Color(0xFF3B82F6), Color(0xFF0284C7)],
+                ),
               ),
+            ),
+          ),
+          
+          // Abstract floating shapes
+          Positioned(
+            top: -100,
+            right: -50,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
+            ).animate(onPlay: (AnimationController c) => c.repeat(reverse: true)).scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 3000.ms, curve: Curves.easeInOut),
+          ),
+          Positioned(
+            bottom: -50,
+            left: -100,
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.05),
+              ),
+            ).animate(onPlay: (AnimationController c) => c.repeat(reverse: true)).slide(begin: const Offset(0, 0), end: const Offset(0.1, -0.1), duration: 4000.ms, curve: Curves.easeInOut),
+          ),
+
+          SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Center(
+                    child: _buildHeroIcon(),
+                  ),
+                ),
+                _buildFormCard(),
+              ],
             ),
           ),
         ],
@@ -91,272 +114,151 @@ class _SchoolCodeScreenState extends State<SchoolCodeScreen>
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF2196F3), Color(0xFF1976D2), Color(0xFF1565C0)],
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 20, bottom: 30),
-          child: SizedBox(
-            height: 200,
-            child: _buildIllustration(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// Custom illustration using Flutter shapes – replaces the image asset
-  Widget _buildIllustration() {
+  Widget _buildHeroIcon() {
     return Stack(
       alignment: Alignment.center,
+      clipBehavior: Clip.none,
       children: [
-        // Phone shape
-        Positioned(
-          child: Container(
-            width: 100,
-            height: 150,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.school_rounded, size: 40, color: Colors.white.withOpacity(0.8)),
-                const SizedBox(height: 8),
-                Container(
-                  width: 60,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.4),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Container(
-                  width: 50,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        // Books
-        Positioned(
-          left: 40,
-          bottom: 20,
-          child: Transform.rotate(
-            angle: -0.15,
-            child: Column(
-              children: [
-                _buildBook(const Color(0xFFFFC107), 55, 12),
-                _buildBook(const Color(0xFFE91E63), 50, 10),
-                _buildBook(const Color(0xFF4CAF50), 45, 8),
-              ],
-            ),
-          ),
-        ),
-        // Graduation cap
-        Positioned(
-          left: 50,
-          top: 15,
-          child: Icon(
-            Icons.school,
-            size: 36,
-            color: Colors.yellow.shade600,
-          ),
-        ),
-        // Person reading
-        Positioned(
-          right: 50,
-          bottom: 30,
-          child: Column(
-            children: [
-              Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFC107),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white.withOpacity(0.5)),
-                ),
-                child: const Icon(Icons.person, size: 18, color: Colors.white),
-              ),
-              Container(
-                width: 25,
-                height: 35,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2196F3).withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(6),
-                ),
+        Container(
+          width: 120,
+          height: 120,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 24,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
-        ),
-        // Gear icon
-        Positioned(
-          right: 45,
-          top: 25,
-          child: Icon(
-            Icons.settings,
-            size: 22,
-            color: Colors.white.withOpacity(0.4),
+          child: ClipOval(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white.withOpacity(0.3), width: 1.5),
+                ),
+                child: const Icon(Icons.school_rounded, size: 56, color: Colors.white),
+              ),
+            ),
           ),
+        ).animate(onPlay: (AnimationController c) => c.repeat(reverse: true)).slideY(begin: -0.05, end: 0.05, duration: 2000.ms, curve: Curves.easeInOut),
+        
+        Positioned(
+          top: 0,
+          right: -10,
+          child: const Icon(Icons.star_rounded, color: Colors.yellowAccent, size: 28)
+              .animate(onPlay: (AnimationController c) => c.repeat(reverse: true))
+              .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.2, 1.2), duration: 1500.ms),
+        ),
+        Positioned(
+          bottom: 10,
+          left: -20,
+          child: const Icon(Icons.menu_book_rounded, color: Colors.white70, size: 32)
+              .animate(onPlay: (AnimationController c) => c.repeat(reverse: true))
+              .rotate(begin: -0.1, end: 0.1, duration: 2500.ms),
         ),
       ],
-    );
-  }
-
-  Widget _buildBook(Color color, double width, double height) {
-    return Container(
-      width: width,
-      height: height,
-      margin: const EdgeInsets.only(bottom: 2),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(3),
-        boxShadow: [
-          BoxShadow(
-            color: color.withOpacity(0.3),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-    );
+    ).animate().fade(duration: 800.ms).scale(begin: const Offset(0.8, 0.8), curve: Curves.easeOutBack);
   }
 
   Widget _buildFormCard() {
     return Container(
       width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(32, 40, 32, 48),
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(40)),
       ),
-      transform: Matrix4.translationValues(0, -24, 0),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(28, 36, 28, 28),
-        child: Column(
-          children: [
-            // Title
-            const Text(
-              'Nhập mã trường',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF1A1A2E),
-              ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Nhập mã trường',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 28,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF0F172A),
+              letterSpacing: -0.5,
             ),
-            const SizedBox(height: 10),
-            Text(
-              'Vui lòng nhập mã/chọn trường để tiếp tục',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey.shade600,
-              ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Vui lòng nhập mã hoặc chọn trường để tiếp tục',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: const Color(0xFF64748B),
+              fontWeight: FontWeight.w500,
             ),
-            const SizedBox(height: 32),
-
-            // Input row
-            Row(
-              children: [
-                // Text field
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF5F7FA),
-                      borderRadius: BorderRadius.circular(30),
-                      border: Border.all(color: const Color(0xFFE0E6ED)),
-                    ),
-                    child: TextField(
-                      controller: _codeController,
-                      textCapitalization: TextCapitalization.characters,
-                      decoration: InputDecoration(
-                        hintText: 'Nhập mã trường',
-                        hintStyle: TextStyle(
-                          color: Colors.grey.shade400,
-                          fontSize: 15,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 22,
-                          vertical: 16,
-                        ),
-                        border: InputBorder.none,
-                      ),
+          ),
+          const SizedBox(height: 32),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF8FAFC),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: TextField(
+                    controller: _codeController,
+                    focusNode: _focusNode,
+                    style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A)),
+                    decoration: InputDecoration(
+                      hintText: 'Nhập mã trường...',
+                      hintStyle: GoogleFonts.inter(color: const Color(0xFF94A3B8), fontWeight: FontWeight.w500),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                // QR / Search icon button
-                Material(
-                  color: const Color(0xFFF5F7FA),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    side: const BorderSide(color: Color(0xFFE0E6ED)),
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(14),
-                    onTap: _onSearchSchool,
-                    child: const Padding(
-                      padding: EdgeInsets.all(14),
-                      child: Icon(
-                        Icons.qr_code_scanner_rounded,
-                        color: Color(0xFF1565C0),
-                        size: 26,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 32),
-
-            // Arrow button
-            GestureDetector(
-              onTap: _onContinue,
-              child: Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF90CAF9), Color(0xFF64B5F6)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFF64B5F6).withOpacity(0.4),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.arrow_forward_rounded,
-                  color: Colors.white,
-                  size: 28,
                 ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: _onSearchSchool,
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFDBEAFE)),
+                  ),
+                  child: const Icon(Icons.qr_code_scanner_rounded, color: Color(0xFF3B82F6), size: 24),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 32),
+          GestureDetector(
+            onTap: _onContinue,
+            child: Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4F46E5), Color(0xFF3B82F6)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF4F46E5).withOpacity(0.4),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.arrow_forward_rounded, color: Colors.white, size: 32),
+            ).animate(onPlay: (AnimationController c) => c.repeat(reverse: true)).scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 1000.ms, curve: Curves.easeInOut),
+          ),
+        ],
       ),
-    );
+    ).animate().slideY(begin: 0.3, end: 0, duration: 800.ms, curve: Curves.easeOutQuart).fade();
   }
 }

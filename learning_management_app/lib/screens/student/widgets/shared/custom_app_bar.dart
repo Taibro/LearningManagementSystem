@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomAppBar extends StatelessWidget {
   final String title;
@@ -21,17 +22,11 @@ class CustomAppBar extends StatelessWidget {
     final canPop = Navigator.canPop(context);
     return Container(
       decoration: BoxDecoration(
-        color: isGradient ? null : const Color(0xFF1565C0),
-        gradient: isGradient
-            ? const LinearGradient(
-                colors: [Color(0xFF1565C0), Color(0xFF1976D2)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              )
-            : null,
+        color: Colors.transparent,
+        border: Border(bottom: BorderSide(color: const Color(0xFFE2E8F0).withOpacity(0.5), width: 1.0)),
       ),
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
+        top: MediaQuery.of(context).padding.top + 8,
         bottom: paddingBottom,
       ),
       child: Row(
@@ -39,7 +34,7 @@ class CustomAppBar extends StatelessWidget {
           if (canPop)
             IconButton(
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A), size: 20),
             )
           else
             const SizedBox(width: 16),
@@ -47,10 +42,10 @@ class CustomAppBar extends StatelessWidget {
             child: Text(
               title,
               textAlign: canPop || trailing != null ? TextAlign.center : TextAlign.left,
-              style: TextStyle(
-                color: Colors.white,
+              style: GoogleFonts.plusJakartaSans(
+                color: const Color(0xFF0F172A),
                 fontSize: fontSize,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w700,
               ),
             ),
           ),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:ui';
 import '../../../../blocs/student/profile/profile_bloc.dart';
 import '../../../../blocs/student/profile/profile_state.dart';
 
@@ -9,19 +11,12 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF1565C0), Color(0xFF1976D2)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
+    return Padding(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 16,
-        left: 20,
-        right: 20,
-        bottom: 24,
+        top: MediaQuery.of(context).padding.top + 24,
+        left: 24,
+        right: 24,
+        bottom: 32,
       ),
       child: BlocBuilder<ProfileBloc, ProfileState>(
         builder: (context, state) {
@@ -38,43 +33,82 @@ class ProfileHeader extends StatelessWidget {
             mssv = '';
           }
 
-          return Row(
+          return Column(
             children: [
               // Avatar
-              Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2.5),
-                  color: Colors.white,
-                ),
-                child: ClipOval(
-                  child: avatarUrl != null
-                      ? Image.network(avatarUrl, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Icon(Icons.person, size: 44, color: Colors.grey[400]))
-                      : Icon(Icons.person, size: 44, color: Colors.grey[400]),
-                ),
-              ),
-              const SizedBox(width: 14),
-              // Name + MSSV
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: const TextStyle(
+              Center(
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF4F46E5), Color(0xFF38BDF8)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4F46E5).withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
                       color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    ),
+                    padding: const EdgeInsets.all(2),
+                    child: ClipOval(
+                      child: avatarUrl != null
+                          ? Image.network(
+                              avatarUrl, 
+                              fit: BoxFit.cover, 
+                              errorBuilder: (context, error, stackTrace) => const Icon(Icons.person_rounded, size: 50, color: Color(0xFFCBD5E1))
+                            )
+                          : const Icon(Icons.person_rounded, size: 50, color: Color(0xFFCBD5E1)),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    mssv,
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
-                  ),
-                ],
+                ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
               ),
+              const SizedBox(height: 16),
+              // Name + MSSV
+              Text(
+                name,
+                style: GoogleFonts.plusJakartaSans(
+                  color: const Color(0xFF0F172A),
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                ),
+                textAlign: TextAlign.center,
+              ).animate().fade(duration: 400.ms, delay: 100.ms).slideY(begin: 0.5, end: 0, curve: Curves.easeOutQuart),
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  mssv,
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF64748B), 
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ).animate().fade(duration: 400.ms, delay: 200.ms).slideY(begin: 0.5, end: 0, curve: Curves.easeOutQuart),
             ],
           );
         },

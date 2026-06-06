@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:learning_management_app/core/enum/AttendanceStatus.dart';
 import 'package:learning_management_app/models/Attendance.dart';
 import 'attendance_method_sheet.dart';
@@ -16,130 +18,179 @@ class AttendanceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color statusColor;
+    Color statusBgColor;
     String statusText;
+    IconData statusIcon;
+
     switch (item.status) {
       case AttendanceStatus.chuaDiemDanh:
-        statusColor = const Color(0xFFE65100);
+        statusColor = const Color(0xFFF59E0B);
+        statusBgColor = const Color(0xFFFEF3C7);
         statusText = 'Chưa điểm danh';
+        statusIcon = Icons.pending_actions_rounded;
         break;
       case AttendanceStatus.daDiemDanh:
-        statusColor = const Color(0xFF2E7D32);
+        statusColor = const Color(0xFF10B981);
+        statusBgColor = const Color(0xFFD1FAE5);
         statusText = 'Đã điểm danh';
+        statusIcon = Icons.check_circle_rounded;
         break;
       case AttendanceStatus.vang:
-        statusColor = const Color(0xFFC62828);
-        statusText = 'Vắng';
+        statusColor = const Color(0xFFEF4444);
+        statusBgColor = const Color(0xFFFEE2E2);
+        statusText = 'Vắng mặt';
+        statusIcon = Icons.cancel_rounded;
         break;
     }
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF4F46E5).withOpacity(0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            item.subjectName,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-              color: Color(0xFF212121),
-            ),
-          ),
-          const SizedBox(height: 10),
-          _infoRow('Tiết :', item.tiet),
-          const SizedBox(height: 5),
-          _infoRow('Lớp :', item.lop),
-          const SizedBox(height: 5),
-          _infoRow('Phòng :', item.phong),
-          const SizedBox(height: 14),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                statusText,
-                style: TextStyle(
-                  color: statusColor,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEEF2FF),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(
+                  Icons.fact_check_rounded,
+                  color: Color(0xFF4F46E5),
+                  size: 24,
                 ),
               ),
-              if (item.status == AttendanceStatus.chuaDiemDanh)
-                ElevatedButton(
-                  onPressed: () => _openAttendanceSheet(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1565C0),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 10,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.subjectName,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        color: const Color(0xFF0F172A),
+                        height: 1.2,
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                    const SizedBox(height: 4),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: statusBgColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(statusIcon, size: 12, color: statusColor),
+                          const SizedBox(width: 4),
+                          Text(
+                            statusText,
+                            style: GoogleFonts.inter(
+                              color: statusColor,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Điểm danh',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                  ),
-                )
-              else
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    item.status == AttendanceStatus.daDiemDanh
-                        ? '✓ Hoàn thành'
-                        : '✗ Vắng',
-                    style: TextStyle(
-                      color: statusColor,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  ],
                 ),
+              ),
             ],
           ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              children: [
+                _infoRow(Icons.access_time_filled_rounded, 'Tiết:', item.tiet),
+                const SizedBox(height: 8),
+                _infoRow(Icons.class_rounded, 'Lớp:', item.lop),
+                const SizedBox(height: 8),
+                _infoRow(Icons.meeting_room_rounded, 'Phòng:', item.phong),
+              ],
+            ),
+          ),
+          if (item.status == AttendanceStatus.chuaDiemDanh) ...[
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => _openAttendanceSheet(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF4F46E5),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  elevation: 0,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.fingerprint_rounded, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Điểm danh ngay',
+                      style: GoogleFonts.inter(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ).animate().shimmer(duration: 2.seconds, delay: 1.seconds),
+          ],
         ],
       ),
     );
   }
 
-  Widget _infoRow(String label, String value) {
+  Widget _infoRow(IconData icon, String label, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Icon(icon, size: 16, color: const Color(0xFF94A3B8)),
+        const SizedBox(width: 8),
         SizedBox(
-          width: 70,
+          width: 60,
           child: Text(
             label,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF757575)),
+            style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B)),
           ),
         ),
         Expanded(
           child: Text(
             value,
-            style: const TextStyle(
+            style: GoogleFonts.inter(
               fontSize: 13,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF212121),
+              color: const Color(0xFF334155),
             ),
           ),
         ),
