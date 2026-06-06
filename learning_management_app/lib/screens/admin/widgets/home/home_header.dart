@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
 
-  static const _kPrimary = Color(0xFF1A237E);
+  static const _kPrimary = Color(0xFF3F51B5);
   static const _kAccent  = Color(0xFF283593);
 
   @override

@@ -41,7 +41,7 @@ class _LecturersTabState extends State<LecturersTab> {
                 child: Text('Không tìm thấy giảng viên',
                     style: TextStyle(color: Color(0xFF9E9E9E))))
             : ListView.separated(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                 itemCount: _filteredLecturers.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (_, i) => _lecturerCard(_filteredLecturers[i]),
