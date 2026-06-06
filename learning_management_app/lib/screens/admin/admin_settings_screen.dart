@@ -15,18 +15,18 @@ class AdminSettingsScreen extends StatefulWidget {
 }
 
 class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
-  static const _kPrimary = Color(0xFF1A237E);
-  static const _kBg = Color(0xFFF0F2FF);
+  static const _kPrimary = Color(0xFF3F51B5);
+  static const _kBg = Color(0xFFF4F7FB);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: Colors.transparent,
       body: Column(children: [
         _buildHeader(),
         Expanded(
             child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           child: Column(children: [
             const AdminProfileCard(),
             const SizedBox(height: 14),
@@ -59,28 +59,49 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
 
   Widget _buildHeader() {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF0D1B6E), _kPrimary],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+      padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 20, 20, 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: _kPrimary.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 14,
-        left: 16,
-        right: 16,
-        bottom: 16,
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: _kPrimary.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.settings_rounded, color: _kPrimary, size: 24),
+          ),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Cài đặt hệ thống',
+                    style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1E293B),
+                        letterSpacing: -0.5)),
+                Text('Quản lý thông tin & Hệ thống',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+              ],
+            ),
+          ),
+        ],
       ),
-      child: const Row(children: [
-        Icon(Icons.settings_rounded, color: Colors.white, size: 22),
-        SizedBox(width: 10),
-        Text('Cài đặt hệ thống',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w700)),
-      ]),
     );
   }
 

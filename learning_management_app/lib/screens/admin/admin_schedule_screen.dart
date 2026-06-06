@@ -14,8 +14,8 @@ class AdminScheduleScreen extends StatefulWidget {
 class _AdminScheduleScreenState extends State<AdminScheduleScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tab;
-  static const _kPrimary = Color(0xFF1A237E);
-  static const _kBg = Color(0xFFF0F2FF);
+  static const _kPrimary = Color(0xFF3F51B5);
+  static const _kBg = Color(0xFFF4F7FB);
 
   @override
   void initState() {
@@ -32,7 +32,7 @@ class _AdminScheduleScreenState extends State<AdminScheduleScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _kBg,
+      backgroundColor: Colors.transparent,
       body: Column(children: [
         _buildHeader(),
         _buildTabBar(),
@@ -45,57 +45,118 @@ class _AdminScheduleScreenState extends State<AdminScheduleScreen>
               RoomsTab(),
             ])),
       ]),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddClassSheet(),
-        backgroundColor: _kPrimary,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text('Thêm lịch',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 100),
+        child: FloatingActionButton.extended(
+          onPressed: () => _showAddClassSheet(),
+          backgroundColor: _kPrimary,
+          icon: const Icon(Icons.add, color: Colors.white),
+          label: const Text('Thêm lịch',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+        ),
       ),
     );
   }
 
   Widget _buildHeader() {
     return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-            colors: [Color(0xFF0D1B6E), _kPrimary],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight),
+      padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 20, 20, 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: _kPrimary.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
       ),
-      padding: EdgeInsets.only(
-          top: MediaQuery.of(context).padding.top + 14,
-          left: 16,
-          right: 16,
-          bottom: 16),
-      child: Row(children: [
-        const Icon(Icons.calendar_month_rounded, color: Colors.white, size: 22),
-        const SizedBox(width: 10),
-        const Text('Quản lý lịch học',
-            style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.w700)),
-        const Spacer(),
-        Text('${mockClasses.length} lớp',
-            style: const TextStyle(color: Colors.white70, fontSize: 13)),
-      ]),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: _kPrimary.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.calendar_month_rounded, color: _kPrimary, size: 24),
+          ),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Quản lý lịch học',
+                    style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1E293B),
+                        letterSpacing: -0.5)),
+                Text('Học kỳ 2 · 2025-2026',
+                    style: TextStyle(fontSize: 13, color: Color(0xFF64748B))),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: BoxDecoration(
+                color: _kPrimary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20)),
+            child: Text('${mockClasses.length} lớp',
+                style: const TextStyle(
+                    color: _kPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildTabBar() {
     return Container(
-      color: _kPrimary,
+      margin: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: _kPrimary.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: TabBar(
         controller: _tab,
-        indicatorColor: Colors.white,
-        indicatorWeight: 3,
+        indicator: BoxDecoration(
+          color: _kPrimary,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: _kPrimary.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        splashBorderRadius: BorderRadius.circular(24),
+        overlayColor: WidgetStateProperty.all(Colors.transparent),
+        dividerColor: Colors.transparent,
         labelColor: Colors.white,
-        unselectedLabelColor: Colors.white54,
-        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        unselectedLabelColor: const Color(0xFF64748B),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, fontFamily: 'Inter'),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13, fontFamily: 'Inter'),
         tabs: const [
-          Tab(text: 'Danh sách lớp'),
-          Tab(text: 'Lịch theo tuần'),
+          Tab(text: 'Lớp học'),
+          Tab(text: 'Lịch tuần'),
           Tab(text: 'Phòng học')
         ],
       ),
