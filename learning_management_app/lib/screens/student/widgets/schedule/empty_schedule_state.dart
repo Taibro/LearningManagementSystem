@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../data/mock_schedule_data.dart';
 import '../../utils/schedule_utils.dart';
 
@@ -17,7 +18,8 @@ class EmptyScheduleState extends StatelessWidget {
             width: 200,
             height: 160,
             child: CustomPaint(painter: _FolderPainter()),
-          ),
+          ).animate(onPlay: (AnimationController controller) => controller.repeat(reverse: true))
+           .slideY(begin: -0.05, end: 0.05, duration: 2000.ms, curve: Curves.easeInOut),
           const SizedBox(height: 20),
           Text(
             'Không có dữ liệu vào ${dayDateLong(date)}',

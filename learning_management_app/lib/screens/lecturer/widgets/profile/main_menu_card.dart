@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'bottom_sheets/salary_sheet.dart';
+import 'package:learning_management_app/screens/lecturer/features/salary_info_screen.dart';
+import 'package:learning_management_app/screens/lecturer/features/teaching_stats_screen.dart';
 import 'bottom_sheets/declaration_sheet.dart';
-import 'bottom_sheets/statistics_sheet.dart';
 import '../../lecturer_personal_profile_screen.dart';
 import '../../lecturer_materials_screen.dart';
 import '../../lecturer_survey_screen.dart';
@@ -9,30 +9,26 @@ import '../../lecturer_survey_screen.dart';
 class MainMenuCard extends StatelessWidget {
   const MainMenuCard({super.key});
 
-  void _showSalarySheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => SalarySheet(),
+
+
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
     );
   }
 
+  // Khai báo thông tin (Declaration) still uses the bottom sheet if no screen was requested, 
+  // but to be uniform, the user wanted to sync perfectly. 
+  // Let's keep Declaration as bottom sheet for now or create a screen? 
+  // The user requested to "hoàn thành giao diện" for ones in home. 
+  // Khai báo thông tin is not in the Home quick actions list that user gave.
   void _showDeclarationSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => const DeclarationSheet(),
-    );
-  }
-
-  void _showStatisticsSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const StatisticsSheet(),
+      builder: (_) => DeclarationSheet(),
     );
   }
 
@@ -72,7 +68,7 @@ class MainMenuCard extends StatelessWidget {
             iconColor: const Color(0xFF2E7D32),
             label: 'Thông tin lương',
             subtitle: 'Xem bảng lương theo tháng',
-            onTap: () => _showSalarySheet(context),
+            onTap: () => _navigateTo(context, const SalaryInfoScreen()),
           ),
           _buildDivider(),
           _buildMenuItem(
@@ -103,7 +99,7 @@ class MainMenuCard extends StatelessWidget {
             iconColor: const Color(0xFF4CAF50),
             label: 'Thống kê thực giảng, coi thi',
             subtitle: 'Tổng hợp giờ giảng, giờ coi thi',
-            onTap: () => _showStatisticsSheet(context),
+            onTap: () => _navigateTo(context, const TeachingStatsScreen()),
           ),
           _buildDivider(),
           _buildMenuItem(

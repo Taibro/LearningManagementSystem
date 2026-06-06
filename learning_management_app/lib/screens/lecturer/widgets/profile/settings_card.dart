@@ -12,14 +12,10 @@ class SettingsCard extends StatefulWidget {
 class _SettingsCardState extends State<SettingsCard> {
   bool _notificationEnabled = true;
 
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature - Sắp ra mắt'),
-        backgroundColor: const Color(0xFF6B4FA0),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
     );
   }
 
@@ -96,7 +92,11 @@ class _SettingsCardState extends State<SettingsCard> {
             iconBgColor: const Color(0xFFEDE7F6),
             iconColor: const Color(0xFF6B4FA0),
             label: 'Điều khoản & chính sách',
-            onTap: () => _showComingSoon(context, 'Điều khoản'),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Tính năng đang phát triển')),
+              );
+            },
           ),
           _buildDivider(),
           _buildMenuItem(
@@ -104,7 +104,11 @@ class _SettingsCardState extends State<SettingsCard> {
             iconBgColor: const Color(0xFFFFF3E0),
             iconColor: const Color(0xFFE65100),
             label: 'Góp ý ứng dụng',
-            onTap: () => _showComingSoon(context, 'Góp ý'),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Tính năng đang phát triển')),
+              );
+            },
           ),
           _buildDivider(),
           // Notification toggle

@@ -3,6 +3,7 @@ import 'lecturer_home_screen.dart';
 import 'lecturer_schedule_screen.dart';
 import 'lecturer_attendance_screen.dart';
 import 'lecturer_profile_screen.dart';
+import 'lecturer_chatbot_screen.dart';
 
 /// Để dùng: thay `home: const MainLayout()` trong main.dart thành
 /// `home: const LecturerMainLayout()` và import file này.
@@ -28,6 +29,17 @@ class _LecturerMainLayoutState extends State<LecturerMainLayout> {
     return Scaffold(
       body: _screens[_selectedIndex],
       bottomNavigationBar: _buildBottomNavBar(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const LecturerChatbotScreen()),
+          );
+        },
+        backgroundColor: const Color(0xFF2E7D32), // Màu xanh rêu của Giảng viên
+        elevation: 4,
+        child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 28),
+      ),
     );
   }
 

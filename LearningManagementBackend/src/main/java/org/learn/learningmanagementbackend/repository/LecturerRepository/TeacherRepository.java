@@ -19,6 +19,7 @@ public interface TeacherRepository extends JpaRepository<Teacher, Integer> {
     @Query(
             value = """
                             SELECT 
+                                t.id AS id,
                                 u.fullName AS fullName,
                                 u.dateOfBirth AS dateOfBirth,
                                 u.gender AS gender,

@@ -4,6 +4,10 @@ import '../models/student/student_profile.dart';
 import '../models/student/student_schedule.dart';
 import '../models/student/student_grade.dart';
 import '../models/student/student_attendance.dart';
+import '../models/student/student_debt.dart';
+import '../models/student/student_conduct.dart';
+import '../models/student/student_notification.dart';
+import '../models/student/student_survey.dart';
 
 class StudentRepository {
   final DioClient _dioClient;
@@ -44,6 +48,42 @@ class StudentRepository {
       return (response.data as List).map((e) => StudentAttendance.fromJson(e)).toList();
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Lỗi khi lấy thông tin điểm danh: ${e.message}');
+    }
+  }
+
+  Future<List<StudentConduct>> getConduct() async {
+    try {
+      final response = await _dioClient.dio.get('/student/conduct');
+      return (response.data as List).map((e) => StudentConduct.fromJson(e)).toList();
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Lỗi khi lấy điểm rèn luyện: ${e.message}');
+    }
+  }
+
+  Future<List<StudentDebt>> getDebtDetail() async {
+    try {
+      final response = await _dioClient.dio.get('/student/debt-detail');
+      return (response.data as List).map((e) => StudentDebt.fromJson(e)).toList();
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Lỗi khi lấy công nợ học phí: ${e.message}');
+    }
+  }
+
+  Future<List<StudentNotification>> getNotifications() async {
+    try {
+      final response = await _dioClient.dio.get('/student/notifications');
+      return (response.data as List).map((e) => StudentNotification.fromJson(e)).toList();
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Lỗi khi lấy tin tức: ${e.message}');
+    }
+  }
+
+  Future<List<StudentSurvey>> getSurveys() async {
+    try {
+      final response = await _dioClient.dio.get('/student/surveys');
+      return (response.data as List).map((e) => StudentSurvey.fromJson(e)).toList();
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Lỗi khi lấy khảo sát: ${e.message}');
     }
   }
 }

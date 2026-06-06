@@ -15,6 +15,9 @@ const getHeaders = () => ({
 export const getProfile = () =>
   axios.get(`${BASE_URL}/profile`, getHeaders()).then(res => res.data);
 
+export const updateProfile = (payload) =>
+  axios.put(`${BASE_URL}/profile`, payload, getHeaders()).then(res => res.data);
+
 // ── WEEKLY SCHEDULE ──────────────────────────────────────────────────────────
 // date: chuỗi 'YYYY-MM-DD' (tùy chọn, mặc định là tuần hiện tại)
 export const getWeeklySchedule = (date) => {
@@ -58,6 +61,9 @@ export const getPayments = () =>
 
 export const cancelPayment = (id) =>
   axios.post(`${BASE_URL}/payment/${id}/cancel`, {}, getHeaders()).then(res => res.data);
+
+export const checkPaymentStatus = (id) =>
+  axios.get(`${BASE_URL}/payment/${id}/check`, getHeaders()).then(res => res.data);
 
 export const mockPaymentSuccess = (id) =>
   axios.post(`${BASE_URL}/payment/${id}/mock-success`, {}, getHeaders()).then(res => res.data);

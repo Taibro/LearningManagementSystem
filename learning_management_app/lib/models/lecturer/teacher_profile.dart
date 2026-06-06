@@ -1,4 +1,5 @@
 class TeacherProfile {
+  final int? teacherId;
   final String? fullName;
   final String? dateOfBirth;
   final String? gender;
@@ -14,6 +15,7 @@ class TeacherProfile {
   final String? primaryTeachingCourse;
 
   TeacherProfile({
+    this.teacherId,
     this.fullName,
     this.dateOfBirth,
     this.gender,
@@ -31,6 +33,7 @@ class TeacherProfile {
 
   factory TeacherProfile.fromJson(Map<String, dynamic> json) {
     return TeacherProfile(
+      teacherId: json['id'],
       fullName: json['fullName'],
       dateOfBirth: json['dateOfBirth'],
       gender: json['gender'],

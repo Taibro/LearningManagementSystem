@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public interface TeacherProfileDto {
 
+    Integer getId();
     String getFullName();
     LocalDate getDateOfBirth();
     String getGender();

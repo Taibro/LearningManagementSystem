@@ -3,6 +3,7 @@ import '../models/lecturer/teacher_profile.dart';
 import '../models/lecturer/monthly_salary.dart';
 import '../models/lecturer/teaching_statistic.dart';
 import '../models/lecturer/teacher_attendance.dart';
+import '../models/lecturer/teacher_material.dart';
 
 class TeacherRepository {
   final Dio _dio;
@@ -36,6 +37,20 @@ class TeacherRepository {
       return TeachingStatistic.fromJson(response.data);
     } catch (e) {
       throw Exception('Lỗi khi tải thống kê giảng dạy: $e');
+    }
+  }
+
+  Future<List<TeacherMaterial>> getMaterials(int teacherId) async {
+    try {
+      final response = await _dio.get(
+        '/api/lecturer/materials',
+        queryParameters: {'teacherId': teacherId},
+      );
+      
+      final List<dynamic> data = response.data;
+      return data.map((m) => TeacherMaterial.fromJson(m)).toList();
+    } catch (e) {
+      throw Exception('Lỗi khi tải tài liệu bài giảng: $e');
     }
   }
 

@@ -1,5 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../student_info_screen.dart';
+import '../../profile_screens/change_password_screen.dart';
+import '../../profile_screens/terms_screen.dart';
+import '../../profile_screens/help_screen.dart';
+import '../../../auth/role_selection_screen.dart';
+import '../../../auth/school_code_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/auth/auth_bloc.dart';
+import '../../../../blocs/auth/auth_event.dart';
 
 class ProfileMenuCard extends StatefulWidget {
   const ProfileMenuCard({super.key});
@@ -14,24 +24,26 @@ class _ProfileMenuCardState extends State<ProfileMenuCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: const Color(0xFF4F46E5).withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
+      clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
           _buildMenuItem(
-            icon: Icons.article_outlined,
-            iconBgColor: const Color(0xFFE3F2FD),
-            iconColor: const Color(0xFF1565C0),
+            icon: Icons.person_rounded,
+            iconBgColor: const Color(0xFFEFF6FF),
+            iconColor: const Color(0xFF3B82F6),
             label: 'Thông tin sinh viên',
             onTap: () => Navigator.push(
               context,
@@ -40,27 +52,36 @@ class _ProfileMenuCardState extends State<ProfileMenuCard> {
           ),
           _buildDivider(),
           _buildMenuItem(
-            icon: Icons.lock_clock_outlined,
-            iconBgColor: const Color(0xFFE8F5E9),
-            iconColor: const Color(0xFF2E7D32),
+            icon: Icons.lock_rounded,
+            iconBgColor: const Color(0xFFF0FDF4),
+            iconColor: const Color(0xFF22C55E),
             label: 'Đổi mật khẩu',
-            onTap: () {},
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ChangePasswordScreen()),
+            ),
           ),
           _buildDivider(),
           _buildMenuItem(
-            icon: Icons.description_outlined,
-            iconBgColor: const Color(0xFFEDE7F6),
-            iconColor: const Color(0xFF5E35B1),
-            label: 'Điều khoản và chính sách sử dụng',
-            onTap: () {},
+            icon: Icons.description_rounded,
+            iconBgColor: const Color(0xFFF5F3FF),
+            iconColor: const Color(0xFF8B5CF6),
+            label: 'Điều khoản và chính sách',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const TermsScreen()),
+            ),
           ),
           _buildDivider(),
           _buildMenuItem(
-            icon: Icons.chat_bubble_outline_rounded,
-            iconBgColor: const Color(0xFFFFF3E0),
-            iconColor: const Color(0xFFE65100),
-            label: 'Góp ý ứng dụng',
-            onTap: () {},
+            icon: Icons.support_agent_rounded,
+            iconBgColor: const Color(0xFFFFF7ED),
+            iconColor: const Color(0xFFF97316),
+            label: 'Trợ giúp & Góp ý',
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const HelpScreen()),
+            ),
           ),
           _buildDivider(),
           // Thông báo với Toggle
@@ -68,15 +89,15 @@ class _ProfileMenuCardState extends State<ProfileMenuCard> {
           _buildDivider(),
           _buildMenuItem(
             icon: Icons.logout_rounded,
-            iconBgColor: const Color(0xFFFFEBEE),
-            iconColor: const Color(0xFFC62828),
+            iconBgColor: const Color(0xFFFEF2F2),
+            iconColor: const Color(0xFFEF4444),
             label: 'Đăng xuất',
             onTap: _showLogoutDialog,
-            showArrow: true,
+            showArrow: false,
           ),
         ],
       ),
-    );
+    ).animate().fade(duration: 500.ms, delay: 300.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuart);
   }
 
   Widget _buildMenuItem({
@@ -89,38 +110,38 @@ class _ProfileMenuCardState extends State<ProfileMenuCard> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(24),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         child: Row(
           children: [
             // Icon box
             Container(
-              width: 36,
-              height: 36,
+              width: 42,
+              height: 42,
               decoration: BoxDecoration(
                 color: iconBgColor,
-                borderRadius: BorderRadius.circular(9),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: iconColor, size: 20),
+              child: Icon(icon, color: iconColor, size: 22),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 16),
             // Label
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF212121),
-                  fontWeight: FontWeight.w500,
+                style: GoogleFonts.inter(
+                  fontSize: 15,
+                  color: const Color(0xFF334155),
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
             if (showArrow)
               const Icon(
-                Icons.chevron_right,
-                color: Color(0xFFBDBDBD),
-                size: 22,
+                Icons.arrow_forward_ios_rounded,
+                color: Color(0xFFCBD5E1),
+                size: 16,
               ),
           ],
         ),
@@ -130,30 +151,30 @@ class _ProfileMenuCardState extends State<ProfileMenuCard> {
 
   Widget _buildToggleItem() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
           Container(
-            width: 36,
-            height: 36,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
-              borderRadius: BorderRadius.circular(9),
+              color: const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(
-              Icons.notifications_outlined,
-              color: Color(0xFF616161),
-              size: 20,
+              Icons.notifications_active_rounded,
+              color: Color(0xFF64748B),
+              size: 22,
             ),
           ),
-          const SizedBox(width: 14),
-          const Expanded(
+          const SizedBox(width: 16),
+          Expanded(
             child: Text(
               'Thông báo',
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF212121),
-                fontWeight: FontWeight.w500,
+              style: GoogleFonts.inter(
+                fontSize: 15,
+                color: const Color(0xFF334155),
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -161,9 +182,9 @@ class _ProfileMenuCardState extends State<ProfileMenuCard> {
             value: _notificationEnabled,
             onChanged: (val) => setState(() => _notificationEnabled = val),
             activeColor: Colors.white,
-            activeTrackColor: const Color(0xFF43A047),
+            activeTrackColor: const Color(0xFF4F46E5),
             inactiveThumbColor: Colors.white,
-            inactiveTrackColor: const Color(0xFFBDBDBD),
+            inactiveTrackColor: const Color(0xFFCBD5E1),
           ),
         ],
       ),
@@ -173,9 +194,9 @@ class _ProfileMenuCardState extends State<ProfileMenuCard> {
   Widget _buildDivider() {
     return const Divider(
       height: 1,
-      indent: 66,
-      endIndent: 0,
-      color: Color(0xFFF0F0F0),
+      indent: 78,
+      endIndent: 20,
+      color: Color(0xFFF1F5F9),
     );
   }
 
@@ -291,7 +312,20 @@ class _ProfileMenuCardState extends State<ProfileMenuCard> {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.pop(ctx);
-                        // TODO: handle logout with selectedOption
+                        context.read<AuthBloc>().add(AuthLogoutRequested());
+                        if (selectedOption == 0) {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (_) => const RoleSelectionScreen(schoolName: 'EduSpace')),
+                            (route) => false,
+                          );
+                        } else {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(builder: (_) => const SchoolCodeScreen()),
+                            (route) => false,
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFE53935),

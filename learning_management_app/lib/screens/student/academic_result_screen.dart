@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:ui';
 import 'widgets/shared/custom_app_bar.dart';
+import 'widgets/shared/mesh_background.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/student/grade/grade_bloc.dart';
 import '../../blocs/student/grade/grade_event.dart';
@@ -29,25 +33,27 @@ class _AcademicResultScreenState extends State<AcademicResultScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: _kBg,
-        body: Column(
-          children: [
-            const CustomAppBar(
-              title: 'Kết quả học tập',
-              isGradient: true,
-              paddingBottom: 16,
-              fontSize: 17,
-            ),
-            _buildTabBar(),
-            const Expanded(
-              child: TabBarView(
-                children: [
-                  _OverviewTab(),
-                  _SummaryTab(),
-                ],
+        backgroundColor: const Color(0xFFF8FAFC),
+        body: MeshBackground(
+          child: Column(
+            children: [
+              const CustomAppBar(
+                title: 'Kết quả học tập',
+                isGradient: true,
+                paddingBottom: 16,
+                fontSize: 17,
               ),
-            ),
-          ],
+              _buildTabBar(),
+              const Expanded(
+                child: TabBarView(
+                  children: [
+                    _OverviewTab(),
+                    _SummaryTab(),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -55,15 +61,16 @@ class _AcademicResultScreenState extends State<AcademicResultScreen> {
 
   Widget _buildTabBar() {
     return Container(
-      color: Colors.white,
-      child: const TabBar(
+      color: Colors.transparent,
+      child: TabBar(
         labelColor: _kPrimary,
-        unselectedLabelColor: Color(0xFF757575),
-        labelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
-        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+        unselectedLabelColor: const Color(0xFF94A3B8),
+        labelStyle: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w700, fontSize: 15),
+        unselectedLabelStyle: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600, fontSize: 15),
         indicatorColor: _kPrimary,
         indicatorWeight: 3,
-        tabs: [
+        dividerColor: const Color(0xFFE2E8F0).withOpacity(0.5),
+        tabs: const [
           Tab(text: 'Tổng quan'),
           Tab(text: 'Tổng kết'),
         ],
@@ -92,51 +99,71 @@ class _OverviewTab extends StatelessWidget {
       _InfoRow('STC phải tích lũy', s.stcPhaiTichLuy.toStringAsFixed(2)),
     ];
 
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      itemCount: rows.length,
-      separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFFE0E0E0)),
-      itemBuilder: (_, i) {
-        final row = rows[i];
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 5,
-                child: Text(
-                  row.label,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF424242),
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.all(20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.85),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.white, width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF4F46E5).withOpacity(0.05),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              itemCount: rows.length,
+              separatorBuilder: (_, __) => Divider(height: 1, indent: 20, endIndent: 20, color: const Color(0xFFE2E8F0).withOpacity(0.5)),
+              itemBuilder: (_, i) {
+                final row = rows[i];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: Text(
+                          row.label,
+                          style: GoogleFonts.inter(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF64748B),
+                          ),
+                        ),
+                      ),
+                      const Text(' : ', style: TextStyle(color: Color(0xFF94A3B8))),
+                      Expanded(
+                        flex: 4,
+                        child: Text(
+                          row.value,
+                          style: GoogleFonts.inter(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF0F172A),
+                          ),
+                          textAlign: TextAlign.right,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ),
-              const Text(
-                ' : ',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF212121),
-                ),
-              ),
-              Expanded(
-                flex: 4,
-                child: Text(
-                  row.value,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF212121),
-                  ),
-                ),
-              ),
-            ],
+                );
+              },
+            ),
           ),
-        );
-      },
+        ),
+      ).animate().fade(duration: 500.ms, delay: 100.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart),
     );
   }
 }
@@ -203,13 +230,13 @@ class _SemesterBlock extends StatelessWidget {
       children: [
         // Semester header
         Padding(
-          padding: const EdgeInsets.only(bottom: 10, top: 6),
+          padding: const EdgeInsets.only(bottom: 12, top: 8),
           child: Text(
             semesterName,
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-              color: _kPrimary,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF4F46E5),
             ),
           ),
         ),
@@ -217,114 +244,99 @@ class _SemesterBlock extends StatelessWidget {
         // Table
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
+            color: Colors.white.withOpacity(0.85),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white, width: 2),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 6,
-                offset: const Offset(0, 2),
+                color: const Color(0xFF4F46E5).withOpacity(0.05),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            children: [
-              // Header row
-              Container(
-                color: _kPrimary,
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                child: const Row(
-                  children: [
-                    SizedBox(width: 60, child: Text('Mã môn', style: _kTableHeader)),
-                    Expanded(child: Text('Môn Học', style: _kTableHeader)),
-                    SizedBox(width: 36, child: Text('TC', style: _kTableHeader, textAlign: TextAlign.center)),
-                    SizedBox(width: 60, child: Text('Điểm TB', style: _kTableHeader, textAlign: TextAlign.center)),
-                  ],
-                ),
-              ),
-              // Data rows
-              ...grades.asMap().entries.map((entry) {
-                final idx = entry.key;
-                final sub = entry.value;
-                final isEven = idx.isEven;
-                return Container(
-                  color: isEven ? Colors.white : const Color(0xFFF5F8FF),
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: Row(
-                    children: [
-                      SizedBox(
-                        width: 60,
-                        child: Text(sub.courseCode ?? 'N/A', style: _kTableCell),
-                      ),
-                      Expanded(
-                        child: Text(sub.courseName ?? 'N/A', style: _kTableCell),
-                      ),
-                      SizedBox(
-                        width: 36,
-                        child: Text(
-                          '${sub.credits ?? 0}',
-                          style: _kTableCell,
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 60,
-                        child: Text(
-                          sub.gradeTotal != null ? sub.gradeTotal!.toStringAsFixed(1) : '-',
-                          style: _kTableCell.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: sub.gradeTotal != null ? const Color(0xFF212121) : const Color(0xFF9E9E9E),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Column(
+                children: [
+                  // Header row
+                  Container(
+                    color: const Color(0xFF4F46E5).withOpacity(0.1),
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                    child: Row(
+                      children: [
+                        SizedBox(width: 60, child: Text('Mã môn', style: _kTableHeader)),
+                        Expanded(child: Text('Môn Học', style: _kTableHeader)),
+                        SizedBox(width: 36, child: Text('TC', style: _kTableHeader, textAlign: TextAlign.center)),
+                        SizedBox(width: 60, child: Text('Điểm TB', style: _kTableHeader, textAlign: TextAlign.center)),
+                      ],
+                    ),
                   ),
-                );
-              }),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 20),
-      ],
-    );
-  }
-
-  Widget _statLine(String label, String? value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 4),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(fontSize: 13, color: Color(0xFF616161)),
-          ),
-          if (value != null) ...[
-            const Spacer(),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF212121),
+                  // Data rows
+                  ...grades.asMap().entries.map((entry) {
+                    final idx = entry.key;
+                    final sub = entry.value;
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(color: const Color(0xFFE2E8F0).withOpacity(0.5), width: 1),
+                        ),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 60,
+                            child: Text(sub.courseCode ?? 'N/A', style: _kTableCell),
+                          ),
+                          Expanded(
+                            child: Text(sub.courseName ?? 'N/A', style: _kTableCell.copyWith(fontWeight: FontWeight.w500, color: const Color(0xFF0F172A))),
+                          ),
+                          SizedBox(
+                            width: 36,
+                            child: Text(
+                              '${sub.credits ?? 0}',
+                              style: _kTableCell,
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 60,
+                            child: Text(
+                              sub.gradeTotal != null ? sub.gradeTotal!.toStringAsFixed(1) : '-',
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: sub.gradeTotal != null ? const Color(0xFF4F46E5) : const Color(0xFF94A3B8),
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
               ),
             ),
-          ],
-        ],
-      ),
+          ),
+        ).animate().fade(duration: 500.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart),
+
+        const SizedBox(height: 24),
+      ],
     );
   }
 }
 
-const TextStyle _kTableHeader = TextStyle(
-  color: Colors.white,
+final TextStyle _kTableHeader = GoogleFonts.inter(
+  color: const Color(0xFF4F46E5),
   fontSize: 12,
-  fontWeight: FontWeight.w600,
+  fontWeight: FontWeight.w700,
 );
 
-const TextStyle _kTableCell = TextStyle(
+final TextStyle _kTableCell = GoogleFonts.inter(
   fontSize: 12,
-  color: Color(0xFF424242),
+  color: const Color(0xFF64748B),
 );

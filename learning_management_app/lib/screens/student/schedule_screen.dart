@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:learning_management_app/models/Schedule.dart';
+import 'widgets/shared/mesh_background.dart';
 import 'data/mock_schedule_data.dart';
 import 'utils/schedule_utils.dart';
 import 'widgets/schedule/schedule_card.dart';
@@ -26,15 +27,17 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBg,
-      body: Column(
-        children: [
-          _appBar(),
-          _dateBar(),
-          if (_mode == ViewMode.week) _weekStrip(),
-          Expanded(child: _body()),
-          const ScheduleLegend(),
-        ],
+      backgroundColor: const Color(0xFFF8FAFC),
+      body: MeshBackground(
+        child: Column(
+          children: [
+            _appBar(),
+            _dateBar(),
+            if (_mode == ViewMode.week) _weekStrip(),
+            const ScheduleLegend(),
+            Expanded(child: _body()),
+          ],
+        ),
       ),
     );
   }
@@ -42,9 +45,12 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Widget _appBar() {
     final canPop = Navigator.canPop(context);
     return Container(
-      color: kPrimary,
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+        border: Border(bottom: BorderSide(color: const Color(0xFFE2E8F0).withOpacity(0.5), width: 1.0)),
+      ),
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
+        top: MediaQuery.of(context).padding.top + 8,
         left: canPop ? 4 : 16,
         right: 16,
         bottom: 14,
@@ -54,23 +60,24 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           if (canPop)
             IconButton(
               onPressed: () => Navigator.pop(context),
-              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
+              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF0F172A), size: 20),
             ),
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(left: canPop ? 0 : 22.0),
-              child: const Text(
-                'Lịch học/ lịch thi',
+              child: Text(
+                'Lịch học / Lịch thi',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
+                style: TextStyle( // GoogleFonts.plusJakartaSans if imported
+                  fontFamily: 'GoogleFonts.plusJakartaSans',
+                  color: const Color(0xFF0F172A),
                   fontSize: 18,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
           ),
-          const Icon(Icons.menu, color: Colors.white, size: 22),
+          const Icon(Icons.more_horiz_rounded, color: Color(0xFF64748B), size: 24),
         ],
       ),
     );
@@ -78,7 +85,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   Widget _dateBar() {
     return Container(
-      color: Colors.white,
+      color: Colors.transparent,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: Row(
         children: [_dateSelectorForMode(), const Spacer(), _viewModeTabs()],
@@ -178,7 +185,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   Widget _weekStrip() {
     final monday = weekStart(_selected);
     return Container(
-      color: Colors.white,
+      color: Colors.transparent,
       padding: const EdgeInsets.fromLTRB(4, 8, 4, 10),
       child: Row(
         children: List.generate(7, (i) {
@@ -198,45 +205,57 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
                   Text(
                     wdShort(day.weekday),
                     style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
                       color: isSel
-                          ? kPrimary
+                          ? const Color(0xFF4F46E5)
                           : isWEnd
-                          ? kRed
-                          : const Color(0xFF9E9E9E),
+                          ? const Color(0xFFEF4444)
+                          : const Color(0xFF64748B),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
 
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
-                      color: isSel ? kPrimary : Colors.transparent,
-                      borderRadius: BorderRadius.circular(10),
+                      gradient: isSel ? const LinearGradient(
+                        colors: [Color(0xFF4F46E5), Color(0xFF3B82F6)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ) : null,
+                      color: isSel ? null : Colors.transparent,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: isSel ? [
+                        BoxShadow(
+                          color: const Color(0xFF4F46E5).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        )
+                      ] : null,
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '${day.day}',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                         color: isSel
                             ? Colors.white
                             : isWEnd
-                            ? kRed
-                            : kTextMain,
+                            ? const Color(0xFFEF4444)
+                            : const Color(0xFF0F172A),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   // Event dot
                   Container(
                     width: 6,
                     height: 6,
                     decoration: BoxDecoration(
-                      color: hasDot ? kOrange : Colors.transparent,
+                      color: hasDot ? const Color(0xFFF59E0B) : Colors.transparent,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -268,7 +287,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final items = itemsFor(_selected);
     if (items.isEmpty) return EmptyScheduleState(date: _selected);
     return ListView.separated(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 120),
       itemCount: items.length,
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (_, i) => ScheduleCard(item: items[i]),
@@ -288,7 +307,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     if (groups.isEmpty) return EmptyScheduleState(date: _selected);
 
     return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 14),
+      padding: const EdgeInsets.fromLTRB(14, 10, 14, 120),
       itemCount: groups.length,
       itemBuilder: (_, gi) {
         final (date, items) = groups[gi];
@@ -373,7 +392,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
               );
             }, childCount: groups.length),
           ),
-        const SliverToBoxAdapter(child: SizedBox(height: 14)),
+        const SliverToBoxAdapter(child: SizedBox(height: 120)),
       ],
     );
   }
