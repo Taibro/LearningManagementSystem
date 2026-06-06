@@ -6,11 +6,26 @@ import '../../lecturer_materials_screen.dart';
 import '../../lecturer_request_screen.dart';
 import '../../lecturer_all_features_screen.dart';
 
-class FunctionGrid extends StatelessWidget {
+class FunctionGrid extends StatefulWidget {
   const FunctionGrid({super.key});
 
   @override
+  State<FunctionGrid> createState() => _FunctionGridState();
+}
+
+class _FunctionGridState extends State<FunctionGrid> {
+  bool _isExpanded = false;
+
+  void _navigateTo(BuildContext context, Widget screen) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => screen),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     final features = [
       {
         'icon': Icons.how_to_reg_outlined,
@@ -95,7 +110,9 @@ class FunctionGrid extends StatelessWidget {
                   builder: (_) => const LecturerAllFeaturesScreen()),
             ),
       },
+      },
     ];
+    final displayedFeatures = _isExpanded ? features : features.take(7).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -127,7 +144,9 @@ class FunctionGrid extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 14),
-        Container(
+        AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
@@ -149,9 +168,47 @@ class FunctionGrid extends StatelessWidget {
               mainAxisSpacing: 16,
               childAspectRatio: 0.75,
             ),
-            itemCount: features.length,
+            itemCount: displayedFeatures.length + 1,
             itemBuilder: (context, index) {
-              final item = features[index];
+              if (index == displayedFeatures.length) {
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isExpanded = !_isExpanded;
+                    });
+                  },
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 54,
+                        height: 54,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF6B4FA0).withOpacity(0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          _isExpanded ? Icons.expand_less_rounded : Icons.grid_view_rounded,
+                          color: const Color(0xFF6B4FA0),
+                          size: 28,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        _isExpanded ? 'Thu gọn' : 'Tất cả',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF424242),
+                          height: 1.3,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              final item = displayedFeatures[index];
               final color = item['color'] as Color;
               final onTap = item['onTap'] as VoidCallback;
               return GestureDetector(
@@ -166,8 +223,7 @@ class FunctionGrid extends StatelessWidget {
                         color: color.withOpacity(0.12),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(item['icon'] as IconData,
-                          color: color, size: 28),
+                      child: Icon(item['icon'] as IconData, color: color, size: 28),
                     ),
                     const SizedBox(height: 6),
                     Text(

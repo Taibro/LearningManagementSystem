@@ -21,6 +21,7 @@ import GeneralReceipts from './pages/GeneralReceipts/GeneralReceipts';
 import OnlineReceipts from './pages/OnlinePayment/Receipts';
 import DefaultPage from './pages/DefaultPage/DefaultPage';
 import CourseRegistration from './pages/CourseRegistration/CourseRegistration';
+import StudentDeclaration from './pages/Declaration/StudentDeclaration';
 import StudentLogin from './pages/Login/StudentLogin';
 
 // Component Bảo vệ: Chưa có token thì bắt quay lại trang login
@@ -65,7 +66,7 @@ export default function AppStudent({ schoolName }) {
           <Route path="student/course-registration" element={<CourseRegistration />} />
 
           
-          {/* <Route path="declaration" element={<DefaultPage title="Kê khai thông tin sinh viên" />} /> */}
+          <Route path="declaration" element={<StudentDeclaration />} />
           <Route path="services" element={<DefaultPage title="Dịch vụ trực tuyến" />} />
           <Route path="certificates" element={<DefaultPage title="Đề xuất chứng chỉ" />} />
           <Route path="student-profile" element={<DefaultPage title="Hồ sơ sinh viên" />} />

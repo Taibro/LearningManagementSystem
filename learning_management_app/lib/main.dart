@@ -8,6 +8,7 @@ import 'package:learning_management_app/screens/student/attendance_screen.dart';
 import 'package:learning_management_app/screens/student/home_screen.dart';
 import 'package:learning_management_app/screens/student/profile_screen.dart';
 import 'package:learning_management_app/screens/student/schedule_screen.dart';
+import 'package:learning_management_app/screens/admin/admin_main_layout.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learning_management_app/core/network/dio_client.dart';
@@ -76,6 +77,7 @@ class MyApp extends StatelessWidget {
           home: const SchoolCodeScreen(),
         ),
       ),
+
     );
   }
 }

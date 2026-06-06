@@ -32,6 +32,15 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getStudentProfile(userDetails.getSpecificCode()));
     }
 
+    // PUT /api/student/profile
+    @PutMapping("/profile")
+    public ResponseEntity<String> updateProfile(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @jakarta.validation.Valid @RequestBody org.learn.learningmanagementbackend.dto.request.StudentUpdateProfileRequest req) {
+        studentService.updateStudentProfile(userDetails.getSpecificCode(), req);
+        return ResponseEntity.ok("Cập nhật thông tin thành công");
+    }
+
     // GET /api/student/weekly-schedule?date=YYYY-MM-DD
     @GetMapping("/weekly-schedule")
     public ResponseEntity<List<StudentScheduleDto>> getWeeklySchedule(
@@ -182,11 +191,26 @@ public class StudentController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/payment/{id}/check")
+    public ResponseEntity<org.learn.learningmanagementbackend.dto.response.TuitionPaymentDto> checkPaymentStatus(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @PathVariable Integer id) {
+        return ResponseEntity.ok(studentService.checkPaymentStatus(userDetails.getSpecificCode(), id));
+    }
+
     @PostMapping("/payment/{id}/mock-success")
     public ResponseEntity<Void> mockPaymentSuccess(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Integer id) {
         studentService.mockPaymentSuccess(userDetails.getSpecificCode(), id);
         return ResponseEntity.ok().build();
+    }
+
+    // Dành riêng cho Demo / Admin gọi để ép giao dịch thành công (thay thế Webhook thật)
+    @GetMapping("/payment/{id}/force-success")
+    public ResponseEntity<String> forcePaymentSuccess(@PathVariable Integer id) {
+        // Dùng tạm mã sinh viên mặc định cho demo, vì đây là link gọi từ ngoài trình duyệt không có token
+        studentService.mockPaymentSuccess("2001216301", id);
+        return ResponseEntity.ok("Giao dịch " + id + " đã được xác nhận thành công! Hãy kiểm tra lại trang sinh viên.");
     }
 }

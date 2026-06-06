@@ -30,7 +30,7 @@ TRUNCATE TABLE school_branches;
 TRUNCATE TABLE schools;
 TRUNCATE TABLE role;
 
-SET FOREIGN_KEY_CHECKS = 1;
+
 
 -- ============================================================
 -- PHẦN 2: LỆNH INSERT DỮ LIỆU MẪU (MOCK DATA)
@@ -41,6 +41,7 @@ INSERT INTO role (name, description) VALUES
   ('LECTURER', 'Giảng viên'),
   ('STUDENT', 'Sinh viên / Học sinh'),
   ('SCHOOL_ADMIN', 'Admin nha truong');
+
 
 
 
@@ -91,18 +92,18 @@ INSERT INTO academic_years (id, school_id, name, start_date, end_date) VALUES
 
 -- 5. BẢNG SEMESTER (12 dòng)
 INSERT INTO semesters (id, academic_year_id, name, start_date, end_date) VALUES
-(1, 2, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(2, 2, 'Học kỳ 2', '2026-01-15', '2026-05-31'),
-(3, 2, 'Học kỳ hè', '2026-06-01', '2026-07-30'),
-(4, 1, 'Học kỳ 1', '2024-08-15', '2024-12-31'),
-(5, 1, 'Học kỳ 2', '2025-01-15', '2025-05-31'),
-(6, 4, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(7, 5, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(8, 6, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(9, 7, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(10, 8, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(11, 9, 'Học kỳ 1', '2025-08-15', '2025-12-31'),
-(12, 10, 'Học kỳ 1', '2025-08-15', '2025-12-31');
+(1, 1, 'Học kỳ 1 (Năm 1)', '2024-08-15', '2024-12-31'),
+(2, 1, 'Học kỳ 2 (Năm 1)', '2025-01-15', '2025-05-31'),
+(3, 2, 'Học kỳ 1 (Năm 2)', '2025-08-15', '2025-12-31'),
+(4, 2, 'Học kỳ 2 (Năm 2)', '2026-01-15', '2026-05-31'),
+(5, 4, 'Học kỳ 1 (Trường khác)', '2026-08-15', '2026-12-31'),
+(6, 5, 'Học kỳ 1 (Trường khác)', '2026-08-15', '2026-12-31'),
+(7, 6, 'Học kỳ 1 (Trường khác)', '2026-08-15', '2026-12-31'),
+(8, 7, 'Học kỳ 1 (Trường khác)', '2026-08-15', '2026-12-31'),
+(9, 8, 'Học kỳ 1 (Trường khác)', '2026-08-15', '2026-12-31'),
+(10, 9, 'Học kỳ 1 (Trường khác)', '2026-08-15', '2026-12-31'),
+(11, 10, 'Học kỳ 1 (Trường khác)', '2026-08-15', '2026-12-31'),
+(12, 11, 'Học kỳ 1 (Trường khác)', '2026-08-15', '2026-12-31');
 
 -- 6. BẢNG DEPARTMENT (12 dòng)
 INSERT INTO departments (id, school_id, code, name) VALUES
@@ -135,7 +136,7 @@ INSERT INTO users (id, school_id, code, citizen_id_number, full_name, email, pas
 (10, 1, 'USR010', '079001000010', 'Hồ Điện Tử', 'gv9@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
 (11, 1, 'USR011', '079001000011', 'Ngô Quản Trị', 'gv10@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
 (12, 1, 'USR012', '079001000012', 'Dương Kế Toán', 'gv11@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
-(13, 1, 'USR013', '079001000013', 'Nguyễn Thanh Tài', 'tai.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
+(13, 1, 'USR013', '079001000013', 'Phan Sĩ Thịnh', 'thinh.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
 (14, 1, 'USR014', '079001000014', 'Nguyễn Minh Dũng', 'dung.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
 (15, 1, 'USR015', '079001000015', 'Lê Hoàng Anh', 'anh.sv@huit.edu.vn', 'hash123', 'MALE', 'HCMC'),
 (16, 1, 'USR016', '079001000016', 'Phạm Thị Cúc', 'cuc.sv@huit.edu.vn', 'hash123', 'FEMALE', 'HCMC'),
@@ -181,11 +182,7 @@ INSERT INTO users (
     NOW()
 );
 
-INSERT INTO user_roles (user_id, role_id)
-VALUES (
-    (SELECT id FROM users WHERE email = 'admin@hcmut.edu.vn' LIMIT 1),
-    (SELECT id FROM role WHERE name = 'SCHOOL_ADMIN' LIMIT 1)
-);
+
 
 
 
@@ -244,7 +241,7 @@ INSERT INTO teachers (id, user_id, teacher_code, department_id, degree) VALUES
 
 -- 10. BẢNG STUDENT (12 dòng)
 INSERT INTO students (id, user_id, student_code, department_id, enrollment_year, class_name) VALUES
-(1, 13, '2001230773', 1, 2023, '12DHTH01'),
+(1, 13, '2001216301', 1, 2023, '12DHTH01'),
 (2, 14, '2001216302', 1, 2023, '12DHTH01'),
 (3, 15, '2001216303', 1, 2023, '12DHTH02'),
 (4, 16, '2001216304', 2, 2023, '12DHKT01'),
@@ -271,7 +268,9 @@ INSERT INTO courses (id, code, name, credits, department_id) VALUES
 (9, 'BUS102', 'Marketing căn bản', 3, 4),
 (10, 'ELE101', 'Mạch điện tử', 3, 5),
 (11, 'ELE102', 'Vi xử lý', 3, 5),
-(12, 'INT104', 'Trí tuệ nhân tạo (AI)', 4, 1);
+(12, 'INT104', 'Trí tuệ nhân tạo (AI)', 4, 1),
+(13, 'INT201', 'Cấu trúc dữ liệu', 3, 1),
+(14, 'INT202', 'Mạng máy tính', 3, 1);
 
 -- 12. BẢNG ROOM (12 dòng)
 INSERT INTO rooms (id, branch_id, building, room_number, capacity, type) VALUES
@@ -288,52 +287,101 @@ INSERT INTO rooms (id, branch_id, building, room_number, capacity, type) VALUES
 (11, 7, 'F', 'F601', 100, 'LECTURE_HALL'),
 (12, 1, 'A', 'A205', 40, 'SEMINAR');
 
--- 13. BẢNG CLASS (12 dòng)
+-- 13. BẢNG CLASS (21 dòng)
 INSERT INTO classes (id, code, course_id, semester_id, max_students, status) VALUES
-(1, 'INT101-HK2-01', 1, 2, 40, 'OPEN'),
-(2, 'INT102-HK2-01', 2, 2, 40, 'OPEN'),
-(3, 'INT103-HK2-01', 3, 2, 40, 'OPEN'),
-(4, 'ENG101-HK2-01', 4, 2, 40, 'IN_PROGRESS'),
-(5, 'ENG102-HK2-01', 5, 2, 40, 'OPEN'),
-(6, 'ACC101-HK2-01', 6, 2, 50, 'OPEN'),
-(7, 'ACC102-HK2-01', 7, 2, 50, 'COMPLETED'),
-(8, 'BUS101-HK2-01', 8, 2, 60, 'OPEN'),
-(9, 'BUS102-HK2-01', 9, 2, 60, 'CLOSED'),
-(10, 'ELE101-HK2-01', 10, 2, 40, 'OPEN'),
-(11, 'ELE102-HK2-01', 11, 2, 40, 'OPEN'),
-(12, 'INT104-HK2-01', 12, 2, 40, 'OPEN');
+(1, 'INT101-HK1-01', 1, 1, 40, 'COMPLETED'),
+(2, 'INT103-HK1-01', 3, 1, 40, 'COMPLETED'),
+(3, 'ENG101-HK1-01', 4, 1, 40, 'COMPLETED'),
+(4, 'INT102-HK2-01', 2, 2, 40, 'COMPLETED'),
+(5, 'INT104-HK2-01', 12, 2, 40, 'COMPLETED'),
+(6, 'ACC101-HK2-01', 6, 2, 40, 'COMPLETED'),
+(7, 'ELE101-HK2-01', 10, 2, 40, 'COMPLETED'),
+(8, 'BUS101-HK2-01', 8, 2, 40, 'COMPLETED'),
+(9, 'INT201-HK3-01A', 13, 3, 40, 'OPEN'),
+(10, 'INT201-HK3-01B', 13, 3, 40, 'OPEN'),
+(11, 'INT201-HK3-01C', 13, 3, 40, 'OPEN'),
+(12, 'INT103-HK3-01A', 3, 3, 40, 'OPEN'),
+(13, 'INT101-HK3-01A', 1, 3, 40, 'OPEN'),
+(14, 'INT202-HK3-01A', 14, 3, 40, 'OPEN'),
+(15, 'INT103-HK3-01B', 3, 3, 40, 'OPEN'),
+(16, 'INT101-HK3-01B', 1, 3, 40, 'OPEN'),
+(17, 'INT202-HK3-01B', 14, 3, 40, 'OPEN'),
+(18, 'INT102-HK3-01A', 2, 3, 40, 'OPEN'),
+(19, 'INT102-HK3-01B', 2, 3, 40, 'OPEN'),
+(20, 'ENG101-HK3-01A', 4, 3, 40, 'OPEN'),
+(21, 'ENG101-HK3-01B', 4, 3, 40, 'OPEN'),
+(22, 'INT104-HK3-01A', 12, 3, 40, 'OPEN'),
+(23, 'INT104-HK3-01B', 12, 3, 40, 'OPEN'),
+(24, 'ACC101-HK3-01A', 6, 3, 40, 'OPEN'),
+(25, 'ACC101-HK3-01B', 6, 3, 40, 'OPEN'),
+(26, 'ELE101-HK3-01A', 10, 3, 40, 'OPEN'),
+(27, 'ELE101-HK3-01B', 10, 3, 40, 'OPEN'),
+(28, 'BUS101-HK3-01A', 8, 3, 40, 'OPEN'),
+(29, 'BUS101-HK3-01B', 8, 3, 40, 'OPEN');
 
--- 14. BẢNG CLASS_TEACHER (12 dòng)
+-- 14. BẢNG CLASS_TEACHER (29 dòng)
 INSERT INTO Class_Teacher (class_id, teacher_id, role) VALUES
 (1, 1, 'main'),
-(2, 1, 'main'),
-(3, 2, 'main'),
-(4, 3, 'main'),
-(5, 3, 'main'),
+(2, 2, 'main'),
+(3, 3, 'main'),
+(4, 1, 'main'),
+(5, 1, 'main'),
 (6, 8, 'main'),
-(7, 11, 'main'),
+(7, 9, 'main'),
 (8, 10, 'main'),
-(9, 10, 'main'),
-(10, 9, 'main'),
-(11, 9, 'assistant'),
-(12, 1, 'main');
+(9, 1, 'main'),
+(10, 1, 'main'),
+(11, 1, 'main'),
+(12, 2, 'main'),
+(13, 1, 'main'),
+(14, 1, 'main'),
+(15, 2, 'main'),
+(16, 1, 'main'),
+(17, 1, 'main'),
+(18, 1, 'main'),
+(19, 1, 'main'),
+(20, 3, 'main'),
+(21, 3, 'main'),
+(22, 1, 'main'),
+(23, 1, 'main'),
+(24, 8, 'main'),
+(25, 8, 'main'),
+(26, 9, 'main'),
+(27, 9, 'main'),
+(28, 10, 'main'),
+(29, 10, 'main');
 
--- 15. BẢNG SCHEDULE (12 dòng)
+-- 15. BẢNG SCHEDULE (29 dòng)
 INSERT INTO schedules (id, class_id, room_id, day_of_week, start_time, end_time, start_date, end_date, start_period, end_period, type) VALUES
-(1, 1, 3, 2, '07:00:00', '09:30:00', '2026-01-15', '2026-06-15', 1, 3, 'REGULAR'),
-(2, 2, 4, 3, '09:40:00', '12:10:00', '2026-01-15', '2026-06-15', 4, 6, 'REGULAR'),
-(3, 3, 1, 4, '13:00:00', '15:30:00', '2026-01-15', '2026-06-15', 7, 9, 'REGULAR'),
-(4, 4, 2, 5, '07:00:00', '08:40:00', '2026-01-15', '2026-06-15', 1, 2, 'REGULAR'),
-(5, 5, 2, 6, '15:40:00', '17:20:00', '2026-01-15', '2026-06-15', 10, 11, 'REGULAR'),
-(6, 6, 5, 2, '13:00:00', '15:30:00', '2026-01-15', '2026-06-15', 7, 9, 'REGULAR'),
-(7, 7, 1, 3, '07:00:00', '09:30:00', '2026-01-15', '2026-06-15', 1, 3, 'REGULAR'),
-(8, 8, 5, 4, '09:40:00', '12:10:00', '2026-01-15', '2026-06-15', 4, 6, 'REGULAR'),
-(9, 9, 1, 5, '13:00:00', '15:30:00', '2026-01-15', '2026-06-15', 7, 9, 'REGULAR'),
-(10, 10, 4, 6, '07:00:00', '09:30:00', '2026-01-15', '2026-06-15', 1, 3, 'REGULAR'),
-(11, 11, 3, 7, '09:40:00', '12:10:00', '2026-01-15', '2026-06-15', 4, 6, 'REGULAR'),
-(12, 12, 4, 2, '15:40:00', '18:10:00', '2026-01-15', '2026-06-15', 10, 12, 'REGULAR');
-
-UPDATE schedules SET end_date = '2026-06-30';
+(1, 1, 3, 2, '07:00:00', '09:30:00', '2024-08-15', '2024-12-31', 1, 3, 'REGULAR'),
+(2, 2, 4, 3, '07:00:00', '09:30:00', '2024-08-15', '2024-12-31', 1, 3, 'REGULAR'),
+(3, 3, 1, 4, '07:00:00', '09:30:00', '2024-08-15', '2024-12-31', 1, 3, 'REGULAR'),
+(4, 4, 2, 2, '07:00:00', '09:30:00', '2025-01-15', '2025-05-31', 1, 3, 'REGULAR'),
+(5, 5, 2, 3, '07:00:00', '09:30:00', '2025-01-15', '2025-05-31', 1, 3, 'REGULAR'),
+(6, 6, 5, 4, '07:00:00', '09:30:00', '2025-01-15', '2025-05-31', 1, 3, 'REGULAR'),
+(7, 7, 1, 5, '07:00:00', '09:30:00', '2025-01-15', '2025-05-31', 1, 3, 'REGULAR'),
+(8, 8, 5, 6, '07:00:00', '09:30:00', '2025-01-15', '2025-05-31', 1, 3, 'REGULAR'),
+(9, 9, 1, 2, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR'),
+(10, 10, 4, 3, '09:40:00', '12:10:00', '2025-08-15', '2025-12-31', 4, 6, 'REGULAR'),
+(11, 11, 3, 2, '07:50:00', '10:25:00', '2025-08-15', '2025-12-31', 2, 4, 'REGULAR'),
+(12, 12, 4, 4, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR'),
+(13, 13, 1, 5, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR'),
+(14, 14, 2, 6, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR'),
+(15, 15, 4, 4, '13:00:00', '15:30:00', '2025-08-15', '2025-12-31', 7, 9, 'REGULAR'),
+(16, 16, 1, 5, '13:00:00', '15:30:00', '2025-08-15', '2025-12-31', 7, 9, 'REGULAR'),
+(17, 17, 2, 6, '13:00:00', '15:30:00', '2025-08-15', '2025-12-31', 7, 9, 'REGULAR'),
+(18, 18, 3, 2, '13:00:00', '15:30:00', '2025-08-15', '2025-12-31', 7, 9, 'REGULAR'),
+(19, 19, 3, 3, '13:00:00', '15:30:00', '2025-08-15', '2025-12-31', 7, 9, 'REGULAR'),
+(20, 20, 5, 2, '15:40:00', '17:20:00', '2025-08-15', '2025-12-31', 10, 11, 'REGULAR'),
+(21, 21, 5, 3, '15:40:00', '17:20:00', '2025-08-15', '2025-12-31', 10, 11, 'REGULAR'),
+(22, 22, 1, 4, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR'),
+(23, 23, 1, 5, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR'),
+(24, 24, 2, 6, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR'),
+(25, 25, 2, 2, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR'),
+(26, 26, 3, 3, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR'),
+(27, 27, 3, 4, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR'),
+(28, 28, 4, 5, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR'),
+(29, 29, 4, 6, '07:00:00', '09:30:00', '2025-08-15', '2025-12-31', 1, 3, 'REGULAR');
 
 -- 16. BẢNG SCHEDULE_EXCEPTION (12 dòng)
 INSERT INTO schedule_exceptions (id, schedule_id, exception_date, reason, exception_type) VALUES
@@ -351,23 +399,19 @@ INSERT INTO schedule_exceptions (id, schedule_id, exception_date, reason, except
 (12, 12, '2026-03-16', 'Họp Bộ môn', 'cancelled');
 
 -- 17. BẢNG ENROLLMENT (12 dòng)
-INSERT INTO enrollments (id, student_id, class_id, status, grade_total) VALUES
-(1, 1, 1, 'ENROLLED', 9.5),
-(2, 2, 1, 'ENROLLED', NULL),
-(3, 3, 1, 'ENROLLED', NULL),
-(4, 1, 2, 'ENROLLED', 9.0),
-(13, 1, 3, 'ENROLLED', 9.0),
-(14, 1, 8, 'ENROLLED', 8.5),
-(15, 1, 10, 'ENROLLED', 8.0),
-(16, 1, 12, 'ENROLLED', 9.5),
-(5, 2, 2, 'ENROLLED', NULL),
-(6, 4, 6, 'ENROLLED', NULL),
-(7, 5, 6, 'ENROLLED', NULL),
-(8, 6, 4, 'ENROLLED', NULL),
-(9, 7, 4, 'ENROLLED', NULL),
-(10, 8, 8, 'ENROLLED', NULL),
-(11, 9, 8, 'ENROLLED', NULL),
-(12, 12, 1, 'ENROLLED', NULL);
+INSERT INTO enrollments (id, student_id, class_id, status, grade_attendance, grade_midterm, grade_final, grade_total, grade_letter) VALUES
+(1, 1, 1, 'COMPLETED', 10.0, 8.0, 7.5, 8.0, 'B+'),
+(2, 1, 2, 'FAILED', 10.0, 5.0, 2.0, 3.5, 'F'),
+(3, 1, 3, 'COMPLETED', 9.0, 7.0, 6.5, 7.0, 'B'),
+(4, 1, 4, 'COMPLETED', 10.0, 9.0, 8.5, 9.0, 'A'),
+(5, 1, 5, 'COMPLETED', 9.5, 8.5, 8.0, 8.5, 'A-'),
+(6, 1, 6, 'COMPLETED', 10.0, 9.0, 8.5, 9.0, 'A'),
+(7, 1, 7, 'COMPLETED', 9.0, 8.0, 7.5, 8.0, 'B+'),
+(8, 1, 8, 'COMPLETED', 9.5, 8.5, 8.0, 8.5, 'A-'),
+(9, 2, 1, 'COMPLETED', 10.0, 8.0, 7.5, 8.0, 'B+'),
+(10, 3, 1, 'COMPLETED', 9.0, 7.0, 6.5, 7.0, 'B'),
+(11, 4, 4, 'COMPLETED', 9.0, 7.5, 7.0, 7.5, 'B'),
+(12, 5, 4, 'COMPLETED', 10.0, 9.5, 9.0, 9.5, 'A+');
 
 -- 18. BẢNG ATTENDANCE_RECORD (12 dòng)
 INSERT INTO attendance_records (id, schedule_id, student_id, attendance_date, status, checked_by, checked_at) VALUES
@@ -401,49 +445,22 @@ INSERT INTO notifications (id, user_id, title, body, type, is_read) VALUES
 
 -- 20. BẢNG TUITION_INVOICE (12 dòng)
 INSERT INTO tuition_invoices (id, student_id, semester_id, total_amount, paid_amount, due_date, status) VALUES
-(1, 1, 2, 15000000.00, 15000000.00, '2026-03-30', 'PAID'),
-(2, 2, 2, 15000000.00, 5000000.00, '2026-03-30', 'PARTIAL'),
-(3, 3, 2, 15000000.00, 0.00, '2026-03-30', 'UNPAID'),
-(4, 4, 2, 14000000.00, 14000000.00, '2026-03-30', 'PAID'),
-(5, 5, 2, 14000000.00, 0.00, '2026-03-30', 'UNPAID'),
-(6, 6, 2, 12000000.00, 12000000.00, '2026-03-30', 'PAID'),
-(7, 7, 2, 12000000.00, 12000000.00, '2026-03-30', 'PAID'),
-(8, 8, 2, 13000000.00, 0.00, '2026-03-30', 'UNPAID'),
-(9, 9, 2, 13000000.00, 0.00, '2026-03-30', 'UNPAID'),
-(10, 10, 2, 16000000.00, 8000000.00, '2026-03-30', 'PARTIAL'),
-(11, 11, 2, 16000000.00, 16000000.00, '2026-03-30', 'PAID'),
-(12, 12, 2, 15000000.00, 15000000.00, '2026-03-30', 'PAID');
+(1, 1, 1, 10000000.00, 10000000.00, '2024-12-30', 'PAID'),
+(2, 1, 2, 15000000.00, 10000000.00, '2025-05-30', 'PARTIAL'),
+(3, 2, 2, 15000000.00, 15000000.00, '2025-05-30', 'PAID'),
+(4, 3, 2, 15000000.00, 0.00, '2025-05-30', 'UNPAID');
 
 -- 21. BẢNG TUITION_PAYMENT (12 dòng)
 INSERT INTO tuition_payments (id, invoice_id, amount, payment_method, transaction_code, status, payment_date) VALUES
-(1, 1, 15000000.00, 'BANK_TRANSFER', 'VN123456', 'SUCCESS', '2026-03-30 12:00:00'),
-(2, 2, 5000000.00, 'MOMO', 'MM98765', 'SUCCESS', '2026-03-30 12:00:00'),
-(3, 4, 14000000.00, 'VNPAY', 'VNP1122', 'SUCCESS', '2026-03-30 12:00:00'),
-(4, 6, 12000000.00, 'CASH', 'CASH001', 'SUCCESS', '2026-03-30 12:00:00'),
-(5, 7, 12000000.00, 'BANK_TRANSFER', 'VN223344', 'SUCCESS', '2026-03-30 12:00:00'),
-(6, 10, 8000000.00, 'VISA', 'VS9988', 'SUCCESS', '2026-03-30 12:00:00'),
-(7, 11, 16000000.00, 'MOMO', 'MM7766', 'SUCCESS', '2026-03-30 12:00:00'),
-(8, 12, 15000000.00, 'BANK_TRANSFER', 'VN445566', 'SUCCESS', '2026-03-30 12:00:00'),
-(9, 1, 0.00, 'BANK_TRANSFER', 'FAIL01', 'FAILED', '2026-03-30 12:00:00'),
-(10, 2, 0.00, 'MOMO', 'FAIL02', 'FAILED', '2026-03-30 12:00:00'),
-(11, 4, 0.00, 'VNPAY', 'FAIL03', 'FAILED', '2026-03-30 12:00:00'),
-(12, 6, 0.00, 'VISA', 'FAIL04', 'FAILED', '2026-03-30 12:00:00');
+(1, 1, 10000000.00, 'BANK_TRANSFER', 'VN123', 'SUCCESS', '2024-09-30 12:00:00'),
+(2, 2, 10000000.00, 'MOMO', 'MM123', 'SUCCESS', '2025-02-15 12:00:00'),
+(3, 3, 15000000.00, 'VNPAY', 'VN456', 'SUCCESS', '2025-02-15 12:00:00');
 
 -- 22. BẢNG STUDENT_SEMESTER_SUMMARY (12 dòng)
 INSERT INTO student_semester_summaries (id, student_id, semester_id, gpa, credits_earned, conduct_score, conduct_grade) VALUES
-(1, 1, 1, 3.50, 15, 90, 'Xuất sắc'),
-(2, 2, 1, 3.20, 15, 85, 'Tốt'),
-(3, 3, 1, 2.80, 15, 75, 'Khá'),
-(4, 4, 1, 3.80, 18, 95, 'Xuất sắc'),
-(5, 5, 1, 2.50, 12, 65, 'Trung bình'),
-(6, 6, 1, 3.10, 16, 80, 'Tốt'),
-(7, 7, 1, 3.90, 20, 98, 'Xuất sắc'),
-(8, 8, 1, 2.90, 15, 78, 'Khá'),
-(9, 9, 1, 3.00, 15, 82, 'Tốt'),
-(10, 10, 1, 3.60, 18, 88, 'Tốt'),
-(11, 11, 1, 2.20, 10, 60, 'Trung bình'),
-(12, 12, 1, 3.51, 15, 92, 'Xuất sắc'),
-(13, 1, 2, NULL, NULL, 95, 'Xuất sắc');
+(1, 1, 1, 6.06, 5, 80, 'Khá'),
+(2, 1, 2, 8.59, 16, 95, 'Xuất sắc'),
+(3, 2, 2, 8.20, 15, 85, 'Tốt');
 
 -- 23. BẢNG SALARY_GRADE (12 dòng)
 INSERT INTO Salary_grade (id, school_id, degree, coefficient, rate_per_session, effective_from, is_active) VALUES
@@ -582,3 +599,6 @@ INSERT INTO audit_logs (id, school_id, user_email, action, table_name, record_id
 (5, 3, 'admin.fpoly@hcmus.edu.vn', 'UPDATE', 'salary_grade', 5, '117.4.x.x', '2025-05-10 09:48:14'),
 (6, 4, 'gv.tran@ueh.edu.vn', 'INSERT', 'class_materials', 1041, '118.70.x.x', '2025-05-09 22:31:07');
 
+
+
+SET FOREIGN_KEY_CHECKS = 1;
