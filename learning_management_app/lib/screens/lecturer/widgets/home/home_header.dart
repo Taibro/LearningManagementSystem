@@ -1,140 +1,210 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
+
+  String _getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return 'Chào buổi sáng,';
+    if (hour < 18) return 'Chào buổi chiều,';
+    return 'Chào buổi tối,';
+  }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF4A3570), Color(0xFF6B4FA0)],
+          colors: [Color(0xFF4F46E5), Color(0xFF6B4FA0)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 12,
-        left: 16,
-        right: 16,
-        bottom: 20,
+        top: MediaQuery.of(context).padding.top + 20,
+        left: 24,
+        right: 24,
+        bottom: 28,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
-                  color: Colors.white,
-                ),
-                child: ClipOval(
-                  child: Icon(Icons.person, size: 38, color: Colors.grey[400]),
-                ),
-              ),
-              const SizedBox(width: 12),
-              const Expanded(
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 54,
+                    height: 54,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: const LinearGradient(
+                        colors: [Color(0x66FFFFFF), Color(0x1AFFFFFF)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      border: Border.all(color: Colors.white.withOpacity(0.5), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.2),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    width: 46,
+                    height: 46,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: ClipOval(
+                      child: Icon(Icons.person, size: 36, color: Color(0xFF6B4FA0)),
+                    ),
+                  ),
+                ],
+              ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
+              const SizedBox(width: 16),
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Xin chào, Nguyễn Văn A',
+                      _getGreeting(),
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.3,
+                      ),
+                    ).animate().fadeIn(duration: 400.ms).slideX(begin: -0.1, end: 0),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'ThS. Nguyễn Văn A',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
                       ),
-                    ),
-                    SizedBox(height: 2),
-                    Text(
-                      'Giảng viên · Khoa CNTT',
-                      style: TextStyle(
-                        color: Colors.white70,
-                        fontSize: 12,
-                      ),
-                    ),
+                    ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideX(begin: -0.1, end: 0),
                   ],
                 ),
               ),
-              Stack(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.notifications_outlined,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                  ),
-                  Positioned(
-                    right: 6,
-                    top: 6,
-                    child: Container(
-                      width: 8,
-                      height: 8,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFFE85D75),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              _buildNotificationButton().animate().scale(duration: 400.ms, delay: 200.ms),
             ],
           ),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildHeaderStat('HK2 2025-2026', 'Học kỳ'),
-                _buildHeaderDivider(),
-                _buildHeaderStat('5', 'Lớp phụ trách'),
-                _buildHeaderDivider(),
-                _buildHeaderStat('120', 'Tiết / học kỳ'),
-              ],
-            ),
-          ),
+          const SizedBox(height: 24),
+          _buildGlassStatsCard().animate().fadeIn(duration: 600.ms, delay: 300.ms).slideY(begin: 0.2, end: 0),
         ],
       ),
     );
   }
 
-  Widget _buildHeaderStat(String value, String label) {
-    return Column(
+  Widget _buildNotificationButton() {
+    return Stack(
       children: [
-        Text(
-          value,
-          style: const TextStyle(
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.15),
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+          ),
+          child: const Icon(
+            Icons.notifications_none_rounded,
             color: Colors.white,
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
+            size: 24,
           ),
         ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white70, fontSize: 11),
+        Positioned(
+          right: 8,
+          top: 8,
+          child: Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEF4444), // Red alert
+              shape: BoxShape.circle,
+              border: Border.all(color: const Color(0xFF6B4FA0), width: 2),
+            ),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildHeaderDivider() {
-    return Container(width: 1, height: 30, color: Colors.white30);
+  Widget _buildGlassStatsCard() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildStatItem('HK2 25-26', 'Học kỳ', Icons.school_rounded),
+              _buildDivider(),
+              _buildStatItem('5 Lớp', 'Phụ trách', Icons.groups_rounded),
+              _buildDivider(),
+              _buildStatItem('120 Tiết', 'Tổng số', Icons.timer_rounded),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem(String value, String label, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, color: Colors.white.withOpacity(0.8), size: 20),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withOpacity(0.7),
+            fontSize: 11,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDivider() {
+    return Container(
+      width: 1,
+      height: 36,
+      color: Colors.white.withOpacity(0.2),
+    );
   }
 }

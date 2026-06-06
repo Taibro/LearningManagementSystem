@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../data/mock_home_data.dart';
 
 class RecentNotifications extends StatelessWidget {
@@ -15,11 +16,12 @@ class RecentNotifications extends StatelessWidget {
             const Text(
               'Thông báo gần đây',
               style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF212121),
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF1E293B),
+                letterSpacing: -0.3,
               ),
-            ),
+            ).animate().fadeIn(duration: 400.ms).slideX(begin: -0.1, end: 0),
             TextButton(
               onPressed: () {},
               style: TextButton.styleFrom(
@@ -31,65 +33,104 @@ class RecentNotifications extends StatelessWidget {
                 'Xem tất cả',
                 style: TextStyle(
                   fontSize: 13,
+                  fontWeight: FontWeight.w600,
                   color: Color(0xFF6B4FA0),
                 ),
               ),
-            ),
+            ).animate().fadeIn(duration: 400.ms).slideX(begin: 0.1, end: 0),
           ],
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+                color: const Color(0xFF6B4FA0).withOpacity(0.04),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
               ),
             ],
           ),
-          child: Column(
-            children: kNotifications.asMap().entries.map((entry) {
-              final i = entry.key;
-              final n = entry.value;
-              return Column(
-                children: [
-                  ListTile(
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    leading: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: (n['color'] as Color).withOpacity(0.12),
-                        shape: BoxShape.circle,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Column(
+              children: kNotifications.asMap().entries.map((entry) {
+                final i = entry.key;
+                final n = entry.value;
+                return Column(
+                  children: [
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () {},
+                        highlightColor: (n['color'] as Color).withOpacity(0.05),
+                        splashColor: (n['color'] as Color).withOpacity(0.1),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 44,
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: (n['color'] as Color).withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: (n['color'] as Color).withOpacity(0.1), width: 1),
+                                ),
+                                child: Icon(n['icon'] as IconData,
+                                    color: n['color'] as Color, size: 22),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      n['title'],
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF1E293B),
+                                        letterSpacing: -0.2,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      n['time'],
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF64748B),
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.chevron_right_rounded,
+                                  color: Color(0xFFCBD5E1), size: 24),
+                            ],
+                          ),
+                        ),
                       ),
-                      child: Icon(n['icon'] as IconData,
-                          color: n['color'] as Color, size: 20),
                     ),
-                    title: Text(
-                      n['title'],
-                      style: const TextStyle(
-                          fontSize: 13, fontWeight: FontWeight.w500),
-                    ),
-                    subtitle: Text(
-                      n['time'],
-                      style: const TextStyle(
-                          fontSize: 11, color: Color(0xFF9E9E9E)),
-                    ),
-                    trailing: const Icon(Icons.chevron_right,
-                        color: Color(0xFFBDBDBD), size: 20),
-                  ),
-                  if (i < kNotifications.length - 1)
-                    const Divider(
-                        height: 1, indent: 70, color: Color(0xFFF0F0F0)),
-                ],
-              );
-            }).toList(),
+                    if (i < kNotifications.length - 1)
+                      const Divider(
+                        height: 1,
+                        thickness: 1,
+                        indent: 76,
+                        endIndent: 16,
+                        color: Color(0xFFF1F5F9),
+                      ),
+                  ],
+                );
+              }).toList(),
+            ),
           ),
-        ),
+        ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.1, end: 0),
       ],
     );
   }

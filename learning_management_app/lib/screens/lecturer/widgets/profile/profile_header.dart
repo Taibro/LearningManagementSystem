@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'bottom_sheets/edit_profile_sheet.dart';
-
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../blocs/lecturer/profile/teacher_profile_bloc.dart';
 import '../../../../blocs/lecturer/profile/teacher_profile_state.dart';
-import 'bottom_sheets/edit_profile_sheet.dart';
 
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({super.key});
@@ -23,32 +22,57 @@ class ProfileHeader extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF4A3570), Color(0xFF6B4FA0)],
+          colors: [Color(0xFF4F46E5), Color(0xFF6B4FA0)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 16,
-        left: 20,
-        right: 20,
-        bottom: 24,
+        top: MediaQuery.of(context).padding.top + 24,
+        left: 24,
+        right: 24,
+        bottom: 32,
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            width: 60,
-            height: 60,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 2.5),
-              color: Colors.white,
-            ),
-            child: ClipOval(
-              child: Icon(Icons.person, size: 46, color: Colors.grey[400]),
-            ),
-          ),
-          const SizedBox(width: 14),
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: const LinearGradient(
+                    colors: [Color(0x66FFFFFF), Color(0x1AFFFFFF)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.2),
+                      blurRadius: 16,
+                      spreadRadius: 4,
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 62,
+                height: 62,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white,
+                ),
+                child: ClipOval(
+                  child: Icon(Icons.person, size: 48, color: Color(0xFF6B4FA0)),
+                ),
+              ),
+            ],
+          ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
+          const SizedBox(width: 20),
           Expanded(
             child: BlocBuilder<TeacherProfileBloc, TeacherProfileState>(
               builder: (context, state) {
@@ -63,20 +87,29 @@ class ProfileHeader extends StatelessWidget {
                         profile.fullName ?? 'Chưa cập nhật',
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
                         ),
-                      ),
-                      const SizedBox(height: 4),
+                      ).animate().fadeIn(duration: 400.ms).slideX(begin: -0.1, end: 0),
+                      const SizedBox(height: 6),
                       Text(
                         'Mã GV: ${profile.teacherCode ?? ''}  ·  Khoa ${profile.departmentName ?? ''}',
-                        style: const TextStyle(color: Colors.white70, fontSize: 12),
-                      ),
-                      const SizedBox(height: 2),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.9),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideX(begin: -0.1, end: 0),
+                      const SizedBox(height: 4),
                       Text(
                         '${profile.degree ?? ''} · ${profile.specialization ?? ''}',
-                        style: const TextStyle(color: Colors.white60, fontSize: 12),
-                      ),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideX(begin: -0.1, end: 0),
                     ],
                   );
                 }
@@ -84,23 +117,28 @@ class ProfileHeader extends StatelessWidget {
               },
             ),
           ),
-          GestureDetector(
-            onTap: () => _showEditProfile(context),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text(
-                'Chỉnh sửa',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _showEditProfile(context),
+              borderRadius: BorderRadius.circular(12),
+              splashColor: Colors.white.withOpacity(0.2),
+              highlightColor: Colors.white.withOpacity(0.1),
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                ),
+                child: const Icon(
+                  Icons.edit_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
               ),
             ),
-          ),
+          ).animate().scale(duration: 400.ms, delay: 300.ms),
         ],
       ),
     );

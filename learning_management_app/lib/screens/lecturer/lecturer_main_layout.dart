@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'lecturer_home_screen.dart';
 import 'lecturer_schedule_screen.dart';
 import 'lecturer_attendance_screen.dart';
 import 'lecturer_profile_screen.dart';
 
-/// Để dùng: thay `home: const MainLayout()` trong main.dart thành
-/// `home: const LecturerMainLayout()` và import file này.
 class LecturerMainLayout extends StatefulWidget {
   const LecturerMainLayout({super.key});
 
@@ -15,80 +15,129 @@ class LecturerMainLayout extends StatefulWidget {
 
 class _LecturerMainLayoutState extends State<LecturerMainLayout> {
   int _selectedIndex = 0;
+  late PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _selectedIndex);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
 
   final List<Widget> _screens = [
     const LecturerHomeScreen(),
     const LecturerScheduleScreen(),
-    const LecturerAttendanceScreen(),
+    const LecturerAttendanceScreen(initialTabIndex: 0),
     const LecturerProfileScreen(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: _buildBottomNavBar(),
+      extendBody: true,
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        onPageChanged: (index) {
+          setState(() => _selectedIndex = index);
+        },
+        children: _screens,
+      ),
+      bottomNavigationBar: _buildFloatingBottomNavBar(),
     );
   }
 
-  Widget _buildBottomNavBar() {
+  Widget _buildFloatingBottomNavBar() {
     final items = [
       {'icon': Icons.home_rounded, 'label': 'Trang chủ'},
-      {'icon': Icons.calendar_today_outlined, 'label': 'Lịch dạy'},
-      {'icon': Icons.checklist_outlined, 'label': 'Điểm danh'},
-      {'icon': Icons.person_outline_rounded, 'label': 'Cá nhân'},
+      {'icon': Icons.calendar_month_rounded, 'label': 'Lịch dạy'},
+      {'icon': Icons.fact_check_rounded, 'label': 'Điểm danh'},
+      {'icon': Icons.person_rounded, 'label': 'Cá nhân'},
     ];
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: List.generate(items.length, (index) {
-              final isSelected = _selectedIndex == index;
-              return GestureDetector(
-                onTap: () => setState(() => _selectedIndex = index),
-                behavior: HitTestBehavior.opaque,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      items[index]['icon'] as IconData,
-                      color: isSelected
-                          ? const Color(0xFF6B4FA0)
-                          : const Color(0xFF9E9E9E),
-                      size: 24,
+    return SafeArea(
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
+        height: 72,
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.85),
+          borderRadius: BorderRadius.circular(36),
+          border: Border.all(color: Colors.white, width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF6B4FA0).withOpacity(0.15),
+              blurRadius: 24,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(36),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(items.length, (index) {
+                final isSelected = _selectedIndex == index;
+                final primaryColor = const Color(0xFF6B4FA0);
+                final inactiveColor = const Color(0xFF94A3B8);
+
+                return GestureDetector(
+                  onTap: () {
+                    if (_selectedIndex != index) {
+                      setState(() => _selectedIndex = index);
+                      _pageController.animateToPage(
+                        index,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOutQuart,
+                      );
+                    }
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: Container(
+                    width: 70,
+                    color: Colors.transparent,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOutBack,
+                          padding: EdgeInsets.all(isSelected ? 6 : 0),
+                          decoration: BoxDecoration(
+                            color: isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            items[index]['icon'] as IconData,
+                            color: isSelected ? primaryColor : inactiveColor,
+                            size: isSelected ? 24 : 22,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          items[index]['label'] as String,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                            color: isSelected ? primaryColor : inactiveColor,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 3),
-                    Text(
-                      items[index]['label'] as String,
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
-                        color: isSelected
-                            ? const Color(0xFF6B4FA0)
-                            : const Color(0xFF9E9E9E),
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
+                  ),
+                );
+              }),
+            ),
           ),
         ),
-      ),
+      ).animate().slideY(begin: 1, end: 0, duration: 600.ms, curve: Curves.easeOutExpo),
     );
   }
 }

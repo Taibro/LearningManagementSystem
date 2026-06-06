@@ -34,7 +34,8 @@ public class TeachingStatisticService {
         String semesterLabel = semester.getName() + " - " + semester.getAcademicYear().getName();
 
         // Lấy dữ liệu Lớp học & Lịch học theo học kỳ mới nhất
-        List<Classes> classes = classRepository.findClassesWithSchedulesByTeacherAndSemester(teacherCode, semester.getId());
+        List<Classes> classes = classRepository.findClassesWithSchedulesByTeacherAndSemester(teacherCode,
+                semester.getId());
 
         int totalTheory = 0, totalLab = 0, totalExam = 0, upcomingExam = 0;
         int totalCompletedPeriods = 0, totalAllPeriods = 0;
@@ -66,7 +67,8 @@ public class TeachingStatisticService {
                         // Xử lý coi thi
                         if (schedule.getType() == ScheduleType.EXAM) {
                             totalExam += 1; // Coi thi đếm theo ca
-                            if (loopDate.isAfter(today)) upcomingExam += 1;
+                            if (loopDate.isAfter(today))
+                                upcomingExam += 1;
                         } else {
                             // Cập nhật số liệu cho lớp và tổng thể
                             classTotalPeriods += periodsPerSession;
@@ -88,7 +90,9 @@ public class TeachingStatisticService {
                 int progress = (int) Math.round((double) classCompletedPeriods / classTotalPeriods * 100);
 
                 classDetails.add(TeachingStatisticResponse.ClassTeachingDetail.builder()
-                        .subjectName(cls.getCourse().getName() + (cls.getSchedules().stream().anyMatch(s -> s.getType() == ScheduleType.LAB) ? " (TH)" : " (LT)"))
+                        .subjectName(cls.getCourse().getName()
+                                + (cls.getSchedules().stream().anyMatch(s -> s.getType() == ScheduleType.LAB) ? " (TH)"
+                                        : " (LT)"))
                         .classCode(cls.getCode())
                         .completedPeriods(classCompletedPeriods)
                         .totalPeriods(classTotalPeriods)
@@ -104,7 +108,8 @@ public class TeachingStatisticService {
         int totalPeriods = totalTheory + totalLab;
         int theoryPct = totalPeriods == 0 ? 0 : (int) Math.round((double) totalTheory / totalPeriods * 100);
         int labPct = totalPeriods == 0 ? 0 : (100 - theoryPct);
-        int overallProgress = totalAllPeriods == 0 ? 0 : (int) Math.round((double) totalCompletedPeriods / totalAllPeriods * 100);
+        int overallProgress = totalAllPeriods == 0 ? 0
+                : (int) Math.round((double) totalCompletedPeriods / totalAllPeriods * 100);
 
         // Chuyển đổi Map thành List cho Biểu đồ
         List<TeachingStatisticResponse.MonthlyChartData> chartData = monthlyPeriodsMap.entrySet().stream()

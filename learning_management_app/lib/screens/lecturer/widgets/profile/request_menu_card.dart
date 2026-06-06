@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../features/request_pause_screen.dart';
-import '../../features/request_substitute_screen.dart';
-import '../../features/request_makeup_screen.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import '../../lecturer_request_screen.dart';
 
 class RequestMenuCard extends StatelessWidget {
   const RequestMenuCard({super.key});
@@ -16,77 +15,102 @@ class RequestMenuCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF6B4FA0).withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Row(
-              children: [
-                const Text(
-                  'ĐỀ XUẤT LỊCH DẠY',
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              child: Row(
+                children: [
+                  const Text(
+                    'ĐỀ XUẤT LỊCH DẠY',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
                       color: Color(0xFF6B4FA0),
-                      letterSpacing: 0.5),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 6,
-                  height: 6,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFE85D75),
-                    shape: BoxShape.circle,
+                      letterSpacing: 0.5,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
-                const Text('1 chờ duyệt',
-                    style: TextStyle(fontSize: 11, color: Color(0xFFE85D75))),
-              ],
+                  const Spacer(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE85D75).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE85D75),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        const Text(
+                          '1 chờ duyệt',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFFE85D75),
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const Divider(height: 1, color: Color(0xFFF5F5F5)),
-          _buildMenuItem(
-            icon: Icons.pause_circle_outline_rounded,
-            iconBgColor: const Color(0xFFFFF8E1),
-            iconColor: const Color(0xFFF5A623),
-            label: 'Đề xuất tạm ngừng lịch dạy',
-            subtitle: '2 đề xuất gần đây',
-            onTap: () => _navigateTo(context, const RequestPauseScreen()),
-            badge: null,
-          ),
-          _buildDivider(),
-          _buildMenuItem(
-            icon: Icons.add_circle_outline_rounded,
-            iconBgColor: const Color(0xFFE8F5E9),
-            iconColor: const Color(0xFF4CAF50),
-            label: 'Đề xuất dạy bù',
-            subtitle: '1 chờ duyệt · 1 đã hoàn thành',
-            onTap: () => _navigateTo(context, const RequestMakeupScreen()),
-            badge: '1',
-          ),
-          _buildDivider(),
-          _buildMenuItem(
-            icon: Icons.swap_horiz_rounded,
-            iconBgColor: const Color(0xFFE3F2FD),
-            iconColor: const Color(0xFF1565C0),
-            label: 'Đề xuất dạy thay',
-            subtitle: 'Không có đề xuất mới',
-            onTap: () => _navigateTo(context, const RequestSubstituteScreen()),
-          ),
-        ],
+            const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
+            _buildMenuItem(
+              icon: Icons.pause_circle_outline_rounded,
+              iconBgColor: const Color(0xFFF59E0B).withOpacity(0.08),
+              iconColor: const Color(0xFFF59E0B),
+              label: 'Đề xuất tạm ngừng lịch dạy',
+              subtitle: '2 đề xuất gần đây',
+              onTap: () => _navigateTo(context, const LecturerRequestScreen(initialTabIndex: 0)),
+              badge: null,
+              index: 0,
+            ),
+            _buildDivider(),
+            _buildMenuItem(
+              icon: Icons.add_circle_outline_rounded,
+              iconBgColor: const Color(0xFF10B981).withOpacity(0.08),
+              iconColor: const Color(0xFF10B981),
+              label: 'Đề xuất dạy bù',
+              subtitle: '1 chờ duyệt · 1 đã hoàn thành',
+              onTap: () => _navigateTo(context, const LecturerRequestScreen(initialTabIndex: 1)),
+              badge: '1',
+              index: 1,
+            ),
+            _buildDivider(),
+            _buildMenuItem(
+              icon: Icons.swap_horiz_rounded,
+              iconBgColor: const Color(0xFF3B82F6).withOpacity(0.08),
+              iconColor: const Color(0xFF3B82F6),
+              label: 'Đề xuất dạy thay',
+              subtitle: 'Không có đề xuất mới',
+              onTap: () => _navigateTo(context, const LecturerRequestScreen(initialTabIndex: 2)),
+              index: 2,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -99,71 +123,86 @@ class RequestMenuCard extends StatelessWidget {
     String? subtitle,
     required VoidCallback onTap,
     String? badge,
+    required int index,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: iconBgColor,
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: iconColor, size: 20),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    label,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF212121),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: const TextStyle(
-                          fontSize: 11, color: Color(0xFF9E9E9E)),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            if (badge != null)
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        highlightColor: iconColor.withOpacity(0.05),
+        splashColor: iconColor.withOpacity(0.1),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE85D75),
-                  borderRadius: BorderRadius.circular(20),
+                  color: iconBgColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: iconColor.withOpacity(0.1), width: 1),
                 ),
-                child: Text(
-                  badge,
-                  style: const TextStyle(
+                child: Icon(icon, color: iconColor, size: 22),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Color(0xFF1E293B),
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    if (subtitle != null) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        subtitle,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey[600],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              if (badge != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFE85D75),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    badge,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 11,
-                      fontWeight: FontWeight.bold),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
-              ),
-            const SizedBox(width: 4),
-            const Icon(Icons.chevron_right, color: Color(0xFFBDBDBD), size: 22),
-          ],
+              const SizedBox(width: 8),
+              const Icon(Icons.chevron_right_rounded, color: Color(0xFFCBD5E1), size: 24),
+            ],
+          ),
         ),
       ),
-    );
+    ).animate().fadeIn(duration: 400.ms, delay: (50 * index).ms).slideX(begin: 0.1, end: 0);
   }
 
   Widget _buildDivider() => const Divider(
-      height: 1, indent: 68, color: Color(0xFFF0F0F0));
+        height: 1,
+        thickness: 1,
+        indent: 80,
+        endIndent: 20,
+        color: Color(0xFFF1F5F9),
+      );
 }

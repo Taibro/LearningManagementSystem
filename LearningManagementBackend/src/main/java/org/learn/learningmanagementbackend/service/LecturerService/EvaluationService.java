@@ -75,7 +75,8 @@ public class EvaluationService {
         double avgPunctuality = roundTo1Decimals(sumPunctuality / totalResponses);
 
         // Tính Điểm TB Tổng & % Hài lòng
-        double averageScore = roundTo1Decimals((avgKnowledge + avgMethod + avgInteraction + avgMaterials + avgPunctuality) / 5.0);
+        double averageScore = roundTo1Decimals(
+                (avgKnowledge + avgMethod + avgInteraction + avgMaterials + avgPunctuality) / 5.0);
         int satisfactionRate = (int) Math.round((double) satisfiedCount / totalResponses * 100);
 
         return EvaluationDashboardResponse.builder()

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'widgets/shared/lecturer_custom_app_bar.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +11,7 @@ import '../../models/lecturer/monthly_salary.dart';
 import 'package:intl/intl.dart';
 
 const Color _kPrimary = Color(0xFF6B4FA0);
-const Color _kBg = Color(0xFFF4F1F8);
+const Color _kBg = Color(0xFFF8F9FA);
 
 class LecturerSalaryScreen extends StatefulWidget {
   const LecturerSalaryScreen({super.key});
@@ -25,9 +27,9 @@ class _LecturerSalaryScreenState extends State<LecturerSalaryScreen> {
   @override
   void initState() {
     super.initState();
-    final now = DateTime.now();
-    _selectedYear = now.year;
-    _selectedMonth = now.month;
+    // Demo: force year 2026, month 3 since we only have test data for this period
+    _selectedYear = 2026;
+    _selectedMonth = 3;
     _fetchSalary();
   }
 
@@ -55,27 +57,44 @@ class _LecturerSalaryScreenState extends State<LecturerSalaryScreen> {
             child: BlocBuilder<TeacherSalaryBloc, TeacherSalaryState>(
               builder: (context, state) {
                 if (state is TeacherSalaryLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(color: _kPrimary));
                 } else if (state is TeacherSalaryLoadFailure) {
                   return Column(
                     children: [
-                      _buildMonthSelector(),
-                      Expanded(child: Center(child: Text('Không có dữ liệu lương tháng $_selectedMonth/$_selectedYear'))),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: _buildMonthSelector(),
+                      ),
+                      Expanded(
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.search_off_rounded, size: 64, color: Colors.grey.shade400),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Không có dữ liệu lương tháng $_selectedMonth/$_selectedYear',
+                                style: GoogleFonts.inter(color: Colors.grey.shade600, fontSize: 16),
+                              ),
+                            ],
+                          ).animate().fadeIn().slideY(begin: 0.1),
+                        ),
+                      ),
                     ],
                   );
                 } else if (state is TeacherSalaryLoadSuccess) {
                   final salary = state.salary;
                   return SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                     child: Column(
                       children: [
-                        _buildSummaryCards(salary),
-                        const SizedBox(height: 16),
-                        _buildMonthSelector(),
-                        const SizedBox(height: 16),
-                        _buildSalaryBreakdown(salary),
-                        const SizedBox(height: 16),
-                        _buildTotalCard(salary),
+                        _buildTotalCard(salary).animate().fadeIn().slideY(begin: 0.1),
+                        const SizedBox(height: 24),
+                        _buildMonthSelector().animate().fadeIn(delay: 100.ms).slideY(begin: 0.1),
+                        const SizedBox(height: 24),
+                        _buildSummaryCards(salary).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1),
+                        const SizedBox(height: 24),
+                        _buildSalaryBreakdown(salary).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1),
                         const SizedBox(height: 24),
                       ],
                     ),
@@ -92,38 +111,58 @@ class _LecturerSalaryScreenState extends State<LecturerSalaryScreen> {
 
   Widget _buildSummaryCards(MonthlySalary salary) {
     final items = [
-      {'value': formatCurrency(salary.baseAmount ?? 0), 'label': 'Lương cơ bản', 'color': const Color(0xFF4CAF50)},
-      {'value': formatCurrency((salary.sessionAmount ?? 0) + (salary.bonusAmount ?? 0)), 'label': 'Phụ cấp', 'color': _kPrimary},
-      {'value': formatCurrency(salary.netAmount ?? 0), 'label': 'Thực nhận', 'color': const Color(0xFFE85D75)},
+      {'value': formatCurrency(salary.baseAmount ?? 0), 'label': 'Lương cơ bản', 'color': const Color(0xFF3B82F6), 'icon': Icons.account_balance_wallet_rounded},
+      {'value': formatCurrency((salary.sessionAmount ?? 0) + (salary.bonusAmount ?? 0)), 'label': 'Phụ cấp & Thưởng', 'color': const Color(0xFFF59E0B), 'icon': Icons.stars_rounded},
     ];
 
     return Row(
       children: items.map((item) {
         final color = item['color'] as Color;
+        final icon = item['icon'] as IconData;
         return Expanded(
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            padding: const EdgeInsets.symmetric(vertical: 14),
+            margin: const EdgeInsets.symmetric(horizontal: 6),
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: color.withOpacity(0.2)),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.06),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: color, size: 22),
+                ),
+                const SizedBox(height: 16),
                 Text(
                   item['value'] as String,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: color,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF1E293B),
                   ),
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 4),
                 Text(
                   item['label'] as String,
-                  style: const TextStyle(fontSize: 10, color: Color(0xFF9E9E9E)),
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF64748B),
+                  ),
                 ),
               ],
             ),
@@ -134,42 +173,63 @@ class _LecturerSalaryScreenState extends State<LecturerSalaryScreen> {
   }
 
   Widget _buildMonthSelector() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: _kPrimary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
+    return GestureDetector(
+      onTap: () {
+        // Implement month picker logic if needed
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF6B4FA0).withOpacity(0.04),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
             ),
-            child: const Icon(Icons.calendar_month, color: _kPrimary, size: 20),
-          ),
-          const SizedBox(width: 12),
-          Text(
-            'Tháng $_selectedMonth/$_selectedYear',
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF212121),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: _kPrimary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(Icons.calendar_month_rounded, color: _kPrimary, size: 20),
             ),
-          ),
-          const Spacer(),
-          const Icon(Icons.keyboard_arrow_down_rounded, color: _kPrimary, size: 24),
-        ],
+            const SizedBox(width: 16),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Kỳ lương',
+                  style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF64748B), fontWeight: FontWeight.w500),
+                ),
+                Text(
+                  'Tháng $_selectedMonth/$_selectedYear',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF1E293B),
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF64748B), size: 20),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -179,112 +239,120 @@ class _LecturerSalaryScreenState extends State<LecturerSalaryScreen> {
       {'label': 'Lương cơ bản', 'amount': formatCurrency(salary.baseAmount ?? 0), 'note': 'Hệ số ${salary.coefficientSnapshot ?? 1.0}', 'plus': true},
       {'label': 'Phụ cấp & Thưởng', 'amount': formatCurrency(salary.bonusAmount ?? 0), 'note': '', 'plus': true},
       {'label': 'Thù lao vượt tiết', 'amount': formatCurrency(salary.sessionAmount ?? 0), 'note': '', 'plus': true},
-      {'label': 'Các khoản khấu trừ', 'amount': '-${formatCurrency(salary.deductionAmount ?? 0)}', 'note': '', 'plus': false},
+      {'label': 'Các khoản khấu trừ', 'amount': '-${formatCurrency(salary.deductionAmount ?? 0)}', 'note': 'Thuế, BHXH...', 'plus': false},
     ];
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF6B4FA0).withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Chi tiết bảng lương',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF212121),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF1E293B),
             ),
           ),
-          const SizedBox(height: 12),
-          ...details.map((item) => _buildSalaryRow(item)),
+          const SizedBox(height: 16),
+          ...details.asMap().entries.map((entry) {
+            final index = entry.key;
+            final item = entry.value;
+            final isLast = index == details.length - 1;
+            return Column(
+              children: [
+                _buildSalaryRow(item),
+                if (!isLast) const Divider(color: Color(0xFFF1F5F9), height: 24, thickness: 1),
+              ],
+            );
+          }),
         ],
       ),
     );
   }
 
   Widget _buildSalaryRow(Map<String, dynamic> item) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: item['plus']
-                  ? const Color(0xFFE8F5E9)
-                  : const Color(0xFFFFEBEE),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              item['plus'] ? Icons.add_rounded : Icons.remove_rounded,
-              color: item['plus']
-                  ? const Color(0xFF2E7D32)
-                  : const Color(0xFFC62828),
-              size: 18,
-            ),
+    final isPlus = item['plus'];
+    final iconColor = isPlus ? const Color(0xFF10B981) : const Color(0xFFEF4444);
+    final bgColor = isPlus ? const Color(0xFFECFDF5) : const Color(0xFFFEF2F2);
+
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(12),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item['label'],
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: item['plus']
-                        ? const Color(0xFF212121)
-                        : const Color(0xFFC62828),
-                  ),
+          child: Icon(
+            isPlus ? Icons.add_rounded : Icons.remove_rounded,
+            color: iconColor,
+            size: 18,
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                item['label'],
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF334155),
                 ),
-                if ((item['note'] as String).isNotEmpty)
-                  Text(
-                    item['note'],
-                    style: const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
-                  ),
+              ),
+              if ((item['note'] as String).isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  item['note'],
+                  style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF94A3B8)),
+                ),
               ],
-            ),
+            ],
           ),
-          Text(
-            item['amount'],
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: item['plus']
-                  ? const Color(0xFF2E7D32)
-                  : const Color(0xFFC62828),
-            ),
+        ),
+        Text(
+          item['amount'],
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 16,
+            fontWeight: FontWeight.w800,
+            color: isPlus ? const Color(0xFF10B981) : const Color(0xFFEF4444),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   Widget _buildTotalCard(MonthlySalary salary) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF6B4FA0), Color(0xFF8B6BBF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: _kPrimary.withOpacity(0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
@@ -294,29 +362,33 @@ class _LecturerSalaryScreenState extends State<LecturerSalaryScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'THỰC NHẬN',
-                style: TextStyle(
-                  color: Colors.white70,
+                style: GoogleFonts.inter(
+                  color: Colors.white.withOpacity(0.8),
                   fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.0,
                 ),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 8),
               Text(
-                'Tháng $_selectedMonth/$_selectedYear',
-                style: const TextStyle(color: Colors.white54, fontSize: 11),
+                formatCurrency(salary.netAmount ?? 0),
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 28,
+                ),
               ),
             ],
           ),
-          Text(
-            formatCurrency(salary.netAmount ?? 0),
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
             ),
+            child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 32),
           ),
         ],
       ),

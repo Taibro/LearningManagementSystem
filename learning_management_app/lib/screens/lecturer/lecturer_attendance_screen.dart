@@ -36,12 +36,12 @@ class _LecturerAttendanceScreenState extends State<LecturerAttendanceScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F1F8),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: Column(
         children: [
           const LecturerCustomAppBar(
             title: 'Quản lý điểm danh',
-            icon: Icons.how_to_reg_outlined,
+            icon: Icons.how_to_reg_rounded,
           ),
           _buildTabBar(),
           Expanded(
@@ -61,19 +61,43 @@ class _LecturerAttendanceScreenState extends State<LecturerAttendanceScreen>
 
   Widget _buildTabBar() {
     return Container(
-      color: const Color(0xFF6B4FA0),
+      margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6B4FA0).withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: TabBar(
         controller: _tabController,
-        indicatorColor: Colors.white,
-        indicatorWeight: 3,
+        indicator: BoxDecoration(
+          color: const Color(0xFF6B4FA0),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF6B4FA0).withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
         labelColor: Colors.white,
-        unselectedLabelColor: Colors.white60,
-        labelStyle:
-            const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        unselectedLabelColor: const Color(0xFF64748B),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, fontFamily: 'Inter'),
+        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13, fontFamily: 'Inter'),
         tabs: const [
           Tab(text: 'Điểm danh'),
           Tab(text: 'QR Code'),
-          Tab(text: 'Kết quả HT'),
+          Tab(text: 'Kết quả'),
         ],
       ),
     );
