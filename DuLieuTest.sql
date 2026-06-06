@@ -4,6 +4,15 @@ SET SESSION sql_mode = '';
 -- ============================================================
 SET FOREIGN_KEY_CHECKS = 0;
 
+TRUNCATE TABLE user_roles;
+TRUNCATE TABLE audit_logs;
+TRUNCATE TABLE system_error_logs;
+TRUNCATE TABLE teacher_evaluations;
+TRUNCATE TABLE teacher_declarations;
+TRUNCATE TABLE class_materials;
+TRUNCATE TABLE saas_invoices;
+TRUNCATE TABLE saas_subscriptions;
+TRUNCATE TABLE saas_plans;
 TRUNCATE TABLE Teacher_salary_detail;
 TRUNCATE TABLE Teacher_salary_sheet;
 TRUNCATE TABLE Salary_config;
@@ -22,7 +31,7 @@ TRUNCATE TABLE rooms;
 TRUNCATE TABLE courses;
 TRUNCATE TABLE students;
 TRUNCATE TABLE teachers;
-TRUNCATE TABLE Users;
+TRUNCATE TABLE users;
 TRUNCATE TABLE departments;
 TRUNCATE TABLE semesters;
 TRUNCATE TABLE academic_years;
@@ -42,40 +51,6 @@ INSERT INTO role (name, description) VALUES
   ('STUDENT', 'Sinh viên / Học sinh'),
   ('SCHOOL_ADMIN', 'Admin nha truong');
 
-INSERT INTO users (
-    school_id,
-    code,
-    citizen_id_number,
-    full_name,
-    email,
-    password_hash,
-    phone,
-    address,
-    gender,
-    is_active,
-    created_at,
-    updated_at
-) VALUES (
-    1,
-    'ADM-HCMUT-01',
-    '079200000001',
-    'Admin Bách Khoa',
-    'admin@hcmut.edu.vn',
-    '$2b$12$KcQeIS2h2UPXMz1/WA3T8OjaArylWfz7lsvEMZn/MEVZkKXQ0I5JG', -- Đây là chuỗi Bcrypt hash của mật khẩu 'Admin@123'
-    '0909123456',
-    '268 Lý Thường Kiệt, Quận 10, TP.HCM',
-    'MALE',
-    true,
-    NOW(),
-    NOW()
-);
-
-INSERT INTO user_roles (user_id, role_id)
-VALUES (
-    (SELECT id FROM users WHERE email = 'admin@hcmut.edu.vn' LIMIT 1),
-    (SELECT id FROM role WHERE name = 'SCHOOL_ADMIN' LIMIT 1)
-);
-
 -- 2. BẢNG SCHOOL (12 dòng)
 INSERT INTO schools (id, code, name, short_name, type, email) VALUES
 (1, 'HUIT', 'Đại học Công Thương TP.HCM', 'HUIT', 'UNIVERSITY', 'contact@huit.edu.vn'),
@@ -90,6 +65,10 @@ INSERT INTO schools (id, code, name, short_name, type, email) VALUES
 (10, 'VLU', 'Đại học Văn Lang', 'VLU', 'UNIVERSITY', 'info@vlu.edu.vn'),
 (11, 'HSU', 'Đại học Hoa Sen', 'HSU', 'UNIVERSITY', 'info@hsu.edu.vn'),
 (12, 'IELTS_HCM', 'Trung tâm IELTS HCM', 'IELTS', 'LANGUAGE_CENTER', 'ielts@hcm.com');
+
+
+
+
 
 -- 3. BẢNG SCHOOL_BRANCHES (12 dòng)
 INSERT INTO school_branches (id, school_id, code, name, address, is_main) VALUES

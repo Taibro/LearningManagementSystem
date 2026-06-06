@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'widgets/shared/lecturer_custom_app_bar.dart';
 
 const Color _kPrimary = Color(0xFF6B4FA0);
@@ -52,26 +53,33 @@ class LecturerSurveyScreen extends StatelessWidget {
       backgroundColor: _kBg,
       body: Column(
         children: [
-          const LecturerCustomAppBar(title: 'Khảo sát'),
+          const LecturerCustomAppBar(title: 'Khảo sát', icon: Icons.poll_rounded),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildOverviewCards(),
-                  const SizedBox(height: 20),
+                  _buildOverviewCards().animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0),
+                  const SizedBox(height: 32),
                   const Text(
                     'Khảo sát theo môn học',
                     style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF212121),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1E293B),
+                      letterSpacing: -0.3,
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  ..._surveys.map((s) => _buildSurveyCard(s)),
-                  const SizedBox(height: 24),
+                  ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
+                  const SizedBox(height: 16),
+                  ..._surveys.asMap().entries.map((entry) => Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: _buildSurveyCard(entry.value)
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: (150 + 50 * entry.key).ms)
+                            .slideY(begin: 0.1, end: 0),
+                      )),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
@@ -92,8 +100,8 @@ class LecturerSurveyScreen extends StatelessWidget {
     final avg = ratedCount > 0 ? (avgRating / ratedCount) : 0.0;
 
     final cards = [
-      {'value': '$completedCount', 'label': 'Hoàn thành', 'color': const Color(0xFF4CAF50)},
-      {'value': '$activeCount', 'label': 'Đang diễn ra', 'color': const Color(0xFFE65100)},
+      {'value': '$completedCount', 'label': 'Hoàn thành', 'color': const Color(0xFF10B981)},
+      {'value': '$activeCount', 'label': 'Đang diễn ra', 'color': const Color(0xFFF59E0B)},
       {'value': avg.toStringAsFixed(1), 'label': 'Điểm TB', 'color': _kPrimary},
     ];
 
@@ -102,17 +110,14 @@ class LecturerSurveyScreen extends StatelessWidget {
         final color = c['color'] as Color;
         return Expanded(
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            margin: const EdgeInsets.symmetric(horizontal: 6),
+            padding: const EdgeInsets.symmetric(vertical: 20),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
               boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
+                BoxShadow(color: color.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 8)),
               ],
             ),
             child: Column(
@@ -120,15 +125,16 @@ class LecturerSurveyScreen extends StatelessWidget {
                 Text(
                   c['value'] as String,
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w900,
                     color: color,
+                    letterSpacing: -0.5,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   c['label'] as String,
-                  style: const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
+                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -143,15 +149,15 @@ class LecturerSurveyScreen extends StatelessWidget {
     String statusLabel;
     switch (survey['status']) {
       case 'completed':
-        statusColor = const Color(0xFF4CAF50);
+        statusColor = const Color(0xFF10B981);
         statusLabel = 'Hoàn thành';
         break;
       case 'active':
-        statusColor = const Color(0xFFE65100);
+        statusColor = const Color(0xFFF59E0B);
         statusLabel = 'Đang diễn ra';
         break;
       default:
-        statusColor = const Color(0xFF9E9E9E);
+        statusColor = const Color(0xFF94A3B8);
         statusLabel = 'Chưa bắt đầu';
     }
 
@@ -161,17 +167,13 @@ class LecturerSurveyScreen extends StatelessWidget {
     final rating = survey['rating'] as double;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 12, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -186,86 +188,97 @@ class LecturerSurveyScreen extends StatelessWidget {
                     Text(
                       survey['subject'],
                       style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF212121),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF1E293B),
+                        letterSpacing: -0.2,
                       ),
                     ),
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 4),
                     Text(
                       '${survey['class']}  ·  ${survey['semester']}',
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E)),
+                      style: const TextStyle(fontSize: 13, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.12),
+                  color: statusColor.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: statusColor.withOpacity(0.2)),
                 ),
                 child: Text(
                   statusLabel,
                   style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
                     color: statusColor,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           // Progress bar
           Row(
             children: [
-              const Text('Phản hồi: ', style: TextStyle(fontSize: 11, color: Color(0xFF9E9E9E))),
+              const Text('Phản hồi:', style: TextStyle(fontSize: 13, color: Color(0xFF64748B), fontWeight: FontWeight.w500)),
+              const SizedBox(width: 8),
               Expanded(
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
+                  borderRadius: BorderRadius.circular(8),
                   child: LinearProgressIndicator(
                     value: ratio,
-                    backgroundColor: const Color(0xFFE0D8F0),
+                    backgroundColor: const Color(0xFFF1F5F9),
                     valueColor: AlwaysStoppedAnimation<Color>(statusColor),
-                    minHeight: 6,
+                    minHeight: 8,
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 12),
               Text(
                 '$responses/$total',
                 style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF616161),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF334155),
                 ),
               ),
             ],
           ),
           if (rating > 0) ...[
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                ...List.generate(5, (i) {
-                  if (i < rating.floor()) {
-                    return const Icon(Icons.star_rounded, color: Color(0xFFFFC107), size: 18);
-                  } else if (i < rating.ceil() && rating % 1 > 0) {
-                    return const Icon(Icons.star_half_rounded, color: Color(0xFFFFC107), size: 18);
-                  } else {
-                    return Icon(Icons.star_outline_rounded, color: Colors.grey.shade300, size: 18);
-                  }
-                }),
-                const SizedBox(width: 6),
-                Text(
-                  rating.toStringAsFixed(1),
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF212121),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ...List.generate(5, (i) {
+                    if (i < rating.floor()) {
+                      return const Icon(Icons.star_rounded, color: Color(0xFFF59E0B), size: 22);
+                    } else if (i < rating.ceil() && rating % 1 > 0) {
+                      return const Icon(Icons.star_half_rounded, color: Color(0xFFF59E0B), size: 22);
+                    } else {
+                      return Icon(Icons.star_outline_rounded, color: Colors.grey.shade300, size: 22);
+                    }
+                  }),
+                  const SizedBox(width: 12),
+                  Text(
+                    rating.toStringAsFixed(1),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF1E293B),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ],

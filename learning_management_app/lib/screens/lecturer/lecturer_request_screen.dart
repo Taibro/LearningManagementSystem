@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'widgets/shared/lecturer_custom_app_bar.dart';
 
 const Color _kPrimary = Color(0xFF6B4FA0);
-const Color _kBg = Color(0xFFF4F1F8);
+const Color _kBg = Color(0xFFF8F9FA);
 
 class LecturerRequestScreen extends StatefulWidget {
-  const LecturerRequestScreen({super.key});
+  final int initialTabIndex;
+  const LecturerRequestScreen({super.key, this.initialTabIndex = 0});
 
   @override
   State<LecturerRequestScreen> createState() => _LecturerRequestScreenState();
@@ -32,7 +35,7 @@ class _LecturerRequestScreenState extends State<LecturerRequestScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 3, vsync: this, initialIndex: widget.initialTabIndex);
   }
 
   @override
@@ -56,7 +59,7 @@ class _LecturerRequestScreenState extends State<LecturerRequestScreen>
                 _RequestTab(
                   type: 'tamNgung',
                   history: _pauseHistory,
-                  title: 'Tạm ngừng lịch dạy',
+                  title: 'Tạm ngừng',
                 ),
                 _RequestTab(
                   type: 'dayBu',
@@ -78,21 +81,46 @@ class _LecturerRequestScreenState extends State<LecturerRequestScreen>
 
   Widget _buildTabBar() {
     return Container(
-      color: _kPrimary,
+      margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF6B4FA0).withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       child: TabBar(
         controller: _tabController,
-        indicatorColor: Colors.white,
-        indicatorWeight: 3,
+        indicator: BoxDecoration(
+          color: _kPrimary,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: _kPrimary.withOpacity(0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
         labelColor: Colors.white,
-        unselectedLabelColor: Colors.white60,
-        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+        unselectedLabelColor: const Color(0xFF64748B),
+        labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 13),
+        unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 13),
         tabs: const [
           Tab(text: 'Tạm ngừng'),
           Tab(text: 'Dạy bù'),
           Tab(text: 'Dạy thay'),
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
   }
 }
 
@@ -110,7 +138,7 @@ class _RequestTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -119,69 +147,75 @@ class _RequestTab extends StatelessWidget {
             onTap: () => _showCreateForm(context),
             child: Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              padding: const EdgeInsets.symmetric(vertical: 18),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF6B4FA0), Color(0xFF8B6BBF)],
+                  colors: [Color(0xFF8B6BBF), Color(0xFF6B4FA0)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
                     color: _kPrimary.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
+                    blurRadius: 16,
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.add_rounded, color: Colors.white, size: 20),
-                  const SizedBox(width: 8),
+                  const Icon(Icons.add_circle_outline_rounded, color: Colors.white, size: 22),
+                  const SizedBox(width: 10),
                   Text(
                     'Tạo đề xuất $title',
-                    style: const TextStyle(
+                    style: GoogleFonts.inter(
                       color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 15,
                     ),
                   ),
                 ],
               ),
             ),
-          ),
+          ).animate().fadeIn().slideY(begin: 0.1),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 32),
 
           // History header
-          const Text(
+          Text(
             'Lịch sử đề xuất',
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF212121),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF1E293B),
             ),
-          ),
-          const SizedBox(height: 12),
+          ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1),
+          const SizedBox(height: 16),
 
           // History items
           if (history.isEmpty)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.symmetric(vertical: 40),
+              padding: const EdgeInsets.symmetric(vertical: 48),
               child: Column(
                 children: [
-                  Icon(Icons.inbox_outlined, size: 48, color: Colors.grey.shade300),
-                  const SizedBox(height: 8),
+                  Icon(Icons.inbox_rounded, size: 64, color: Colors.grey.shade300),
+                  const SizedBox(height: 16),
                   Text(
                     'Chưa có đề xuất nào',
-                    style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                    style: GoogleFonts.inter(color: Colors.grey.shade500, fontSize: 15),
                   ),
                 ],
               ),
-            )
+            ).animate().fadeIn(delay: 200.ms)
           else
-            ...history.map((item) => _buildHistoryCard(item)),
+            ...history.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              return _buildHistoryCard(item).animate().fadeIn(delay: (200 + index * 100).ms).slideY(begin: 0.1);
+            }),
         ],
       ),
     );
@@ -191,34 +225,40 @@ class _RequestTab extends StatelessWidget {
     Color statusColor;
     String statusLabel;
     IconData statusIcon;
+    Color bgColor;
+
     switch (item['status']) {
       case 'approved':
-        statusColor = const Color(0xFF4CAF50);
+        statusColor = const Color(0xFF10B981);
         statusLabel = 'Đã duyệt';
-        statusIcon = Icons.check_circle_outline;
+        statusIcon = Icons.check_circle_rounded;
+        bgColor = const Color(0xFFECFDF5);
         break;
       case 'rejected':
-        statusColor = const Color(0xFFC62828);
+        statusColor = const Color(0xFFEF4444);
         statusLabel = 'Từ chối';
-        statusIcon = Icons.cancel_outlined;
+        statusIcon = Icons.cancel_rounded;
+        bgColor = const Color(0xFFFEF2F2);
         break;
       default:
-        statusColor = const Color(0xFFE65100);
+        statusColor = const Color(0xFFF59E0B);
         statusLabel = 'Chờ duyệt';
-        statusIcon = Icons.access_time;
+        statusIcon = Icons.schedule_rounded;
+        bgColor = const Color(0xFFFFFBEB);
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF6B4FA0).withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -231,42 +271,55 @@ class _RequestTab extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    width: 32,
-                    height: 32,
+                    width: 40,
+                    height: 40,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFEDE7F6),
-                      borderRadius: BorderRadius.circular(8),
+                      color: _kPrimary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.class_outlined, color: _kPrimary, size: 18),
+                    child: const Icon(Icons.class_rounded, color: _kPrimary, size: 20),
                   ),
-                  const SizedBox(width: 10),
-                  Text(
-                    '${item['class']} · ${item['date']}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 13,
-                      color: Color(0xFF212121),
-                    ),
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item['class'],
+                        style: GoogleFonts.inter(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 15,
+                          color: const Color(0xFF1E293B),
+                        ),
+                      ),
+                      Text(
+                        item['date'],
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF64748B),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.12),
+                  color: bgColor,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(statusIcon, size: 12, color: statusColor),
-                    const SizedBox(width: 3),
+                    Icon(statusIcon, size: 14, color: statusColor),
+                    const SizedBox(width: 4),
                     Text(
                       statusLabel,
-                      style: TextStyle(
+                      style: GoogleFonts.inter(
                         fontSize: 11,
                         color: statusColor,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
@@ -274,10 +327,26 @@ class _RequestTab extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Lý do: ${item['reason']}',
-            style: const TextStyle(fontSize: 12, color: Color(0xFF616161)),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.info_outline_rounded, color: Color(0xFF94A3B8), size: 18),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    item['reason'],
+                    style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF475569), height: 1.4),
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -303,126 +372,135 @@ class _CreateRequestSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
+      height: MediaQuery.of(context).size.height * 0.85,
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
       child: Column(
         children: [
           // Handle
           Center(
             child: Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              width: 40,
-              height: 4,
+              margin: const EdgeInsets.only(top: 16, bottom: 8),
+              width: 48,
+              height: 6,
               decoration: BoxDecoration(
-                color: const Color(0xFFE0D8F0),
-                borderRadius: BorderRadius.circular(2),
+                color: const Color(0xFFE2E8F0),
+                borderRadius: BorderRadius.circular(3),
               ),
             ),
           ),
           // Header
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
             child: Row(
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 48,
+                  height: 48,
                   decoration: BoxDecoration(
                     color: _kPrimary.withOpacity(0.1),
-                    shape: BoxShape.circle,
+                    borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Icon(Icons.edit_note_rounded, color: _kPrimary, size: 22),
+                  child: const Icon(Icons.edit_document, color: _kPrimary, size: 24),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 16),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Tạo đề xuất $title',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                        color: Color(0xFF212121),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                        color: const Color(0xFF1E293B),
                       ),
                     ),
-                    const Text(
-                      'Điền thông tin bên dưới',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Điền đầy đủ các thông tin bên dưới',
+                      style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B)),
                     ),
                   ],
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFF0F0F0)),
+          const Divider(height: 1, color: Color(0xFFF1F5F9), thickness: 1.5),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(24),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildFormField('Lớp học phần', '010110195604 - 14DHTH04', isDropdown: true),
-                  const SizedBox(height: 12),
-                  _buildFormField('Ngày', '25/04/2026', isDate: true),
-                  const SizedBox(height: 12),
-                  _buildFormField('Ca học', 'Sáng (Tiết 1–3)', isDropdown: true),
-                  const SizedBox(height: 12),
+                  _buildFormField('Lớp học phần', 'Chọn lớp học phần', isDropdown: true),
+                  const SizedBox(height: 20),
+                  _buildFormField('Ngày', 'DD/MM/YYYY', isDate: true),
+                  const SizedBox(height: 20),
+                  _buildFormField('Ca học', 'Chọn ca học', isDropdown: true),
+                  const SizedBox(height: 20),
                   if (type == 'dayBu') ...[
-                    _buildFormField('Ngày dạy bù', '28/04/2026', isDate: true),
-                    const SizedBox(height: 12),
+                    _buildFormField('Ngày dạy bù', 'DD/MM/YYYY', isDate: true),
+                    const SizedBox(height: 20),
                     _buildFormField('Phòng học', 'VD: A401'),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
                   ],
                   if (type == 'dayThay') ...[
                     _buildFormField('Giảng viên dạy thay', 'Chọn giảng viên', isDropdown: true),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 20),
                   ],
-                  const Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text('Lý do',
-                        style: TextStyle(fontSize: 12, color: Color(0xFF616161))),
-                  ),
-                  const SizedBox(height: 4),
+                  Text('Lý do', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF475569))),
+                  const SizedBox(height: 8),
                   Container(
-                    height: 80,
-                    padding: const EdgeInsets.all(10),
+                    height: 100,
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      border: Border.all(color: const Color(0xFFE0D8F0)),
-                      borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xFFF8FAFC),
+                      border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Align(
+                    child: Align(
                       alignment: Alignment.topLeft,
-                      child: Text('Nhập lý do đề xuất...',
-                          style: TextStyle(fontSize: 13, color: Color(0xFFBDBDBD))),
+                      child: Text('Nhập lý do chi tiết...',
+                          style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8))),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 32),
                   GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      padding: const EdgeInsets.symmetric(vertical: 18),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
                           colors: [Color(0xFF6B4FA0), Color(0xFF8B6BBF)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
                             color: _kPrimary.withOpacity(0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8),
                           ),
                         ],
                       ),
-                      child: const Center(
-                        child: Text('📤  Gửi đề xuất',
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.send_rounded, color: Colors.white, size: 20),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Gửi đề xuất',
+                            style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -432,7 +510,7 @@ class _CreateRequestSheet extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).animate().slideY(begin: 1, duration: 400.ms, curve: Curves.easeOutCubic);
   }
 
   Widget _buildFormField(String label, String hint,
@@ -440,27 +518,24 @@ class _CreateRequestSheet extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF616161))),
-        const SizedBox(height: 4),
+        Text(label, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF475569))),
+        const SizedBox(height: 8),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0xFFE0D8F0)),
-            borderRadius: BorderRadius.circular(8),
+            color: const Color(0xFFF8FAFC),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(hint,
-                  style: const TextStyle(fontSize: 13, color: Color(0xFF424242))),
+              Text(hint, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8))),
               if (isDropdown)
-                const Icon(Icons.keyboard_arrow_down,
-                    color: _kPrimary, size: 18)
+                const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF64748B), size: 22)
               else if (isDate)
-                const Icon(Icons.calendar_today_outlined,
-                    color: _kPrimary, size: 16),
+                const Icon(Icons.calendar_month_rounded, color: Color(0xFF64748B), size: 20),
             ],
           ),
         ),
