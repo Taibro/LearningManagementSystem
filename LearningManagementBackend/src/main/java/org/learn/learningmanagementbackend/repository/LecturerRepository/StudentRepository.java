@@ -76,7 +76,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             LEFT JOIN users u   ON u.id = t.user_id
             LEFT JOIN schedule_exceptions se ON se.schedule_id = sch.id AND se.approval_status = 'APPROVED' AND ((se.exception_date >= :startDate AND se.exception_date <= :endDate) OR (se.replacement_date >= :startDate AND se.replacement_date <= :endDate))
             WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
-              AND e.status IN ('ENROLLED', 'COMPLETED', 'FAILED')
+              AND e.status = 'ENROLLED'
               AND sch.start_date <= :endDate
               AND sch.end_date   >= :startDate
               AND c.status != 'CANCELLED'
@@ -112,7 +112,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             LEFT JOIN teachers t ON t.id = ct.teacher_id
             LEFT JOIN users u   ON u.id = t.user_id
             WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
-              AND e.status IN ('ENROLLED', 'COMPLETED', 'FAILED')
+              AND e.status = 'ENROLLED'
               AND (:semesterId = 0 OR c.semester_id = :semesterId)
               AND c.status != 'CANCELLED'
             ORDER BY sch.start_date, sch.day_of_week
@@ -486,7 +486,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             JOIN classes c ON c.id = e.class_id
             JOIN courses co ON co.id = c.course_id
             JOIN semesters sem ON sem.id = c.semester_id
-            LEFT JOIN class_teacher ct ON ct.class_id = c.id AND ct.role = 'main'
+            LEFT JOIN Class_Teacher ct ON ct.class_id = c.id AND ct.role = 'main'
             LEFT JOIN teachers t ON t.id = ct.teacher_id
             LEFT JOIN users u ON u.id = t.user_id
             LEFT JOIN schedules sch ON sch.class_id = c.id

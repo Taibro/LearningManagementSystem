@@ -53,22 +53,6 @@ public class StudentService {
         return studentRepository.getStudentProfileByCode(studentCode);
     }
 
-    @org.springframework.transaction.annotation.Transactional
-    public void updateStudentProfile(String studentCode, org.learn.learningmanagementbackend.dto.request.StudentUpdateProfileRequest req) {
-        Student student = studentRepository.findByStudentCode(studentCode)
-                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND, "Không tìm thấy sinh viên"));
-        org.learn.learningmanagementbackend.model.Users user = student.getUser();
-        if (req.getEmail() != null) user.setEmail(req.getEmail());
-        if (req.getPhone() != null) user.setPhone(req.getPhone());
-        if (req.getAddress() != null) user.setAddress(req.getAddress());
-        if (req.getGender() != null) {
-            try {
-                user.setGender(org.learn.learningmanagementbackend.enums.Gender.valueOf(req.getGender().toUpperCase()));
-            } catch (IllegalArgumentException ignored) {}
-        }
-        studentRepository.save(student);
-    }
-
     // ── WEEKLY SCHEDULE ───────────────────────────────────────────────────────
     public List<StudentScheduleDto> getWeeklySchedule(String studentCode, LocalDate targetDate) {
         if (targetDate == null) {
@@ -233,53 +217,6 @@ public class StudentService {
             invoice.setStatus(org.learn.learningmanagementbackend.enums.TuitionInvoiceStatus.PARTIAL);
         }
         tuitionInvoiceRepository.save(invoice);
-    }
-
-    @Transactional
-    public org.learn.learningmanagementbackend.dto.response.TuitionPaymentDto checkPaymentStatus(String studentCode, Integer paymentId) {
-        org.learn.learningmanagementbackend.model.TuitionPayment payment = tuitionPaymentRepository.findById(paymentId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy giao dịch"));
-        if (!payment.getTuitionInvoice().getStudent().getStudentCode().equals(studentCode)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Không có quyền truy cập giao dịch này");
-        }
-        
-        if (payment.getStatus() == org.learn.learningmanagementbackend.enums.TuitionPaymentStatus.SUCCESS) {
-            return mapToPaymentDto(payment);
-        }
-
-        // LƯU Ý: ĐÂY LÀ CHỖ ĐIỀN API TOKEN CỦA SEPAY
-        // Bạn hãy đăng ký tài khoản SePay.vn và tạo API Token rồi dán vào đây
-        String sepayToken = ""; 
-        
-        if (sepayToken.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Hệ thống chưa cấu hình SePay API Token. Vui lòng xem code Backend!");
-        }
-
-        try {
-            org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
-            org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
-            headers.set("Authorization", "Bearer " + sepayToken);
-            org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(headers);
-            
-            org.springframework.http.ResponseEntity<String> response = restTemplate.exchange(
-                "https://userapi-sandbox.sepay.vn/userapi/transactions/list", 
-                org.springframework.http.HttpMethod.GET, 
-                entity, 
-                String.class
-            );
-
-            String body = response.getBody();
-            if (body != null && body.contains(payment.getTransactionCode())) {
-                // Đã tìm thấy giao dịch khớp mã
-                mockPaymentSuccess(studentCode, paymentId);
-                payment.setStatus(org.learn.learningmanagementbackend.enums.TuitionPaymentStatus.SUCCESS);
-            }
-        } catch (Exception e) {
-            // Log error
-            System.err.println("SePay Error: " + e.getMessage());
-        }
-
-        return mapToPaymentDto(payment);
     }
 
     public List<org.learn.learningmanagementbackend.dto.response.ScholarshipDto> getScholarships(String studentCode) {

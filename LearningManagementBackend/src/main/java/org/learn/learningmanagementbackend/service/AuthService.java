@@ -155,31 +155,6 @@ public class AuthService {
     public org.learn.learningmanagementbackend.dto.response.UserProfileMobileResponse mobileLogin(AuthRequest request) {
         String combinedUsername = request.getUserType().toUpperCase() + ":" + request.getLoginCode();
 
-        System.out.println("====== DEBUG LOGIN ======");
-        System.out.println("combinedUsername: " + combinedUsername);
-        System.out.println("Raw password entered: " + request.getPassword());
-        try {
-            Users testUser = null;
-            if ("STUDENT".equalsIgnoreCase(request.getUserType())) {
-                org.learn.learningmanagementbackend.model.Student s = studentRepository.findByStudentCode(request.getLoginCode()).orElse(null);
-                if (s != null) testUser = s.getUser();
-            } else if ("SCHOOL_ADMIN".equalsIgnoreCase(request.getUserType())) {
-                testUser = userRepository.findByEmail(request.getLoginCode()).orElse(null);
-            }
-            if (testUser != null) {
-                System.out.println("User found in DB!");
-                System.out.println("Hash in DB: " + testUser.getPasswordHash());
-                org.springframework.security.crypto.password.PasswordEncoder pe = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
-                boolean matches = pe.matches(request.getPassword(), testUser.getPasswordHash());
-                System.out.println("Password match result: " + matches);
-            } else {
-                System.out.println("USER NOT FOUND IN DB before auth manager!");
-            }
-        } catch (Exception e) {
-            System.out.println("Error in debug block: " + e.getMessage());
-        }
-        System.out.println("=========================");
-
         // Kích hoạt Spring Security kiểm tra mật khẩu
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(combinedUsername, request.getPassword())
