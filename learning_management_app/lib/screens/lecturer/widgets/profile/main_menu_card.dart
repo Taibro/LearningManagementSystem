@@ -6,6 +6,7 @@ import '../../features/lecture_materials_screen.dart';
 import '../../features/survey_screen.dart';
 import 'bottom_sheets/declaration_sheet.dart';
 import 'bottom_sheets/statistics_sheet.dart';
+import 'bottom_sheets/salary_sheet.dart';
 import '../../lecturer_personal_profile_screen.dart';
 import '../../lecturer_materials_screen.dart';
 import '../../lecturer_survey_screen.dart';

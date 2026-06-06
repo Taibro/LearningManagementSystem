@@ -25,7 +25,6 @@ class _FunctionGridState extends State<FunctionGrid> {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
     final features = [
       {
         'icon': Icons.how_to_reg_outlined,
@@ -109,7 +108,6 @@ class _FunctionGridState extends State<FunctionGrid> {
               MaterialPageRoute(
                   builder: (_) => const LecturerAllFeaturesScreen()),
             ),
-      },
       },
     ];
     final displayedFeatures = _isExpanded ? features : features.take(7).toList();

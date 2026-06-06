@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../auth/school_code_screen.dart';
 import '../../lecturer_change_password_screen.dart';
+import '../../features/terms_screen.dart';
+import '../../features/feedback_screen.dart';
 
 class SettingsCard extends StatefulWidget {
   const SettingsCard({super.key});
