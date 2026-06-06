@@ -40,4 +40,9 @@ public class AuthController {
         String tempToken = authHeader.replace("Bearer ", "");
         return ResponseEntity.ok(authService.verify2faLogin(request, tempToken));
     }
+
+    @PostMapping("/mobile/login")
+    public ResponseEntity<org.learn.learningmanagementbackend.dto.response.UserProfileMobileResponse> mobileLogin(@RequestBody AuthRequest request) {
+        return ResponseEntity.ok(authService.mobileLogin(request));
+    }
 }

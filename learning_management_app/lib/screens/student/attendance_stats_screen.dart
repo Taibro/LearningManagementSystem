@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'data/mock_extra_data.dart';
 import 'widgets/shared/custom_app_bar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/student/attendance/attendance_bloc.dart';
+import '../../blocs/student/attendance/attendance_event.dart';
+import '../../blocs/student/attendance/attendance_state.dart';
+import '../../models/student/student_attendance.dart';
 
 const Color _kPrimary = Color(0xFF1565C0);
 const Color _kBg = Color(0xFFF0F4FF);
@@ -13,14 +18,13 @@ class AttendanceStatsScreen extends StatefulWidget {
 }
 
 class _AttendanceStatsScreenState extends State<AttendanceStatsScreen> {
-  // Track which semester is expanded (-1 = none)
-  int _expandedIndex = -1;
+  // Track which semester is expanded (key = semesterName)
+  String? _expandedSemester;
 
   @override
   void initState() {
     super.initState();
-    // Expand the last semester by default
-    _expandedIndex = kAttendanceStats.length - 1;
+    context.read<AttendanceBloc>().add(AttendanceFetchRequested());
   }
 
   @override
@@ -34,18 +38,50 @@ class _AttendanceStatsScreenState extends State<AttendanceStatsScreen> {
           _buildTableHeader(),
           // Body
           Expanded(
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: kAttendanceStats.length,
-              itemBuilder: (_, i) => _SemesterSection(
-                semester: kAttendanceStats[i],
-                isExpanded: _expandedIndex == i,
-                onToggle: () {
-                  setState(() {
-                    _expandedIndex = _expandedIndex == i ? -1 : i;
-                  });
-                },
-              ),
+            child: BlocBuilder<AttendanceBloc, AttendanceState>(
+              builder: (context, state) {
+                if (state is AttendanceLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is AttendanceLoadFailure) {
+                  return Center(child: Text('Lỗi: ${state.message}'));
+                } else if (state is AttendanceLoadSuccess) {
+                  final attendances = state.attendances;
+                  if (attendances.isEmpty) {
+                    return const Center(child: Text('Chưa có dữ liệu điểm danh'));
+                  }
+
+                  // Nhóm theo học kỳ
+                  final grouped = <String, List<StudentAttendance>>{};
+                  for (var a in attendances) {
+                    final sem = a.semesterName ?? 'Chưa xác định';
+                    grouped.putIfAbsent(sem, () => []).add(a);
+                  }
+
+                  if (_expandedSemester == null && grouped.isNotEmpty) {
+                    _expandedSemester = grouped.keys.last;
+                  }
+
+                  return ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: grouped.length,
+                    itemBuilder: (_, i) {
+                      final semName = grouped.keys.elementAt(i);
+                      final semAttendances = grouped[semName]!;
+                      return _SemesterSection(
+                        semesterName: semName,
+                        attendances: semAttendances,
+                        isExpanded: _expandedSemester == semName,
+                        onToggle: () {
+                          setState(() {
+                            _expandedSemester = _expandedSemester == semName ? null : semName;
+                          });
+                        },
+                      );
+                    },
+                  );
+                }
+                return const SizedBox();
+              },
             ),
           ),
         ],
@@ -115,18 +151,24 @@ class _AttendanceStatsScreenState extends State<AttendanceStatsScreen> {
 }
 
 class _SemesterSection extends StatelessWidget {
-  final AttendanceStatSemester semester;
+  final String semesterName;
+  final List<StudentAttendance> attendances;
   final bool isExpanded;
   final VoidCallback onToggle;
 
   const _SemesterSection({
-    required this.semester,
+    required this.semesterName,
+    required this.attendances,
     required this.isExpanded,
     required this.onToggle,
   });
 
   @override
   Widget build(BuildContext context) {
+    int totalDvht = attendances.fold(0, (sum, a) => sum + (a.credits ?? 0));
+    int totalCp = attendances.fold(0, (sum, a) => sum + (a.absentWithPermission ?? 0));
+    int totalKp = attendances.fold(0, (sum, a) => sum + (a.absentWithoutPermission ?? 0));
+
     return Column(
       children: [
         // Semester header row
@@ -147,7 +189,7 @@ class _SemesterSection extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    semester.label,
+                    semesterName,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -159,7 +201,7 @@ class _SemesterSection extends StatelessWidget {
                   width: 42,
                   child: Center(
                     child: Text(
-                      '${semester.totalDvht}',
+                      '$totalDvht',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
@@ -172,7 +214,7 @@ class _SemesterSection extends StatelessWidget {
                   width: 30,
                   child: Center(
                     child: Text(
-                      '${semester.totalCp}',
+                      '$totalCp',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
@@ -185,13 +227,13 @@ class _SemesterSection extends StatelessWidget {
                   width: 30,
                   child: Center(
                     child: Text(
-                      '${semester.totalKp}',
+                      '$totalKp',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
                         color: isExpanded
                             ? Colors.white
-                            : semester.totalKp > 0
+                            : totalKp > 0
                                 ? const Color(0xFFE65100)
                                 : const Color(0xFF212121),
                       ),
@@ -205,10 +247,12 @@ class _SemesterSection extends StatelessWidget {
         const Divider(height: 1, color: Color(0xFFE0E0E0)),
         // Subject rows (if expanded)
         if (isExpanded)
-          ...semester.subjects.asMap().entries.map((entry) {
+          ...attendances.asMap().entries.map((entry) {
             final idx = entry.key;
             final sub = entry.value;
             final isEven = idx.isEven;
+            final kp = sub.absentWithoutPermission ?? 0;
+
             return Container(
               color: isEven ? Colors.white : const Color(0xFFF5F8FF),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -217,14 +261,14 @@ class _SemesterSection extends StatelessWidget {
                   SizedBox(
                     width: 70,
                     child: Text(
-                      sub.maMon,
+                      sub.classCode ?? '',
                       style: const TextStyle(fontSize: 12, color: Color(0xFF424242)),
                     ),
                   ),
                   Expanded(
                     child: Center(
                       child: Text(
-                        sub.tenMon,
+                        sub.courseName ?? '',
                         textAlign: TextAlign.center,
                         style: const TextStyle(fontSize: 12, color: Color(0xFF424242)),
                       ),
@@ -234,7 +278,7 @@ class _SemesterSection extends StatelessWidget {
                     width: 42,
                     child: Center(
                       child: Text(
-                        '${sub.dvht}',
+                        '${sub.credits ?? 0}',
                         style: const TextStyle(fontSize: 12, color: Color(0xFF424242)),
                       ),
                     ),
@@ -243,7 +287,7 @@ class _SemesterSection extends StatelessWidget {
                     width: 30,
                     child: Center(
                       child: Text(
-                        '${sub.cp}',
+                        '${sub.absentWithPermission ?? 0}',
                         style: const TextStyle(fontSize: 12, color: Color(0xFF424242)),
                       ),
                     ),
@@ -252,14 +296,14 @@ class _SemesterSection extends StatelessWidget {
                     width: 30,
                     child: Center(
                       child: Text(
-                        '${sub.kp}',
+                        '$kp',
                         style: TextStyle(
                           fontSize: 12,
-                          color: sub.kp > 0
+                          color: kp > 0
                               ? const Color(0xFFE65100)
                               : const Color(0xFF424242),
                           fontWeight:
-                              sub.kp > 0 ? FontWeight.w600 : FontWeight.normal,
+                              kp > 0 ? FontWeight.w600 : FontWeight.normal,
                         ),
                       ),
                     ),

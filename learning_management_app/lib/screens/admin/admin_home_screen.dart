@@ -1,10 +1,23 @@
 import 'package:flutter/material.dart';
+import 'add_student_screen.dart';
+import 'add_teacher_screen.dart';
+import 'add_class_screen.dart';
+import 'announcement_screen.dart';
+import 'update_schedule_screen.dart';
+import 'backup_screen.dart';
 import 'widgets/home/home_header.dart';
 import 'widgets/home/system_stats_grid.dart';
 import 'widgets/home/semester_progress_card.dart';
 import 'widgets/home/pending_requests_card.dart';
 import 'widgets/home/quick_actions_card.dart';
 import 'widgets/home/activity_feed_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/admin/dashboard/admin_dashboard_bloc.dart';
+import '../../blocs/admin/dashboard/admin_dashboard_event.dart';
+import '../../blocs/admin/dashboard/admin_dashboard_state.dart';
+import '../../blocs/admin/request/admin_request_bloc.dart';
+import '../../blocs/admin/request/admin_request_event.dart';
+import '../../blocs/admin/request/admin_request_state.dart';
 
 class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
@@ -14,6 +27,13 @@ class AdminHomeScreen extends StatefulWidget {
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
   static const _kBg = Color(0xFFF0F2FF);
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<AdminDashboardBloc>().add(const AdminDashboardFetchRequested());
+    context.read<AdminRequestBloc>().add(const AdminRequestFetchPending());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,16 +48,37 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SystemStatsGrid(),
+                  BlocBuilder<AdminDashboardBloc, AdminDashboardState>(
+                    builder: (context, state) {
+                      if (state is AdminDashboardLoadSuccess) {
+                        return SystemStatsGrid(stats: state.stats);
+                      }
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                  ),
                   const SizedBox(height: 20),
                   const SemesterProgressCard(),
                   const SizedBox(height: 20),
-                  PendingRequestsCard(
-                    onAction: (action) => _snack('Đã $action đề xuất'),
+                  BlocBuilder<AdminRequestBloc, AdminRequestState>(
+                    builder: (context, state) {
+                      if (state is AdminRequestLoadSuccess) {
+                        return PendingRequestsCard(
+                          requests: state.pendingRequests,
+                          onAction: (action, id) {
+                            if (action == 'Phê duyệt') {
+                              context.read<AdminRequestBloc>().add(AdminRequestApprove(id));
+                            } else {
+                              context.read<AdminRequestBloc>().add(AdminRequestReject(id, 'Từ chối'));
+                            }
+                          },
+                        );
+                      }
+                      return const Center(child: CircularProgressIndicator());
+                    },
                   ),
                   const SizedBox(height: 20),
                   QuickActionsCard(
-                    onAction: (action) => _snack(action),
+                    onAction: _handleQuickAction,
                   ),
                   const SizedBox(height: 20),
                   const ActivityFeedCard(),
@@ -51,12 +92,37 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     );
   }
 
-  void _snack(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(msg.replaceAll('\n', ' ')),
-      backgroundColor: const Color(0xFF1A237E),
-      behavior: SnackBarBehavior.floating,
-      duration: const Duration(seconds: 2),
-    ));
+  void _navigate(Widget screen) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+  }
+
+  void _handleQuickAction(String action) {
+    switch (action) {
+      case 'Thêm\nsinh viên':
+        _navigate(const AddStudentScreen());
+        break;
+      case 'Thêm\ngiảng viên':
+        _navigate(const AddTeacherScreen());
+        break;
+      case 'Thêm\nlớp học':
+        _navigate(const AddClassScreen());
+        break;
+      case 'Thông\nbáo':
+        _navigate(const AnnouncementScreen());
+        break;
+      case 'Cập nhật\nlịch':
+        _navigate(const UpdateScheduleScreen());
+        break;
+      case 'Sao lưu\nDL':
+        _navigate(const BackupScreen());
+        break;
+      default:
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Chưa có màn hình cho: $action'),
+          backgroundColor: const Color(0xFF1A237E),
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 2),
+        ));
+    }
   }
 }

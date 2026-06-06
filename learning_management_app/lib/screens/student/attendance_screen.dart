@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:learning_management_app/core/enum/AttendanceStatus.dart';
 import 'package:learning_management_app/models/Attendance.dart';
 import 'widgets/attendance/attendance_card.dart';
+import 'widgets/shared/custom_app_bar.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -32,7 +33,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       backgroundColor: const Color(0xFFF0F4FF),
       body: Column(
         children: [
-          _buildAppBar(),
+          const CustomAppBar(title: 'Điểm danh'),
           Expanded(
             child: _items.isEmpty
                 ? _buildEmpty()
@@ -51,26 +52,6 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildAppBar() {
-    return Container(
-      color: const Color(0xFF1565C0),
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top,
-        bottom: 14,
-      ),
-      child: const Center(
-        child: Text(
-          'Điểm danh',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
       ),
     );
   }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../data/mock_attendance_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/lecturer/attendance/teacher_attendance_bloc.dart';
+import '../../../../blocs/lecturer/attendance/teacher_attendance_event.dart';
+import '../../../../blocs/lecturer/attendance/teacher_attendance_state.dart';
+import '../../../../models/lecturer/teacher_attendance.dart';
 
 class ManualAttendanceTab extends StatefulWidget {
   const ManualAttendanceTab({super.key});
@@ -16,6 +20,19 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
       TextEditingController(text: 'Lớp học nghiêm túc, đúng giờ.');
 
   @override
+  void initState() {
+    super.initState();
+    // Fetch initial attendance data (mocking IDs)
+    context.read<TeacherAttendanceBloc>().add(
+          const TeacherAttendanceFetchRequested(
+            classId: 1,
+            scheduleId: 1,
+            date: '2026-03-01',
+          ),
+        );
+  }
+
+  @override
   void dispose() {
     _commentController.dispose();
     super.dispose();
@@ -23,18 +40,35 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
 
   @override
   Widget build(BuildContext context) {
-    final present = kStudents.where((s) => s['status'] == 0).length;
-    final excused = kStudents.where((s) => s['status'] == 1).length;
-    final absent = kStudents.where((s) => s['status'] == 2).length;
+    return BlocBuilder<TeacherAttendanceBloc, TeacherAttendanceState>(
+      builder: (context, state) {
+        if (state is TeacherAttendanceLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is TeacherAttendanceLoadFailure) {
+          return Center(child: Text('Lỗi: ${state.message}'));
+        } else if (state is TeacherAttendanceLoadSuccess) {
+          return _buildContent(state.attendanceList);
+        }
+        return const Center(child: Text('Vui lòng chọn lớp để xem điểm danh'));
+      },
+    );
+  }
+
+  Widget _buildContent(TeacherAttendanceList data) {
+    final studentsList = data.students ?? [];
+
+    final present = studentsList.where((s) => s.attendanceStatus == 'PRESENT').length;
+    final excused = studentsList.where((s) => s.attendanceStatus == 'LATE').length; // using LATE for now
+    final absent = studentsList.where((s) => s.attendanceStatus == 'ABSENT').length;
 
     final filtered = _searchQuery.isEmpty
-        ? kStudents
-        : kStudents
+        ? studentsList
+        : studentsList
             .where((s) =>
-                (s['name'] as String)
+                (s.studentName ?? '')
                     .toLowerCase()
                     .contains(_searchQuery.toLowerCase()) ||
-                (s['mssv'] as String)
+                (s.studentCode ?? '')
                     .toLowerCase()
                     .contains(_searchQuery.toLowerCase()))
             .toList();
@@ -49,7 +83,7 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
           // Stats
           Row(
             children: [
-              _buildStatChip('Sĩ số', '${kStudents.length}',
+              _buildStatChip('Sĩ số', '${studentsList.length}',
                   const Color(0xFF6B4FA0)),
               const SizedBox(width: 8),
               _buildStatChip(
@@ -64,7 +98,7 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
           ),
           const SizedBox(height: 14),
           // Comment
-          _buildCommentCard(),
+          _buildCommentCard(data),
           const SizedBox(height: 14),
           // Student list
           _buildStudentList(filtered),
@@ -207,7 +241,7 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
     );
   }
 
-  Widget _buildCommentCard() {
+  Widget _buildCommentCard(TeacherAttendanceList data) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -252,13 +286,30 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
             child: Row(
               children: [
                 _buildActionBtn('Lưu điểm danh', const Color(0xFF6B4FA0),
-                    Icons.save_outlined),
+                    Icons.save_outlined, () async {
+                  final bloc = context.read<TeacherAttendanceBloc>();
+                  int successCount = 0;
+                  for (final s in (data.students ?? [])) {
+                    bloc.add(TeacherAttendanceSaveRequested(
+                      classId: data.classId ?? 1,
+                      scheduleId: data.scheduleId ?? 1,
+                      sessionDate: data.sessionDate ?? '2026-03-01',
+                      studentCode: s.studentCode ?? '',
+                      status: s.attendanceStatus ?? 'PRESENT',
+                      notes: _commentController.text,
+                    ));
+                    successCount++;
+                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Đã lưu điểm danh cho $successCount sinh viên'), backgroundColor: const Color(0xFF6B4FA0)),
+                  );
+                }),
                 const SizedBox(width: 8),
                 _buildActionBtn('Xuất Excel', const Color(0xFF2E7D32),
-                    Icons.table_chart_outlined),
+                    Icons.table_chart_outlined, null),
                 const SizedBox(width: 8),
                 _buildActionBtn('Đồng bộ', const Color(0xFFC62828),
-                    Icons.sync_rounded),
+                    Icons.sync_rounded, null),
               ],
             ),
           ),
@@ -267,9 +318,9 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
     );
   }
 
-  Widget _buildActionBtn(String label, Color color, IconData icon) {
+  Widget _buildActionBtn(String label, Color color, IconData icon, VoidCallback? onTap) {
     return GestureDetector(
-      onTap: () {
+      onTap: onTap ?? () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(label), backgroundColor: const Color(0xFF6B4FA0)),
         );
@@ -295,7 +346,7 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
     );
   }
 
-  Widget _buildStudentList(List<Map<String, dynamic>> list) {
+  Widget _buildStudentList(List<AttendanceDetail> list) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -338,8 +389,18 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
     );
   }
 
-  Widget _buildStudentRow(int index, Map<String, dynamic> s) {
+  Widget _buildStudentRow(int index, AttendanceDetail s) {
     final labels = ['Có mặt', 'Vắng phép', 'Vắng'];
+    final statuses = ['PRESENT', 'LATE', 'ABSENT']; // Using LATE as excused absence for now
+    
+    int getStatusIndex(String status) {
+      if (status == 'LATE') return 1;
+      if (status == 'ABSENT') return 2;
+      return 0; // PRESENT
+    }
+    
+    final sIndex = getStatusIndex(s.attendanceStatus ?? 'PRESENT');
+
     final colors = [
       const Color(0xFF4CAF50),
       const Color(0xFFE65100),
@@ -371,10 +432,10 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(s['name'],
+                Text(s.studentName ?? '',
                     style: const TextStyle(
                         fontSize: 13, fontWeight: FontWeight.w600)),
-                Text('${s['mssv']} · ${s['class']}',
+                Text('${s.studentCode ?? ''}',
                     style: const TextStyle(
                         fontSize: 11, color: Color(0xFF9E9E9E))),
               ],
@@ -384,22 +445,23 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
           GestureDetector(
             onTap: () {
               setState(() {
-                s['status'] = (s['status'] + 1) % 3;
+                final nextIndex = (sIndex + 1) % 3;
+                s.attendanceStatus = statuses[nextIndex];
               });
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
               decoration: BoxDecoration(
-                color: colors[s['status'] as int].withOpacity(0.12),
+                color: colors[sIndex].withOpacity(0.12),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                    color: colors[s['status'] as int].withOpacity(0.4)),
+                    color: colors[sIndex].withOpacity(0.4)),
               ),
               child: Text(
-                labels[s['status'] as int],
+                labels[sIndex],
                 style: TextStyle(
                   fontSize: 11,
-                  color: colors[s['status'] as int],
+                  color: colors[sIndex],
                   fontWeight: FontWeight.w600,
                 ),
               ),

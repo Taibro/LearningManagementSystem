@@ -1,9 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:learning_management_app/screens/lecturer/lecturer_main_layout.dart';
+import 'package:learning_management_app/screens/auth/school_code_screen.dart';
 import 'package:learning_management_app/screens/student/attendance_screen.dart';
 import 'package:learning_management_app/screens/student/home_screen.dart';
 import 'package:learning_management_app/screens/student/profile_screen.dart';
 import 'package:learning_management_app/screens/student/schedule_screen.dart';
+
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:learning_management_app/core/network/dio_client.dart';
+import 'package:learning_management_app/repositories/auth_repository.dart';
+import 'package:learning_management_app/repositories/student_repository.dart';
+import 'package:learning_management_app/blocs/auth/auth_bloc.dart';
+import 'package:learning_management_app/blocs/student/profile/profile_bloc.dart';
+import 'package:learning_management_app/blocs/student/schedule/schedule_bloc.dart';
+import 'package:learning_management_app/blocs/student/grade/grade_bloc.dart';
+import 'package:learning_management_app/blocs/student/attendance/attendance_bloc.dart';
+
+import 'package:learning_management_app/repositories/teacher_repository.dart';
+import 'package:learning_management_app/blocs/lecturer/profile/teacher_profile_bloc.dart';
+import 'package:learning_management_app/blocs/lecturer/salary/teacher_salary_bloc.dart';
+import 'package:learning_management_app/blocs/lecturer/statistic/teacher_statistic_bloc.dart';
+import 'package:learning_management_app/blocs/lecturer/attendance/teacher_attendance_bloc.dart';
+
+import 'package:learning_management_app/repositories/school_admin_repository.dart';
+import 'package:learning_management_app/blocs/admin/dashboard/admin_dashboard_bloc.dart';
+import 'package:learning_management_app/blocs/admin/request/admin_request_bloc.dart';
+import 'package:learning_management_app/blocs/admin/notification/admin_notification_bloc.dart';
+import 'package:learning_management_app/blocs/admin/user_management/admin_user_management_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,16 +36,42 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Student App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
-        useMaterial3: true,
+    return MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(create: (context) => DioClient()),
+        RepositoryProvider(create: (context) => AuthRepository(context.read<DioClient>())),
+        RepositoryProvider(create: (context) => StudentRepository(context.read<DioClient>())),
+        RepositoryProvider(create: (context) => TeacherRepository(context.read<DioClient>().dio)),
+        RepositoryProvider(create: (context) => SchoolAdminRepository(context.read<DioClient>().dio)),
+      ],
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (context) => AuthBloc(context.read<AuthRepository>())),
+          BlocProvider(create: (context) => ProfileBloc(context.read<StudentRepository>())),
+          BlocProvider(create: (context) => ScheduleBloc(context.read<StudentRepository>())),
+          BlocProvider(create: (context) => GradeBloc(context.read<StudentRepository>())),
+          BlocProvider(create: (context) => AttendanceBloc(context.read<StudentRepository>())),
+          // Lecturer Blocs
+          BlocProvider(create: (context) => TeacherProfileBloc(context.read<TeacherRepository>())),
+          BlocProvider(create: (context) => TeacherSalaryBloc(context.read<TeacherRepository>())),
+          BlocProvider(create: (context) => TeacherStatisticBloc(context.read<TeacherRepository>())),
+          BlocProvider(create: (context) => TeacherAttendanceBloc(context.read<TeacherRepository>())),
+          // Admin Blocs
+          BlocProvider(create: (context) => AdminDashboardBloc(context.read<SchoolAdminRepository>())),
+          BlocProvider(create: (context) => AdminRequestBloc(context.read<SchoolAdminRepository>())),
+          BlocProvider(create: (context) => AdminNotificationBloc(context.read<SchoolAdminRepository>())),
+          BlocProvider(create: (context) => AdminUserManagementBloc(context.read<SchoolAdminRepository>())),
+        ],
+        child: MaterialApp(
+          title: 'Learning Management System',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1565C0)),
+            useMaterial3: true,
+          ),
+          home: const SchoolCodeScreen(),
+        ),
       ),
-      // home: const LecturerMainLayout(),
-      home: const MainLayout(),
-    //   home: const MainLayout(),
     );
   }
 }

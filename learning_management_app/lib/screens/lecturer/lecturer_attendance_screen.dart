@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'widgets/attendance/manual_attendance_tab.dart';
 import 'widgets/attendance/qr_attendance_tab.dart';
 import 'widgets/attendance/grades_tab.dart';
+import 'widgets/shared/lecturer_custom_app_bar.dart';
 
 class LecturerAttendanceScreen extends StatefulWidget {
-  const LecturerAttendanceScreen({super.key});
+  final int initialTabIndex;
+  const LecturerAttendanceScreen({super.key, this.initialTabIndex = 0});
 
   @override
   State<LecturerAttendanceScreen> createState() =>
@@ -18,7 +20,11 @@ class _LecturerAttendanceScreenState extends State<LecturerAttendanceScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(
+      length: 3,
+      vsync: this,
+      initialIndex: widget.initialTabIndex,
+    );
   }
 
   @override
@@ -33,7 +39,10 @@ class _LecturerAttendanceScreenState extends State<LecturerAttendanceScreen>
       backgroundColor: const Color(0xFFF4F1F8),
       body: Column(
         children: [
-          _buildHeader(),
+          const LecturerCustomAppBar(
+            title: 'Quản lý điểm danh',
+            icon: Icons.how_to_reg_outlined,
+          ),
           _buildTabBar(),
           Expanded(
             child: TabBarView(
@@ -43,38 +52,6 @@ class _LecturerAttendanceScreenState extends State<LecturerAttendanceScreen>
                 QrAttendanceTab(),
                 GradesTab(),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF4A3570), Color(0xFF6B4FA0)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 14,
-        left: 16,
-        right: 16,
-        bottom: 16,
-      ),
-      child: const Row(
-        children: [
-          Icon(Icons.how_to_reg_outlined, color: Colors.white, size: 22),
-          SizedBox(width: 10),
-          Text(
-            'Quản lý điểm danh',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
             ),
           ),
         ],

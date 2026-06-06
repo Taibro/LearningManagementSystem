@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'backup_screen.dart';
+import 'manage_semester_screen.dart';
 import 'widgets/settings/admin_profile_card.dart';
 import 'widgets/settings/semester_card.dart';
 import 'widgets/settings/system_card.dart';
@@ -30,7 +32,15 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
             const SizedBox(height: 14),
             const SemesterCard(),
             const SizedBox(height: 14),
-            SystemCard(onAction: (msg) => _snack(msg)),
+            SystemCard(onAction: (msg) {
+              if (msg == 'Đang sao lưu...') {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const BackupScreen()));
+              } else if (msg == 'Mở quản lý học kỳ') {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const ManageSemesterScreen()));
+              } else {
+                _snack(msg);
+              }
+            }),
             const SizedBox(height: 14),
             const NotificationCard(),
             const SizedBox(height: 14),

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import '../../../../models/admin/dashboard_stats.dart';
 
 class SystemStatsGrid extends StatelessWidget {
-  const SystemStatsGrid({super.key});
+  final DashboardStats stats;
+  const SystemStatsGrid({super.key, required this.stats});
 
   @override
   Widget build(BuildContext context) {
     final cards = [
-      {'label': 'Sinh viên',   'value': '2,480', 'icon': Icons.school_outlined,       'color': const Color(0xFF1A237E)},
-      {'label': 'Giảng viên',  'value': '148',   'icon': Icons.person_outlined,        'color': const Color(0xFF2E7D32)},
-      {'label': 'Lớp học phần','value': '312',   'icon': Icons.class_outlined,         'color': const Color(0xFFE65100)},
-      {'label': 'Phòng học',   'value': '86',    'icon': Icons.meeting_room_outlined,  'color': const Color(0xFFE85D75)},
+      {'label': 'Sinh viên',   'value': '${stats.totalStudents ?? 0}', 'icon': Icons.school_outlined,       'color': const Color(0xFF1A237E)},
+      {'label': 'Giảng viên',  'value': '${stats.totalTeachers ?? 0}',   'icon': Icons.person_outlined,        'color': const Color(0xFF2E7D32)},
+      {'label': 'Lớp học phần','value': '${stats.totalClasses ?? 0}',   'icon': Icons.class_outlined,         'color': const Color(0xFFE65100)},
+      {'label': 'Vắng hôm nay',   'value': '${stats.todayAbsences ?? 0}',    'icon': Icons.meeting_room_outlined,  'color': const Color(0xFFE85D75)},
     ];
     
     return GridView.builder(

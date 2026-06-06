@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import '../../lecturer_attendance_screen.dart';
+import '../../lecturer_teaching_stats_screen.dart';
+import '../../lecturer_salary_screen.dart';
+import '../../lecturer_materials_screen.dart';
+import '../../lecturer_request_screen.dart';
+import '../../lecturer_all_features_screen.dart';
 
 class FunctionGrid extends StatelessWidget {
   const FunctionGrid({super.key});
@@ -9,42 +15,85 @@ class FunctionGrid extends StatelessWidget {
       {
         'icon': Icons.how_to_reg_outlined,
         'label': 'Điểm danh',
-        'color': const Color(0xFF6B4FA0)
+        'color': const Color(0xFF6B4FA0),
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) =>
+                      const LecturerAttendanceScreen(initialTabIndex: 0)),
+            ),
       },
       {
         'icon': Icons.qr_code_2_rounded,
         'label': 'QR Code',
-        'color': const Color(0xFF4CAF50)
+        'color': const Color(0xFF4CAF50),
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) =>
+                      const LecturerAttendanceScreen(initialTabIndex: 1)),
+            ),
       },
       {
         'icon': Icons.grade_rounded,
         'label': 'Kết quả\nhọc tập',
-        'color': const Color(0xFF2196F3)
+        'color': const Color(0xFF2196F3),
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) =>
+                      const LecturerAttendanceScreen(initialTabIndex: 2)),
+            ),
       },
       {
         'icon': Icons.bar_chart_rounded,
         'label': 'Thống kê\ngiảng dạy',
-        'color': const Color(0xFFE65100)
+        'color': const Color(0xFFE65100),
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const LecturerTeachingStatsScreen()),
+            ),
       },
       {
         'icon': Icons.monetization_on_outlined,
         'label': 'Thông tin\nlương',
-        'color': const Color(0xFF2E7D32)
+        'color': const Color(0xFF2E7D32),
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const LecturerSalaryScreen()),
+            ),
       },
       {
         'icon': Icons.library_books_outlined,
         'label': 'Tài liệu\nbài giảng',
-        'color': const Color(0xFF5C6BC0)
+        'color': const Color(0xFF5C6BC0),
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const LecturerMaterialsScreen()),
+            ),
       },
       {
         'icon': Icons.pending_actions_outlined,
         'label': 'Đề xuất\nlịch dạy',
-        'color': const Color(0xFFE85D75)
+        'color': const Color(0xFFE85D75),
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const LecturerRequestScreen()),
+            ),
       },
       {
         'icon': Icons.grid_view_rounded,
         'label': 'Tất cả',
-        'color': const Color(0xFF6B4FA0)
+        'color': const Color(0xFF6B4FA0),
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const LecturerAllFeaturesScreen()),
+            ),
       },
     ];
 
@@ -104,8 +153,9 @@ class FunctionGrid extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = features[index];
               final color = item['color'] as Color;
+              final onTap = item['onTap'] as VoidCallback;
               return GestureDetector(
-                onTap: () {},
+                onTap: onTap,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [

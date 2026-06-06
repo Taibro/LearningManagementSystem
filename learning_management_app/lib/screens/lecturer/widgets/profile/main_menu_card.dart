@@ -2,20 +2,12 @@ import 'package:flutter/material.dart';
 import 'bottom_sheets/salary_sheet.dart';
 import 'bottom_sheets/declaration_sheet.dart';
 import 'bottom_sheets/statistics_sheet.dart';
+import '../../lecturer_personal_profile_screen.dart';
+import '../../lecturer_materials_screen.dart';
+import '../../lecturer_survey_screen.dart';
 
 class MainMenuCard extends StatelessWidget {
   const MainMenuCard({super.key});
-
-  void _showComingSoon(BuildContext context, String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('$feature - Sắp ra mắt'),
-        backgroundColor: const Color(0xFF6B4FA0),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 
   void _showSalarySheet(BuildContext context) {
     showModalBottomSheet(
@@ -67,7 +59,11 @@ class MainMenuCard extends StatelessWidget {
             iconColor: const Color(0xFF5C6BC0),
             label: 'Hồ sơ cá nhân',
             subtitle: 'Thông tin giảng viên',
-            onTap: () => _showComingSoon(context, 'Hồ sơ cá nhân'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const LecturerPersonalProfileScreen()),
+            ),
           ),
           _buildDivider(),
           _buildMenuItem(
@@ -94,7 +90,11 @@ class MainMenuCard extends StatelessWidget {
             iconColor: const Color(0xFF6B4FA0),
             label: 'Quản lý tài liệu bài giảng',
             subtitle: 'Tải lên và quản lý giáo án',
-            onTap: () => _showComingSoon(context, 'Tài liệu bài giảng'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const LecturerMaterialsScreen()),
+            ),
           ),
           _buildDivider(),
           _buildMenuItem(
@@ -112,7 +112,11 @@ class MainMenuCard extends StatelessWidget {
             iconColor: const Color(0xFFE85D75),
             label: 'Khảo sát',
             subtitle: 'Lấy ý kiến sinh viên về môn học',
-            onTap: () => _showComingSoon(context, 'Khảo sát'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => const LecturerSurveyScreen()),
+            ),
           ),
         ],
       ),

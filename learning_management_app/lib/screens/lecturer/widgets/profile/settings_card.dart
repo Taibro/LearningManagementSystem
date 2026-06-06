@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../auth/school_code_screen.dart';
+import '../../lecturer_change_password_screen.dart';
 
 class SettingsCard extends StatefulWidget {
   const SettingsCard({super.key});
@@ -37,7 +39,13 @@ class _SettingsCardState extends State<SettingsCard> {
                 style: TextStyle(color: Color(0xFF616161))),
           ),
           ElevatedButton(
-            onPressed: () => Navigator.pop(ctx),
+            onPressed: () {
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const SchoolCodeScreen()),
+                (route) => false,
+              );
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFC62828),
               foregroundColor: Colors.white,
@@ -73,7 +81,14 @@ class _SettingsCardState extends State<SettingsCard> {
             iconBgColor: const Color(0xFFE8F5E9),
             iconColor: const Color(0xFF2E7D32),
             label: 'Đổi mật khẩu',
-            onTap: () => _showComingSoon(context, 'Đổi mật khẩu'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const LecturerChangePasswordScreen(),
+                ),
+              );
+            },
           ),
           _buildDivider(),
           _buildMenuItem(

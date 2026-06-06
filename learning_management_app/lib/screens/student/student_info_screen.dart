@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
 import 'widgets/shared/custom_app_bar.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/student/profile/profile_bloc.dart';
+import '../../blocs/student/profile/profile_event.dart';
+import '../../blocs/student/profile/profile_state.dart';
+import '../../models/student/student_profile.dart';
+import 'package:intl/intl.dart';
+
 const Color _kBg = Color(0xFFF0F4FF);
 
-class StudentInfoScreen extends StatelessWidget {
+class StudentInfoScreen extends StatefulWidget {
   const StudentInfoScreen({super.key});
+
+  @override
+  State<StudentInfoScreen> createState() => _StudentInfoScreenState();
+}
+
+class _StudentInfoScreenState extends State<StudentInfoScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProfileBloc>().add(ProfileFetchRequested());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,13 +32,25 @@ class StudentInfoScreen extends StatelessWidget {
         children: [
           const CustomAppBar(title: 'Thông tin sinh viên'),
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildAvatarSection(),
-                  _buildInfoList(),
-                ],
-              ),
+            child: BlocBuilder<ProfileBloc, ProfileState>(
+              builder: (context, state) {
+                if (state is ProfileLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is ProfileLoadFailure) {
+                  return Center(child: Text('Lỗi: ${state.message}'));
+                } else if (state is ProfileLoadSuccess) {
+                  final profile = state.profile;
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _buildAvatarSection(profile),
+                        _buildInfoList(profile),
+                      ],
+                    ),
+                  );
+                }
+                return const SizedBox();
+              },
             ),
           ),
         ],
@@ -30,7 +60,7 @@ class StudentInfoScreen extends StatelessWidget {
 
 
 
-  Widget _buildAvatarSection() {
+  Widget _buildAvatarSection(StudentProfile profile) {
     return Container(
       color: Colors.white,
       width: double.infinity,
@@ -47,13 +77,15 @@ class StudentInfoScreen extends StatelessWidget {
               color: Colors.white,
             ),
             child: ClipOval(
-              child: Icon(Icons.person, size: 64, color: Colors.grey[400]),
+              child: profile.avatarUrl != null
+                  ? Image.network(profile.avatarUrl!, fit: BoxFit.cover, errorBuilder: (context, error, stackTrace) => Icon(Icons.person, size: 64, color: Colors.grey[400]))
+                  : Icon(Icons.person, size: 64, color: Colors.grey[400]),
             ),
           ),
           const SizedBox(height: 14),
-          const Text(
-            'Nguyễn Thành Tài',
-            style: TextStyle(
+          Text(
+            profile.fullName ?? 'Chưa cập nhật',
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Color(0xFF212121),
@@ -64,22 +96,23 @@ class StudentInfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoList() {
+  Widget _buildInfoList(StudentProfile profile) {
+    final dobFormat = profile.dateOfBirth != null ? DateFormat('dd/MM/yyyy').format(profile.dateOfBirth!) : 'Chưa cập nhật';
     final items = [
       _InfoItem('Trạng thái', 'Đang học'),
-      _InfoItem('MSSV', '2001230773'),
-      _InfoItem('Khoa', 'Khoa Công nghệ Thông tin'),
-      _InfoItem('Lớp', '14DHTH05-14DHTH05'),
+      _InfoItem('MSSV', profile.studentCode ?? 'N/A'),
+      _InfoItem('Khoa', profile.departmentName ?? 'N/A'),
+      _InfoItem('Lớp', profile.className ?? 'N/A'),
       _InfoItem('Bậc đào tạo', 'Đại học'),
       _InfoItem('Loại hình đào tạo', 'Chính quy'),
-      _InfoItem('Khóa học', '2023'),
-      _InfoItem('Ngành', 'Công nghệ thông tin'),
-      _InfoItem('Chuyên ngành', 'Công nghệ phần mềm'),
-      _InfoItem('Ngày sinh', '14/10/2005'),
-      _InfoItem('Giới tính', 'Nam'),
-      _InfoItem('Email', 'thanhtai@sgu.edu.vn'),
-      _InfoItem('Số điện thoại', '0901234567'),
-      _InfoItem('Địa chỉ', 'TP. Hồ Chí Minh'),
+      _InfoItem('Khóa học', profile.enrollmentYear?.toString() ?? 'N/A'),
+      _InfoItem('Ngành', profile.major ?? 'N/A'),
+      _InfoItem('Ngày sinh', dobFormat),
+      _InfoItem('Giới tính', profile.gender ?? 'N/A'),
+      _InfoItem('Email', profile.email ?? 'N/A'),
+      _InfoItem('Số điện thoại', profile.phone ?? 'N/A'),
+      _InfoItem('Địa chỉ', profile.address ?? 'N/A'),
+      _InfoItem('CCCD', profile.citizenIdNumber ?? 'N/A'),
     ];
 
     return Container(

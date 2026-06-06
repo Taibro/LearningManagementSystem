@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'bottom_sheets/edit_profile_sheet.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/lecturer/profile/teacher_profile_bloc.dart';
+import '../../../../blocs/lecturer/profile/teacher_profile_state.dart';
+import 'bottom_sheets/edit_profile_sheet.dart';
+
 class ProfileHeader extends StatelessWidget {
   const ProfileHeader({super.key});
 
@@ -44,29 +49,39 @@ class ProfileHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 14),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Nguyễn Văn A',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  'Mã GV: GV001  ·  Khoa CNTT',
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Tiến sĩ · Giảng viên chính',
-                  style: TextStyle(color: Colors.white60, fontSize: 12),
-                ),
-              ],
+          Expanded(
+            child: BlocBuilder<TeacherProfileBloc, TeacherProfileState>(
+              builder: (context, state) {
+                if (state is TeacherProfileLoading) {
+                  return const Center(child: CircularProgressIndicator(color: Colors.white));
+                } else if (state is TeacherProfileLoadSuccess) {
+                  final profile = state.profile;
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        profile.fullName ?? 'Chưa cập nhật',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Mã GV: ${profile.teacherCode ?? ''}  ·  Khoa ${profile.departmentName ?? ''}',
+                        style: const TextStyle(color: Colors.white70, fontSize: 12),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${profile.degree ?? ''} · ${profile.specialization ?? ''}',
+                        style: const TextStyle(color: Colors.white60, fontSize: 12),
+                      ),
+                    ],
+                  );
+                }
+                return const Text('Không thể tải dữ liệu', style: TextStyle(color: Colors.white));
+              },
             ),
           ),
           GestureDetector(

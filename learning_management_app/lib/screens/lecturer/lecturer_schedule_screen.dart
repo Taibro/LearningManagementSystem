@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'widgets/schedule/weekly_tab.dart';
 import 'widgets/schedule/progress_tab.dart';
+import 'widgets/shared/lecturer_custom_app_bar.dart';
 
 class LecturerScheduleScreen extends StatefulWidget {
   const LecturerScheduleScreen({super.key});
@@ -31,7 +32,10 @@ class _LecturerScheduleScreenState extends State<LecturerScheduleScreen>
       backgroundColor: const Color(0xFFF4F1F8),
       body: Column(
         children: [
-          _buildHeader(),
+          const LecturerCustomAppBar(
+            title: 'Lịch giảng dạy',
+            icon: Icons.calendar_today_rounded,
+          ),
           _buildTabBar(),
           Expanded(
             child: TabBarView(
@@ -40,38 +44,6 @@ class _LecturerScheduleScreenState extends State<LecturerScheduleScreen>
                 WeeklyTab(),
                 ProgressTab(),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Color(0xFF4A3570), Color(0xFF6B4FA0)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 14,
-        left: 16,
-        right: 16,
-        bottom: 16,
-      ),
-      child: const Row(
-        children: [
-          Icon(Icons.calendar_today_rounded, color: Colors.white, size: 22),
-          SizedBox(width: 10),
-          Text(
-            'Lịch giảng dạy',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
             ),
           ),
         ],

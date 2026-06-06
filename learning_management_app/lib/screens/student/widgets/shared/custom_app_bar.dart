@@ -18,6 +18,7 @@ class CustomAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final canPop = Navigator.canPop(context);
     return Container(
       decoration: BoxDecoration(
         color: isGradient ? null : const Color(0xFF1565C0),
@@ -35,15 +36,17 @@ class CustomAppBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const SizedBox(width: 4),
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
-          ),
+          if (canPop)
+            IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
+            )
+          else
+            const SizedBox(width: 16),
           Expanded(
             child: Text(
               title,
-              textAlign: TextAlign.center,
+              textAlign: canPop || trailing != null ? TextAlign.center : TextAlign.left,
               style: TextStyle(
                 color: Colors.white,
                 fontSize: fontSize,
@@ -51,7 +54,7 @@ class CustomAppBar extends StatelessWidget {
               ),
             ),
           ),
-          if (trailing != null) trailing! else const SizedBox(width: 48),
+          if (trailing != null) trailing! else SizedBox(width: canPop ? 48 : 16),
         ],
       ),
     );

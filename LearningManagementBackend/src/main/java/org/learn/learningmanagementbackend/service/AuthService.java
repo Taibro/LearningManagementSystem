@@ -152,5 +152,62 @@ public class AuthService {
         return response;
     }
 
-    
+    public org.learn.learningmanagementbackend.dto.response.UserProfileMobileResponse mobileLogin(AuthRequest request) {
+        String combinedUsername = request.getUserType().toUpperCase() + ":" + request.getLoginCode();
+
+        // Kích hoạt Spring Security kiểm tra mật khẩu
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(combinedUsername, request.getPassword())
+        );
+
+        if (!"SAAS_ADMIN".equals(request.getUserType().toUpperCase())) {
+            if (request.getSchool() == null || request.getSchool().trim().isEmpty()) {
+                throw new RuntimeException("Vui lòng chọn trường học!");
+            }
+        }
+
+        org.learn.learningmanagementbackend.dto.response.UserProfileMobileResponse response = new org.learn.learningmanagementbackend.dto.response.UserProfileMobileResponse();
+        response.setRole(request.getUserType().toUpperCase());
+
+        if ("STUDENT".equals(response.getRole())) {
+            Student student = studentRepository.findByStudentCode(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Sinh viên này trong Database!"));
+            if (!request.getSchool().equalsIgnoreCase(student.getUser().getSchool().getCode())) {
+                throw new RuntimeException("Tài khoản không thuộc trường học đã chọn!");
+            }
+            response.setId(student.getUser().getId());
+            response.setFullName(student.getUser().getFullName());
+            response.setEmail(student.getUser().getEmail());
+            response.setSpecificCode(student.getStudentCode());
+            response.setToken(jwtService.generateToken(combinedUsername));
+        } else if ("LECTURER".equals(response.getRole())) {
+            Teacher teacher = teacherRepository.findByTeacherCode(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Giảng viên này trong Database!"));
+            if (!request.getSchool().equalsIgnoreCase(teacher.getUser().getSchool().getCode())) {
+                throw new RuntimeException("Tài khoản không thuộc trường học đã chọn!");
+            }
+            response.setId(teacher.getUser().getId());
+            response.setFullName(teacher.getUser().getFullName());
+            response.setEmail(teacher.getUser().getEmail());
+            response.setSpecificCode(teacher.getTeacherCode());
+            response.setToken(jwtService.generateToken(combinedUsername));
+        } else {
+            Users admin = userRepository.findByEmail(request.getLoginCode()).orElseThrow(() -> new RuntimeException("Không tìm thấy Admin này trong Database!"));
+            if (!"SAAS_ADMIN".equals(response.getRole())) {
+                if (admin.getSchool() == null || !request.getSchool().equalsIgnoreCase(admin.getSchool().getCode())) {
+                    throw new RuntimeException("Tài khoản không thuộc trường học đã chọn!");
+                }
+            }
+            response.setId(admin.getId());
+            response.setFullName(admin.getFullName());
+            response.setEmail(admin.getEmail());
+            response.setSpecificCode("ADMIN");
+            if (admin.getSchool() != null) {
+                response.setSchoolId(admin.getSchool().getId());
+            }
+
+            // Logic cho Mobile Admin: KHÔNG cần 2FA, trả về token thật luôn
+            response.setToken(jwtService.generateToken(combinedUsername));
+        }
+        return response;
+    }
+
 }

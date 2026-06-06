@@ -1,12 +1,28 @@
 import 'package:flutter/material.dart';
 import 'widgets/shared/custom_app_bar.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/student/grade/grade_bloc.dart';
+import '../../blocs/student/grade/grade_event.dart';
+import '../../blocs/student/grade/grade_state.dart';
+import '../../models/student/student_grade.dart';
 import 'data/mock_grade_data.dart';
 
 const Color _kPrimary = Color(0xFF1565C0);
 const Color _kBg = Color(0xFFF0F4FF);
 
-class AcademicResultScreen extends StatelessWidget {
+class AcademicResultScreen extends StatefulWidget {
   const AcademicResultScreen({super.key});
+
+  @override
+  State<AcademicResultScreen> createState() => _AcademicResultScreenState();
+}
+
+class _AcademicResultScreenState extends State<AcademicResultScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<GradeBloc>().add(GradeFetchRequested());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,23 +147,54 @@ class _InfoRow {
   const _InfoRow(this.label, this.value);
 }
 
-// ── Tab 2: Tổng kết ──────────────────────────────────────────────────
 class _SummaryTab extends StatelessWidget {
   const _SummaryTab();
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: kSemesterSummaries.length,
-      itemBuilder: (_, i) => _SemesterBlock(semester: kSemesterSummaries[i]),
+    return BlocBuilder<GradeBloc, GradeState>(
+      builder: (context, state) {
+        if (state is GradeLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is GradeLoadFailure) {
+          return Center(child: Text('Lỗi: ${state.message}'));
+        } else if (state is GradeLoadSuccess) {
+          final grades = state.grades;
+          if (grades.isEmpty) {
+            return const Center(child: Text('Chưa có dữ liệu điểm'));
+          }
+
+          // Nhóm điểm theo học kỳ
+          final groupedGrades = <String, List<StudentGrade>>{};
+          for (var grade in grades) {
+            final sem = grade.semesterName ?? 'Chưa xác định';
+            if (!groupedGrades.containsKey(sem)) {
+              groupedGrades[sem] = [];
+            }
+            groupedGrades[sem]!.add(grade);
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: groupedGrades.length,
+            itemBuilder: (_, i) {
+              final semesterName = groupedGrades.keys.elementAt(i);
+              final semesterGrades = groupedGrades[semesterName]!;
+              return _SemesterBlock(semesterName: semesterName, grades: semesterGrades);
+            },
+          );
+        }
+        return const SizedBox();
+      },
     );
   }
 }
 
 class _SemesterBlock extends StatelessWidget {
-  final SemesterSummary semester;
-  const _SemesterBlock({required this.semester});
+  final String semesterName;
+  final List<StudentGrade> grades;
+  
+  const _SemesterBlock({required this.semesterName, required this.grades});
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +205,7 @@ class _SemesterBlock extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(bottom: 10, top: 6),
           child: Text(
-            semester.label,
+            semesterName,
             style: const TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.bold,
@@ -197,7 +244,7 @@ class _SemesterBlock extends StatelessWidget {
                 ),
               ),
               // Data rows
-              ...semester.subjects.asMap().entries.map((entry) {
+              ...grades.asMap().entries.map((entry) {
                 final idx = entry.key;
                 final sub = entry.value;
                 final isEven = idx.isEven;
@@ -208,15 +255,15 @@ class _SemesterBlock extends StatelessWidget {
                     children: [
                       SizedBox(
                         width: 60,
-                        child: Text(sub.maMon, style: _kTableCell),
+                        child: Text(sub.courseCode ?? 'N/A', style: _kTableCell),
                       ),
                       Expanded(
-                        child: Text(sub.tenMon, style: _kTableCell),
+                        child: Text(sub.courseName ?? 'N/A', style: _kTableCell),
                       ),
                       SizedBox(
                         width: 36,
                         child: Text(
-                          '${sub.tinChi}',
+                          '${sub.credits ?? 0}',
                           style: _kTableCell,
                           textAlign: TextAlign.center,
                         ),
@@ -224,10 +271,10 @@ class _SemesterBlock extends StatelessWidget {
                       SizedBox(
                         width: 60,
                         child: Text(
-                          sub.diemTB != null ? sub.diemTB!.toStringAsFixed(1) : '-',
+                          sub.gradeTotal != null ? sub.gradeTotal!.toStringAsFixed(1) : '-',
                           style: _kTableCell.copyWith(
                             fontWeight: FontWeight.w600,
-                            color: sub.diemTB != null ? const Color(0xFF212121) : const Color(0xFF9E9E9E),
+                            color: sub.gradeTotal != null ? const Color(0xFF212121) : const Color(0xFF9E9E9E),
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -239,23 +286,6 @@ class _SemesterBlock extends StatelessWidget {
             ],
           ),
         ),
-
-        // Semester stats
-        if (semester.diemTBCHocLuc != null) ...[
-          const SizedBox(height: 12),
-          _statLine('Điểm TBC học lực', semester.diemTBCHocLuc?.toStringAsFixed(2)),
-          _statLine('Điểm TBC tín chỉ', semester.diemTBCTinChi?.toStringAsFixed(2)),
-          _statLine('Xếp loại học lực', semester.xepLoaiHocLuc),
-          _statLine('Xếp loại hạnh kiểm', semester.xepLoaiHanhKiem),
-          _statLine('Trạng thái học vụ', semester.trangThaiHocVu),
-        ] else ...[
-          const SizedBox(height: 12),
-          _statLine('Điểm TBC học lực', null),
-          _statLine('Điểm TBC tín chỉ', null),
-          _statLine('Xếp loại học lực', null),
-          _statLine('Xếp loại hạnh kiểm', null),
-          _statLine('Trạng thái học vụ', null),
-        ],
 
         const SizedBox(height: 20),
       ],

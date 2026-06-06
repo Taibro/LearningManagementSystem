@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
 import 'widgets/profile/profile_header.dart';
 import 'widgets/profile/profile_menu_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/student/profile/profile_bloc.dart';
+import '../../blocs/student/profile/profile_event.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProfileBloc>().add(ProfileFetchRequested());
+  }
 
   @override
   Widget build(BuildContext context) {

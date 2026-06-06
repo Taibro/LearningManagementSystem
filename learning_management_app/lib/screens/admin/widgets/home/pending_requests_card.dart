@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../data/mock_admin_home_data.dart';
+import '../../../../models/admin/schedule_exception_response.dart';
 import 'home_helpers.dart';
 
 class PendingRequestsCard extends StatelessWidget {
-  final Function(String) onAction;
-  const PendingRequestsCard({super.key, required this.onAction});
+  final List<ScheduleExceptionResponse> requests;
+  final Function(String, int) onAction;
+  const PendingRequestsCard({super.key, required this.requests, required this.onAction});
 
   @override
   Widget build(BuildContext context) {
@@ -17,12 +18,12 @@ class PendingRequestsCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(color: const Color(0xFFE85D75), borderRadius: BorderRadius.circular(20)),
-              child: Text('${mockPendingRequests.length}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+              child: Text('${requests.length}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
             ),
           ]),
           const SizedBox(height: 12),
-          ...mockPendingRequests.map((r) {
-            final col = r['color'] as Color;
+          ...requests.map((r) {
+            final col = const Color(0xFFE65100);
             return Container(
               margin: const EdgeInsets.only(bottom: 10),
               padding: const EdgeInsets.all(12),
@@ -35,18 +36,18 @@ class PendingRequestsCard extends StatelessWidget {
                 Container(
                   width: 38, height: 38,
                   decoration: BoxDecoration(color: col.withOpacity(0.12), shape: BoxShape.circle),
-                  child: Icon(r['icon'] as IconData, color: col, size: 20),
+                  child: Icon(Icons.event_busy_outlined, color: col, size: 20),
                 ),
                 const SizedBox(width: 10),
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(r['type'] as String, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-                  Text('${r['from']} · ${r['class']} · ${r['date']}',
+                  Text(r.exceptionType ?? 'Đề xuất', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  Text('${r.teacherName} · ${r.classCode} · ${r.exceptionDate}',
                       style: const TextStyle(fontSize: 11, color: Color(0xFF9E9E9E))),
                 ])),
                 const SizedBox(width: 8),
-                _approveBtn('Duyệt', const Color(0xFF4CAF50)),
+                _approveBtn('Phê duyệt', const Color(0xFF4CAF50), r.id ?? 0),
                 const SizedBox(width: 6),
-                _approveBtn('Từ chối', const Color(0xFFC62828)),
+                _approveBtn('Từ chối', const Color(0xFFC62828), r.id ?? 0),
               ]),
             );
           }),
@@ -55,9 +56,9 @@ class PendingRequestsCard extends StatelessWidget {
     );
   }
 
-  Widget _approveBtn(String label, Color color) {
+  Widget _approveBtn(String label, Color color, int id) {
     return GestureDetector(
-      onTap: () => onAction(label),
+      onTap: () => onAction(label, id),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(6)),

@@ -5,8 +5,23 @@ import 'widgets/profile/main_menu_card.dart';
 import 'widgets/profile/request_menu_card.dart';
 import 'widgets/profile/settings_card.dart';
 
-class LecturerProfileScreen extends StatelessWidget {
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/lecturer/profile/teacher_profile_bloc.dart';
+import '../../blocs/lecturer/profile/teacher_profile_event.dart';
+
+class LecturerProfileScreen extends StatefulWidget {
   const LecturerProfileScreen({super.key});
+
+  @override
+  State<LecturerProfileScreen> createState() => _LecturerProfileScreenState();
+}
+
+class _LecturerProfileScreenState extends State<LecturerProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<TeacherProfileBloc>().add(TeacherProfileFetchRequested());
+  }
 
   @override
   Widget build(BuildContext context) {
