@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../screens/student/transaction_history_screen.dart';
 import '../../../screens/student/receipt_screen.dart';
 
@@ -11,6 +12,95 @@ class PaymentBottomSheet extends StatelessWidget {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (_) => const PaymentBottomSheet(),
+    );
+  }
+
+  Future<void> _launchApp(BuildContext context, String urlScheme) async {
+    final Uri uri = Uri.parse(urlScheme);
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Không tìm thấy ứng dụng trên thiết bị.'), backgroundColor: Color(0xFFC62828)),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Không thể mở ứng dụng thanh toán.'), backgroundColor: Color(0xFFC62828)),
+        );
+      }
+    }
+  }
+
+  void _showPaymentMethods(BuildContext context) {
+    Navigator.pop(context); // Đóng bottom sheet hiện tại
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFBDBDBD),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const Text(
+                'Chọn phương thức thanh toán',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF212121),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildItem(
+                    ctx,
+                    icon: Icons.account_balance_outlined,
+                    color: const Color(0xFF1565C0),
+                    bgColor: const Color(0xFFE3F2FD),
+                    label: 'Ngân hàng',
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _launchApp(ctx, 'vnpay://');
+                    },
+                  ),
+                  _buildItem(
+                    ctx,
+                    icon: Icons.wallet_outlined,
+                    color: const Color(0xFFC2185B),
+                    bgColor: const Color(0xFFFCE4EC),
+                    label: 'MoMo',
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      _launchApp(ctx, 'momo://');
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -62,32 +152,7 @@ class PaymentBottomSheet extends StatelessWidget {
                   color: const Color(0xFF1565C0),
                   bgColor: const Color(0xFFE3F2FD),
                   label: 'Thanh toán\nhọc phí',
-                  onTap: () {
-                    Navigator.pop(context);
-                    // TODO: Navigate to tuition payment
-                  },
-                ),
-                _buildItem(
-                  context,
-                  icon: Icons.miscellaneous_services_outlined,
-                  color: const Color(0xFF2E7D32),
-                  bgColor: const Color(0xFFE8F5E9),
-                  label: 'Thanh toán\ndịch vụ',
-                  onTap: () {
-                    Navigator.pop(context);
-                    // TODO: Navigate to service payment
-                  },
-                ),
-                _buildItem(
-                  context,
-                  icon: Icons.request_page_outlined,
-                  color: const Color(0xFFE65100),
-                  bgColor: const Color(0xFFFFF3E0),
-                  label: 'Thanh toán\nbiểu mẫu',
-                  onTap: () {
-                    Navigator.pop(context);
-                    // TODO: Navigate to form payment
-                  },
+                  onTap: () => _showPaymentMethods(context),
                 ),
                 _buildItem(
                   context,
