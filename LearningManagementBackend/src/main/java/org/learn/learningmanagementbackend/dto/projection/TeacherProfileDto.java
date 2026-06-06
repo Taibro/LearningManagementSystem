@@ -7,7 +7,7 @@ public interface TeacherProfileDto {
     Integer getId();
     String getFullName();
     LocalDate getDateOfBirth();
-    String getGender();
+    org.learn.learningmanagementbackend.enums.Gender getGender();
     String getEmail();
     String getPhone();
     String getAvatarUrl();

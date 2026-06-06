@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../blocs/lecturer/attendance/teacher_attendance_bloc.dart';
 import '../../../../blocs/lecturer/attendance/teacher_attendance_event.dart';
 import '../../../../blocs/lecturer/attendance/teacher_attendance_state.dart';
 import '../../../../models/lecturer/teacher_attendance.dart';
+
+const Color _kPrimary = Color(0xFF6B4FA0);
 
 class ManualAttendanceTab extends StatefulWidget {
   const ManualAttendanceTab({super.key});
@@ -43,13 +47,37 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
     return BlocBuilder<TeacherAttendanceBloc, TeacherAttendanceState>(
       builder: (context, state) {
         if (state is TeacherAttendanceLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: _kPrimary));
         } else if (state is TeacherAttendanceLoadFailure) {
-          return Center(child: Text('Lỗi: ${state.message}'));
+          return Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.error_outline_rounded, size: 64, color: Colors.red.shade300),
+                const SizedBox(height: 16),
+                Text(
+                  'Lỗi: ${state.message}',
+                  style: GoogleFonts.inter(color: const Color(0xFFEF4444)),
+                ),
+              ],
+            ).animate().fadeIn().slideY(begin: 0.1),
+          );
         } else if (state is TeacherAttendanceLoadSuccess) {
           return _buildContent(state.attendanceList);
         }
-        return const Center(child: Text('Vui lòng chọn lớp để xem điểm danh'));
+        return Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.checklist_rtl_rounded, size: 64, color: Colors.grey.shade400),
+              const SizedBox(height: 16),
+              Text(
+                'Vui lòng chọn lớp để xem điểm danh',
+                style: GoogleFonts.inter(color: const Color(0xFF64748B)),
+              ),
+            ],
+          ).animate().fadeIn().slideY(begin: 0.1),
+        );
       },
     );
   }
@@ -74,34 +102,31 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
             .toList();
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 140),
       child: Column(
         children: [
           // Filter card
-          _buildFilterCard(),
-          const SizedBox(height: 14),
+          _buildFilterCard().animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0),
+          const SizedBox(height: 24),
           // Stats
           Row(
             children: [
-              _buildStatChip('Sĩ số', '${studentsList.length}',
-                  const Color(0xFF6B4FA0)),
-              const SizedBox(width: 8),
-              _buildStatChip(
-                  'Có mặt', '$present', const Color(0xFF4CAF50)),
-              const SizedBox(width: 8),
-              _buildStatChip(
-                  'Vắng có phép', '$excused', const Color(0xFFE65100)),
-              const SizedBox(width: 8),
-              _buildStatChip(
-                  'Vắng không phép', '$absent', const Color(0xFFC62828)),
+              _buildStatChip('Sĩ số', '${studentsList.length}', const Color(0xFF3B82F6), 0),
+              const SizedBox(width: 12),
+              _buildStatChip('Có mặt', '$present', const Color(0xFF10B981), 1),
+              const SizedBox(width: 12),
+              _buildStatChip('Vắng (P)', '$excused', const Color(0xFFF59E0B), 2),
+              const SizedBox(width: 12),
+              _buildStatChip('Vắng (KP)', '$absent', const Color(0xFFEF4444), 3),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 24),
           // Comment
-          _buildCommentCard(data),
-          const SizedBox(height: 14),
+          _buildCommentCard(data).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.1, end: 0),
+          const SizedBox(height: 24),
           // Student list
-          _buildStudentList(filtered),
+          _buildStudentList(filtered).animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.1, end: 0),
+          const SizedBox(height: 32),
         ],
       ),
     );
@@ -115,15 +140,16 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
       '010110195602 - 14DHTH02',
     ];
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF6B4FA0).withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -135,36 +161,36 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
                 child: _buildDropdown('Học kỳ', semesters, _selectedSemester,
                     (v) => setState(() => _selectedSemester = v!)),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 16),
               Expanded(
                 child: _buildDropdown('Lớp học phần', classes, _selectedClass,
                     (v) => setState(() => _selectedClass = v!)),
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 16),
           TextField(
             decoration: InputDecoration(
               hintText: 'Tìm kiếm sinh viên...',
-              hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFBDBDBD)),
-              prefixIcon:
-                  const Icon(Icons.search, size: 18, color: Color(0xFF9E9E9E)),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              hintStyle: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8), fontWeight: FontWeight.w500),
+              prefixIcon: const Icon(Icons.search_rounded, size: 20, color: Color(0xFF64748B)),
+              filled: true,
+              fillColor: const Color(0xFFF8FAFC),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE0D8F0)),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE0D8F0)),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFF6B4FA0)),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF6B4FA0), width: 1.5),
               ),
             ),
-            style: const TextStyle(fontSize: 13),
+            style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF1E293B), fontWeight: FontWeight.w500),
             onChanged: (v) => setState(() => _searchQuery = v),
           ),
         ],
@@ -177,116 +203,137 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label,
-            style:
-                const TextStyle(fontSize: 11, color: Color(0xFF616161))),
-        const SizedBox(height: 4),
+        Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            color: const Color(0xFF64748B),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 6),
         DropdownButtonFormField<String>(
           value: value,
           items: items
               .map((e) => DropdownMenuItem(
                     value: e,
                     child: Text(e,
-                        style: const TextStyle(fontSize: 12),
+                        style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1E293B)),
                         overflow: TextOverflow.ellipsis),
                   ))
               .toList(),
           onChanged: onChanged,
           decoration: InputDecoration(
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            filled: true,
+            fillColor: const Color(0xFFF8FAFC),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE0D8F0)),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Color(0xFFE0D8F0)),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
             ),
           ),
           isExpanded: true,
-          style: const TextStyle(fontSize: 12, color: Color(0xFF212121)),
-          icon: const Icon(Icons.keyboard_arrow_down,
-              color: Color(0xFF6B4FA0), size: 18),
+          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF64748B), size: 20),
         ),
       ],
     );
   }
 
-  Widget _buildStatChip(String label, String value, Color color) {
+  Widget _buildStatChip(String label, String value, Color color, int index) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+        padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [color, color.withOpacity(0.8)],
-          ),
-          borderRadius: BorderRadius.circular(10),
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: color.withOpacity(0.15), width: 1.5),
         ),
         child: Column(
           children: [
-            Text(value,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold)),
-            const SizedBox(height: 2),
-            Text(label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: Colors.white70, fontSize: 9, height: 1.2)),
+            Text(
+              value,
+              style: GoogleFonts.plusJakartaSans(
+                color: color,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: color.withOpacity(0.9),
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+                height: 1.2,
+              ),
+            ),
           ],
         ),
-      ),
+      ).animate().scale(duration: 400.ms, delay: (50 * index).ms, curve: Curves.easeOutBack),
     );
   }
 
   Widget _buildCommentCard(TeacherAttendanceList data) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF6B4FA0).withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Nhận xét lớp',
-              style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF424242))),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _commentController,
-            maxLines: 2,
-            style: const TextStyle(fontSize: 13),
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.all(10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE0D8F0)),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE0D8F0)),
-              ),
+          Text(
+            'Nhận xét lớp',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: const Color(0xFF1E293B),
             ),
           ),
           const SizedBox(height: 12),
+          TextField(
+            controller: _commentController,
+            maxLines: 2,
+            style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF1E293B), fontWeight: FontWeight.w500),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: const Color(0xFFF8FAFC),
+              contentPadding: const EdgeInsets.all(16),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: Color(0xFF6B4FA0), width: 1.5),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildActionBtn('Lưu điểm danh', const Color(0xFF6B4FA0),
-                    Icons.save_outlined, () async {
+                _buildActionBtn('Lưu điểm danh', const Color(0xFF6B4FA0), Icons.save_rounded, () async {
                   final bloc = context.read<TeacherAttendanceBloc>();
                   int successCount = 0;
                   for (final s in (data.students ?? [])) {
@@ -301,15 +348,18 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
                     successCount++;
                   }
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Đã lưu điểm danh cho $successCount sinh viên'), backgroundColor: const Color(0xFF6B4FA0)),
+                    SnackBar(
+                      content: Text('Đã lưu điểm danh cho $successCount sinh viên', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+                      backgroundColor: const Color(0xFF6B4FA0),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
                   );
                 }),
-                const SizedBox(width: 8),
-                _buildActionBtn('Xuất Excel', const Color(0xFF2E7D32),
-                    Icons.table_chart_outlined, null),
-                const SizedBox(width: 8),
-                _buildActionBtn('Đồng bộ', const Color(0xFFC62828),
-                    Icons.sync_rounded, null),
+                const SizedBox(width: 12),
+                _buildActionBtn('Xuất Excel', const Color(0xFF10B981), Icons.table_chart_rounded, null),
+                const SizedBox(width: 12),
+                _buildActionBtn('Đồng bộ', const Color(0xFF3B82F6), Icons.sync_rounded, null),
               ],
             ),
           ),
@@ -319,28 +369,47 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
   }
 
   Widget _buildActionBtn(String label, Color color, IconData icon, VoidCallback? onTap) {
-    return GestureDetector(
-      onTap: onTap ?? () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(label), backgroundColor: const Color(0xFF6B4FA0)),
-        );
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.white, size: 15),
-            const SizedBox(width: 5),
-            Text(label,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600)),
-          ],
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap ?? () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(label, style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+              backgroundColor: color,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -350,12 +419,13 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF6B4FA0).withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -363,16 +433,37 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.all(14),
-            child: Text(
-              'Danh sách sinh viên (${list.length})',
-              style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF212121)),
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Danh sách sinh viên',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF1E293B),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF6B4FA0).withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    '${list.length} SV',
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF6B4FA0),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFF0F0F0)),
+          const Divider(height: 1, thickness: 1.5, color: Color(0xFFF1F5F9)),
           ...list.asMap().entries.map((entry) {
             final i = entry.key;
             final s = entry.value;
@@ -380,7 +471,7 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
               children: [
                 _buildStudentRow(i, s),
                 if (i < list.length - 1)
-                  const Divider(height: 1, indent: 16, color: Color(0xFFF0F0F0)),
+                  const Divider(height: 1, thickness: 1, indent: 20, color: Color(0xFFF1F5F9)),
               ],
             );
           }),
@@ -402,67 +493,83 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
     final sIndex = getStatusIndex(s.attendanceStatus ?? 'PRESENT');
 
     final colors = [
-      const Color(0xFF4CAF50),
-      const Color(0xFFE65100),
-      const Color(0xFFC62828),
+      const Color(0xFF10B981),
+      const Color(0xFFF59E0B),
+      const Color(0xFFEF4444),
     ];
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       child: Row(
         children: [
           Container(
-            width: 28,
-            height: 28,
-            decoration: const BoxDecoration(
-              color: Color(0xFFEDE7F6),
-              shape: BoxShape.circle,
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Center(
               child: Text(
                 '${index + 1}',
-                style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF6B4FA0)),
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF64748B),
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(s.studentName ?? '',
-                    style: const TextStyle(
-                        fontSize: 13, fontWeight: FontWeight.w600)),
-                Text('${s.studentCode ?? ''}',
-                    style: const TextStyle(
-                        fontSize: 11, color: Color(0xFF9E9E9E))),
+                Text(
+                  s.studentName ?? '',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF1E293B),
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${s.studentCode ?? ''}',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: const Color(0xFF64748B),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ],
             ),
           ),
           // Status toggle
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                final nextIndex = (sIndex + 1) % 3;
-                s.attendanceStatus = statuses[nextIndex];
-              });
-            },
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                color: colors[sIndex].withOpacity(0.12),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                    color: colors[sIndex].withOpacity(0.4)),
-              ),
-              child: Text(
-                labels[sIndex],
-                style: TextStyle(
-                  fontSize: 11,
-                  color: colors[sIndex],
-                  fontWeight: FontWeight.w600,
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  final nextIndex = (sIndex + 1) % 3;
+                  s.attendanceStatus = statuses[nextIndex];
+                });
+              },
+              borderRadius: BorderRadius.circular(20),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: colors[sIndex].withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: colors[sIndex].withOpacity(0.2), width: 1.5),
+                ),
+                child: Text(
+                  labels[sIndex],
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: colors[sIndex],
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
             ),

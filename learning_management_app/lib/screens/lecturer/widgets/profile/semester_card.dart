@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class SemesterCard extends StatelessWidget {
   const SemesterCard({super.key});
@@ -6,16 +7,16 @@ class SemesterCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF6B4FA0).withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -25,75 +26,128 @@ class SemesterCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 32,
-                height: 32,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEDE7F6),
-                  borderRadius: BorderRadius.circular(8),
+                  color: const Color(0xFF6B4FA0).withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF6B4FA0).withOpacity(0.1), width: 1),
                 ),
-                child: const Icon(Icons.school_outlined,
-                    color: Color(0xFF6B4FA0), size: 18),
+                child: const Icon(Icons.school_rounded, color: Color(0xFF6B4FA0), size: 24),
               ),
-              const SizedBox(width: 10),
-              const Text(
-                'Học kỳ 2 - 2025/2026',
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                    color: Color(0xFF212121)),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Học kỳ 2 - 2025/2026',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        color: Color(0xFF1E293B),
+                        letterSpacing: -0.2,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Tiến độ giảng dạy',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Text(
+                  'Đang diễn ra',
+                  style: TextStyle(
+                    color: Color(0xFF059669),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 24),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildSemStat('5', 'Lớp phụ\ntrách'),
-              _buildSemDivider(),
-              _buildSemStat('120', 'Tiết kế\nhoạch'),
-              _buildSemDivider(),
-              _buildSemStat('87', 'Tiết đã\ndạy'),
-              _buildSemDivider(),
-              _buildSemStat('33', 'Tiết còn\nlại'),
+              _buildSemStat('5', 'Lớp dạy'),
+              _buildSemStat('120', 'Tổng tiết'),
+              _buildSemStat('87', 'Đã dạy', color: const Color(0xFF10B981)),
+              _buildSemStat('33', 'Còn lại', color: const Color(0xFFF59E0B)),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 20),
           ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
+            borderRadius: BorderRadius.circular(8),
+            child: const LinearProgressIndicator(
               value: 87 / 120,
-              backgroundColor: const Color(0xFFE0D8F0),
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                  Color(0xFF6B4FA0)),
-              minHeight: 7,
+              backgroundColor: Color(0xFFF1F5F9),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6B4FA0)),
+              minHeight: 8,
             ),
+          ).animate().slideX(begin: -0.2, end: 0, duration: 800.ms, curve: Curves.easeOutQuart),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Đã hoàn thành 72.5%',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                '87/120 tiết',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[800],
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 4),
-          const Text('Tiến độ giảng dạy: 72.5%',
-              style: TextStyle(fontSize: 11, color: Color(0xFF9E9E9E))),
         ],
       ),
     );
   }
 
-  Widget _buildSemStat(String value, String label) {
+  Widget _buildSemStat(String value, String label, {Color color = const Color(0xFF6B4FA0)}) {
     return Column(
       children: [
-        Text(value,
-            style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF6B4FA0))),
-        const SizedBox(height: 2),
-        Text(label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-                fontSize: 10, color: Color(0xFF9E9E9E), height: 1.3)),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            color: color,
+            letterSpacing: -0.5,
+          ),
+        ).animate().scale(duration: 400.ms, curve: Curves.easeOutBack),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ],
     );
-  }
-
-  Widget _buildSemDivider() {
-    return Container(width: 1, height: 36, color: const Color(0xFFF0F0F0));
   }
 }

@@ -29,26 +29,26 @@ public class AttendanceService {
 
         List<Enrollment> enrollments = enrollmentRepository.getEnrolledStudentsByClassId(classId);
 
-        List<AttendanceRecord> existingRecords = attendanceRepository.findByScheduleIdAndAttendanceDate(scheduleId, date);
+        List<AttendanceRecord> existingRecords = attendanceRepository.findByScheduleIdAndAttendanceDate(scheduleId,
+                date);
 
         Map<Integer, AttendanceStatus> attendanceMap = existingRecords.stream()
                 .collect(Collectors.toMap(
                         rec -> rec.getStudent().getId(),
-                        AttendanceRecord::getStatus
-                ));
+                        AttendanceRecord::getStatus));
 
         int countPresent = 0;
         int countAbsent = 0;
 
         List<AttendanceListResponse.StudentAttendanceDto> studentDtos = enrollments.stream().map(enrollment -> {
             Integer studentId = enrollment.getStudent().getId();
-            String status = String.valueOf(attendanceMap.get(studentId));
+            AttendanceStatus status = attendanceMap.get(studentId);
 
             return AttendanceListResponse.StudentAttendanceDto.builder()
                     .studentId(studentId)
                     .studentCode(enrollment.getStudent().getStudentCode())
                     .fullName(enrollment.getStudent().getUser().getFullName())
-                    .status(AttendanceStatus.valueOf(status))
+                    .status(status)
                     .build();
         }).collect(Collectors.toList());
 
@@ -72,7 +72,6 @@ public class AttendanceService {
                 .build();
     }
 
-
     @Transactional(rollbackFor = Exception.class)
     public void saveAttendance(AttendanceSaveRequest request) {
 
@@ -80,14 +79,14 @@ public class AttendanceService {
         var teacherRef = userRepository.getReferenceById(request.getTeacherId());
 
         for (AttendanceSaveRequest.StudentStatus studentReq : request.getRecords()) {
-            if (studentReq.getStatus() == null) continue;
+            if (studentReq.getStatus() == null)
+                continue;
 
             AttendanceRecord record = attendanceRepository
                     .findByScheduleIdAndStudentIdAndAttendanceDate(
                             request.getScheduleId(),
                             studentReq.getStudentId(),
-                            request.getAttendanceDate()
-                    )
+                            request.getAttendanceDate())
                     .orElse(new AttendanceRecord());
 
             if (record.getId() == null) {

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../auth/school_code_screen.dart';
 import '../../lecturer_change_password_screen.dart';
+import '../../features/terms_screen.dart';
+import '../../features/feedback_screen.dart';
 
 class SettingsCard extends StatefulWidget {
   const SettingsCard({super.key});
@@ -23,16 +26,19 @@ class _SettingsCardState extends State<SettingsCard> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: const Text('Đăng xuất',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF1E293B))),
         content: const Text('Bạn có chắc chắn muốn đăng xuất không?',
-            style: TextStyle(fontSize: 14, color: Color(0xFF616161))),
+            style: TextStyle(fontSize: 14, color: Color(0xFF64748B))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Huỷ',
-                style: TextStyle(color: Color(0xFF616161))),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFF64748B),
+              textStyle: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+            child: const Text('Huỷ'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -43,85 +49,86 @@ class _SettingsCardState extends State<SettingsCard> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFC62828),
+              backgroundColor: const Color(0xFFEF4444),
               foregroundColor: Colors.white,
+              elevation: 0,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                  borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             ),
-            child: const Text('Đăng xuất'),
+            child: const Text('Đăng xuất', style: TextStyle(fontWeight: FontWeight.w600)),
           ),
         ],
-      ),
+      ).animate().scale(duration: 300.ms, curve: Curves.easeOutBack),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF6B4FA0).withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
-      child: Column(
-        children: [
-          _buildMenuItem(
-            icon: Icons.lock_outline_rounded,
-            iconBgColor: const Color(0xFFE8F5E9),
-            iconColor: const Color(0xFF2E7D32),
-            label: 'Đổi mật khẩu',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const LecturerChangePasswordScreen(),
-                ),
-              );
-            },
-          ),
-          _buildDivider(),
-          _buildMenuItem(
-            icon: Icons.description_outlined,
-            iconBgColor: const Color(0xFFEDE7F6),
-            iconColor: const Color(0xFF6B4FA0),
-            label: 'Điều khoản & chính sách',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Tính năng đang phát triển')),
-              );
-            },
-          ),
-          _buildDivider(),
-          _buildMenuItem(
-            icon: Icons.chat_bubble_outline_rounded,
-            iconBgColor: const Color(0xFFFFF3E0),
-            iconColor: const Color(0xFFE65100),
-            label: 'Góp ý ứng dụng',
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Tính năng đang phát triển')),
-              );
-            },
-          ),
-          _buildDivider(),
-          // Notification toggle
-          _buildToggleItem(),
-          _buildDivider(),
-          _buildMenuItem(
-            icon: Icons.logout_rounded,
-            iconBgColor: const Color(0xFFFFEBEE),
-            iconColor: const Color(0xFFC62828),
-            label: 'Đăng xuất',
-            onTap: () => _showLogoutDialog(context),
-          ),
-        ],
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: Column(
+          children: [
+            _buildMenuItem(
+              icon: Icons.lock_outline_rounded,
+              iconBgColor: const Color(0xFF10B981).withOpacity(0.08),
+              iconColor: const Color(0xFF10B981),
+              label: 'Đổi mật khẩu',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LecturerChangePasswordScreen(),
+                  ),
+                );
+              },
+              index: 0,
+            ),
+            _buildDivider(),
+            _buildMenuItem(
+              icon: Icons.description_outlined,
+              iconBgColor: const Color(0xFF6B4FA0).withOpacity(0.08),
+              iconColor: const Color(0xFF6B4FA0),
+              label: 'Điều khoản & chính sách',
+              onTap: () => _navigateTo(context, const TermsScreen()),
+              index: 1,
+            ),
+            _buildDivider(),
+            _buildMenuItem(
+              icon: Icons.chat_bubble_outline_rounded,
+              iconBgColor: const Color(0xFFF59E0B).withOpacity(0.08),
+              iconColor: const Color(0xFFF59E0B),
+              label: 'Góp ý ứng dụng',
+              onTap: () => _navigateTo(context, const FeedbackScreen()),
+              index: 2,
+            ),
+            _buildDivider(),
+            // Notification toggle
+            _buildToggleItem(index: 3),
+            _buildDivider(),
+            _buildMenuItem(
+              icon: Icons.logout_rounded,
+              iconBgColor: const Color(0xFFEF4444).withOpacity(0.08),
+              iconColor: const Color(0xFFEF4444),
+              label: 'Đăng xuất',
+              onTap: () => _showLogoutDialog(context),
+              index: 4,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -132,64 +139,73 @@ class _SettingsCardState extends State<SettingsCard> {
     required Color iconColor,
     required String label,
     required VoidCallback onTap,
+    required int index,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: iconBgColor,
-                borderRadius: BorderRadius.circular(10),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        highlightColor: iconColor.withOpacity(0.05),
+        splashColor: iconColor.withOpacity(0.1),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: iconBgColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: iconColor.withOpacity(0.1), width: 1),
+                ),
+                child: Icon(icon, color: iconColor, size: 22),
               ),
-              child: Icon(icon, color: iconColor, size: 20),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF212121),
-                  fontWeight: FontWeight.w500,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    color: Color(0xFF1E293B),
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.2,
+                  ),
                 ),
               ),
-            ),
-            const Icon(Icons.chevron_right, color: Color(0xFFBDBDBD), size: 22),
-          ],
+              const Icon(Icons.chevron_right_rounded, color: Color(0xFFCBD5E1), size: 24),
+            ],
+          ),
         ),
       ),
-    );
+    ).animate().fadeIn(duration: 400.ms, delay: (50 * index).ms).slideX(begin: 0.1, end: 0);
   }
 
-  Widget _buildToggleItem() {
+  Widget _buildToggleItem({required int index}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       child: Row(
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFF3F4F6),
-              borderRadius: BorderRadius.circular(10),
+              color: const Color(0xFFF1F5F9),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
             ),
             child: const Icon(Icons.notifications_outlined,
-                color: Color(0xFF616161), size: 20),
+                color: Color(0xFF64748B), size: 22),
           ),
-          const SizedBox(width: 14),
+          const SizedBox(width: 16),
           const Expanded(
             child: Text(
               'Thông báo',
               style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF212121),
-                fontWeight: FontWeight.w500,
+                fontSize: 15,
+                color: Color(0xFF1E293B),
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.2,
               ),
             ),
           ),
@@ -199,13 +215,18 @@ class _SettingsCardState extends State<SettingsCard> {
             activeColor: Colors.white,
             activeTrackColor: const Color(0xFF6B4FA0),
             inactiveThumbColor: Colors.white,
-            inactiveTrackColor: const Color(0xFFBDBDBD),
+            inactiveTrackColor: const Color(0xFFCBD5E1),
           ),
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 400.ms, delay: (50 * index).ms).slideX(begin: 0.1, end: 0);
   }
 
   Widget _buildDivider() => const Divider(
-      height: 1, indent: 68, color: Color(0xFFF0F0F0));
+        height: 1,
+        thickness: 1,
+        indent: 80,
+        endIndent: 20,
+        color: Color(0xFFF1F5F9),
+      );
 }

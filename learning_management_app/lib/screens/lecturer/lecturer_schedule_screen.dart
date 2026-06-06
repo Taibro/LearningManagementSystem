@@ -29,7 +29,7 @@ class _LecturerScheduleScreenState extends State<LecturerScheduleScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F1F8),
+      backgroundColor: const Color(0xFFF8FAFC),
       body: Column(
         children: [
           const LecturerCustomAppBar(
@@ -53,19 +53,35 @@ class _LecturerScheduleScreenState extends State<LecturerScheduleScreen>
 
   Widget _buildTabBar() {
     return Container(
-      color: const Color(0xFF6B4FA0),
-      child: TabBar(
-        controller: _tabController,
-        indicatorColor: Colors.white,
-        indicatorWeight: 3,
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white60,
-        labelStyle:
-            const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-        tabs: const [
-          Tab(text: 'Lịch theo tuần'),
-          Tab(text: 'Tiến độ giảng dạy'),
-        ],
+      color: Colors.white,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border(
+            bottom: BorderSide(color: const Color(0xFFF1F5F9), width: 1.5),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: TabBar(
+          controller: _tabController,
+          indicatorColor: const Color(0xFF6B4FA0),
+          indicatorWeight: 3,
+          labelColor: const Color(0xFF6B4FA0),
+          unselectedLabelColor: const Color(0xFF64748B),
+          indicatorSize: TabBarIndicatorSize.tab,
+          labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+          tabs: const [
+            Tab(text: 'Lịch theo tuần'),
+            Tab(text: 'Tiến độ giảng dạy'),
+          ],
+        ),
       ),
     );
   }

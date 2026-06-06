@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'lecturer_attendance_screen.dart';
 import 'lecturer_teaching_stats_screen.dart';
 import 'lecturer_salary_screen.dart';
@@ -10,7 +12,7 @@ import 'lecturer_schedule_screen.dart';
 import 'widgets/shared/lecturer_custom_app_bar.dart';
 
 const Color _kPrimary = Color(0xFF6B4FA0);
-const Color _kBg = Color(0xFFF4F1F8);
+const Color _kBg = Color(0xFFF8F9FA);
 
 class LecturerAllFeaturesScreen extends StatelessWidget {
   const LecturerAllFeaturesScreen({super.key});
@@ -19,10 +21,9 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final features = [
       _Feature(
-        icon: Icons.how_to_reg_outlined,
+        icon: Icons.how_to_reg_rounded,
         label: 'Điểm danh',
         color: _kPrimary,
-        bgColor: const Color(0xFFEDE7F6),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -32,8 +33,7 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
       _Feature(
         icon: Icons.qr_code_2_rounded,
         label: 'QR Code',
-        color: const Color(0xFF4CAF50),
-        bgColor: const Color(0xFFE8F5E9),
+        color: const Color(0xFF10B981),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -43,8 +43,7 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
       _Feature(
         icon: Icons.grade_rounded,
         label: 'Kết quả\nhọc tập',
-        color: const Color(0xFF2196F3),
-        bgColor: const Color(0xFFE3F2FD),
+        color: const Color(0xFF3B82F6),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -54,8 +53,7 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
       _Feature(
         icon: Icons.bar_chart_rounded,
         label: 'Thống kê\ngiảng dạy',
-        color: const Color(0xFFE65100),
-        bgColor: const Color(0xFFFFF3E0),
+        color: const Color(0xFFF59E0B),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -63,10 +61,9 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
         ),
       ),
       _Feature(
-        icon: Icons.monetization_on_outlined,
+        icon: Icons.account_balance_wallet_rounded,
         label: 'Thông tin\nlương',
         color: const Color(0xFF2E7D32),
-        bgColor: const Color(0xFFE8F5E9),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -74,10 +71,9 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
         ),
       ),
       _Feature(
-        icon: Icons.library_books_outlined,
+        icon: Icons.library_books_rounded,
         label: 'Tài liệu\nbài giảng',
         color: const Color(0xFF5C6BC0),
-        bgColor: const Color(0xFFE8EAF6),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -85,10 +81,9 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
         ),
       ),
       _Feature(
-        icon: Icons.pending_actions_outlined,
+        icon: Icons.edit_document,
         label: 'Đề xuất\nlịch dạy',
-        color: const Color(0xFFE85D75),
-        bgColor: const Color(0xFFFCE4EC),
+        color: const Color(0xFFEC4899),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -96,10 +91,9 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
         ),
       ),
       _Feature(
-        icon: Icons.badge_outlined,
+        icon: Icons.badge_rounded,
         label: 'Hồ sơ\ncá nhân',
         color: const Color(0xFF5C6BC0),
-        bgColor: const Color(0xFFE8EAF6),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -107,10 +101,9 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
         ),
       ),
       _Feature(
-        icon: Icons.poll_outlined,
+        icon: Icons.poll_rounded,
         label: 'Khảo sát',
         color: const Color(0xFFE85D75),
-        bgColor: const Color(0xFFFCE4EC),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -118,10 +111,9 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
         ),
       ),
       _Feature(
-        icon: Icons.calendar_today_outlined,
+        icon: Icons.calendar_month_rounded,
         label: 'Lịch dạy',
         color: const Color(0xFFE65100),
-        bgColor: const Color(0xFFFFF3E0),
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(
@@ -137,27 +129,28 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
           const LecturerCustomAppBar(title: 'Tất cả tính năng'),
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                      color: const Color(0xFF6B4FA0).withOpacity(0.04),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
                     ),
                   ],
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                 child: GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 4,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 20,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 24,
                     childAspectRatio: 0.7,
                   ),
                   itemCount: features.length,
@@ -165,58 +158,57 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
                     final f = features[i];
                     return GestureDetector(
                       onTap: f.onTap,
+                      behavior: HitTestBehavior.opaque,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
-                            width: 54,
-                            height: 54,
+                            width: 56,
+                            height: 56,
                             decoration: BoxDecoration(
-                              color: f.bgColor,
-                              borderRadius: BorderRadius.circular(14),
+                              color: f.color.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: f.color.withOpacity(0.15), width: 1.5),
                             ),
                             child: Icon(f.icon, color: f.color, size: 28),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 10),
                           Text(
                             f.label,
                             textAlign: TextAlign.center,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF424242),
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF334155),
                               height: 1.3,
                             ),
                           ),
                         ],
                       ),
-                    );
+                    ).animate().scale(delay: (i * 50).ms, curve: Curves.easeOutBack, duration: 400.ms);
                   },
                 ),
               ),
-            ),
+            ).animate().fadeIn(duration: 500.ms).slideY(begin: 0.1, end: 0),
           ),
         ],
       ),
     );
   }
-
 }
 
 class _Feature {
   final IconData icon;
   final String label;
   final Color color;
-  final Color bgColor;
   final VoidCallback onTap;
 
   const _Feature({
     required this.icon,
     required this.label,
     required this.color,
-    required this.bgColor,
     required this.onTap,
   });
 }

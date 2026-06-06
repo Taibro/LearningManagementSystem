@@ -14,7 +14,7 @@ public interface StudentProfileDto {
     // Thông tin cá nhân (từ Users)
     String getFullName();
     LocalDate getDateOfBirth();
-    String getGender();
+    org.learn.learningmanagementbackend.enums.Gender getGender();
     String getEmail();
     String getPhone();
     String getAddress();
