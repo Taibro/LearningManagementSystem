@@ -14,6 +14,7 @@ class AttendanceScreen extends StatefulWidget {
   State<AttendanceScreen> createState() => _AttendanceScreenState();
 }
 
+class _AttendanceScreenState extends State<AttendanceScreen> {
   List<Attendance> _items = [];
   bool _isLoading = true;
 
@@ -73,7 +74,7 @@ class AttendanceScreen extends StatefulWidget {
                       : ListView.separated(
                           padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
                           itemCount: _items.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: 14),
+                          separatorBuilder: (context, index) => const SizedBox(height: 14),
                           itemBuilder: (_, i) => AttendanceCard(
                             item: _items[i],
                             onAttendanceSuccess: () {
