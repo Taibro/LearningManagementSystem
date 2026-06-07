@@ -113,40 +113,55 @@ class _ChatbotViewState extends State<_ChatbotView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF212121), size: 20),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFE8EAF6),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(Icons.smart_toy_rounded, color: Color(0xFF5C6BC0), size: 20),
-            ),
-            const SizedBox(width: 10),
-            const Text(
-              'Trợ lý ảo AI',
-              style: TextStyle(
-                color: Color(0xFF212121),
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFF4EBFF), // Soft premium purple
+            Color(0xFFE0E7FF), // Soft premium blue
+            Color(0xFFF0FBFF), // Soft cyan
           ],
         ),
       ),
-      body: Column(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          backgroundColor: Colors.white.withOpacity(0.7),
+          elevation: 0,
+          flexibleSpace: ClipRect(
+            // Cần BackdropFilter nếu muốn làm mờ thật sự nhưng để đơn giản ta dùng opacity
+          ),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF212121), size: 20),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF8B5CF6).withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(Icons.smart_toy_rounded, color: Color(0xFF8B5CF6), size: 20),
+              ),
+              const SizedBox(width: 10),
+              const Text(
+                'Trợ lý ảo AI',
+                style: TextStyle(
+                  color: Color(0xFF212121),
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        body: Column(
         children: [
           Expanded(
             child: BlocConsumer<ChatbotBloc, ChatState>(
@@ -175,6 +190,7 @@ class _ChatbotViewState extends State<_ChatbotView> {
           _buildInputArea(context),
         ],
       ),
+    ),
     );
   }
 
