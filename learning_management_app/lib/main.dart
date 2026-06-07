@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:learning_management_app/core/network/fcm_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:learning_management_app/screens/auth/school_code_screen.dart';
 import 'package:learning_management_app/screens/student/attendance_screen.dart';
@@ -40,6 +41,7 @@ import 'package:learning_management_app/core/utils/feature_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   try {
     await Firebase.initializeApp();
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);

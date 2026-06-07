@@ -1,9 +1,10 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../models/chatbot/chat_message.dart';
 
 abstract class CoreChatbotRepository {
-  // TODO: Paste your Gemini API Key here after execution.
-  static const String _apiKey = 'AQ.Ab8RN6Lq87f_s5Bca5uzntrAok1eQW7__Oae599MglsqLAIcZQ';
+  // Load API Key from .env
+  static String get _apiKey => dotenv.env['GEMINI_API_KEY'] ?? '';
 
   // Dùng map để tách biệt lịch sử giữa Sinh viên và Giảng viên
   static final Map<String, ChatSession> _globalChatSessions = {};
