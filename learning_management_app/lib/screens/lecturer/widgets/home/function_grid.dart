@@ -1,22 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:learning_management_app/core/utils/feature_manager.dart';
 import '../../lecturer_attendance_screen.dart';
 import '../../lecturer_teaching_stats_screen.dart';
 import '../../lecturer_salary_screen.dart';
 import '../../lecturer_materials_screen.dart';
 import '../../lecturer_request_screen.dart';
 import '../../lecturer_all_features_screen.dart';
+import '../../lecturer_customize_features_screen.dart';
+import '../../lecturer_personal_profile_screen.dart';
+import '../../lecturer_survey_screen.dart';
+import '../../lecturer_schedule_screen.dart';
 
-class FunctionGrid extends StatelessWidget {
+class FunctionGrid extends StatefulWidget {
   const FunctionGrid({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    void navigateTo(Widget screen) {
-      Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
-    }
+  State<FunctionGrid> createState() => _FunctionGridState();
+}
 
-    final features = [
+class _FunctionGridState extends State<FunctionGrid> {
+  late List<Map<String, dynamic>> _allFeatures;
+  List<Map<String, dynamic>> _displayFeatures = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _initFeatures();
+    _loadDisplayFeatures();
+  }
+
+  void navigateTo(Widget screen) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => screen));
+  }
+
+  void _initFeatures() {
+    _allFeatures = [
       {
         'icon': Icons.how_to_reg_rounded,
         'label': 'Điểm danh',
@@ -31,33 +50,51 @@ class FunctionGrid extends StatelessWidget {
       },
       {
         'icon': Icons.grade_rounded,
-        'label': 'Kết quả\nhọc tập',
+        'label': 'Kết quả học tập',
         'color': const Color(0xFF3B82F6),
         'onTap': () => navigateTo(const LecturerAttendanceScreen(initialTabIndex: 2)),
       },
       {
         'icon': Icons.bar_chart_rounded,
-        'label': 'Thống kê\ngiảng dạy',
+        'label': 'Thống kê giảng dạy',
         'color': const Color(0xFFF59E0B),
         'onTap': () => navigateTo(const LecturerTeachingStatsScreen()),
       },
       {
         'icon': Icons.account_balance_wallet_rounded,
-        'label': 'Thông tin\nlương',
+        'label': 'Thông tin lương',
         'color': const Color(0xFF2E7D32),
         'onTap': () => navigateTo(const LecturerSalaryScreen()),
       },
       {
         'icon': Icons.library_books_rounded,
-        'label': 'Tài liệu\nbài giảng',
+        'label': 'Tài liệu bài giảng',
         'color': const Color(0xFF5C6BC0),
         'onTap': () => navigateTo(const LecturerMaterialsScreen()),
       },
       {
         'icon': Icons.edit_document,
-        'label': 'Đề xuất\nlịch dạy',
+        'label': 'Đề xuất lịch dạy',
         'color': const Color(0xFFEC4899),
         'onTap': () => navigateTo(const LecturerRequestScreen()),
+      },
+      {
+        'icon': Icons.badge_rounded,
+        'label': 'Hồ sơ cá nhân',
+        'color': const Color(0xFF5C6BC0),
+        'onTap': () => navigateTo(const LecturerPersonalProfileScreen()),
+      },
+      {
+        'icon': Icons.poll_rounded,
+        'label': 'Khảo sát',
+        'color': const Color(0xFFE85D75),
+        'onTap': () => navigateTo(const LecturerSurveyScreen()),
+      },
+      {
+        'icon': Icons.calendar_month_rounded,
+        'label': 'Lịch dạy',
+        'color': const Color(0xFFE65100),
+        'onTap': () => navigateTo(const LecturerScheduleScreen()),
       },
       {
         'icon': Icons.grid_view_rounded,
@@ -66,7 +103,29 @@ class FunctionGrid extends StatelessWidget {
         'onTap': () => navigateTo(const LecturerAllFeaturesScreen()),
       },
     ];
+  }
 
+  void _loadDisplayFeatures() {
+    final manager = FeatureManager();
+    final savedHome = manager.getHomeFeatureIds('lecturer');
+
+    if (savedHome == null) {
+      _displayFeatures = _allFeatures.where((f) => [
+        'Điểm danh', 'QR Code', 'Kết quả học tập', 'Thống kê giảng dạy',
+        'Thông tin lương', 'Tài liệu bài giảng', 'Đề xuất lịch dạy'
+      ].contains(f['label']) || f['label'] == 'Tất cả').toList();
+    } else {
+      _displayFeatures = savedHome
+          .map((label) => _allFeatures.firstWhere((f) => f['label'] == label, orElse: () => _allFeatures.first))
+          .toList();
+      if (!_displayFeatures.any((f) => f['label'] == 'Tất cả')) {
+        _displayFeatures.add(_allFeatures.firstWhere((f) => f['label'] == 'Tất cả'));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -83,7 +142,15 @@ class FunctionGrid extends StatelessWidget {
               ),
             ).animate().fadeIn(duration: 400.ms).slideX(begin: -0.1, end: 0),
             TextButton.icon(
-              onPressed: () {},
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const LecturerCustomizeFeaturesScreen()),
+                );
+                setState(() {
+                  _loadDisplayFeatures();
+                });
+              },
               icon: const Icon(Icons.tune_rounded, size: 16, color: Color(0xFF64748B)),
               label: const Text(
                 'Tuỳ chỉnh',
@@ -119,11 +186,11 @@ class FunctionGrid extends StatelessWidget {
               crossAxisCount: 4,
               crossAxisSpacing: 8,
               mainAxisSpacing: 20,
-              childAspectRatio: 0.75,
+              childAspectRatio: 0.65,
             ),
-            itemCount: features.length,
+            itemCount: _displayFeatures.length,
             itemBuilder: (context, index) {
-              final item = features[index];
+              final item = _displayFeatures[index];
               return _buildGridItem(
                 icon: item['icon'] as IconData,
                 label: item['label'] as String,
@@ -161,18 +228,20 @@ class FunctionGrid extends StatelessWidget {
             ),
             child: Icon(icon, color: color, size: 28),
           ),
-          const SizedBox(height: 10),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12,
-              color: Color(0xFF334155),
-              fontWeight: FontWeight.w600,
-              height: 1.3,
+          const SizedBox(height: 8),
+          Expanded(
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 11,
+                color: Color(0xFF334155),
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

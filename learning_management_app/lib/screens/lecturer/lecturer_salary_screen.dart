@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'widgets/shared/lecturer_custom_app_bar.dart';
 
@@ -57,7 +58,7 @@ class _LecturerSalaryScreenState extends State<LecturerSalaryScreen> {
             child: BlocBuilder<TeacherSalaryBloc, TeacherSalaryState>(
               builder: (context, state) {
                 if (state is TeacherSalaryLoading) {
-                  return const Center(child: CircularProgressIndicator(color: _kPrimary));
+                  return Center(child: CustomLoadingIndicator());
                 } else if (state is TeacherSalaryLoadFailure) {
                   return Column(
                     children: [

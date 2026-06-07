@@ -6,6 +6,7 @@ import 'data/mock_extra_data.dart';
 import 'widgets/shared/custom_app_bar.dart';
 import 'widgets/shared/mesh_background.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 import '../../blocs/student/attendance/attendance_bloc.dart';
 import '../../blocs/student/attendance/attendance_event.dart';
 import '../../blocs/student/attendance/attendance_state.dart';
@@ -42,7 +43,7 @@ class _AttendanceStatsScreenState extends State<AttendanceStatsScreen> {
               child: BlocBuilder<AttendanceBloc, AttendanceState>(
                 builder: (context, state) {
                   if (state is AttendanceLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Center(child: CustomLoadingIndicator());
                   } else if (state is AttendanceLoadFailure) {
                     return Center(child: Text('Lỗi: ${state.message}'));
                   } else if (state is AttendanceLoadSuccess) {

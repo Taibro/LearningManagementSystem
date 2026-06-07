@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:learning_management_app/core/utils/feature_manager.dart';
-import 'widgets/shared/custom_app_bar.dart';
+import 'widgets/shared/lecturer_custom_app_bar.dart';
 
-const Color _kBg = Color(0xFFF0F4FF);
+const Color _kBg = Color(0xFFF8F9FA);
 
-/// Represents a feature that can appear on the home screen grid.
 class FeatureItem {
   final IconData icon;
   final String label;
@@ -21,15 +20,16 @@ class FeatureItem {
   });
 }
 
-class CustomizeFeaturesScreen extends StatefulWidget {
-  const CustomizeFeaturesScreen({super.key});
+class LecturerCustomizeFeaturesScreen extends StatefulWidget {
+  const LecturerCustomizeFeaturesScreen({super.key});
 
   @override
-  State<CustomizeFeaturesScreen> createState() =>
-      _CustomizeFeaturesScreenState();
+  State<LecturerCustomizeFeaturesScreen> createState() =>
+      _LecturerCustomizeFeaturesScreenState();
 }
 
-class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
+class _LecturerCustomizeFeaturesScreenState
+    extends State<LecturerCustomizeFeaturesScreen> {
   late List<FeatureItem> _homeFeatures;
   late List<FeatureItem> _otherFeatures;
   late List<FeatureItem> _defaultHomeFeatures;
@@ -40,69 +40,69 @@ class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
     super.initState();
     _defaultHomeFeatures = [
       FeatureItem(
+        icon: Icons.how_to_reg_rounded,
+        label: 'Điểm danh',
+        color: const Color(0xFF6B4FA0),
+        bgColor: const Color(0xFF6B4FA0).withOpacity(0.1),
+      ),
+      FeatureItem(
+        icon: Icons.qr_code_2_rounded,
+        label: 'QR Code',
+        color: const Color(0xFF10B981),
+        bgColor: const Color(0xFF10B981).withOpacity(0.1),
+      ),
+      FeatureItem(
         icon: Icons.grade_rounded,
-        label: 'Xem điểm',
-        color: const Color(0xFF1565C0),
-        bgColor: const Color(0xFFE3F2FD),
+        label: 'Kết quả học tập',
+        color: const Color(0xFF3B82F6),
+        bgColor: const Color(0xFF3B82F6).withOpacity(0.1),
       ),
       FeatureItem(
-        icon: Icons.star_rounded,
-        label: 'Thành tích',
-        color: const Color(0xFFE65100),
-        bgColor: const Color(0xFFFFF3E0),
+        icon: Icons.bar_chart_rounded,
+        label: 'Thống kê giảng dạy',
+        color: const Color(0xFFF59E0B),
+        bgColor: const Color(0xFFF59E0B).withOpacity(0.1),
       ),
       FeatureItem(
-        icon: Icons.menu_book_rounded,
-        label: 'Chương trình khung',
-        color: const Color(0xFFC62828),
-        bgColor: const Color(0xFFFFEBEE),
-      ),
-      FeatureItem(
-        icon: Icons.monetization_on_outlined,
-        label: 'Thanh toán học phí',
+        icon: Icons.account_balance_wallet_rounded,
+        label: 'Thông tin lương',
         color: const Color(0xFF2E7D32),
-        bgColor: const Color(0xFFE8F5E9),
+        bgColor: const Color(0xFF2E7D32).withOpacity(0.1),
       ),
       FeatureItem(
-        icon: Icons.receipt_long_outlined,
-        label: 'Phiếu thu tổng hợp',
-        color: const Color(0xFF00695C),
-        bgColor: const Color(0xFFE0F2F1),
+        icon: Icons.library_books_rounded,
+        label: 'Tài liệu bài giảng',
+        color: const Color(0xFF5C6BC0),
+        bgColor: const Color(0xFF5C6BC0).withOpacity(0.1),
       ),
       FeatureItem(
-        icon: Icons.how_to_reg_outlined,
-        label: 'Thống kê điểm danh',
-        color: const Color(0xFF1565C0),
-        bgColor: const Color(0xFFE3F2FD),
-      ),
-      FeatureItem(
-        icon: Icons.calendar_month_outlined,
-        label: 'Lịch học/ lịch thi',
-        color: const Color(0xFFE65100),
-        bgColor: const Color(0xFFFFF3E0),
+        icon: Icons.edit_document,
+        label: 'Đề xuất lịch dạy',
+        color: const Color(0xFFEC4899),
+        bgColor: const Color(0xFFEC4899).withOpacity(0.1),
       ),
     ];
 
     _defaultOtherFeatures = [
       FeatureItem(
-        icon: Icons.emoji_events_outlined,
-        label: 'Rèn luyện',
-        color: const Color(0xFFC62828),
-        bgColor: const Color(0xFFFFEBEE),
+        icon: Icons.badge_rounded,
+        label: 'Hồ sơ cá nhân',
+        color: const Color(0xFF5C6BC0),
+        bgColor: const Color(0xFF5C6BC0).withOpacity(0.1),
         isOnHome: false,
       ),
       FeatureItem(
-        icon: Icons.article_outlined,
-        label: 'Tin tức',
-        color: const Color(0xFF1565C0),
-        bgColor: const Color(0xFFE3F2FD),
-        isOnHome: false,
-      ),
-      FeatureItem(
-        icon: Icons.poll_outlined,
+        icon: Icons.poll_rounded,
         label: 'Khảo sát',
+        color: const Color(0xFFE85D75),
+        bgColor: const Color(0xFFE85D75).withOpacity(0.1),
+        isOnHome: false,
+      ),
+      FeatureItem(
+        icon: Icons.calendar_month_rounded,
+        label: 'Lịch dạy',
         color: const Color(0xFFE65100),
-        bgColor: const Color(0xFFFFF3E0),
+        bgColor: const Color(0xFFE65100).withOpacity(0.1),
         isOnHome: false,
       ),
     ];
@@ -112,8 +112,8 @@ class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
 
   void _loadFeatures() {
     final manager = FeatureManager();
-    final savedHome = manager.getHomeFeatureIds('student');
-    final savedOther = manager.getOtherFeatureIds('student');
+    final savedHome = manager.getHomeFeatureIds('lecturer');
+    final savedOther = manager.getOtherFeatureIds('lecturer');
 
     if (savedHome == null) {
       _homeFeatures = List.from(_defaultHomeFeatures);
@@ -126,7 +126,7 @@ class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
       for (var f in _homeFeatures) {
         f.isOnHome = true;
       }
-      
+
       _otherFeatures = savedOther
           ?.map((label) => allDefaults.firstWhere((f) => f.label == label, orElse: () => allDefaults.first))
           .toList() ?? [];
@@ -139,7 +139,7 @@ class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
   void _saveFeatures() {
     final manager = FeatureManager();
     manager.saveFeatures(
-      'student',
+      'lecturer',
       _homeFeatures.map((f) => f.label).toList(),
       _otherFeatures.map((f) => f.label).toList(),
     );
@@ -202,7 +202,7 @@ class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
       backgroundColor: _kBg,
       body: Column(
         children: [
-          const CustomAppBar(title: 'Tuỳ chỉnh tính năng'),
+          const LecturerCustomAppBar(title: 'Tuỳ chỉnh tính năng'),
           Expanded(
             child: SingleChildScrollView(
               child: Column(
@@ -219,8 +219,6 @@ class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
       ),
     );
   }
-
-
 
   Widget _buildSectionTitle(String title) {
     return Padding(
@@ -250,7 +248,7 @@ class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),

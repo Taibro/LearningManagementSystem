@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 
 class BackupScreen extends StatefulWidget {
   const BackupScreen({super.key});
@@ -121,7 +122,7 @@ class _BackupScreenState extends State<BackupScreen> {
             ),
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               if (_isBackingUp)
-                const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: _kPrimary))
+                SizedBox(width: 18, height: 18, child: CustomLoadingIndicator())
               else
                 const Icon(Icons.backup_rounded, color: _kPrimary, size: 20),
               const SizedBox(width: 8),

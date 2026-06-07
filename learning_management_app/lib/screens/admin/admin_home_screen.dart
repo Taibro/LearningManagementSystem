@@ -12,6 +12,7 @@ import 'widgets/home/pending_requests_card.dart';
 import 'widgets/home/quick_actions_card.dart';
 import 'widgets/home/activity_feed_card.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 import '../../blocs/admin/dashboard/admin_dashboard_bloc.dart';
 import '../../blocs/admin/dashboard/admin_dashboard_event.dart';
 import '../../blocs/admin/dashboard/admin_dashboard_state.dart';
@@ -52,8 +53,20 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     builder: (context, state) {
                       if (state is AdminDashboardLoadSuccess) {
                         return SystemStatsGrid(stats: state.stats);
+                      } else if (state is AdminDashboardLoadFailure) {
+                        return Container(
+                          padding: const EdgeInsets.all(20),
+                          alignment: Alignment.center,
+                          child: Column(
+                            children: [
+                              const Icon(Icons.error_outline, color: Colors.red, size: 40),
+                              const SizedBox(height: 8),
+                              Text('Chưa thể tải dữ liệu thống kê\n${state.message}', textAlign: TextAlign.center, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                            ]
+                          ),
+                        );
                       }
-                      return const Center(child: CircularProgressIndicator());
+                      return Center(child: Padding(padding: const EdgeInsets.all(20), child: CustomLoadingIndicator()));
                     },
                   ),
                   const SizedBox(height: 20),
@@ -72,8 +85,20 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                             }
                           },
                         );
+                      } else if (state is AdminRequestLoadFailure) {
+                        return Container(
+                          padding: const EdgeInsets.all(20),
+                          alignment: Alignment.center,
+                          child: Column(
+                            children: [
+                              const Icon(Icons.error_outline, color: Colors.red, size: 40),
+                              const SizedBox(height: 8),
+                              Text('Chưa thể tải danh sách yêu cầu\n${state.message}', textAlign: TextAlign.center, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                            ]
+                          ),
+                        );
                       }
-                      return const Center(child: CircularProgressIndicator());
+                      return Center(child: Padding(padding: const EdgeInsets.all(20), child: CustomLoadingIndicator()));
                     },
                   ),
                   const SizedBox(height: 20),

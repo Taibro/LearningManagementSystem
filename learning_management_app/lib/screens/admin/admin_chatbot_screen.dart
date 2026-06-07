@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:learning_management_app/models/admin/schedule_exception_response.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 
 import '../../core/network/dio_client.dart';
 import '../../blocs/chatbot/chatbot_bloc.dart';
@@ -92,7 +94,7 @@ class _AdminChatbotScreenState extends State<AdminChatbotScreen> {
         elevation: 0,
       ),
       body: _isLoadingContext
-          ? const Center(child: CircularProgressIndicator(color: Color(0xFFC62828)))
+          ? Center(child: CustomLoadingIndicator())
           : _contextError != null
               ? Center(
                   child: Padding(
@@ -117,7 +119,7 @@ class _AdminChatbotScreenState extends State<AdminChatbotScreen> {
                           },
                           builder: (context, state) {
                             if (state is ChatLoading && state.messages.isEmpty) {
-                              return const Center(child: CircularProgressIndicator(color: Color(0xFFC62828)));
+                              return Center(child: CustomLoadingIndicator());
                             }
 
                             final messages = state.messages;
@@ -172,13 +174,13 @@ class _AdminChatbotScreenState extends State<AdminChatbotScreen> {
                                           ),
                                         ],
                                       ),
-                                      child: const Row(
+                                      child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           SizedBox(
                                             width: 16,
                                             height: 16,
-                                            child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFFC62828)),
+                                            child: CustomLoadingIndicator(),
                                           ),
                                           SizedBox(width: 8),
                                           Text('AI đang suy nghĩ...', style: TextStyle(color: Color(0xFF64748B), fontSize: 13)),

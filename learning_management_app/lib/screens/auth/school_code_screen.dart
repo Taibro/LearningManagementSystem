@@ -97,15 +97,21 @@ class _SchoolCodeScreenState extends State<SchoolCodeScreen> {
           ),
 
           SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Center(
-                    child: _buildHeroIcon(),
+            child: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: _buildHeroIcon(),
+                        ),
+                      ),
+                      _buildFormCard(),
+                    ],
                   ),
                 ),
-                _buildFormCard(),
               ],
             ),
           ),
