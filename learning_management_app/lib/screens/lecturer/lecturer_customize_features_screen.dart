@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'widgets/shared/custom_app_bar.dart';
+import '../student/widgets/shared/custom_app_bar.dart';
 
 const Color _kBg = Color(0xFFF0F4FF);
 
@@ -21,35 +21,31 @@ class FeatureItem {
   });
 }
 
-class CustomizeFeaturesScreen extends StatefulWidget {
-  const CustomizeFeaturesScreen({super.key});
+class LecturerCustomizeFeaturesScreen extends StatefulWidget {
+  const LecturerCustomizeFeaturesScreen({super.key});
 
   @override
-  State<CustomizeFeaturesScreen> createState() =>
-      _CustomizeFeaturesScreenState();
+  State<LecturerCustomizeFeaturesScreen> createState() =>
+      _LecturerCustomizeFeaturesScreenState();
 }
 
-class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
+class _LecturerCustomizeFeaturesScreenState extends State<LecturerCustomizeFeaturesScreen> {
   late List<FeatureItem> _homeFeatures;
   late List<FeatureItem> _otherFeatures;
 
-  @override
   late List<FeatureItem> _allFeatures;
 
   @override
   void initState() {
     super.initState();
     _allFeatures = [
-      FeatureItem(icon: Icons.grade_rounded, label: 'Xem điểm', color: const Color(0xFF1565C0), bgColor: const Color(0xFFE3F2FD)),
-      FeatureItem(icon: Icons.star_rounded, label: 'Thành tích', color: const Color(0xFFE65100), bgColor: const Color(0xFFFFF3E0)),
-      FeatureItem(icon: Icons.menu_book_rounded, label: 'Chương trình khung', color: const Color(0xFFC62828), bgColor: const Color(0xFFFFEBEE)),
-      FeatureItem(icon: Icons.monetization_on_outlined, label: 'Thanh toán học phí', color: const Color(0xFF2E7D32), bgColor: const Color(0xFFE8F5E9)),
-      FeatureItem(icon: Icons.receipt_long_outlined, label: 'Phiếu thu tổng hợp', color: const Color(0xFF00695C), bgColor: const Color(0xFFE0F2F1)),
-      FeatureItem(icon: Icons.how_to_reg_outlined, label: 'Thống kê điểm danh', color: const Color(0xFF1565C0), bgColor: const Color(0xFFE3F2FD)),
-      FeatureItem(icon: Icons.calendar_month_outlined, label: 'Lịch học/ lịch thi', color: const Color(0xFFE65100), bgColor: const Color(0xFFFFF3E0)),
-      FeatureItem(icon: Icons.emoji_events_outlined, label: 'Rèn luyện', color: const Color(0xFFC62828), bgColor: const Color(0xFFFFEBEE)),
-      FeatureItem(icon: Icons.article_outlined, label: 'Tin tức', color: const Color(0xFF1565C0), bgColor: const Color(0xFFE3F2FD)),
-      FeatureItem(icon: Icons.poll_outlined, label: 'Khảo sát', color: const Color(0xFFE65100), bgColor: const Color(0xFFFFF3E0)),
+      FeatureItem(icon: Icons.how_to_reg_rounded, label: 'Điểm danh', color: const Color(0xFF6B4FA0), bgColor: const Color(0xFF6B4FA0).withOpacity(0.1)),
+      FeatureItem(icon: Icons.qr_code_2_rounded, label: 'QR Code', color: const Color(0xFF10B981), bgColor: const Color(0xFF10B981).withOpacity(0.1)),
+      FeatureItem(icon: Icons.grade_rounded, label: 'Kết quả\nhọc tập', color: const Color(0xFF3B82F6), bgColor: const Color(0xFF3B82F6).withOpacity(0.1)),
+      FeatureItem(icon: Icons.bar_chart_rounded, label: 'Thống kê\ngiảng dạy', color: const Color(0xFFF59E0B), bgColor: const Color(0xFFF59E0B).withOpacity(0.1)),
+      FeatureItem(icon: Icons.account_balance_wallet_rounded, label: 'Thông tin\nlương', color: const Color(0xFF2E7D32), bgColor: const Color(0xFF2E7D32).withOpacity(0.1)),
+      FeatureItem(icon: Icons.library_books_rounded, label: 'Tài liệu\nbài giảng', color: const Color(0xFF5C6BC0), bgColor: const Color(0xFF5C6BC0).withOpacity(0.1)),
+      FeatureItem(icon: Icons.edit_document, label: 'Đề xuất\nlịch dạy', color: const Color(0xFFEC4899), bgColor: const Color(0xFFEC4899).withOpacity(0.1)),
       FeatureItem(icon: Icons.chat_rounded, label: 'Trò chuyện', color: const Color(0xFFE11D48), bgColor: const Color(0xFFE11D48).withOpacity(0.1)),
     ];
     _homeFeatures = [];
@@ -59,7 +55,7 @@ class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
-    final savedHomeLabels = prefs.getStringList('student_home_features');
+    final savedHomeLabels = prefs.getStringList('lecturer_home_features');
 
     setState(() {
       if (savedHomeLabels != null) {
@@ -74,8 +70,7 @@ class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
           item.isOnHome = false;
         }
       } else {
-        // Defaults
-        final defaultHome = ['Xem điểm', 'Thành tích', 'Chương trình khung', 'Thanh toán học phí', 'Phiếu thu tổng hợp', 'Thống kê điểm danh', 'Lịch học/ lịch thi'];
+        final defaultHome = ['Điểm danh', 'QR Code', 'Kết quả\nhọc tập', 'Thống kê\ngiảng dạy', 'Thông tin\nlương', 'Tài liệu\nbài giảng', 'Đề xuất\nlịch dạy'];
         _homeFeatures = _allFeatures.where((f) => defaultHome.contains(f.label)).toList();
         for (var item in _homeFeatures) {
           item.isOnHome = true;
@@ -91,7 +86,7 @@ class _CustomizeFeaturesScreenState extends State<CustomizeFeaturesScreen> {
   Future<void> _savePreferences() async {
     final prefs = await SharedPreferences.getInstance();
     final homeLabels = _homeFeatures.map((e) => e.label).toList();
-    await prefs.setStringList('student_home_features', homeLabels);
+    await prefs.setStringList('lecturer_home_features', homeLabels);
   }
 
   void _removeFromHome(int index) {

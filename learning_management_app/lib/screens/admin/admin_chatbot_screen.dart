@@ -34,11 +34,24 @@ class _AdminChatbotScreenState extends State<AdminChatbotScreen> {
 
   Future<void> _loadContext() async {
     try {
-      final stats = await _adminRepo.getDashboardStats();
-      final unpaidInvoices = await _adminRepo.getUnpaidInvoices();
-      
+      final results = await Future.wait([
+        _adminRepo.getDashboardStats(),
+        _adminRepo.getUnpaidInvoices(),
+        _adminRepo.getAllStudents(),
+        _adminRepo.getAllTeachers(),
+        _adminRepo.getAllClasses(),
+        _adminRepo.getAllCourses(),
+      ]);
+
       setState(() {
-        _chatbotRepo = AdminChatbotRepository(stats, unpaidInvoices);
+        _chatbotRepo = AdminChatbotRepository(
+          stats: results[0] as dynamic,
+          unpaidInvoices: results[1] as dynamic,
+          students: results[2] as dynamic,
+          teachers: results[3] as dynamic,
+          classes: results[4] as dynamic,
+          courses: results[5] as dynamic,
+        );
         _isLoadingContext = false;
       });
     } catch (e) {

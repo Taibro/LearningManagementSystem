@@ -189,4 +189,12 @@ public class StudentController {
         studentService.mockPaymentSuccess(userDetails.getSpecificCode(), id);
         return ResponseEntity.ok().build();
     }
+
+    // ── TEACHER CHAT LIST ────────────────────────────────────────────────────
+    @GetMapping("/teachers")
+    public ResponseEntity<List<org.learn.learningmanagementbackend.dto.response.TeacherChatResponse>> getTeachers(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(defaultValue = "0") Integer semesterId) {
+        return ResponseEntity.ok(studentService.getTeachersForChat(userDetails.getSpecificCode(), semesterId));
+    }
 }

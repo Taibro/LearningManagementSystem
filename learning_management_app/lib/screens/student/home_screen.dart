@@ -25,16 +25,26 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               const HomeHeader(),
               Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const CurrentClassCard().animate().fade(duration: 600.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutCubic),
-                      const SizedBox(height: 28),
-                      const FunctionSection(),
-                    ],
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    // Simulate a network request
+                    await Future.delayed(const Duration(seconds: 1));
+                    if (mounted) {
+                      setState(() {});
+                    }
+                  },
+                  color: const Color(0xFF1565C0),
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const CurrentClassCard().animate().fade(duration: 600.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutCubic),
+                        const SizedBox(height: 28),
+                        const FunctionSection(),
+                      ],
+                    ),
                   ),
                 ),
               ),

@@ -82,6 +82,10 @@ public class Users extends BaseEntity {
     @Column(name = "is_mfa_enabled")
     private Boolean isMfaEnabled = false;
 
+    // FCM Token for Push Notifications
+    @Column(name = "fcm_token", length = 500)
+    private String fcmToken;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Teacher teacher;
 

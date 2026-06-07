@@ -8,6 +8,7 @@ import 'attendance_stats_screen.dart';
 import 'features_screens/conduct_screen.dart';
 import 'features_screens/survey_screen.dart';
 import 'features_screens/news_screen.dart';
+import 'features_screens/student_teacher_list_screen.dart';
 import 'curriculum_screen.dart';
 import 'receipt_screen.dart';
 import 'schedule_screen.dart';
@@ -119,6 +120,16 @@ class AllFeaturesScreen extends StatelessWidget {
         onTap: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => const SurveyScreen()),
+        ),
+      ),
+      _Feature(
+        icon: Icons.chat_rounded,
+        label: 'Trò chuyện',
+        color: const Color(0xFFE11D48),
+        bgColor: const Color(0xFFE11D48).withOpacity(0.1),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const StudentTeacherListScreen()),
         ),
       ),
     ];

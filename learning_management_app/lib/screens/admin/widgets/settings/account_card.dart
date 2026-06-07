@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'settings_helpers.dart';
 import 'bottom_sheets/change_password_sheet.dart';
 import 'bottom_sheets/activity_log_sheet.dart';
+import '../../../../blocs/auth/auth_bloc.dart';
+import '../../../../blocs/auth/auth_event.dart';
+import '../../../auth/school_code_screen.dart';
 
 class AccountCard extends StatelessWidget {
   final Function(String) onAction;
@@ -79,7 +83,15 @@ class AccountCard extends StatelessWidget {
                     child: const Text('Huỷ',
                         style: TextStyle(color: Color(0xFF616161)))),
                 ElevatedButton(
-                  onPressed: () => Navigator.pop(ctx),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    context.read<AuthBloc>().add(AuthLogoutRequested());
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (_) => const SchoolCodeScreen()),
+                      (route) => false,
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1A237E),
                       foregroundColor: Colors.white,

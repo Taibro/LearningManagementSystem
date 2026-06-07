@@ -6,6 +6,9 @@ import 'lecturer_schedule_screen.dart';
 import 'lecturer_attendance_screen.dart';
 import 'lecturer_profile_screen.dart';
 import 'lecturer_chatbot_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/lecturer/profile/teacher_profile_bloc.dart';
+import '../../blocs/lecturer/profile/teacher_profile_event.dart';
 
 class LecturerMainLayout extends StatefulWidget {
   const LecturerMainLayout({super.key});
@@ -22,6 +25,7 @@ class _LecturerMainLayoutState extends State<LecturerMainLayout> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: _selectedIndex);
+    context.read<TeacherProfileBloc>().add(TeacherProfileFetchRequested());
   }
 
   @override

@@ -1,6 +1,10 @@
 import 'package:dio/dio.dart';
 import '../models/admin/admin_dashboard_stats.dart';
 import '../models/admin/admin_tuition_invoice.dart';
+import '../models/admin/admin_student.dart';
+import '../models/admin/admin_teacher.dart';
+import '../models/admin/admin_class.dart';
+import '../models/admin/admin_course.dart';
 
 class AdminRepository {
   final Dio _dio;
@@ -41,6 +45,46 @@ class AdminRepository {
         return [];
       }
       throw Exception('Lỗi khi tải danh sách hóa đơn: $e');
+    }
+  }
+
+  Future<List<AdminStudent>> getAllStudents() async {
+    try {
+      final response = await _dio.get('/school-admin/students');
+      return (response.data as List).map((json) => AdminStudent.fromJson(json)).toList();
+    } catch (e) {
+      if (e is DioException && e.response?.statusCode == 404) return [];
+      throw Exception('Lỗi khi tải danh sách sinh viên: $e');
+    }
+  }
+
+  Future<List<AdminTeacher>> getAllTeachers() async {
+    try {
+      final response = await _dio.get('/school-admin/teachers/get-all');
+      return (response.data as List).map((json) => AdminTeacher.fromJson(json)).toList();
+    } catch (e) {
+      if (e is DioException && e.response?.statusCode == 404) return [];
+      throw Exception('Lỗi khi tải danh sách giảng viên: $e');
+    }
+  }
+
+  Future<List<AdminClass>> getAllClasses() async {
+    try {
+      final response = await _dio.get('/school-admin/classes');
+      return (response.data as List).map((json) => AdminClass.fromJson(json)).toList();
+    } catch (e) {
+      if (e is DioException && e.response?.statusCode == 404) return [];
+      throw Exception('Lỗi khi tải danh sách lớp học: $e');
+    }
+  }
+
+  Future<List<AdminCourse>> getAllCourses() async {
+    try {
+      final response = await _dio.get('/school-admin/courses/get-all');
+      return (response.data as List).map((json) => AdminCourse.fromJson(json)).toList();
+    } catch (e) {
+      if (e is DioException && e.response?.statusCode == 404) return [];
+      throw Exception('Lỗi khi tải danh sách môn học: $e');
     }
   }
 }

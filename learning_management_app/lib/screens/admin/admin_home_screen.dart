@@ -43,47 +43,57 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         children: [
           const HomeHeader(),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  BlocBuilder<AdminDashboardBloc, AdminDashboardState>(
-                    builder: (context, state) {
-                      if (state is AdminDashboardLoadSuccess) {
-                        return SystemStatsGrid(stats: state.stats);
-                      }
-                      return const Center(child: CircularProgressIndicator());
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  const SemesterProgressCard(),
-                  const SizedBox(height: 20),
-                  BlocBuilder<AdminRequestBloc, AdminRequestState>(
-                    builder: (context, state) {
-                      if (state is AdminRequestLoadSuccess) {
-                        return PendingRequestsCard(
-                          requests: state.pendingRequests,
-                          onAction: (action, id) {
-                            if (action == 'Phê duyệt') {
-                              context.read<AdminRequestBloc>().add(AdminRequestApprove(id));
-                            } else {
-                              context.read<AdminRequestBloc>().add(AdminRequestReject(id, 'Từ chối'));
-                            }
-                          },
-                        );
-                      }
-                      return const Center(child: CircularProgressIndicator());
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  QuickActionsCard(
-                    onAction: _handleQuickAction,
-                  ),
-                  const SizedBox(height: 20),
-                  const ActivityFeedCard(),
-                  const SizedBox(height: 8),
-                ],
+            child: RefreshIndicator(
+              onRefresh: () async {
+                context.read<AdminDashboardBloc>().add(const AdminDashboardFetchRequested());
+                context.read<AdminRequestBloc>().add(const AdminRequestFetchPending());
+                // Delay slightly to show the loading indicator while Blocs fetch
+                await Future.delayed(const Duration(seconds: 1));
+              },
+              color: const Color(0xFF1A237E),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BlocBuilder<AdminDashboardBloc, AdminDashboardState>(
+                      builder: (context, state) {
+                        if (state is AdminDashboardLoadSuccess) {
+                          return SystemStatsGrid(stats: state.stats);
+                        }
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    const SemesterProgressCard(),
+                    const SizedBox(height: 20),
+                    BlocBuilder<AdminRequestBloc, AdminRequestState>(
+                      builder: (context, state) {
+                        if (state is AdminRequestLoadSuccess) {
+                          return PendingRequestsCard(
+                            requests: state.pendingRequests,
+                            onAction: (action, id) {
+                              if (action == 'Phê duyệt') {
+                                context.read<AdminRequestBloc>().add(AdminRequestApprove(id));
+                              } else {
+                                context.read<AdminRequestBloc>().add(AdminRequestReject(id, 'Từ chối'));
+                              }
+                            },
+                          );
+                        }
+                        return const Center(child: CircularProgressIndicator());
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    QuickActionsCard(
+                      onAction: _handleQuickAction,
+                    ),
+                    const SizedBox(height: 20),
+                    const ActivityFeedCard(),
+                    const SizedBox(height: 8),
+                  ],
+                ),
               ),
             ),
           ),

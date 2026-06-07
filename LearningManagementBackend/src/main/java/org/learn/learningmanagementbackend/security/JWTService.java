@@ -48,4 +48,12 @@ public class JWTService {
         final String username = extractUserName(token);
         return (username.equals(userDetails.getUsername()) && !extractClaim(token, Claims::getExpiration).before(new Date()));
     }
+
+    public boolean isTokenValid(String token) {
+        try {
+            return !extractClaim(token, Claims::getExpiration).before(new Date());
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

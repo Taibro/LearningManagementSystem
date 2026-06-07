@@ -8,6 +8,7 @@ import '../models/student/student_debt.dart';
 import '../models/student/student_conduct.dart';
 import '../models/student/student_notification.dart';
 import '../models/student/student_survey.dart';
+import '../models/student/teacher_chat_response.dart';
 
 class StudentRepository {
   final DioClient _dioClient;
@@ -84,6 +85,15 @@ class StudentRepository {
       return (response.data as List).map((e) => StudentSurvey.fromJson(e)).toList();
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Lỗi khi lấy khảo sát: ${e.message}');
+    }
+  }
+
+  Future<List<TeacherChatResponse>> getTeachersForChat({int semesterId = 0}) async {
+    try {
+      final response = await _dioClient.dio.get('/student/teachers', queryParameters: {'semesterId': semesterId});
+      return (response.data as List).map((e) => TeacherChatResponse.fromJson(e)).toList();
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Lỗi khi lấy danh sách giảng viên: ${e.message}');
     }
   }
 }

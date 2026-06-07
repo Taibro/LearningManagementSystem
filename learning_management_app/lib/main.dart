@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:learning_management_app/core/network/fcm_service.dart';
 
 import 'package:learning_management_app/screens/auth/school_code_screen.dart';
 import 'package:learning_management_app/screens/student/attendance_screen.dart';
@@ -32,7 +35,14 @@ import 'package:learning_management_app/blocs/admin/request/admin_request_bloc.d
 import 'package:learning_management_app/blocs/admin/notification/admin_notification_bloc.dart';
 import 'package:learning_management_app/blocs/admin/user_management/admin_user_management_bloc.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp();
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  } catch (e) {
+    debugPrint('Firebase init error: $e');
+  }
   runApp(const MyApp());
 }
 

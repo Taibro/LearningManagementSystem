@@ -340,5 +340,11 @@ public class StudentService {
     public List<StudentDebtDetailDto> getDebtDetail(String studentCode, Integer semesterId) {
         return studentRepository.getDebtDetail(studentCode, semesterId);
     }
+
+    // ── TEACHER CHAT LIST ─────────────────────────────────────────────────────
+    public List<org.learn.learningmanagementbackend.dto.response.TeacherChatResponse> getTeachersForChat(String studentCode, Integer semesterId) {
+        return studentRepository.getTeachersForStudent(studentCode, semesterId);
+    }
 }
+
 

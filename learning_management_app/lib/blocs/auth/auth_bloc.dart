@@ -3,6 +3,7 @@ import 'auth_event.dart';
 import 'auth_state.dart';
 import '../../repositories/auth_repository.dart';
 import '../../core/storage/secure_storage.dart';
+import '../../core/network/fcm_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
@@ -27,6 +28,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       if (user.token != null) {
         await SecureStorage.saveToken(user.token!);
+        // Initialize FCM and send token to server after saving auth token
+        await FcmService.init();
       }
 
       emit(AuthSuccess(user));

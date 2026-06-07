@@ -3,7 +3,7 @@ import '../models/chatbot/chat_message.dart';
 
 abstract class CoreChatbotRepository {
   // TODO: Paste your Gemini API Key here after execution.
-  static const String _apiKey = '';
+  static const String _apiKey = 'AQ.Ab8RN6Lq87f_s5Bca5uzntrAok1eQW7__Oae599MglsqLAIcZQ';
 
   // Dùng map để tách biệt lịch sử giữa Sinh viên và Giảng viên
   static final Map<String, ChatSession> _globalChatSessions = {};

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../blocs/lecturer/profile/teacher_profile_bloc.dart';
+import '../../../../../blocs/lecturer/profile/teacher_profile_state.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
@@ -84,15 +87,28 @@ class HomeHeader extends StatelessWidget {
                       ),
                     ).animate().fadeIn(duration: 400.ms).slideX(begin: -0.1, end: 0),
                     const SizedBox(height: 4),
-                    const Text(
-                      'ThS. Nguyễn Văn A',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.5,
-                      ),
-                    ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideX(begin: -0.1, end: 0),
+                    BlocBuilder<TeacherProfileBloc, TeacherProfileState>(
+                      builder: (context, state) {
+                        String name = 'Đang tải...';
+                        if (state is TeacherProfileLoadSuccess) {
+                          name = '${state.profile.degree ?? 'Giảng viên'} ${state.profile.fullName}';
+                        } else if (state is TeacherProfileLoadFailure) {
+                          name = 'Lỗi tải dữ liệu';
+                        }
+                        
+                        return Text(
+                          name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.5,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideX(begin: -0.1, end: 0);
+                      },
+                    ),
                   ],
                 ),
               ),

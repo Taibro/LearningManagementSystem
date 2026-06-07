@@ -499,4 +499,28 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
     List<StudentCourseRegDto> getEnrolledClasses(
             @Param("studentCode") String studentCode,
             @Param("semesterId")  Integer semesterId);
+
+    // ── LẤY DANH SÁCH GIẢNG VIÊN ĐỂ CHAT ──────────────────────────────────────
+    @Query("""
+            SELECT new org.learn.learningmanagementbackend.dto.response.TeacherChatResponse(
+                t.id,
+                u.fullName,
+                d.name,
+                u.email
+            )
+            FROM Enrollment e
+            JOIN e.classes c
+            JOIN c.teacherLecturings ct
+            JOIN ct.teacher t
+            JOIN t.user u
+            LEFT JOIN t.department d
+            WHERE e.student.studentCode = :studentCode
+              AND e.status IN ('ENROLLED', 'PENDING')
+              AND (:semesterId = 0 OR c.semester.id = :semesterId)
+            GROUP BY t.id, u.fullName, d.name, u.email
+            ORDER BY u.fullName
+            """)
+    List<org.learn.learningmanagementbackend.dto.response.TeacherChatResponse> getTeachersForStudent(
+            @Param("studentCode") String studentCode,
+            @Param("semesterId") Integer semesterId);
 }
