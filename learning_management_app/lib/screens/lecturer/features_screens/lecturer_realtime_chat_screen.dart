@@ -133,95 +133,109 @@ class _LecturerRealtimeChatScreenState extends State<LecturerRealtimeChatScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1E293B)),
-          onPressed: () => Navigator.pop(context),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFF0F4FF), // Soft premium blue
+            Color(0xFFFAFAFA), // White-ish
+            Color(0xFFF5E6FF), // Soft premium purple
+          ],
         ),
-        title: Row(
-          children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  backgroundColor: const Color(0xFF4F46E5).withOpacity(0.1),
-                  child: Text(
-                    widget.studentName.isNotEmpty ? widget.studentName[0].toUpperCase() : 'SV',
-                    style: GoogleFonts.inter(color: const Color(0xFF4F46E5), fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: 0,
-                  child: Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: _isConnected ? Colors.green : Colors.red,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.white.withOpacity(0.8),
+          flexibleSpace: ClipRect(),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Color(0xFF1E293B)),
+            onPressed: () => Navigator.pop(context),
+          ),
+          title: Row(
+            children: [
+              Stack(
                 children: [
-                  Text(
-                    widget.studentName,
-                    style: GoogleFonts.inter(
-                      color: const Color(0xFF1E293B),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                  CircleAvatar(
+                    backgroundColor: const Color(0xFF4F46E5).withOpacity(0.1),
+                    child: Text(
+                      widget.studentName.isNotEmpty ? widget.studentName[0].toUpperCase() : 'SV',
+                      style: GoogleFonts.inter(color: const Color(0xFF4F46E5), fontWeight: FontWeight.bold),
                     ),
                   ),
-                  Text(
-                    _isConnected ? 'Đang hoạt động' : 'Đang kết nối...',
-                    style: GoogleFonts.inter(
-                      color: const Color(0xFF64748B),
-                      fontSize: 12,
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: _isConnected ? Colors.green : Colors.red,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-          ],
-        ),
-      ),
-      body: _isLoadingHistory
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                Expanded(
-                  child: _messages.isEmpty
-                      ? Center(
-                          child: Text(
-                            'Không có tin nhắn',
-                            style: GoogleFonts.inter(
-                              color: const Color(0xFF94A3B8),
-                              fontSize: 14,
-                            ),
-                          ),
-                        )
-                      : ListView.builder(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _messages.length,
-                          itemBuilder: (context, index) {
-                            final msg = _messages[index];
-                            return _buildMessageBubble(msg);
-                          },
-                        ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.studentName,
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF1E293B),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      _isConnected ? 'Đang hoạt động' : 'Đang kết nối...',
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF64748B),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
-                _buildInputArea(),
-              ],
-            ),
+              ),
+            ],
+          ),
+        ),
+        body: _isLoadingHistory
+            ? const Center(child: CircularProgressIndicator())
+            : Column(
+                children: [
+                  Expanded(
+                    child: _messages.isEmpty
+                        ? Center(
+                            child: Text(
+                              'Hãy là người bắt đầu cuộc trò chuyện',
+                              style: GoogleFonts.inter(
+                                color: const Color(0xFF94A3B8),
+                                fontSize: 14,
+                              ),
+                            ),
+                          )
+                        : ListView.builder(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.all(16),
+                            itemCount: _messages.length,
+                            itemBuilder: (context, index) {
+                              final msg = _messages[index];
+                              return _buildMessageBubble(msg);
+                            },
+                          ),
+                  ),
+                  _buildInputArea(),
+                ],
+              ),
+      ),
     );
   }
 
@@ -230,21 +244,28 @@ class _LecturerRealtimeChatScreenState extends State<LecturerRealtimeChatScreen>
       alignment: msg.isMine ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         constraints: BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: msg.isMine ? const Color(0xFF4F46E5) : Colors.white,
-          borderRadius: BorderRadius.circular(16).copyWith(
-            bottomRight: msg.isMine ? const Radius.circular(0) : const Radius.circular(16),
-            bottomLeft: !msg.isMine ? const Radius.circular(0) : const Radius.circular(16),
+          gradient: msg.isMine 
+              ? const LinearGradient(
+                  colors: [Color(0xFF6366F1), Color(0xFF4F46E5)], // Indigo gradient
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                )
+              : null,
+          color: msg.isMine ? null : Colors.white.withOpacity(0.9),
+          borderRadius: BorderRadius.circular(20).copyWith(
+            bottomRight: msg.isMine ? const Radius.circular(4) : const Radius.circular(20),
+            bottomLeft: !msg.isMine ? const Radius.circular(4) : const Radius.circular(20),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 5,
-              offset: const Offset(0, 2),
+              color: msg.isMine ? const Color(0xFF4F46E5).withOpacity(0.3) : Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -256,15 +277,19 @@ class _LecturerRealtimeChatScreenState extends State<LecturerRealtimeChatScreen>
             height: 1.4,
           ),
         ),
-      ).animate().fade(duration: 200.ms).slideY(begin: 0.2, end: 0),
+      ).animate().fade(duration: 200.ms).slideY(begin: 0.1, end: 0),
     );
   }
 
   Widget _buildInputArea() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.8),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(24),
+          topRight: Radius.circular(24),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
@@ -274,21 +299,23 @@ class _LecturerRealtimeChatScreenState extends State<LecturerRealtimeChatScreen>
         ],
       ),
       child: SafeArea(
+        top: false,
         child: Row(
           children: [
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF1F5F9),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
                 ),
                 child: TextField(
                   controller: _controller,
                   decoration: InputDecoration(
-                    hintText: 'Nhắn tin...',
+                    hintText: 'Soạn tin nhắn...',
                     hintStyle: GoogleFonts.inter(color: const Color(0xFF94A3B8)),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   ),
                   onSubmitted: (_) => _sendMessage(),
                 ),
@@ -298,14 +325,25 @@ class _LecturerRealtimeChatScreenState extends State<LecturerRealtimeChatScreen>
             GestureDetector(
               onTap: _sendMessage,
               child: Container(
-                width: 48,
-                height: 48,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF4F46E5),
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF6366F1), Color(0xFF4F46E5)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF4F46E5).withOpacity(0.4),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                child: const Icon(Icons.send_rounded, color: Colors.white, size: 20),
-              ),
+                child: const Icon(Icons.send_rounded, color: Colors.white, size: 22),
+              ).animate().scale(delay: 200.ms),
             ),
           ],
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class DraggableChatbotButton extends StatefulWidget {
   final VoidCallback onPressed;
@@ -64,11 +65,39 @@ class _DraggableChatbotButtonState extends State<DraggableChatbotButton> {
             _offset = Offset(x, y);
           });
         },
-        child: FloatingActionButton(
-          onPressed: widget.onPressed,
-          backgroundColor: widget.backgroundColor,
-          elevation: 4,
-          child: Icon(widget.iconData, color: Colors.white, size: 28),
+        child: GestureDetector(
+          onTap: widget.onPressed,
+          child: Container(
+            width: 75,
+            height: 75,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white, // Nền trắng để làm nổi bật Lottie màu tím
+              border: Border.all(
+                color: const Color(0xFF8B5CF6), // Đổi thành màu tím cao cấp đồng bộ
+                width: 3.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF8B5CF6).withOpacity(0.4), // Đổ bóng tím
+                  blurRadius: 12,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Lottie.asset(
+                'assets/lottie/chatbot.json',
+                width: 55,
+                height: 55,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(widget.iconData, color: widget.backgroundColor, size: 32);
+                },
+              ),
+            ),
+          ),
         ),
       ),
     );
