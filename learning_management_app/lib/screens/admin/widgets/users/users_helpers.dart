@@ -3,16 +3,18 @@ import 'package:flutter/material.dart';
 Widget buildSearchBar(String hint, ValueChanged<String> onChanged) {
   const kPrimary = Color(0xFF1A237E);
   return Container(
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(14, 10, 14, 6),
+    color: Colors.transparent,
+    padding: const EdgeInsets.fromLTRB(20, 10, 20, 6),
     child: TextField(
       decoration: InputDecoration(
-        hintText: hint, hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFBDBDBD)),
-        prefixIcon: const Icon(Icons.search, size: 18, color: Color(0xFF9E9E9E)),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE8E0F0))),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: Color(0xFFE8E0F0))),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: kPrimary)),
+        hintText: hint, hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+        prefixIcon: const Icon(Icons.search, size: 20, color: Color(0xFF64748B)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        filled: true,
+        fillColor: Colors.white.withOpacity(0.8),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.transparent)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.transparent)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: kPrimary.withOpacity(0.3), width: 1.5)),
       ),
       style: const TextStyle(fontSize: 13),
       onChanged: onChanged,
@@ -23,8 +25,8 @@ Widget buildSearchBar(String hint, ValueChanged<String> onChanged) {
 Widget buildFilterRow(List<String> filters, String selected, ValueChanged<String> onTap) {
   const kPrimary = Color(0xFF1A237E);
   return Container(
-    color: Colors.white,
-    padding: const EdgeInsets.only(left: 14, right: 14, bottom: 10),
+    color: Colors.transparent,
+    padding: const EdgeInsets.only(left: 20, right: 20, bottom: 10),
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(children: filters.map((f) {
@@ -32,13 +34,14 @@ Widget buildFilterRow(List<String> filters, String selected, ValueChanged<String
         return Padding(padding: const EdgeInsets.only(right: 8), child: GestureDetector(
           onTap: () => onTap(f),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
-              color: sel ? kPrimary : Colors.white,
+              color: sel ? kPrimary : Colors.white.withOpacity(0.8),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: sel ? kPrimary : const Color(0xFFE0D8F0)),
+              border: Border.all(color: sel ? kPrimary : Colors.transparent),
+              boxShadow: sel ? [BoxShadow(color: kPrimary.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))] : null,
             ),
-            child: Text(f, style: TextStyle(fontSize: 12, color: sel ? Colors.white : const Color(0xFF424242), fontWeight: FontWeight.w500)),
+            child: Text(f, style: TextStyle(fontSize: 12, color: sel ? Colors.white : const Color(0xFF475569), fontWeight: FontWeight.bold)),
           ),
         ));
       }).toList()),

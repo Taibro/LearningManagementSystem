@@ -40,7 +40,7 @@ class _ClassListTabState extends State<ClassListTab> {
                 child: Text('Không tìm thấy lớp học',
                     style: TextStyle(color: Color(0xFF9E9E9E))))
             : ListView.separated(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                 itemCount: _filteredClasses.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (_, i) => _buildClassCard(_filteredClasses[i]),
@@ -52,26 +52,20 @@ class _ClassListTabState extends State<ClassListTab> {
   Widget _buildClassFilter() {
     final filters = ['Tất cả', 'Lý thuyết', 'Thực hành', 'Trực tuyến'];
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+      color: Colors.transparent,
+      padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
       child: Column(children: [
         TextField(
           decoration: InputDecoration(
             hintText: 'Tìm môn học, giảng viên, nhóm lớp...',
-            hintStyle: const TextStyle(fontSize: 13, color: Color(0xFFBDBDBD)),
-            prefixIcon:
-                const Icon(Icons.search, size: 18, color: Color(0xFF9E9E9E)),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE8E0F0))),
-            enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFE8E0F0))),
-            focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: _kPrimary)),
+            hintStyle: const TextStyle(fontSize: 13, color: Color(0xFF94A3B8)),
+            prefixIcon: const Icon(Icons.search, size: 20, color: Color(0xFF64748B)),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.8),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.transparent)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.transparent)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _kPrimary.withOpacity(0.3), width: 1.5)),
           ),
           style: const TextStyle(fontSize: 13),
           onChanged: (v) => setState(() => _scheduleSearch = v),
@@ -87,19 +81,14 @@ class _ClassListTabState extends State<ClassListTab> {
               child: GestureDetector(
                 onTap: () => setState(() => _scheduleFilter = f),
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: sel ? _kPrimary : Colors.white,
+                    color: sel ? _kPrimary : Colors.white.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: sel ? _kPrimary : const Color(0xFFE0D8F0)),
+                    border: Border.all(color: sel ? _kPrimary : Colors.transparent),
+                    boxShadow: sel ? [BoxShadow(color: _kPrimary.withOpacity(0.3), blurRadius: 8, offset: const Offset(0, 2))] : null,
                   ),
-                  child: Text(f,
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: sel ? Colors.white : const Color(0xFF424242),
-                          fontWeight: FontWeight.w500)),
+                  child: Text(f, style: TextStyle(fontSize: 12, color: sel ? Colors.white : const Color(0xFF475569), fontWeight: FontWeight.bold)),
                 ),
               ),
             );

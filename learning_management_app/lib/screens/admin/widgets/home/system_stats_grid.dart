@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
 import '../../../../models/admin/dashboard_stats.dart';
 
 class SystemStatsGrid extends StatelessWidget {
@@ -25,28 +26,67 @@ class SystemStatsGrid extends StatelessWidget {
         final c = cards[i];
         final col = c['color'] as Color;
         return Container(
-          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [BoxShadow(color: col.withOpacity(0.12), blurRadius: 10, offset: const Offset(0, 4))],
+            color: Colors.white.withOpacity(0.9),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white, width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: col.withOpacity(0.15),
+                blurRadius: 15,
+                offset: const Offset(0, 8),
+              )
+            ],
           ),
-          child: Row(children: [
-            Container(
-              width: 44, height: 44,
-              decoration: BoxDecoration(color: col.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-              child: Icon(c['icon'] as IconData, color: col, size: 24),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: col.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(c['icon'] as IconData, color: col, size: 24),
+                        ),
+                        const Spacer(),
+                        Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey.shade400, size: 14),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      c['value'] as String,
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        color: col,
+                        letterSpacing: -0.5,
+                      ),
+                    ),
+                    Text(
+                      c['label'] as String,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.grey.shade700,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(width: 12),
-            Expanded(child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(c['value'] as String, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: col)),
-                Text(c['label'] as String, style: const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E))),
-              ],
-            )),
-          ]),
+          ),
         );
       },
     );

@@ -1,8 +1,9 @@
 import '../models/admin/admin_dashboard_stats.dart';
+import '../models/admin/admin_tuition_invoice.dart';
 import 'core_chatbot_repository.dart';
 
 class AdminChatbotRepository extends CoreChatbotRepository {
-  AdminChatbotRepository(AdminDashboardStats stats) : super(roleKey: 'admin') {
+  AdminChatbotRepository(AdminDashboardStats stats, List<AdminTuitionInvoice> unpaidInvoices) : super(roleKey: 'admin') {
     String statsStr = "Thông tin tổng quan:\n"
         "          - Tên trường: ${stats.schoolName ?? 'Không rõ'}\n"
         "          - Tổng số sinh viên: ${stats.totalStudents ?? 0}\n"
@@ -10,6 +11,21 @@ class AdminChatbotRepository extends CoreChatbotRepository {
         "          - Tổng số lớp học: ${stats.totalClasses ?? 0}\n"
         "          - Số sinh viên vắng mặt hôm nay: ${stats.todayAbsences ?? 0}\n"
         "          - Tổng nợ học phí: ${stats.totalTuitionDebt ?? 0} đ";
+
+    String unpaidStr = "Danh sách sinh viên đang nợ học phí:\n";
+    if (unpaidInvoices.isEmpty) {
+      unpaidStr += "Hiện tại không có sinh viên nào nợ học phí.\n";
+    } else {
+      // Limit to max 50 to avoid large context
+      final displayInvoices = unpaidInvoices.take(50).toList();
+      for (var inv in displayInvoices) {
+        final debt = (inv.totalAmount ?? 0) - (inv.paidAmount ?? 0);
+        unpaidStr += " - Sinh viên: ${inv.studentName} (Mã: ${inv.studentCode}) nợ: $debt đ\n";
+      }
+      if (unpaidInvoices.length > 50) {
+        unpaidStr += " - ... và ${unpaidInvoices.length - 50} sinh viên khác.\n";
+      }
+    }
 
     String systemInstruction = '''
           Bạn là Trợ lý ảo AI của Hệ thống Quản lý Đào tạo (EduSpace). 
@@ -20,6 +36,9 @@ class AdminChatbotRepository extends CoreChatbotRepository {
           
           * Thống kê tổng quan:
           $statsStr
+          
+          * Dữ liệu Tài chính chi tiết:
+          $unpaidStr
           
           QUY TẮC NGHIÊM NGẶT:
           1. TUYỆT ĐỐI KHÔNG trả lời các câu hỏi ngoài lề như: giải trí, phim ảnh, âm nhạc, chính trị, thời tiết.

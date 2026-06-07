@@ -9,7 +9,7 @@ class RoomsTab extends StatelessWidget {
     const kPrimary = Color(0xFF1A237E);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
       child: Column(children: [
         // Summary chips
         Row(children: [

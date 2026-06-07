@@ -35,9 +35,10 @@ class _AdminChatbotScreenState extends State<AdminChatbotScreen> {
   Future<void> _loadContext() async {
     try {
       final stats = await _adminRepo.getDashboardStats();
+      final unpaidInvoices = await _adminRepo.getUnpaidInvoices();
       
       setState(() {
-        _chatbotRepo = AdminChatbotRepository(stats);
+        _chatbotRepo = AdminChatbotRepository(stats, unpaidInvoices);
         _isLoadingContext = false;
       });
     } catch (e) {

@@ -42,7 +42,7 @@ class _StudentsTabState extends State<StudentsTab> {
                 child: Text('Không tìm thấy sinh viên',
                     style: TextStyle(color: Color(0xFF9E9E9E))))
             : ListView.separated(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
                 itemCount: _filteredStudents.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
                 itemBuilder: (_, i) => _studentCard(_filteredStudents[i]),

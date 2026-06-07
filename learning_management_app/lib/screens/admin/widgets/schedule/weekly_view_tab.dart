@@ -20,8 +20,8 @@ class _WeeklyViewTabState extends State<WeeklyViewTab> {
     return Column(children: [
       // Week navigator
       Container(
-        color: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        color: Colors.transparent,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: Row(children: [
           IconButton(onPressed: () => setState(() => _weekOffset--),
               icon: const Icon(Icons.chevron_left, color: _kPrimary), padding: EdgeInsets.zero, constraints: const BoxConstraints()),
@@ -41,7 +41,7 @@ class _WeeklyViewTabState extends State<WeeklyViewTab> {
       ),
       Expanded(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
           child: Column(
             children: List.generate(6, (dayIdx) {
               final dayClasses = (classMap[dayIdx] ?? [])
@@ -81,7 +81,7 @@ class _WeeklyViewTabState extends State<WeeklyViewTab> {
                       child: Text('Không có lịch', style: TextStyle(fontSize: 13, color: Colors.grey[400], fontStyle: FontStyle.italic)))
                   else
                     Padding(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(16),
                       child: Column(children: dayClasses.map((c) {
                         Color col = c['type'] == 'practice' ? const Color(0xFF5C6BC0)
                             : c['type'] == 'online' ? const Color(0xFFE65100) : const Color(0xFF2E7D32);
