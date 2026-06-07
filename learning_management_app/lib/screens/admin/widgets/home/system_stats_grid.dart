@@ -19,7 +19,7 @@ class SystemStatsGrid extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2, crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 1.8,
+        crossAxisCount: 2, crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: 1.1,
       ),
       itemCount: cards.length,
       itemBuilder: (_, i) {
@@ -27,12 +27,12 @@ class SystemStatsGrid extends StatelessWidget {
         final col = c['color'] as Color;
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.9),
+            color: Colors.white.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Colors.white, width: 1.5),
             boxShadow: [
               BoxShadow(
-                color: col.withOpacity(0.15),
+                color: col.withValues(alpha: 0.15),
                 blurRadius: 15,
                 offset: const Offset(0, 8),
               )
@@ -53,7 +53,7 @@ class SystemStatsGrid extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: col.withOpacity(0.1),
+                            color: col.withValues(alpha: 0.1),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(c['icon'] as IconData, color: col, size: 24),

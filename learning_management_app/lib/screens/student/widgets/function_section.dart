@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:learning_management_app/core/utils/feature_manager.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../screens/student/academic_result_screen.dart';
@@ -10,7 +11,10 @@ import '../../../screens/student/curriculum_screen.dart';
 import '../../../screens/student/customize_features_screen.dart';
 import '../../../screens/student/receipt_screen.dart';
 import '../../../screens/student/schedule_screen.dart';
+import '../../../screens/student/features_screens/conduct_screen.dart';
 import '../../../screens/student/features_screens/student_teacher_list_screen.dart';
+import '../../../screens/student/features_screens/news_screen.dart';
+import '../../../screens/student/features_screens/survey_screen.dart';
 import 'payment_bottom_sheet.dart';
 
 class FunctionSection extends StatefulWidget {
@@ -21,98 +25,145 @@ class FunctionSection extends StatefulWidget {
 }
 
 class _FunctionSectionState extends State<FunctionSection> {
+  late List<Map<String, dynamic>> _allFeatures;
   List<Map<String, dynamic>> _displayFeatures = [];
-
-  final Map<String, Map<String, dynamic>> _allFeaturesMap = {
-    'Xem điểm': {
-      'icon': Icons.grade_rounded,
-      'label': 'Xem điểm',
-      'colors': [const Color(0xFF3B82F6), const Color(0xFF2563EB)],
-      'onTap': (context) => Navigator.push(context, MaterialPageRoute(builder: (_) => const AcademicResultScreen())),
-    },
-    'Thành tích': {
-      'icon': Icons.star_rounded,
-      'label': 'Thành tích',
-      'colors': [const Color(0xFFF59E0B), const Color(0xFFD97706)],
-      'onTap': (context) => Navigator.push(context, MaterialPageRoute(builder: (_) => const AchievementScreen())),
-    },
-    'Thanh toán học phí': {
-      'icon': Icons.monetization_on_outlined,
-      'label': 'Thanh toán',
-      'colors': [const Color(0xFF10B981), const Color(0xFF059669)],
-      'onTap': (context) => PaymentBottomSheet.show(context),
-    },
-    'Phiếu thu tổng hợp': {
-      'icon': Icons.receipt_long_outlined,
-      'label': 'Phiếu thu',
-      'colors': [const Color(0xFF06B6D4), const Color(0xFF0891B2)],
-      'onTap': (context) => Navigator.push(context, MaterialPageRoute(builder: (_) => const ReceiptScreen())),
-    },
-    'Thống kê điểm danh': {
-      'icon': Icons.how_to_reg_outlined,
-      'label': 'Điểm danh',
-      'colors': [const Color(0xFF8B5CF6), const Color(0xFF6D28D9)],
-      'onTap': (context) => Navigator.push(context, MaterialPageRoute(builder: (_) => const AttendanceStatsScreen())),
-    },
-    'Chương trình khung': {
-      'icon': Icons.menu_book_rounded,
-      'label': 'Chương trình',
-      'colors': [const Color(0xFFEF4444), const Color(0xFFDC2626)],
-      'onTap': (context) => Navigator.push(context, MaterialPageRoute(builder: (_) => const CurriculumScreen())),
-    },
-    'Lịch học/ lịch thi': {
-      'icon': Icons.calendar_month_outlined,
-      'label': 'Lịch học',
-      'colors': [const Color(0xFFF97316), const Color(0xFFEA580C)],
-      'onTap': (context) => Navigator.push(context, MaterialPageRoute(builder: (_) => const ScheduleScreen())),
-    },
-    'Trò chuyện': {
-      'icon': Icons.chat_rounded,
-      'label': 'Trò chuyện',
-      'colors': [const Color(0xFFE11D48), const Color(0xFFBE123C)],
-      'onTap': (context) => Navigator.push(context, MaterialPageRoute(builder: (_) => const StudentTeacherListScreen())),
-    },
-    // Khảo sát, Tin tức, Rèn luyện can be added similarly if needed
-  };
 
   @override
   void initState() {
     super.initState();
-    _loadFeatures();
+    _initFeatures();
+    _loadDisplayFeatures();
   }
 
-  Future<void> _loadFeatures() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedHomeLabels = prefs.getStringList('student_home_features');
-    
-    List<Map<String, dynamic>> features = [];
-    if (savedHomeLabels != null) {
-      for (var label in savedHomeLabels) {
-        if (_allFeaturesMap.containsKey(label)) {
-          features.add(_allFeaturesMap[label]!);
-        }
-      }
+  void _initFeatures() {
+    _allFeatures = [
+      {
+        'icon': Icons.grade_rounded,
+        'label': 'Xem điểm',
+        'colors': [const Color(0xFF3B82F6), const Color(0xFF2563EB)],
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AcademicResultScreen()),
+            ),
+      },
+      {
+        'icon': Icons.chat_bubble_rounded,
+        'label': 'Trò chuyện',
+        'colors': [const Color(0xFF4F46E5), const Color(0xFF3730A3)],
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const StudentTeacherListScreen()),
+            ),
+      },
+      {
+        'icon': Icons.star_rounded,
+        'label': 'Thành tích',
+        'colors': [const Color(0xFFF59E0B), const Color(0xFFD97706)],
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AchievementScreen()),
+            ),
+      },
+      {
+        'icon': Icons.menu_book_rounded,
+        'label': 'Chương trình khung',
+        'colors': [const Color(0xFFEF4444), const Color(0xFFDC2626)],
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CurriculumScreen()),
+            ),
+      },
+      {
+        'icon': Icons.account_balance_wallet_rounded,
+        'label': 'Thanh toán học phí',
+        'colors': [const Color(0xFF10B981), const Color(0xFF059669)],
+        'onTap': () => PaymentBottomSheet.show(context),
+      },
+      {
+        'icon': Icons.receipt_long_rounded,
+        'label': 'Phiếu thu tổng hợp',
+        'colors': [const Color(0xFF06B6D4), const Color(0xFF0891B2)],
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ReceiptScreen()),
+            ),
+      },
+      {
+        'icon': Icons.fact_check_rounded,
+        'label': 'Thống kê điểm danh',
+        'colors': [const Color(0xFF8B5CF6), const Color(0xFF6D28D9)],
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AttendanceStatsScreen()),
+            ),
+      },
+      {
+        'icon': Icons.calendar_month_rounded,
+        'label': 'Lịch học/ lịch thi',
+        'colors': [const Color(0xFFF97316), const Color(0xFFEA580C)],
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ScheduleScreen()),
+            ),
+      },
+      {
+        'icon': Icons.emoji_events_rounded,
+        'label': 'Rèn luyện',
+        'colors': [const Color(0xFFEAB308), const Color(0xFFCA8A04)],
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const ConductScreen()),
+            ),
+      },
+      {
+        'icon': Icons.article_rounded,
+        'label': 'Tin tức',
+        'colors': [const Color(0xFF3B82F6), const Color(0xFF2563EB)],
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const NewsScreen()),
+            ),
+      },
+      {
+        'icon': Icons.poll_rounded,
+        'label': 'Khảo sát',
+        'colors': [const Color(0xFF14B8A6), const Color(0xFF0D9488)],
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SurveyScreen()),
+            ),
+      },
+      {
+        'icon': Icons.widgets_rounded,
+        'label': 'Tất cả',
+        'colors': [const Color(0xFF64748B), const Color(0xFF475569)],
+        'onTap': () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const AllFeaturesScreen()),
+            ),
+      },
+    ];
+  }
+
+  void _loadDisplayFeatures() {
+    final manager = FeatureManager();
+    final savedHome = manager.getHomeFeatureIds('student');
+
+    if (savedHome == null) {
+      // Default: the first 7 features plus "Tất cả"
+      _displayFeatures = _allFeatures.where((f) => [
+        'Xem điểm', 'Thành tích', 'Chương trình khung', 'Thanh toán học phí', 
+        'Phiếu thu tổng hợp', 'Thống kê điểm danh', 'Lịch học/ lịch thi', 'Trò chuyện'
+      ].contains(f['label']) || f['label'] == 'Tất cả').toList();
     } else {
-      // Defaults
-      final defaultLabels = ['Xem điểm', 'Thành tích', 'Thanh toán học phí', 'Phiếu thu tổng hợp', 'Thống kê điểm danh', 'Chương trình khung', 'Lịch học/ lịch thi'];
-      for (var label in defaultLabels) {
-        if (_allFeaturesMap.containsKey(label)) {
-          features.add(_allFeaturesMap[label]!);
-        }
+      _displayFeatures = savedHome
+          .map((label) => _allFeatures.firstWhere((f) => f['label'] == label, orElse: () => _allFeatures.first))
+          .toList();
+      // Always add "Tất cả" at the end if not present
+      if (!_displayFeatures.any((f) => f['label'] == 'Tất cả')) {
+        _displayFeatures.add(_allFeatures.firstWhere((f) => f['label'] == 'Tất cả'));
       }
     }
-    
-    // Always append "Tất cả" at the end, regardless of user customization
-    features.add({
-      'icon': Icons.widgets_rounded,
-      'label': 'Tất cả',
-      'colors': [const Color(0xFF64748B), const Color(0xFF475569)],
-      'onTap': (context) => Navigator.push(context, MaterialPageRoute(builder: (_) => const AllFeaturesScreen())),
-    });
-
-    setState(() {
-      _displayFeatures = features;
-    });
   }
 
   @override
@@ -137,8 +188,9 @@ class _FunctionSectionState extends State<FunctionSection> {
                   context,
                   MaterialPageRoute(builder: (_) => const CustomizeFeaturesScreen()),
                 );
-                // Reload when returning from customize screen
-                _loadFeatures();
+                setState(() {
+                  _loadDisplayFeatures();
+                });
               },
               icon: const Icon(Icons.tune_rounded, size: 16, color: Color(0xFF64748B)),
               label: Text(
@@ -187,9 +239,9 @@ class _FunctionSectionState extends State<FunctionSection> {
             itemBuilder: (context, index) {
               final item = _displayFeatures[index];
               final colors = item['colors'] as List<Color>;
-              final onTap = item['onTap'] as Function(BuildContext);
+              final onTap = item['onTap'] as VoidCallback;
               return GestureDetector(
-                onTap: () => onTap(context),
+                onTap: onTap,
                 behavior: HitTestBehavior.opaque,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,

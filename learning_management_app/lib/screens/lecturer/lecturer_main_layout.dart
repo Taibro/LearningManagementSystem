@@ -6,6 +6,7 @@ import 'lecturer_schedule_screen.dart';
 import 'lecturer_attendance_screen.dart';
 import 'lecturer_profile_screen.dart';
 import 'lecturer_chatbot_screen.dart';
+import '../../core/widgets/draggable_chatbot_button.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/lecturer/profile/teacher_profile_bloc.dart';
 import '../../blocs/lecturer/profile/teacher_profile_event.dart';
@@ -45,29 +46,29 @@ class _LecturerMainLayoutState extends State<LecturerMainLayout> {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: PageView(
-        controller: _pageController,
-        physics: const NeverScrollableScrollPhysics(),
-        onPageChanged: (index) {
-          setState(() => _selectedIndex = index);
-        },
-        children: _screens,
+      body: Stack(
+        children: [
+          PageView(
+            controller: _pageController,
+            physics: const NeverScrollableScrollPhysics(),
+            onPageChanged: (index) {
+              setState(() => _selectedIndex = index);
+            },
+            children: _screens,
+          ),
+          DraggableChatbotButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LecturerChatbotScreen()),
+              );
+            },
+            iconData: Icons.smart_toy_rounded,
+            backgroundColor: const Color(0xFF2E7D32),
+          ),
+        ],
       ),
       bottomNavigationBar: _buildFloatingBottomNavBar(),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80.0),
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const LecturerChatbotScreen()),
-            );
-          },
-          backgroundColor: const Color(0xFF2E7D32), // Màu xanh rêu của Giảng viên
-          elevation: 4,
-          child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 28),
-        ),
-      ),
     );
   }
 
@@ -106,49 +107,51 @@ class _LecturerMainLayoutState extends State<LecturerMainLayout> {
                 final primaryColor = const Color(0xFF6B4FA0);
                 final inactiveColor = const Color(0xFF94A3B8);
 
-                return GestureDetector(
-                  onTap: () {
-                    if (_selectedIndex != index) {
-                      setState(() => _selectedIndex = index);
-                      _pageController.animateToPage(
-                        index,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeOutQuart,
-                      );
-                    }
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    width: 70,
-                    color: Colors.transparent,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOutBack,
-                          padding: EdgeInsets.all(isSelected ? 6 : 0),
-                          decoration: BoxDecoration(
-                            color: isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
-                            shape: BoxShape.circle,
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      if (_selectedIndex != index) {
+                        setState(() => _selectedIndex = index);
+                        _pageController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeOutQuart,
+                        );
+                      }
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      color: Colors.transparent,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeOutBack,
+                            padding: EdgeInsets.all(isSelected ? 6 : 0),
+                            decoration: BoxDecoration(
+                              color: isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              items[index]['icon'] as IconData,
+                              color: isSelected ? primaryColor : inactiveColor,
+                              size: isSelected ? 24 : 22,
+                            ),
                           ),
-                          child: Icon(
-                            items[index]['icon'] as IconData,
-                            color: isSelected ? primaryColor : inactiveColor,
-                            size: isSelected ? 24 : 22,
+                          const SizedBox(height: 4),
+                          Text(
+                            items[index]['label'] as String,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                              color: isSelected ? primaryColor : inactiveColor,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          items[index]['label'] as String,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                            color: isSelected ? primaryColor : inactiveColor,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );

@@ -151,7 +151,7 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
                     crossAxisCount: 4,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 24,
-                    childAspectRatio: 0.7,
+                    childAspectRatio: 0.58,
                   ),
                   itemCount: features.length,
                   itemBuilder: (_, i) {
@@ -172,17 +172,19 @@ class LecturerAllFeaturesScreen extends StatelessWidget {
                             ),
                             child: Icon(f.icon, color: f.color, size: 28),
                           ),
-                          const SizedBox(height: 10),
-                          Text(
-                            f.label,
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF334155),
-                              height: 1.3,
+                          const SizedBox(height: 8),
+                          Expanded(
+                            child: Text(
+                              f.label,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF334155),
+                                height: 1.2,
+                              ),
                             ),
                           ),
                         ],

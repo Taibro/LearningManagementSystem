@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
 import 'choose_school_screen.dart';
+import 'role_selection_screen.dart';
+import 'data/mock_school_data.dart';
 import '../student/widgets/shared/mesh_background.dart'; // Ensure correct path or create a local mesh
 
 /// Screen 1: Nhập mã trường
@@ -97,15 +99,21 @@ class _SchoolCodeScreenState extends State<SchoolCodeScreen> {
           ),
 
           SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Center(
-                    child: _buildHeroIcon(),
+            child: CustomScrollView(
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: _buildHeroIcon(),
+                        ),
+                      ),
+                      _buildFormCard(),
+                    ],
                   ),
                 ),
-                _buildFormCard(),
               ],
             ),
           ),
@@ -208,6 +216,25 @@ class _SchoolCodeScreenState extends State<SchoolCodeScreen> {
                   child: TextField(
                     controller: _codeController,
                     focusNode: _focusNode,
+                    onChanged: (val) {
+                      final q = val.trim().toLowerCase();
+                      if (q.isNotEmpty) {
+                        try {
+                          final match = mockSchools.firstWhere(
+                            (s) => s.code.toLowerCase() == q
+                          );
+                          _focusNode.unfocus();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => RoleSelectionScreen(schoolName: match.name),
+                            ),
+                          );
+                        } catch (e) {
+                          // No exact match yet, do nothing
+                        }
+                      }
+                    },
                     style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A)),
                     decoration: InputDecoration(
                       hintText: 'Nhập mã trường...',

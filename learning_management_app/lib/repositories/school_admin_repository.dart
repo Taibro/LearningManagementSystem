@@ -10,7 +10,7 @@ class SchoolAdminRepository {
 
   Future<DashboardStats> getDashboardStats() async {
     try {
-      final response = await _dio.get('/api/school-admin/dashboard/stats');
+      final response = await _dio.get('/school-admin/dashboard/stats');
       return DashboardStats.fromJson(response.data);
     } catch (e) {
       throw Exception('Lỗi khi tải thống kê: $e');
@@ -19,7 +19,7 @@ class SchoolAdminRepository {
 
   Future<List<ScheduleExceptionResponse>> getPendingExceptions() async {
     try {
-      final response = await _dio.get('/api/school-admin/schedule-exceptions/pending');
+      final response = await _dio.get('/school-admin/schedule-exceptions/pending');
       final data = response.data as List;
       return data.map((e) => ScheduleExceptionResponse.fromJson(e)).toList();
     } catch (e) {
@@ -29,7 +29,7 @@ class SchoolAdminRepository {
 
   Future<ScheduleExceptionResponse> approveException(int id) async {
     try {
-      final response = await _dio.put('/api/school-admin/schedule-exceptions/$id/approve');
+      final response = await _dio.put('/school-admin/schedule-exceptions/$id/approve');
       return ScheduleExceptionResponse.fromJson(response.data);
     } catch (e) {
       throw Exception('Lỗi khi duyệt yêu cầu: $e');
@@ -38,7 +38,7 @@ class SchoolAdminRepository {
 
   Future<ScheduleExceptionResponse> rejectException(int id, String adminNote) async {
     try {
-      final response = await _dio.put('/api/school-admin/schedule-exceptions/$id/reject', data: {'adminNote': adminNote});
+      final response = await _dio.put('/school-admin/schedule-exceptions/$id/reject', data: {'adminNote': adminNote});
       return ScheduleExceptionResponse.fromJson(response.data);
     } catch (e) {
       throw Exception('Lỗi khi từ chối yêu cầu: $e');
@@ -47,7 +47,7 @@ class SchoolAdminRepository {
 
   Future<List<NotificationResponse>> getAllNotifications() async {
     try {
-      final response = await _dio.get('/api/school-admin/notifications');
+      final response = await _dio.get('/school-admin/notifications');
       final data = response.data as List;
       return data.map((e) => NotificationResponse.fromJson(e)).toList();
     } catch (e) {
@@ -57,7 +57,7 @@ class SchoolAdminRepository {
 
   Future<NotificationResponse> createNotification(Map<String, dynamic> request) async {
     try {
-      final response = await _dio.post('/api/school-admin/notifications', data: request);
+      final response = await _dio.post('/school-admin/notifications', data: request);
       return NotificationResponse.fromJson(response.data);
     } catch (e) {
       throw Exception('Lỗi khi tạo thông báo: $e');
@@ -66,7 +66,7 @@ class SchoolAdminRepository {
 
   Future<Map<String, dynamic>> createStudent(Map<String, dynamic> request) async {
     try {
-      final response = await _dio.post('/api/school-admin/students', data: request);
+      final response = await _dio.post('/school-admin/students', data: request);
       return response.data;
     } catch (e) {
       throw Exception('Lỗi khi tạo sinh viên: $e');
@@ -75,7 +75,7 @@ class SchoolAdminRepository {
 
   Future<Map<String, dynamic>> createTeacher(Map<String, dynamic> request) async {
     try {
-      final response = await _dio.post('/api/school-admin/teachers', data: request);
+      final response = await _dio.post('/school-admin/teachers', data: request);
       return response.data;
     } catch (e) {
       throw Exception('Lỗi khi tạo giảng viên: $e');

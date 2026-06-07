@@ -7,6 +7,7 @@ import 'admin_users_screen.dart';
 import 'admin_reports_screen.dart';
 import 'admin_settings_screen.dart';
 import 'admin_chatbot_screen.dart';
+import '../../core/widgets/draggable_chatbot_button.dart';
 import 'widgets/shared/admin_animated_background.dart';
 
 class AdminMainLayout extends StatefulWidget {
@@ -55,23 +56,19 @@ class _AdminMainLayoutState extends State<AdminMainLayout> {
             },
             children: _screens,
           ),
+          DraggableChatbotButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AdminChatbotScreen()),
+              );
+            },
+            iconData: Icons.smart_toy_rounded,
+            backgroundColor: const Color(0xFFC62828),
+          ),
         ],
       ),
       bottomNavigationBar: _buildFloatingBottomNavBar(),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 80.0),
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const AdminChatbotScreen()),
-            );
-          },
-          backgroundColor: const Color(0xFFC62828), // Màu đỏ đặc trưng cho Admin AI
-          elevation: 4,
-          child: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 28),
-        ),
-      ),
     );
   }
 

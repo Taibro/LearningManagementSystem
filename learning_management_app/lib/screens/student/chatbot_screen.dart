@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../blocs/chatbot/chatbot_bloc.dart';
 import '../../blocs/chatbot/chat_event.dart';
@@ -38,10 +41,10 @@ class ChatbotScreen extends StatelessWidget {
       ]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
+          return Scaffold(
             backgroundColor: Color(0xFFF8FAFC),
             body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF5C6BC0)),
+              child: CustomLoadingIndicator(),
             ),
           );
         }
@@ -236,13 +239,13 @@ class _ChatbotViewState extends State<_ChatbotView> {
             )
           ],
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(
               width: 16,
               height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF5C6BC0)),
+              child: CustomLoadingIndicator(),
             ),
             SizedBox(width: 8),
             Text('Đang suy nghĩ...', style: TextStyle(color: Color(0xFF616161), fontSize: 13)),
