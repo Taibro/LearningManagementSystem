@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learning_management_app/models/Attendance.dart';
+import 'package:learning_management_app/repositories/student_repository.dart';
+import 'qr_scanner_screen.dart';
 
 class AttendanceMethodSheet extends StatefulWidget {
   final Attendance item;
@@ -205,9 +208,7 @@ class _AttendanceMethodSheetState extends State<AttendanceMethodSheet> {
         ),
         const SizedBox(height: 24),
         ElevatedButton.icon(
-          onPressed: () {
-            _handleSuccess();
-          },
+          onPressed: _openScanner,
           icon: const Icon(Icons.qr_code_scanner),
           label: const Text('Mở Camera'),
           style: ElevatedButton.styleFrom(
@@ -227,9 +228,51 @@ class _AttendanceMethodSheetState extends State<AttendanceMethodSheet> {
   Widget _buildCodeView() {
     return _CodeEntryForm(
       onSubmit: (code) {
-        if (code.isNotEmpty) _handleSuccess();
+        if (code.isNotEmpty) _submitAttendance(code);
       },
     );
+  }
+
+  void _openScanner() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const QRScannerScreen()),
+    );
+    if (result != null && result is String) {
+      _submitAttendance(result);
+    }
+  }
+
+  void _submitAttendance(String qrToken) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      // Assuming studentId is 1 for now or fetched from somewhere. 
+      // In a real app we might get the user profile first or not need studentId if the token has it.
+      // But based on QrScanRequest it needs studentId. Let's pass 1 for test or fetch from profileBloc.
+      // Ideally backend extracts from JWT, but since it's required in body, we pass 1 as placeholder 
+      // or we can catch any error.
+      final repo = context.read<StudentRepository>();
+      await repo.scanQrCode(qrToken);
+      
+      if (context.mounted) Navigator.pop(context); // Close loading
+      _handleSuccess();
+    } catch (e) {
+      if (context.mounted) {
+        Navigator.pop(context); // Close loading
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   void _handleSuccess() {

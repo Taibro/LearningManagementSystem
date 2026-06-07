@@ -60,7 +60,7 @@ export default function AdminLogin({ initialSchool }) {
     setSLoading(true);
     try {
       const res = await fetch(`${API_BASE_URL}/auth/login`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         body: JSON.stringify({ loginCode: sEmail, password: sPass, userType: 'SCHOOL_ADMIN', school: school })
@@ -128,7 +128,7 @@ export default function AdminLogin({ initialSchool }) {
   const fetchQrCode = async (email) => {
     try {
       const response = await fetch(`${API_BASE_URL}/auth/2fa/setup`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
         body: JSON.stringify({ email })
@@ -153,7 +153,7 @@ export default function AdminLogin({ initialSchool }) {
     try {
       if (schoolView === 'setup') {
         const response = await fetch(`${API_BASE_URL}/auth/2fa/verify-setup`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
           body: JSON.stringify({ email: sEmail, code })
@@ -163,7 +163,7 @@ export default function AdminLogin({ initialSchool }) {
           if (isValid) {
             // Setup thành công, gọi luôn login verify
             const loginResp = await fetch(`${API_BASE_URL}/auth/login/verify-2fa`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -187,7 +187,7 @@ export default function AdminLogin({ initialSchool }) {
         }
       } else {
         const res = await fetch(`${API_BASE_URL}/auth/login/verify-2fa`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'POST',
           headers: { 
             'Content-Type': 'application/json',

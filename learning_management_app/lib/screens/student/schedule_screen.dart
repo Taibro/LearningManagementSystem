@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:learning_management_app/models/Schedule.dart';
+import 'package:learning_management_app/models/student/student_schedule.dart';
+import 'package:learning_management_app/repositories/student_repository.dart';
+import 'package:learning_management_app/core/enum/ScheduleType.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'widgets/shared/mesh_background.dart';
-import 'data/mock_schedule_data.dart';
+import 'data/mock_schedule_data.dart' hide kData;
 import 'utils/schedule_utils.dart';
 import 'widgets/schedule/schedule_card.dart';
 import 'widgets/schedule/empty_schedule_state.dart';
@@ -10,6 +14,7 @@ import 'widgets/schedule/pickers/calendar_picker_sheet.dart';
 import 'widgets/schedule/pickers/year_picker_sheet.dart';
 import 'widgets/schedule/pickers/week_picker_sheet.dart';
 import 'widgets/schedule/pickers/month_year_picker_sheet.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 
 enum ViewMode { day, week, month }
 
@@ -21,8 +26,49 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
-  DateTime _selected = DateTime(2026, 4, 16);
+  DateTime _selected = DateTime.now();
   ViewMode _mode = ViewMode.day;
+  Future<List<StudentSchedule>>? _scheduleFuture;
+  final Map<String, List<Schedule>> _scheduleMap = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _scheduleFuture = context.read<StudentRepository>().getProgressSchedule();
+  }
+
+  void _processData(List<StudentSchedule> apiSchedules) {
+    _scheduleMap.clear();
+    for (var s in apiSchedules) {
+      if (s.startDate == null || s.endDate == null || s.dayOfWeek == null) continue;
+      
+      DateTime currentDate = s.startDate!;
+      while (currentDate.isBefore(s.endDate!) || currentDate.isAtSameMomentAs(s.endDate!)) {
+        int expectedWeekday = s.dayOfWeek! - 1; 
+        
+        if (currentDate.weekday == expectedWeekday) {
+          final key = dateKey(currentDate);
+          _scheduleMap.putIfAbsent(key, () => []);
+          
+          ScheduleType type = ScheduleType.lichHoc;
+          if (s.sessionType == 'ONLINE') type = ScheduleType.lichTrucTuyen;
+          if (s.sessionType == 'EXAM') type = ScheduleType.lichThi;
+          
+          _scheduleMap[key]!.add(Schedule(
+            subjectName: s.courseName ?? '',
+            tiet: '${s.startPeriod ?? ''} - ${s.endPeriod ?? ''}',
+            phong: s.roomName ?? '',
+            giangVien: s.teacherName ?? '',
+            type: type,
+          ));
+        }
+        currentDate = currentDate.add(const Duration(days: 1));
+      }
+    }
+  }
+
+  bool _hasItems(DateTime d) => (_scheduleMap[dateKey(d)] ?? []).isNotEmpty;
+  List<Schedule> _itemsFor(DateTime d) => _scheduleMap[dateKey(d)] ?? [];
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +81,21 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             _dateBar(),
             if (_mode == ViewMode.week) _weekStrip(),
             const ScheduleLegend(),
-            Expanded(child: _body()),
+            Expanded(
+              child: FutureBuilder<List<StudentSchedule>>(
+                future: _scheduleFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CustomLoadingIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text('Lỗi: ${snapshot.error}'));
+                  }
+                  _processData(snapshot.data ?? []);
+                  return _body();
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -192,7 +252,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           final day = monday.add(Duration(days: i));
           final isSel = sameDay(day, _selected);
           final isWEnd = day.weekday >= 6;
-          final hasDot = hasItems(day);
+          final hasDot = _hasItems(day);
 
           return Expanded(
             child: GestureDetector(
@@ -284,7 +344,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   // ── Day View ──────────────────────────────────────────────────────
 
   Widget _dayView() {
-    final items = itemsFor(_selected);
+    final items = _itemsFor(_selected);
     if (items.isEmpty) return EmptyScheduleState(date: _selected);
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 120),
@@ -301,7 +361,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final groups = <(DateTime, List<Schedule>)>[];
     for (int i = 0; i < 7; i++) {
       final d = monday.add(Duration(days: i));
-      final it = itemsFor(d);
+      final it = _itemsFor(d);
       if (it.isNotEmpty) groups.add((d, it));
     }
     if (groups.isEmpty) return EmptyScheduleState(date: _selected);
@@ -337,7 +397,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
     final groups = <(DateTime, List<Schedule>)>[];
     for (int d = 1; d <= daysInMonth; d++) {
       final date = DateTime(y, m, d);
-      final it = itemsFor(date);
+      final it = _itemsFor(date);
       if (it.isNotEmpty) groups.add((date, it));
     }
 
@@ -442,7 +502,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             final isSel = sameDay(date, _selected);
             final isTod = sameDay(date, kToday);
             final isWEnd = date.weekday >= 6;
-            final hasDot = hasItems(date);
+            final hasDot = _hasItems(date);
 
             return GestureDetector(
               onTap: () => setState(() => _selected = date),

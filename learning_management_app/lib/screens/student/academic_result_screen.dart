@@ -8,9 +8,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/student/grade/grade_bloc.dart';
 import '../../blocs/student/grade/grade_event.dart';
 import '../../blocs/student/grade/grade_state.dart';
+import '../../blocs/student/profile/profile_bloc.dart';
+import '../../blocs/student/profile/profile_event.dart';
+import '../../blocs/student/profile/profile_state.dart';
 import 'package:learning_management_app/models/student/student_grade.dart';
 import '../../core/widgets/custom_loading_indicator.dart';
-import 'data/mock_grade_data.dart';
 
 const Color _kPrimary = Color(0xFF1565C0);
 const Color _kBg = Color(0xFFF0F4FF);
@@ -27,6 +29,7 @@ class _AcademicResultScreenState extends State<AcademicResultScreen> {
   void initState() {
     super.initState();
     context.read<GradeBloc>().add(GradeFetchRequested());
+    context.read<ProfileBloc>().add(ProfileFetchRequested());
   }
 
   @override
@@ -86,85 +89,154 @@ class _OverviewTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final s = kStudentOverview;
-    final rows = [
-      _InfoRow('Họ tên', s.hoTen),
-      _InfoRow('Sinh viên năm', '${s.sinhVienNam}'),
-      _InfoRow('Niên khóa', s.nienKhoa),
-      _InfoRow('Thời gian đào tạo', '${s.thoiGianDaoTao}'),
-      _InfoRow('Điểm TBC tích lũy (hệ 4)', '${s.diemTBCHe4}'),
-      _InfoRow('Điểm TBC tích lũy (hệ 10)', '${s.diemTBCHe10}'),
-      _InfoRow('STC đã đăng ký', '${s.stcDaDangKy}'),
-      _InfoRow('STC đã tích lũy', '${s.stcDaTichLuy}'),
-      _InfoRow('%STC nợ', '${s.stcNo} (${s.phanTramStcNo.toStringAsFixed(2)}%)'),
-      _InfoRow('STC phải tích lũy', s.stcPhaiTichLuy.toStringAsFixed(2)),
-    ];
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, profileState) {
+        return BlocBuilder<GradeBloc, GradeState>(
+          builder: (context, gradeState) {
+            if (profileState is ProfileLoading || gradeState is GradeLoading) {
+              return const Center(child: CustomLoadingIndicator());
+            }
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.all(20),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.85),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.white, width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF4F46E5).withOpacity(0.05),
-              blurRadius: 24,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-            child: ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: rows.length,
-              separatorBuilder: (_, __) => Divider(height: 1, indent: 20, endIndent: 20, color: const Color(0xFFE2E8F0).withOpacity(0.5)),
-              itemBuilder: (_, i) {
-                final row = rows[i];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 5,
-                        child: Text(
-                          row.label,
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: const Color(0xFF64748B),
-                          ),
-                        ),
-                      ),
-                      const Text(' : ', style: TextStyle(color: Color(0xFF94A3B8))),
-                      Expanded(
-                        flex: 4,
-                        child: Text(
-                          row.value,
-                          style: GoogleFonts.inter(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF0F172A),
-                          ),
-                          textAlign: TextAlign.right,
-                        ),
+            if (profileState is ProfileLoadFailure) {
+              return Center(child: Text('Lỗi tải thông tin: ${profileState.message}'));
+            }
+            if (gradeState is GradeLoadFailure) {
+              return Center(child: Text('Lỗi tải điểm: ${gradeState.message}'));
+            }
+
+            if (profileState is ProfileLoadSuccess && gradeState is GradeLoadSuccess) {
+              final profile = profileState.profile;
+              final grades = gradeState.grades;
+
+              // Calculate stats
+              int stcDaDangKy = 0;
+              int stcDaTichLuy = 0;
+              double sumDiem10 = 0.0;
+              double sumDiem4 = 0.0;
+              int stcTinhDiem = 0;
+
+              for (var g in grades) {
+                final tinChi = g.credits ?? 0;
+                stcDaDangKy += tinChi;
+                
+                if (g.gradeTotal != null) {
+                  final diem10 = g.gradeTotal!;
+                  stcTinhDiem += tinChi;
+                  sumDiem10 += diem10 * tinChi;
+                  
+                  // Convert hệ 4
+                  double diem4 = 0.0;
+                  if (diem10 >= 8.5) diem4 = 4.0;
+                  else if (diem10 >= 8.0) diem4 = 3.5;
+                  else if (diem10 >= 7.0) diem4 = 3.0;
+                  else if (diem10 >= 6.5) diem4 = 2.5;
+                  else if (diem10 >= 5.5) diem4 = 2.0;
+                  else if (diem10 >= 5.0) diem4 = 1.5;
+                  else if (diem10 >= 4.0) diem4 = 1.0;
+                  
+                  sumDiem4 += diem4 * tinChi;
+
+                  if (diem10 >= 4.0) {
+                    stcDaTichLuy += tinChi;
+                  }
+                }
+              }
+
+              double tbc10 = stcTinhDiem > 0 ? sumDiem10 / stcTinhDiem : 0.0;
+              double tbc4 = stcTinhDiem > 0 ? sumDiem4 / stcTinhDiem : 0.0;
+              
+              int stcNo = stcDaDangKy - stcDaTichLuy;
+              if (stcNo < 0) stcNo = 0;
+              double percentNo = stcDaDangKy > 0 ? (stcNo / stcDaDangKy) * 100 : 0.0;
+              
+              final nienKhoa = profile.enrollmentYear != null ? '${profile.enrollmentYear} - ${profile.enrollmentYear! + 4}' : 'Chưa xác định';
+              final namHoc = profile.enrollmentYear != null ? DateTime.now().year - profile.enrollmentYear! : 1;
+
+              final rows = [
+                _InfoRow('Họ tên', profile.fullName ?? 'N/A'),
+                _InfoRow('Sinh viên năm', '${namHoc > 0 ? namHoc : 1}'),
+                _InfoRow('Niên khóa', nienKhoa),
+                _InfoRow('Thời gian đào tạo', '4.0'),
+                _InfoRow('Điểm TBC tích lũy (hệ 4)', tbc4.toStringAsFixed(2)),
+                _InfoRow('Điểm TBC tích lũy (hệ 10)', tbc10.toStringAsFixed(2)),
+                _InfoRow('STC đã đăng ký', '$stcDaDangKy'),
+                _InfoRow('STC đã tích lũy', '$stcDaTichLuy'),
+                _InfoRow('%STC nợ', '$stcNo (${percentNo.toStringAsFixed(2)}%)'),
+                _InfoRow('STC phải tích lũy', '151.00'), // Fixed for now
+              ];
+
+              return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.all(20),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4F46E5).withOpacity(0.05),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
                       ),
                     ],
                   ),
-                );
-              },
-            ),
-          ),
-        ),
-      ).animate().fade(duration: 500.ms, delay: 100.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+                      child: ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: rows.length,
+                        separatorBuilder: (_, __) => Divider(height: 1, indent: 20, endIndent: 20, color: const Color(0xFFE2E8F0).withOpacity(0.5)),
+                        itemBuilder: (_, i) {
+                          final row = rows[i];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  flex: 5,
+                                  child: Text(
+                                    row.label,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: const Color(0xFF64748B),
+                                    ),
+                                  ),
+                                ),
+                                const Text(' : ', style: TextStyle(color: Color(0xFF94A3B8))),
+                                Expanded(
+                                  flex: 4,
+                                  child: Text(
+                                    row.value,
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: const Color(0xFF0F172A),
+                                    ),
+                                    textAlign: TextAlign.right,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ).animate().fade(duration: 500.ms, delay: 100.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart),
+              );
+            }
+
+            return const SizedBox();
+          },
+        );
+      },
     );
   }
 }

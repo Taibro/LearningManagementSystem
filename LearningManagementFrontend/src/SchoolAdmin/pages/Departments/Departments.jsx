@@ -69,7 +69,7 @@ export default function Departments() {
 
     try {
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ export default function Departments() {
     if (!window.confirm('Bạn có chắc muốn xóa khoa này không?')) return;
     try {
       const res = await fetch(`${API_BASE}/delete-department/${id}`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

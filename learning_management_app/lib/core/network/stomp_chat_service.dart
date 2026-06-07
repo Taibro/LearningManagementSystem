@@ -3,17 +3,31 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 import '../storage/secure_storage.dart';
+import '../services/notification_service.dart';
 
 class StompChatService {
-  late StompClient _stompClient;
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  static final StompChatService _instance = StompChatService._internal();
+
+  factory StompChatService() {
+    return _instance;
+  }
+
+  StompChatService._internal();
+
+  StompClient? _stompClient;
   
-  // Callback when a message is received
+  // Callback when a message is received specifically for a chat screen
   Function(Map<String, dynamic>)? onMessageReceived;
   Function()? onConnected;
   
-  Future<void> connect(String receiverEmail) async {
+  // Track who we are currently chatting with to prevent showing drop-down banner for them
+  String? currentChatEmail;
+
+  Future<void> initGlobalConnection() async {
+    if (_stompClient != null && _stompClient!.isActive) return;
+
     final token = await SecureStorage.getToken();
+    if (token == null) return;
     
     _stompClient = StompClient(
       config: StompConfig(
@@ -22,13 +36,22 @@ class StompChatService {
           if (onConnected != null) onConnected!();
           
           // Subscribe to user's private queue
-          _stompClient.subscribe(
+          _stompClient!.subscribe(
             destination: '/user/queue/messages',
             callback: (StompFrame frame) {
               if (frame.body != null) {
                 final message = json.decode(frame.body!);
-                if (onMessageReceived != null) {
+                
+                // If we are on the chat screen with this sender, pass it to the screen
+                if (onMessageReceived != null && currentChatEmail == message['senderEmail']) {
                   onMessageReceived!(message);
+                } else {
+                  // Otherwise, show global in-app notification banner
+                  NotificationService.showChatNotification(
+                    senderName: message['senderName'] ?? message['senderEmail'] ?? 'Người dùng',
+                    senderEmail: message['senderEmail'] ?? '',
+                    content: message['content'] ?? '',
+                  );
                 }
               }
             },
@@ -46,12 +69,12 @@ class StompChatService {
       ),
     );
     
-    _stompClient.activate();
+    _stompClient!.activate();
   }
 
   void sendMessage(String receiverEmail, String content) {
-    if (_stompClient.isActive) {
-      _stompClient.send(
+    if (_stompClient != null && _stompClient!.isActive) {
+      _stompClient!.send(
         destination: '/app/chat.send',
         body: json.encode({
           'receiverEmail': receiverEmail,
@@ -62,6 +85,7 @@ class StompChatService {
   }
 
   void disconnect() {
-    _stompClient.deactivate();
+    _stompClient?.deactivate();
+    _stompClient = null;
   }
 }

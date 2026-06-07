@@ -4,6 +4,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../blocs/lecturer/profile/teacher_profile_bloc.dart';
 import '../../../../../blocs/lecturer/profile/teacher_profile_state.dart';
+import '../../../shared/shared_notifications_screen.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
@@ -108,7 +109,7 @@ class HomeHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              _buildNotificationButton().animate().scale(duration: 400.ms, delay: 200.ms),
+              _buildNotificationButton(context).animate().scale(duration: 400.ms, delay: 200.ms),
             ],
           ),
           const SizedBox(height: 24),
@@ -118,37 +119,45 @@ class HomeHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildNotificationButton() {
-    return Stack(
-      children: [
-        Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
-            shape: BoxShape.circle,
-            border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
-          ),
-          child: const Icon(
-            Icons.notifications_none_rounded,
-            color: Colors.white,
-            size: 24,
-          ),
-        ),
-        Positioned(
-          right: 8,
-          top: 8,
-          child: Container(
-            width: 10,
-            height: 10,
+  Widget _buildNotificationButton(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const SharedNotificationsScreen()),
+        );
+      },
+      child: Stack(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFEF4444), // Red alert
+              color: Colors.white.withOpacity(0.15),
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF6B4FA0), width: 2),
+              border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+            ),
+            child: const Icon(
+              Icons.notifications_none_rounded,
+              color: Colors.white,
+              size: 24,
             ),
           ),
-        ),
-      ],
+          Positioned(
+            right: 8,
+            top: 8,
+            child: Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(
+                color: const Color(0xFFEF4444), // Red alert
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFF6B4FA0), width: 2),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -71,7 +71,7 @@ export default function Semesters() {
 
     try {
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ export default function Semesters() {
     if (!window.confirm("Bạn có chắc muốn xóa năm học này? Các học kỳ liên quan có thể bị ảnh hưởng.")) return;
     try {
       const res = await fetch(`${API_BASE_URL}/school-admin/academic-years/${id}`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -122,7 +122,7 @@ export default function Semesters() {
 
     try {
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -146,7 +146,7 @@ export default function Semesters() {
     if (!window.confirm("Bạn có chắc muốn xóa học kỳ này?")) return;
     try {
       const res = await fetch(`${API_BASE_URL}/school-admin/semesters/${id}`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

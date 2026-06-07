@@ -4,6 +4,7 @@ import 'auth_state.dart';
 import '../../repositories/auth_repository.dart';
 import '../../core/storage/secure_storage.dart';
 import '../../core/network/fcm_service.dart';
+import '../../core/network/stomp_chat_service.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _authRepository;
@@ -28,8 +29,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       if (user.token != null) {
         await SecureStorage.saveToken(user.token!);
+        if (user.role != null) {
+          await SecureStorage.saveRole(user.role!);
+        }
         // Initialize FCM and send token to server after saving auth token
         await FcmService.init();
+        
+        // Initialize Global STOMP Connection for real-time chat notifications
+        await StompChatService().initGlobalConnection();
       }
 
       emit(AuthSuccess(user));
@@ -43,6 +50,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     Emitter<AuthState> emit,
   ) async {
     emit(AuthLoading());
+    StompChatService().disconnect();
     await SecureStorage.deleteToken();
     emit(AuthInitial());
   }

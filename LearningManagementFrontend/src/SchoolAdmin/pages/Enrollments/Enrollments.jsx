@@ -55,7 +55,7 @@ export default function Enrollments() {
 
     try {
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export default function Enrollments() {
 
     try {
       const res = await fetch(`${API_BASE_URL}/school-admin/enrollments/${currentGrades.id}`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',

@@ -81,7 +81,7 @@ export default function Teachers() {
     try {
       const token = localStorage.getItem('adminToken');
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method,
         headers: { 
           'Content-Type': 'application/json',

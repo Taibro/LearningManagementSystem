@@ -53,7 +53,7 @@ export default function Students() {
 
     try {
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export default function Students() {
     if(!window.confirm("Bạn có chắc muốn xóa sinh viên này?")) return;
     try {
       const res = await fetch(`${API_BASE_URL}/school-admin/students/${id}`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });

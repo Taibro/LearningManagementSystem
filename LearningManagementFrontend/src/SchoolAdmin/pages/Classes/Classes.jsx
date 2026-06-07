@@ -90,10 +90,7 @@ export default function Classes() {
     try {
       const res = await fetch(url, {
         method,
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
-        },
+        
         body: JSON.stringify(payload)
       });
       if (res.ok) {

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
-import 'data/mock_extra_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../models/student/tuition_payment.dart';
+import '../../repositories/student_repository.dart';
 import 'widgets/shared/custom_app_bar.dart';
 import 'widgets/shared/mesh_background.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 
 const Color _kPrimary = Color(0xFF4F46E5);
 
@@ -20,17 +23,43 @@ class ReceiptScreen extends StatelessWidget {
           children: [
             const CustomAppBar(title: 'Phiếu thu'),
             Expanded(
-              child: ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-                itemCount: kReceipts.length,
-                itemBuilder: (_, i) => Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: _ReceiptCard(receipt: kReceipts[i])
-                      .animate()
-                      .fade(duration: 400.ms, delay: (50 * i).ms)
-                      .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart),
-                ),
+              child: FutureBuilder<List<TuitionPayment>>(
+                future: context.read<StudentRepository>().getPayments(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CustomLoadingIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Lỗi: ${snapshot.error}', style: const TextStyle(color: Colors.red)),
+                    );
+                  }
+                  
+                  // Only show successful payments as receipts
+                  final txs = (snapshot.data ?? [])
+                      .where((tx) => tx.status == 'SUCCESS')
+                      .toList();
+                      
+                  if (txs.isEmpty) {
+                    return const Center(child: Text('Chưa có phiếu thu nào.'));
+                  }
+                  
+                  // Sort descending by date
+                  txs.sort((a, b) => b.paymentDate.compareTo(a.paymentDate));
+
+                  return ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
+                    itemCount: txs.length,
+                    itemBuilder: (_, i) => Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: _ReceiptCard(receipt: txs[i])
+                          .animate()
+                          .fade(duration: 400.ms, delay: (50 * i).ms)
+                          .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -41,7 +70,7 @@ class ReceiptScreen extends StatelessWidget {
 }
 
 class _ReceiptCard extends StatelessWidget {
-  final Receipt receipt;
+  final TuitionPayment receipt;
   const _ReceiptCard({required this.receipt});
 
   String _formatMoney(double amount) {
@@ -55,6 +84,16 @@ class _ReceiptCard extends StatelessWidget {
       if (count % 3 == 0 && i != 0) buffer.write('.');
     }
     return '${buffer.toString().split('').reversed.join()}đ';
+  }
+
+  String _formatDate(String isoDate) {
+    if (isoDate.isEmpty) return '';
+    try {
+      final dt = DateTime.parse(isoDate).toLocal();
+      return '${dt.hour.toString().padLeft(2, '0')}:${dt.minute.toString().padLeft(2, '0')}, ${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
+    } catch (_) {
+      return isoDate;
+    }
   }
 
   @override
@@ -90,7 +129,7 @@ class _ReceiptCard extends StatelessWidget {
                       style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B), fontWeight: FontWeight.w500, height: 1.3),
                       children: [
                         TextSpan(
-                          text: receipt.soPhieu,
+                          text: receipt.transactionCode.isNotEmpty ? receipt.transactionCode : '#${receipt.id}',
                           style: GoogleFonts.inter(
                             fontWeight: FontWeight.bold,
                             color: const Color(0xFF0F172A),
@@ -107,7 +146,7 @@ class _ReceiptCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      receipt.ngayGio,
+                      _formatDate(receipt.paymentDate),
                       style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF475569)),
                     ),
                   ),
@@ -137,7 +176,7 @@ class _ReceiptCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          receipt.donViThu,
+                          receipt.paymentMethod,
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -170,7 +209,7 @@ class _ReceiptCard extends StatelessWidget {
                   ),
                   const Spacer(),
                   Text(
-                    _formatMoney(receipt.soTien),
+                    _formatMoney(receipt.amount),
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -179,37 +218,35 @@ class _ReceiptCard extends StatelessWidget {
                   ),
                 ],
               ),
-              // Link xem hóa đơn
-              if (receipt.hasInvoice) ...[
-                const SizedBox(height: 16),
-                InkWell(
-                  onTap: () {}, // TODO: handle action
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    decoration: BoxDecoration(
-                      color: _kPrimary.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: _kPrimary.withOpacity(0.2)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.open_in_new_rounded, size: 16, color: _kPrimary),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Xem hoá đơn điện tử',
-                          style: GoogleFonts.inter(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: _kPrimary,
-                          ),
+              // Link xem hóa đơn (Optional, wait, real API doesn't have hasInvoice. Always true for receipts? Let's just keep it)
+              const SizedBox(height: 16),
+              InkWell(
+                onTap: () {}, // TODO: handle action
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: BoxDecoration(
+                    color: _kPrimary.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: _kPrimary.withOpacity(0.2)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.open_in_new_rounded, size: 16, color: _kPrimary),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Xem hoá đơn điện tử',
+                        style: GoogleFonts.inter(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: _kPrimary,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ],
           ),
         ),

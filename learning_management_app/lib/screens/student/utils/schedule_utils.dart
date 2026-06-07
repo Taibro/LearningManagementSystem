@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:learning_management_app/core/enum/ScheduleType.dart';
 import '../data/mock_schedule_data.dart';
-import 'package:learning_management_app/models/Schedule.dart';
 
 String dateKey(DateTime d) =>
     '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
@@ -44,6 +43,3 @@ Color typeColor(ScheduleType t) {
       return kRed;
   }
 }
-
-bool hasItems(DateTime d) => (kData[dateKey(d)] ?? []).isNotEmpty;
-List<Schedule> itemsFor(DateTime d) => kData[dateKey(d)] ?? [];

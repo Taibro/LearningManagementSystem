@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
+import '../../shared/shared_notifications_screen.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
@@ -92,45 +93,53 @@ class HomeHeader extends StatelessWidget {
               ).animate().fade(duration: 600.ms, delay: 200.ms).slideX(begin: 0.1, end: 0),
               
               // --- Notification Bell ---
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    const Icon(
-                      Icons.notifications_outlined,
-                      color: Color(0xFF334155),
-                      size: 24,
-                    ),
-                    Positioned(
-                      top: 10,
-                      right: 12,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFFEF4444), // Red dot
-                          shape: BoxShape.circle,
-                        ),
-                      ).animate(onPlay: (AnimationController controller) => controller.repeat())
-                       .scaleXY(begin: 0.8, end: 1.2, duration: 1.seconds, curve: Curves.easeInOut)
-                       .then().scaleXY(begin: 1.2, end: 0.8, duration: 1.seconds, curve: Curves.easeInOut),
-                    ),
-                  ],
-                ),
-              ).animate().scale(duration: 400.ms, delay: 400.ms, curve: Curves.easeOutBack),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SharedNotificationsScreen()),
+                  );
+                },
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      )
+                    ],
+                  ),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      const Icon(
+                        Icons.notifications_outlined,
+                        color: Color(0xFF334155),
+                        size: 24,
+                      ),
+                      Positioned(
+                        top: 10,
+                        right: 12,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFEF4444), // Red dot
+                            shape: BoxShape.circle,
+                          ),
+                        ).animate(onPlay: (AnimationController controller) => controller.repeat())
+                         .scaleXY(begin: 0.8, end: 1.2, duration: 1.seconds, curve: Curves.easeInOut)
+                         .then().scaleXY(begin: 1.2, end: 0.8, duration: 1.seconds, curve: Curves.easeInOut),
+                      ),
+                    ],
+                  ),
+                ).animate().scale(duration: 400.ms, delay: 400.ms, curve: Curves.easeOutBack),
+              ),
             ],
           ),
         ),

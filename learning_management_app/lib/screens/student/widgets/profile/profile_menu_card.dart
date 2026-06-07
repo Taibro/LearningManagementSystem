@@ -10,6 +10,7 @@ import '../../../auth/school_code_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../blocs/auth/auth_bloc.dart';
 import '../../../../blocs/auth/auth_event.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileMenuCard extends StatefulWidget {
   const ProfileMenuCard({super.key});
@@ -20,6 +21,27 @@ class ProfileMenuCard extends StatefulWidget {
 
 class _ProfileMenuCardState extends State<ProfileMenuCard> {
   bool _notificationEnabled = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationSetting();
+  }
+
+  Future<void> _loadNotificationSetting() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _notificationEnabled = prefs.getBool('notifications_enabled') ?? true;
+    });
+  }
+
+  Future<void> _toggleNotification(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('notifications_enabled', value);
+    setState(() {
+      _notificationEnabled = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +202,7 @@ class _ProfileMenuCardState extends State<ProfileMenuCard> {
           ),
           Switch(
             value: _notificationEnabled,
-            onChanged: (val) => setState(() => _notificationEnabled = val),
+            onChanged: _toggleNotification,
             activeColor: Colors.white,
             activeTrackColor: const Color(0xFF4F46E5),
             inactiveThumbColor: Colors.white,

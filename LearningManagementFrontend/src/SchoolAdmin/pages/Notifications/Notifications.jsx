@@ -45,7 +45,7 @@ export default function Notifications() {
 
     try {
       const res = await fetch(`${API_BASE_URL}/school-admin/notifications`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ export default function Notifications() {
   const handleDelete = async (id) => {
     try {
       await fetch(`${API_BASE_URL}/school-admin/notifications/${id}`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });
@@ -82,7 +82,7 @@ export default function Notifications() {
   const handleMarkRead = async (id) => {
     try {
       await fetch(`${API_BASE_URL}/school-admin/notifications/${id}/read`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
       });

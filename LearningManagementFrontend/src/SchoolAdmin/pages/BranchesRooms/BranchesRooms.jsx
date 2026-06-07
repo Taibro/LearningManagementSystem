@@ -71,7 +71,7 @@ export default function BranchesRooms() {
 
     try {
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ export default function BranchesRooms() {
     if (!window.confirm("Bạn có chắc muốn xóa cơ sở này?")) return;
     try {
       const res = await fetch(`${API_BASE_URL}/school-admin/branches/${id}`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -131,7 +131,7 @@ export default function BranchesRooms() {
 
     try {
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -155,7 +155,7 @@ export default function BranchesRooms() {
     if (!window.confirm("Bạn có chắc muốn xóa phòng học này?")) return;
     try {
       const res = await fetch(`${API_BASE_URL}/school-admin/rooms/${id}`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

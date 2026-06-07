@@ -80,7 +80,7 @@ export default function Exceptions() {
   const handleApprove = async (id) => {
     try {
       const res = await fetch(`${API_BASE_URL}/school-admin/schedule-exceptions/${id}/approve`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${getAdminToken()}` }
       });
@@ -107,7 +107,7 @@ export default function Exceptions() {
     }
     try {
       const res = await fetch(`${API_BASE_URL}/school-admin/schedule-exceptions/${rejectModal.id}/reject`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ export default function Exceptions() {
 
     try {
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +164,7 @@ export default function Exceptions() {
     if (!window.confirm('Bạn có chắc muốn xóa ngoại lệ này?')) return;
     try {
       const res = await fetch(`${API_BASE_URL}/school-admin/schedule-exceptions/${id}`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${getAdminToken()}` }
       });

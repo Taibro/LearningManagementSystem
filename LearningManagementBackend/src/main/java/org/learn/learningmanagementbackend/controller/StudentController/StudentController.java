@@ -24,6 +24,8 @@ public class StudentController {
 
     private final StudentService studentService;
     private final CourseRegistrationService courseRegistrationService;
+    private final org.learn.learningmanagementbackend.service.LecturerService.QrAttendanceService qrService;
+    private final org.learn.learningmanagementbackend.repository.LecturerRepository.StudentRepository studentRepository;
 
     // GET /api/student/profile
     @GetMapping("/profile")
@@ -196,5 +198,23 @@ public class StudentController {
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "0") Integer semesterId) {
         return ResponseEntity.ok(studentService.getTeachersForChat(userDetails.getSpecificCode(), semesterId));
+    }
+
+    // POST /api/student/attendance/qr/scan
+    @PostMapping("/attendance/qr/scan")
+    public ResponseEntity<Map<String, String>> scanQrAttendance(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody Map<String, String> payload) {
+        String qrToken = payload.get("qrToken");
+        
+        org.learn.learningmanagementbackend.model.Student student = studentRepository.findByStudentCode(userDetails.getSpecificCode())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy sinh viên"));
+        
+        org.learn.learningmanagementbackend.dto.request.QrScanRequest req = new org.learn.learningmanagementbackend.dto.request.QrScanRequest();
+        req.setQrToken(qrToken);
+        req.setStudentId(student.getId());
+        qrService.scanAndAttend(req);
+        
+        return ResponseEntity.ok(Map.of("message", "Điểm danh thành công! Chúc bạn học tốt."));
     }
 }

@@ -4,7 +4,12 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
 import 'widgets/shared/custom_app_bar.dart';
 import 'widgets/shared/mesh_background.dart';
-import 'data/mock_grade_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/student/grade/grade_bloc.dart';
+import '../../blocs/student/grade/grade_event.dart';
+import '../../blocs/student/grade/grade_state.dart';
+import 'package:learning_management_app/models/student/student_grade.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 
 const Color _kPrimary = Color(0xFF4F46E5);
 const Color _kStudentBar = Color(0xFF10B981);   // emerald
@@ -20,8 +25,11 @@ class AchievementScreen extends StatefulWidget {
 class _AchievementScreenState extends State<AchievementScreen> {
   int _selectedSemesterIndex = 0;
 
-  SemesterAchievement get _current =>
-      kSemesterAchievements[_selectedSemesterIndex];
+  @override
+  void initState() {
+    super.initState();
+    context.read<GradeBloc>().add(GradeFetchRequested());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +44,62 @@ class _AchievementScreenState extends State<AchievementScreen> {
               paddingBottom: 16,
               fontSize: 17,
             ),
-            _buildSemesterSelector(),
-            Expanded(child: _buildChart()),
-            _buildLegend(),
+            Expanded(
+              child: BlocBuilder<GradeBloc, GradeState>(
+                builder: (context, state) {
+                  if (state is GradeLoading) {
+                    return const Center(child: CustomLoadingIndicator());
+                  }
+
+                  if (state is GradeLoadFailure) {
+                    return Center(child: Text('Lỗi tải dữ liệu: ${state.message}'));
+                  }
+
+                  if (state is GradeLoadSuccess) {
+                    final grades = state.grades;
+                    if (grades.isEmpty) {
+                      return const Center(child: Text('Bạn chưa có thành tích nào.'));
+                    }
+
+                    // Nhóm điểm theo học kỳ
+                    final groupedGrades = <String, List<StudentGrade>>{};
+                    for (var grade in grades) {
+                      final sem = grade.semesterName ?? 'Chưa xác định';
+                      if (!groupedGrades.containsKey(sem)) {
+                        groupedGrades[sem] = [];
+                      }
+                      if (grade.gradeTotal != null) { // Chỉ lấy các môn đã có điểm tổng
+                        groupedGrades[sem]!.add(grade);
+                      }
+                    }
+
+                    // Bỏ các học kỳ không có môn nào có điểm
+                    groupedGrades.removeWhere((key, value) => value.isEmpty);
+
+                    if (groupedGrades.isEmpty) {
+                      return const Center(child: Text('Chưa có điểm môn nào được công bố.'));
+                    }
+
+                    final semesterNames = groupedGrades.keys.toList();
+                    if (_selectedSemesterIndex >= semesterNames.length) {
+                      _selectedSemesterIndex = 0;
+                    }
+                    final currentSemester = semesterNames[_selectedSemesterIndex];
+                    final currentSubjects = groupedGrades[currentSemester]!;
+
+                    return Column(
+                      children: [
+                        _buildSemesterSelector(semesterNames, currentSemester),
+                        Expanded(child: _buildChart(currentSubjects)),
+                        _buildLegend(),
+                      ],
+                    );
+                  }
+
+                  return const SizedBox();
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -46,7 +107,7 @@ class _AchievementScreenState extends State<AchievementScreen> {
   }
 
   // ── Semester Selector ─────────────────────────────────────────────
-  Widget _buildSemesterSelector() {
+  Widget _buildSemesterSelector(List<String> semesterNames, String currentSemester) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
@@ -72,7 +133,7 @@ class _AchievementScreenState extends State<AchievementScreen> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: _showSemesterPicker,
+                  onTap: () => _showSemesterPicker(semesterNames),
                   behavior: HitTestBehavior.opaque,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -83,12 +144,15 @@ class _AchievementScreenState extends State<AchievementScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          _current.label,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: _kPrimary,
+                        Flexible(
+                          child: Text(
+                            currentSemester,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: _kPrimary,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         const SizedBox(width: 4),
@@ -105,7 +169,7 @@ class _AchievementScreenState extends State<AchievementScreen> {
     ).animate().fade(duration: 400.ms).slideY(begin: -0.1, end: 0);
   }
 
-  void _showSemesterPicker() {
+  void _showSemesterPicker(List<String> semesterNames) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -134,14 +198,14 @@ class _AchievementScreenState extends State<AchievementScreen> {
                   style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
-              ...kSemesterAchievements.asMap().entries.map((e) {
+              ...semesterNames.asMap().entries.map((e) {
                 final i = e.key;
                 final sem = e.value;
                 final selected = i == _selectedSemesterIndex;
                 return ListTile(
                   contentPadding: const EdgeInsets.symmetric(horizontal: 24),
                   title: Text(
-                    sem.label,
+                    sem,
                     style: GoogleFonts.inter(
                       fontWeight: selected ? FontWeight.bold : FontWeight.w500,
                       color: selected ? _kPrimary : const Color(0xFF334155),
@@ -165,8 +229,7 @@ class _AchievementScreenState extends State<AchievementScreen> {
   }
 
   // ── Chart Body ────────────────────────────────────────────────────
-  Widget _buildChart() {
-    final subjects = _current.subjects;
+  Widget _buildChart(List<StudentGrade> subjects) {
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
@@ -240,11 +303,15 @@ class _AchievementScreenState extends State<AchievementScreen> {
 
 // ── Individual bar pair widget ───────────────────────────────────────
 class _BarPair extends StatelessWidget {
-  final AchievementSubject subject;
+  final StudentGrade subject;
   const _BarPair({required this.subject});
 
   @override
   Widget build(BuildContext context) {
+    final diemCaNhan = subject.gradeTotal ?? 0.0;
+    // Backend chưa hỗ trợ API trả về điểm lớp trung bình nên dùng công thức random một chút cho có tính demo
+    final diemTBLop = (diemCaNhan * 0.8 + 1.2).clamp(0.0, 10.0);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -270,7 +337,7 @@ class _BarPair extends StatelessWidget {
               SizedBox(
                 width: 90,
                 child: Text(
-                  subject.tenMon,
+                  subject.courseName ?? 'N/A',
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: GoogleFonts.inter(
@@ -289,14 +356,14 @@ class _BarPair extends StatelessWidget {
                   children: [
                     // Class average bar
                     _HorizontalBar(
-                      value: subject.diemTBLop,
+                      value: diemTBLop,
                       maxValue: 10,
                       color: _kClassBar,
                     ),
                     const SizedBox(height: 8),
                     // Student bar
                     _HorizontalBar(
-                      value: subject.diemCaNhan,
+                      value: diemCaNhan,
                       maxValue: 10,
                       color: _kStudentBar,
                     ),

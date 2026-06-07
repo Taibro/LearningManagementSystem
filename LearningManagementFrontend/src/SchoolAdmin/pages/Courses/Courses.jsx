@@ -86,7 +86,7 @@ export default function Courses() {
 
     try {
       const res = await fetch(url, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method,
         headers: { 
           'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ export default function Courses() {
     if (!window.confirm('Bạn có chắc muốn xóa môn học này không? Tất cả các Lớp Học Phần thuộc môn này cũng sẽ bị xóa!')) return;
     try {
       const res = await fetch(`${API_COURSE}/delete-course/${id}`, {
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` },
+        
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

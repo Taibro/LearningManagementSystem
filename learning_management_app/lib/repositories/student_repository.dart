@@ -9,6 +9,7 @@ import '../models/student/student_conduct.dart';
 import '../models/student/student_notification.dart';
 import '../models/student/student_survey.dart';
 import '../models/student/teacher_chat_response.dart';
+import '../models/student/tuition_payment.dart';
 
 class StudentRepository {
   final DioClient _dioClient;
@@ -31,6 +32,15 @@ class StudentRepository {
       return (response.data as List).map((e) => StudentSchedule.fromJson(e)).toList();
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Lỗi khi lấy lịch học: ${e.message}');
+    }
+  }
+
+  Future<List<StudentSchedule>> getProgressSchedule({int semesterId = 0}) async {
+    try {
+      final response = await _dioClient.dio.get('/student/progress-schedule', queryParameters: {'semesterId': semesterId});
+      return (response.data as List).map((e) => StudentSchedule.fromJson(e)).toList();
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Lỗi khi lấy tiến độ lịch học: ${e.message}');
     }
   }
 
@@ -94,6 +104,28 @@ class StudentRepository {
       return (response.data as List).map((e) => TeacherChatResponse.fromJson(e)).toList();
     } on DioException catch (e) {
       throw Exception(e.response?.data['message'] ?? 'Lỗi khi lấy danh sách giảng viên: ${e.message}');
+    }
+  }
+
+  Future<List<TuitionPayment>> getPayments() async {
+    try {
+      final response = await _dioClient.dio.get('/student/payments');
+      return (response.data as List).map((e) => TuitionPayment.fromJson(e)).toList();
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Lỗi khi lấy lịch sử giao dịch: ${e.message}');
+    }
+  }
+
+  Future<void> scanQrCode(String qrToken) async {
+    try {
+      await _dioClient.dio.post(
+        '/student/attendance/qr/scan', 
+        data: {
+          'qrToken': qrToken,
+        },
+      );
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['message'] ?? 'Lỗi điểm danh: ${e.message}');
     }
   }
 }

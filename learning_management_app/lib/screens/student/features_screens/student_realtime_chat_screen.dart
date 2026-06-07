@@ -74,15 +74,8 @@ class _StudentRealtimeChatScreenState extends State<StudentRealtimeChatScreen> {
       setState(() => _isLoadingHistory = false);
     }
 
-    // 2. Connect STOMP
-    _chatService.onConnected = () {
-      if (mounted) {
-        setState(() {
-          _isConnected = true;
-        });
-      }
-    };
-
+    // 2. Setup Global STOMP Listeners
+    _chatService.currentChatEmail = widget.teacher.email;
     _chatService.onMessageReceived = (message) {
       if (mounted) {
         setState(() {
@@ -96,8 +89,12 @@ class _StudentRealtimeChatScreenState extends State<StudentRealtimeChatScreen> {
         _scrollToBottom();
       }
     };
-
-    _chatService.connect(widget.teacher.email);
+    
+    await _chatService.initGlobalConnection();
+    
+    setState(() {
+      _isConnected = true; // Assuming global connection is either already active or connects quickly
+    });
   }
 
   void _sendMessage() {
@@ -122,7 +119,10 @@ class _StudentRealtimeChatScreenState extends State<StudentRealtimeChatScreen> {
 
   @override
   void dispose() {
-    _chatService.disconnect();
+    if (_chatService.currentChatEmail == widget.teacher.email) {
+      _chatService.currentChatEmail = null;
+      _chatService.onMessageReceived = null;
+    }
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();

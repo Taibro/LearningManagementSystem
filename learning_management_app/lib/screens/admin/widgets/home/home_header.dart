@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../shared/shared_notifications_screen.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
@@ -50,17 +51,25 @@ class HomeHeader extends StatelessWidget {
                   ],
                 ),
               ),
-              Stack(children: [
-                Container(
-                  width: 40, height: 40,
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), shape: BoxShape.circle),
-                  child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 22),
-                ),
-                Positioned(right: 6, top: 6,
-                  child: Container(width: 9, height: 9,
-                    decoration: const BoxDecoration(color: Color(0xFFE85D75), shape: BoxShape.circle)),
-                ),
-              ]),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const SharedNotificationsScreen()),
+                  );
+                },
+                child: Stack(children: [
+                  Container(
+                    width: 40, height: 40,
+                    decoration: BoxDecoration(color: Colors.white.withOpacity(0.15), shape: BoxShape.circle),
+                    child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 22),
+                  ),
+                  Positioned(right: 6, top: 6,
+                    child: Container(width: 9, height: 9,
+                      decoration: const BoxDecoration(color: Color(0xFFE85D75), shape: BoxShape.circle)),
+                  ),
+                ]),
+              ),
             ],
           ),
           const SizedBox(height: 16),

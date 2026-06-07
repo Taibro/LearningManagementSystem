@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
-import 'data/mock_extra_data.dart';
 import 'widgets/shared/custom_app_bar.dart';
 import 'widgets/shared/mesh_background.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

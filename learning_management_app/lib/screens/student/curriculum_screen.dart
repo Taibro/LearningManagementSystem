@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/student/profile/profile_bloc.dart';
+import '../../blocs/student/profile/profile_event.dart';
+import '../../blocs/student/profile/profile_state.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 import 'data/mock_extra_data.dart';
 import 'widgets/shared/custom_app_bar.dart';
 import 'widgets/shared/mesh_background.dart';
@@ -21,6 +26,7 @@ class _CurriculumScreenState extends State<CurriculumScreen> {
   @override
   void initState() {
     super.initState();
+    context.read<ProfileBloc>().add(ProfileFetchRequested());
     for (int i = 0; i < kCurriculum.semesters.length; i++) {
       final sem = kCurriculum.semesters[i];
       final hasInProgress = sem.categories.any((c) =>
@@ -50,72 +56,91 @@ class _CurriculumScreenState extends State<CurriculumScreen> {
   }
 
   Widget _buildStudentInfo() {
-    final c = kCurriculum;
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.85),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF4F46E5).withOpacity(0.05),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Chuyên ngành',
-                style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF64748B), fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                c.chuyenNganh,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: _kPrimary,
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Text('Ngành: ', style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
-                  Expanded(
-                    child: Text(c.nganh,
-                        style: GoogleFonts.inter(
-                            fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A))),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Row(
-                children: [
-                  Text('Hệ đào tạo: ', style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
-                  Text(c.heDaoTao,
-                      style: GoogleFonts.inter(
-                          fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A))),
-                  const SizedBox(width: 24),
-                  Text('Loại: ', style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
-                  Text(c.loaiDaoTao,
-                      style: GoogleFonts.inter(
-                          fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A))),
-                ],
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, state) {
+        if (state is ProfileLoading) {
+          return const Center(child: CustomLoadingIndicator());
+        }
+        
+        String chuyenNganh = 'Đang cập nhật...';
+        String nganh = 'Đang cập nhật...';
+        String heDaoTao = 'Đại học'; // Default
+        String loaiDaoTao = 'Chính quy'; // Default
+
+        if (state is ProfileLoadSuccess) {
+          final profile = state.profile;
+          chuyenNganh = profile.major ?? 'Chưa xác định';
+          nganh = profile.departmentName ?? 'Chưa xác định';
+          // Hệ đào tạo và loại hình hiện tại backend chưa có field rõ ràng, nên ta có thể fix cứng hoặc suy luận
+        }
+
+        return Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.85),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF4F46E5).withOpacity(0.05),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
-        ),
-      ),
-    ).animate().fade(duration: 400.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOutQuart);
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Chuyên ngành',
+                    style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF64748B), fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    chuyenNganh,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: _kPrimary,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Text('Ngành: ', style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
+                      Expanded(
+                        child: Text(nganh,
+                            style: GoogleFonts.inter(
+                                fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A))),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Text('Hệ đào tạo: ', style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
+                      Text(heDaoTao,
+                          style: GoogleFonts.inter(
+                              fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A))),
+                      const SizedBox(width: 24),
+                      Text('Loại: ', style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF64748B))),
+                      Text(loaiDaoTao,
+                          style: GoogleFonts.inter(
+                              fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF0F172A))),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ).animate().fade(duration: 400.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOutQuart);
+      },
+    );
   }
 
   Widget _buildTableHeader() {
