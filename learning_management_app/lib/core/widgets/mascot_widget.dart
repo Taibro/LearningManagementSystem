@@ -86,8 +86,7 @@ class _MascotWidgetState extends State<MascotWidget> {
       return Positioned(
         top: topPos,
         left: leftPos,
-        child: GestureDetector(
-          onTap: widget.onTap,
+        child: IgnorePointer(
           child: Transform.scale(
             scaleX: isFacingRight ? 1 : -1,
             alignment: Alignment.center,
@@ -111,8 +110,7 @@ class _MascotWidgetState extends State<MascotWidget> {
       curve: Curves.easeInOut,
       top: topPos,
       left: leftPos,
-      child: GestureDetector(
-        onTap: widget.onTap,
+      child: IgnorePointer(
         child: Transform.scale(
           scaleX: isFacingRight ? 1 : -1,
           alignment: Alignment.center,

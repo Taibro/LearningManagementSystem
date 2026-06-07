@@ -66,16 +66,9 @@ class _HomeScreenState extends State<HomeScreen> {
             iconData: Icons.smart_toy_rounded,
             backgroundColor: const Color(0xFF1565C0),
           ),
-          MascotWidget(
+          const MascotWidget(
             lottieAsset: 'assets/lottie/student.json',
             isMoving: true, // Học sinh di chuyển ngẫu nhiên
-            onTap: () {
-              // Bấm vào thì mở Chatbot
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ChatbotScreen()),
-              );
-            },
           ),
         ],
       ),

@@ -67,15 +67,9 @@ class _LecturerMainLayoutState extends State<LecturerMainLayout> {
             iconData: Icons.smart_toy_rounded,
             backgroundColor: const Color(0xFF2E7D32),
           ),
-          MascotWidget(
+          const MascotWidget(
             lottieAsset: 'assets/lottie/lecturer.json',
             isMoving: false, // Giảng viên đứng im góc trái
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const LecturerChatbotScreen()),
-              );
-            },
           ),
         ],
       ),
