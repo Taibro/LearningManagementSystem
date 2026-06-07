@@ -7,6 +7,7 @@ import 'lecturer_attendance_screen.dart';
 import 'lecturer_profile_screen.dart';
 import 'lecturer_chatbot_screen.dart';
 import '../../core/widgets/draggable_chatbot_button.dart';
+import '../../core/widgets/mascot_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/lecturer/profile/teacher_profile_bloc.dart';
 import '../../blocs/lecturer/profile/teacher_profile_event.dart';
@@ -65,6 +66,10 @@ class _LecturerMainLayoutState extends State<LecturerMainLayout> {
             },
             iconData: Icons.smart_toy_rounded,
             backgroundColor: const Color(0xFF2E7D32),
+          ),
+          const MascotWidget(
+            lottieAsset: 'assets/lottie/lecturer.json',
+            isMoving: false, // Giảng viên đứng im góc trái
           ),
         ],
       ),
