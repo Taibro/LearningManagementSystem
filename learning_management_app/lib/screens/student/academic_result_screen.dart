@@ -8,7 +8,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/student/grade/grade_bloc.dart';
 import '../../blocs/student/grade/grade_event.dart';
 import '../../blocs/student/grade/grade_state.dart';
-import '../../models/student/student_grade.dart';
+import 'package:learning_management_app/models/student/student_grade.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 import 'data/mock_grade_data.dart';
 
 const Color _kPrimary = Color(0xFF1565C0);
@@ -182,7 +183,7 @@ class _SummaryTab extends StatelessWidget {
     return BlocBuilder<GradeBloc, GradeState>(
       builder: (context, state) {
         if (state is GradeLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CustomLoadingIndicator());
         } else if (state is GradeLoadFailure) {
           return Center(child: Text('Lỗi: ${state.message}'));
         } else if (state is GradeLoadSuccess) {

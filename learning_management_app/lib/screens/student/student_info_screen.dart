@@ -9,7 +9,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/student/profile/profile_bloc.dart';
 import '../../blocs/student/profile/profile_event.dart';
 import '../../blocs/student/profile/profile_state.dart';
-import '../../models/student/student_profile.dart';
+import 'package:learning_management_app/models/student/student_profile.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 import 'package:intl/intl.dart';
 
 class StudentInfoScreen extends StatefulWidget {
@@ -38,7 +39,7 @@ class _StudentInfoScreenState extends State<StudentInfoScreen> {
               child: BlocBuilder<ProfileBloc, ProfileState>(
                 builder: (context, state) {
                   if (state is ProfileLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return Center(child: CustomLoadingIndicator());
                   } else if (state is ProfileLoadFailure) {
                     return Center(child: Text('Lỗi: ${state.message}'));
                   } else if (state is ProfileLoadSuccess) {

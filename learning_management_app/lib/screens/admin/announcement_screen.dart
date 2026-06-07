@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/admin/notification/admin_notification_bloc.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 import '../../blocs/admin/notification/admin_notification_event.dart';
 import '../../blocs/admin/notification/admin_notification_state.dart';
 
@@ -237,7 +238,7 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
     return BlocBuilder<AdminNotificationBloc, AdminNotificationState>(
       builder: (context, state) {
         if (state is AdminNotificationLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CustomLoadingIndicator());
         }
         if (state is AdminNotificationLoadSuccess) {
           return Container(

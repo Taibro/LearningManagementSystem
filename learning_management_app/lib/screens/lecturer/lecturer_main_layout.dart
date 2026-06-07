@@ -102,49 +102,51 @@ class _LecturerMainLayoutState extends State<LecturerMainLayout> {
                 final primaryColor = const Color(0xFF6B4FA0);
                 final inactiveColor = const Color(0xFF94A3B8);
 
-                return GestureDetector(
-                  onTap: () {
-                    if (_selectedIndex != index) {
-                      setState(() => _selectedIndex = index);
-                      _pageController.animateToPage(
-                        index,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeOutQuart,
-                      );
-                    }
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    width: 70,
-                    color: Colors.transparent,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOutBack,
-                          padding: EdgeInsets.all(isSelected ? 6 : 0),
-                          decoration: BoxDecoration(
-                            color: isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
-                            shape: BoxShape.circle,
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      if (_selectedIndex != index) {
+                        setState(() => _selectedIndex = index);
+                        _pageController.animateToPage(
+                          index,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.easeOutQuart,
+                        );
+                      }
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      color: Colors.transparent,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeOutBack,
+                            padding: EdgeInsets.all(isSelected ? 6 : 0),
+                            decoration: BoxDecoration(
+                              color: isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              items[index]['icon'] as IconData,
+                              color: isSelected ? primaryColor : inactiveColor,
+                              size: isSelected ? 24 : 22,
+                            ),
                           ),
-                          child: Icon(
-                            items[index]['icon'] as IconData,
-                            color: isSelected ? primaryColor : inactiveColor,
-                            size: isSelected ? 24 : 22,
+                          const SizedBox(height: 4),
+                          Text(
+                            items[index]['label'] as String,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                              color: isSelected ? primaryColor : inactiveColor,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          items[index]['label'] as String,
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                            color: isSelected ? primaryColor : inactiveColor,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 );

@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../blocs/lecturer/attendance/teacher_attendance_bloc.dart';
+import '../../../../core/widgets/custom_loading_indicator.dart';
 import '../../../../blocs/lecturer/attendance/teacher_attendance_event.dart';
 import '../../../../blocs/lecturer/attendance/teacher_attendance_state.dart';
 import '../../../../models/lecturer/teacher_attendance.dart';
@@ -47,7 +48,7 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
     return BlocBuilder<TeacherAttendanceBloc, TeacherAttendanceState>(
       builder: (context, state) {
         if (state is TeacherAttendanceLoading) {
-          return const Center(child: CircularProgressIndicator(color: _kPrimary));
+          return Center(child: CustomLoadingIndicator());
         } else if (state is TeacherAttendanceLoadFailure) {
           return Center(
             child: Column(

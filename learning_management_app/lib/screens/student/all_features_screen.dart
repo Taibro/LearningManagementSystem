@@ -164,7 +164,7 @@ class AllFeaturesScreen extends StatelessWidget {
                             crossAxisCount: 4,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 24,
-                            childAspectRatio: 0.7,
+                            childAspectRatio: 0.58,
                           ),
                           itemCount: features.length,
                           itemBuilder: (_, i) {

@@ -3,6 +3,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'widgets/shared/lecturer_custom_app_bar.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 import '../../blocs/lecturer/profile/teacher_profile_bloc.dart';
 import '../../blocs/lecturer/profile/teacher_profile_event.dart';
 import '../../blocs/lecturer/profile/teacher_profile_state.dart';
@@ -38,7 +39,7 @@ class _LecturerPersonalProfileScreenState extends State<LecturerPersonalProfileS
             child: BlocBuilder<TeacherProfileBloc, TeacherProfileState>(
               builder: (context, state) {
                 if (state is TeacherProfileLoading || state is TeacherProfileInitial) {
-                  return const Center(child: CircularProgressIndicator(color: _kPrimary));
+                  return Center(child: CustomLoadingIndicator());
                 } else if (state is TeacherProfileLoadFailure) {
                   return Center(
                     child: Column(

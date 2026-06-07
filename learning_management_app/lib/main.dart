@@ -32,7 +32,11 @@ import 'package:learning_management_app/blocs/admin/request/admin_request_bloc.d
 import 'package:learning_management_app/blocs/admin/notification/admin_notification_bloc.dart';
 import 'package:learning_management_app/blocs/admin/user_management/admin_user_management_bloc.dart';
 
-void main() {
+import 'package:learning_management_app/core/utils/feature_manager.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await FeatureManager().init();
   runApp(const MyApp());
 }
 
@@ -177,7 +181,7 @@ class _MainLayoutState extends State<MainLayout> {
                   },
                   behavior: HitTestBehavior.opaque,
                   child: Container(
-                    width: 70,
+                    width: 75,
                     color: Colors.transparent, // expanded touch area
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -186,7 +190,7 @@ class _MainLayoutState extends State<MainLayout> {
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
                           curve: Curves.easeOutBack,
-                          padding: EdgeInsets.all(isSelected ? 8 : 4),
+                          padding: EdgeInsets.all(isSelected ? 6 : 2),
                           decoration: BoxDecoration(
                             color: isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
                             shape: BoxShape.circle,
@@ -194,19 +198,24 @@ class _MainLayoutState extends State<MainLayout> {
                           child: Icon(
                             items[index]['icon'] as IconData,
                             color: isSelected ? primaryColor : inactiveColor,
-                            size: isSelected ? 26 : 24,
+                            size: isSelected ? 24 : 22,
                           ),
                         ),
-                        if (isSelected) const SizedBox(height: 4),
-                        if (isSelected)
-                          Container(
-                            width: 4,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: primaryColor,
-                              shape: BoxShape.circle,
-                            ),
-                          ).animate().scale(duration: 200.ms, curve: Curves.easeOutBack),
+                        const SizedBox(height: 4),
+                        AnimatedDefaultTextStyle(
+                          duration: const Duration(milliseconds: 300),
+                          style: GoogleFonts.inter(
+                            fontSize: isSelected ? 11 : 10,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                            color: isSelected ? primaryColor : inactiveColor,
+                          ),
+                          child: Text(
+                            items[index]['label'] as String,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ],
                     ),
                   ),

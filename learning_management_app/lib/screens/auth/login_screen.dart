@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
@@ -397,13 +398,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   child: isLoading
-                      ? const SizedBox(
+                      ? SizedBox(
                           width: 24,
                           height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 3,
-                            valueColor: AlwaysStoppedAnimation(Colors.white),
-                          ),
+                          child: CustomLoadingIndicator(),
                         )
                       : Text(
                           'Đăng nhập',
