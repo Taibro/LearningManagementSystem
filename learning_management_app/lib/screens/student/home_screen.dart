@@ -6,6 +6,7 @@ import 'widgets/current_class_card.dart';
 import 'widgets/function_section.dart';
 import 'chatbot_screen.dart';
 import '../../core/widgets/draggable_chatbot_button.dart';
+import '../../core/widgets/mascot_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -64,6 +65,10 @@ class _HomeScreenState extends State<HomeScreen> {
             },
             iconData: Icons.smart_toy_rounded,
             backgroundColor: const Color(0xFF1565C0),
+          ),
+          const MascotWidget(
+            lottieAsset: 'assets/lottie/student.json',
+            isMoving: true, // Học sinh di chuyển ngẫu nhiên
           ),
         ],
       ),
