@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/admin/users/admin_users_bloc.dart';
+import '../../blocs/admin/users/admin_users_event.dart';
 import 'widgets/users/students_tab.dart';
 import 'widgets/users/lecturers_tab.dart';
 import 'widgets/users/bottom_sheets/user_form_sheet.dart';
@@ -19,6 +22,7 @@ class _AdminUsersScreenState extends State<AdminUsersScreen>
   void initState() {
     super.initState();
     _tab = TabController(length: 2, vsync: this);
+    context.read<AdminUsersBloc>().add(const AdminUsersFetchRequested());
   }
 
   @override

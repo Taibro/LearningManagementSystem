@@ -1,31 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../data/mock_schedule_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/lecturer/statistic/teacher_statistic_bloc.dart';
+import '../../../../blocs/lecturer/statistic/teacher_statistic_state.dart';
+import '../../../../models/lecturer/teaching_statistic.dart';
 
 class ProgressTab extends StatelessWidget {
   const ProgressTab({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 140),
-      child: Column(
-        children: [
-          _buildProgressFilter().animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0),
-          const SizedBox(height: 20),
-          ...kProgressList.asMap().entries.map((entry) => Padding(
-                padding: const EdgeInsets.only(bottom: 16),
-                child: _buildProgressCard(entry.value)
-                    .animate()
-                    .fadeIn(duration: 400.ms, delay: (50 * entry.key).ms)
-                    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart),
-              )),
-        ],
-      ),
+    return BlocBuilder<TeacherStatisticBloc, TeacherStatisticState>(
+      builder: (context, state) {
+        if (state is TeacherStatisticLoading) {
+          return const Center(child: CircularProgressIndicator(color: Color(0xFF6B4FA0)));
+        }
+        
+        List<ClassTeachingDetail> classDetails = [];
+        String currentSemester = 'HK2 - 2025-2026';
+        if (state is TeacherStatisticLoadSuccess) {
+          classDetails = state.statistic.classDetails ?? [];
+          currentSemester = state.statistic.currentSemesterLabel ?? currentSemester;
+        }
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 140),
+          child: Column(
+            children: [
+              _buildProgressFilter(currentSemester).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0),
+              const SizedBox(height: 20),
+              if (classDetails.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 40),
+                  child: Text('Không có dữ liệu', style: TextStyle(color: Colors.grey, fontSize: 16)),
+                )
+              else
+                ...classDetails.asMap().entries.map((entry) => Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: _buildProgressCard(entry.value)
+                          .animate()
+                          .fadeIn(duration: 400.ms, delay: (50 * entry.key).ms)
+                          .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart),
+                    )),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildProgressFilter() {
+  Widget _buildProgressFilter(String currentSemester) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -49,12 +73,12 @@ class ProgressTab extends StatelessWidget {
                 border: Border.all(color: const Color(0xFFE2E8F0)),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('HK2 - 2025-2026',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF1E293B), fontWeight: FontWeight.w600)),
-                  Icon(Icons.keyboard_arrow_down_rounded,
+                  Text(currentSemester,
+                      style: const TextStyle(fontSize: 14, color: Color(0xFF1E293B), fontWeight: FontWeight.w600)),
+                  const Icon(Icons.keyboard_arrow_down_rounded,
                       color: Color(0xFF64748B), size: 20),
                 ],
               ),
@@ -99,10 +123,25 @@ class ProgressTab extends StatelessWidget {
     );
   }
 
-  Widget _buildProgressCard(Map<String, dynamic> item) {
-    final pct = item['done'] / item['total'];
-    final chapters = List<Map<String, dynamic>>.from(item['chapters']);
-    final statusColor = Color(item['statusColor'] as int);
+  Widget _buildProgressCard(ClassTeachingDetail item) {
+    final done = item.completedPeriods ?? 0;
+    final total = item.totalPeriods ?? 0;
+    final pct = total > 0 ? done / total : 0.0;
+    final pctString = item.progressPercentage ?? (pct * 100).toInt();
+    
+    // Choose color based on progress
+    Color statusColor;
+    String status;
+    if (pct == 1) {
+      statusColor = const Color(0xFF10B981);
+      status = 'Hoàn thành';
+    } else if (pct > 0) {
+      statusColor = const Color(0xFF3B82F6);
+      status = 'Đang dạy';
+    } else {
+      statusColor = const Color(0xFFF59E0B);
+      status = 'Chưa bắt đầu';
+    }
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -138,7 +177,7 @@ class ProgressTab extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item['subject'],
+                      item.subjectName ?? 'Môn học',
                       style: const TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: 16,
@@ -148,7 +187,7 @@ class ProgressTab extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      item['code'],
+                      item.classCode ?? 'Mã lớp',
                       style: const TextStyle(
                         fontSize: 13,
                         color: Color(0xFF64748B),
@@ -165,7 +204,7 @@ class ProgressTab extends StatelessWidget {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  item['status'],
+                  status,
                   style: TextStyle(
                     fontSize: 11,
                     color: statusColor,
@@ -191,7 +230,7 @@ class ProgressTab extends StatelessWidget {
               ),
               const SizedBox(width: 16),
               Text(
-                '${(pct * 100).toInt()}%',
+                '$pctString%',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w800,
@@ -205,72 +244,15 @@ class ProgressTab extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Đã dạy: ${item['done']} tiết',
+                'Đã dạy: $done tiết',
                 style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
               ),
               Text(
-                'Còn lại: ${item['total'] - item['done']} tiết',
+                'Còn lại: ${total - done} tiết',
                 style: const TextStyle(fontSize: 12, color: Color(0xFF64748B), fontWeight: FontWeight.w600),
               ),
             ],
           ),
-          if (chapters.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            const Divider(height: 1, thickness: 1, color: Color(0xFFF1F5F9)),
-            const SizedBox(height: 16),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: chapters.map((ch) {
-                Color chipColor;
-                Color bgColor;
-                if (ch['done'] == true) {
-                  chipColor = const Color(0xFF10B981);
-                  bgColor = const Color(0xFF10B981).withOpacity(0.08);
-                } else if ((ch['pct'] as double) > 0) {
-                  chipColor = const Color(0xFFF59E0B);
-                  bgColor = const Color(0xFFF59E0B).withOpacity(0.08);
-                } else {
-                  chipColor = const Color(0xFF64748B);
-                  bgColor = const Color(0xFFF1F5F9);
-                }
-                return Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: bgColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: chipColor.withOpacity(0.1), width: 1),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        ch['label'],
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: chipColor,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        ch['done'] == true
-                            ? '✓'
-                            : (ch['pct'] as double) > 0
-                                ? '${((ch['pct'] as double) * 100).toInt()}%'
-                                : 'Chưa',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: chipColor.withOpacity(0.8),
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
         ],
       ),
     );

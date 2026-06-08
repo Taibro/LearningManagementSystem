@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../data/mock_home_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../repositories/teacher_repository.dart';
+import '../../../../models/lecturer/teacher_schedule.dart';
 
 class TodayClasses extends StatefulWidget {
   const TodayClasses({super.key});
@@ -13,6 +15,39 @@ class TodayClasses extends StatefulWidget {
 class _TodayClassesState extends State<TodayClasses> {
   final PageController _pageController = PageController(viewportFraction: 1.0);
   int _currentPage = 0;
+  List<TeacherSchedule> _todayClasses = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTodayClasses();
+  }
+
+  Future<void> _fetchTodayClasses() async {
+    try {
+      final repo = context.read<TeacherRepository>();
+      final now = DateTime.now();
+      final todayStr = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+      final schedules = await repo.getWeeklySchedule(date: todayStr);
+      
+      final currentJavaDay = now.weekday; // 1 = Monday, 7 = Sunday
+      final targetDay = currentJavaDay == 7 ? 8 : currentJavaDay + 1;
+
+      final filtered = schedules.where((s) => s.dayOfWeek == targetDay).toList();
+      
+      if (mounted) {
+        setState(() {
+          _todayClasses = filtered;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -22,7 +57,17 @@ class _TodayClassesState extends State<TodayClasses> {
 
   @override
   Widget build(BuildContext context) {
-    if (kTodayClasses.isEmpty) return const SizedBox.shrink();
+    if (_isLoading) {
+      return const SizedBox(
+        height: 146,
+        child: Center(child: CircularProgressIndicator(color: Color(0xFF6A1B9A))),
+      );
+    }
+    
+    if (_todayClasses.isEmpty) return const SizedBox.shrink();
+
+    final now = DateTime.now();
+    final dateStr = "Thứ ${now.weekday == 7 ? 'CN' : now.weekday + 1}, ${now.day.toString().padLeft(2, '0')}/${now.month.toString().padLeft(2, '0')}/${now.year}";
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -45,7 +90,7 @@ class _TodayClassesState extends State<TodayClasses> {
             ),
             const SizedBox(width: 8),
             Text(
-              'Thứ 2, 28/04/2026',
+              dateStr,
               style: TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500),
             ).animate().fadeIn(duration: 400.ms).slideX(begin: 0.1, end: 0),
           ],
@@ -58,9 +103,9 @@ class _TodayClassesState extends State<TodayClasses> {
             onPageChanged: (index) {
               setState(() => _currentPage = index);
             },
-            itemCount: kTodayClasses.length,
+            itemCount: _todayClasses.length,
             itemBuilder: (context, index) {
-              final cls = kTodayClasses[index];
+              final cls = _todayClasses[index];
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 2),
                 child: _buildClassCard(cls, index),
@@ -68,12 +113,12 @@ class _TodayClassesState extends State<TodayClasses> {
             },
           ),
         ),
-        if (kTodayClasses.length > 1) ...[
+        if (_todayClasses.length > 1) ...[
           const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(
-              kTodayClasses.length,
+              _todayClasses.length,
               (index) => AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -91,22 +136,22 @@ class _TodayClassesState extends State<TodayClasses> {
     );
   }
 
-  Widget _buildClassCard(Map<String, dynamic> cls, int index) {
+  Widget _buildClassCard(TeacherSchedule cls, int index) {
     Color accentColor;
     Color bgColor;
     Color iconBgColor;
     IconData typeIcon;
     String typeLabel;
 
-    switch (cls['type']) {
-      case 'practice':
+    switch (cls.sessionType) {
+      case 'TH':
         accentColor = const Color(0xFF0EA5E9);
         bgColor = const Color(0xFFF0F9FF);
         iconBgColor = const Color(0xFFE0F2FE);
         typeIcon = Icons.computer_outlined;
         typeLabel = 'Thực hành';
         break;
-      case 'online':
+      case 'ONL':
         accentColor = const Color(0xFFE85D75);
         bgColor = const Color(0xFFFFF1F2);
         iconBgColor = const Color(0xFFFFE4E6);
@@ -197,7 +242,7 @@ class _TodayClassesState extends State<TodayClasses> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          '$typeLabel • ${cls['room']}',
+                          '$typeLabel • ${cls.roomName ?? ''}',
                           style: GoogleFonts.inter(
                             color: accentColor,
                             fontSize: 11,
@@ -209,7 +254,7 @@ class _TodayClassesState extends State<TodayClasses> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        cls['subject'],
+                        cls.courseName ?? '',
                         style: GoogleFonts.plusJakartaSans(
                           color: const Color(0xFF0F172A),
                           fontSize: 16,
@@ -226,7 +271,7 @@ class _TodayClassesState extends State<TodayClasses> {
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              '${cls['session']} (${cls['time']})',
+                              'Ca ${cls.startPeriod} - ${cls.endPeriod} (${cls.startTime} - ${cls.endTime})',
                               style: GoogleFonts.inter(color: const Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.w500),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -242,7 +287,7 @@ class _TodayClassesState extends State<TodayClasses> {
                 // Go Button
                 GestureDetector(
                   onTap: () {
-                    if (_currentPage < kTodayClasses.length - 1) {
+                    if (_currentPage < _todayClasses.length - 1) {
                       _pageController.nextPage(
                         duration: const Duration(milliseconds: 400),
                         curve: Curves.easeOutCubic,

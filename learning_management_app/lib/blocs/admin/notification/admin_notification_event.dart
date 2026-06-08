@@ -10,3 +10,8 @@ class AdminNotificationCreate extends AdminNotificationEvent {
   final Map<String, dynamic> request;
   const AdminNotificationCreate(this.request);
 }
+
+class AdminNotificationBroadcast extends AdminNotificationEvent {
+  final Map<String, dynamic> request;
+  const AdminNotificationBroadcast(this.request);
+}

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/admin/user_management/admin_user_management_bloc.dart';
+import '../../blocs/admin/user_management/admin_user_management_event.dart';
+import '../../blocs/admin/user_management/admin_user_management_state.dart';
 
 class AddClassScreen extends StatefulWidget {
   const AddClassScreen({super.key});
@@ -40,27 +44,43 @@ class _AddClassScreenState extends State<AddClassScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _kBg,
-      body: Column(children: [
-        _buildHeader(),
-        Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              child: Column(children: [
-                _buildBasicInfoCard(),
-                const SizedBox(height: 16),
-                _buildScheduleCard(),
-                const SizedBox(height: 24),
-                _buildSubmitButton(),
-                const SizedBox(height: 16),
-              ]),
+    return BlocListener<AdminUserManagementBloc, AdminUserManagementState>(
+      listener: (context, state) {
+        if (state is AdminUserManagementSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(state.message),
+            backgroundColor: _kPrimary,
+          ));
+          Navigator.pop(context);
+        } else if (state is AdminUserManagementFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(state.message),
+            backgroundColor: Colors.red,
+          ));
+        }
+      },
+      child: Scaffold(
+        backgroundColor: _kBg,
+        body: Column(children: [
+          _buildHeader(),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: _formKey,
+                child: Column(children: [
+                  _buildBasicInfoCard(),
+                  const SizedBox(height: 16),
+                  _buildScheduleCard(),
+                  const SizedBox(height: 24),
+                  _buildSubmitButton(),
+                  const SizedBox(height: 16),
+                ]),
+              ),
             ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 
@@ -223,12 +243,17 @@ class _AddClassScreenState extends State<AddClassScreen> {
 
   void _submit() {
     if (_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Đã thêm lớp học thành công!'),
-        backgroundColor: _kPrimary,
-        behavior: SnackBarBehavior.floating,
-      ));
-      Navigator.pop(context);
+      context.read<AdminUserManagementBloc>().add(AdminUserManagementCreateClass({
+        'classCode': _codeCtrl.text,
+        'className': _nameCtrl.text,
+        'subject': _selectedSubject,
+        'teacher': _selectedTeacher,
+        'semester': _selectedSemester,
+        'maxStudents': int.tryParse(_maxCtrl.text) ?? 40,
+        'room': _selectedRoom,
+        'dayOfWeek': _selectedDay,
+        'period': _selectedPeriod,
+      }));
     }
   }
 }

@@ -4,6 +4,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../blocs/lecturer/profile/teacher_profile_bloc.dart';
 import '../../../../../blocs/lecturer/profile/teacher_profile_state.dart';
+import '../../../../../blocs/lecturer/statistic/teacher_statistic_bloc.dart';
+import '../../../../../blocs/lecturer/statistic/teacher_statistic_state.dart';
 import '../../../shared/shared_notifications_screen.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -95,15 +97,23 @@ class HomeHeader extends StatelessWidget {
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
-                      child: const Text(
-                        'ThS. Nguyễn Văn A',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                        ),
-                      ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideX(begin: -0.1, end: 0),
+                      child: BlocBuilder<TeacherProfileBloc, TeacherProfileState>(
+                        builder: (context, state) {
+                          String name = 'Đang tải...';
+                          if (state is TeacherProfileLoadSuccess) {
+                            name = '${state.profile.degree ?? ''} ${state.profile.fullName ?? ''}'.trim();
+                          }
+                          return Text(
+                            name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                          ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideX(begin: -0.1, end: 0);
+                        },
+                      ),
                     ),
                   ],
                 ),
@@ -162,36 +172,51 @@ class HomeHeader extends StatelessWidget {
   }
 
   Widget _buildGlassStatsCard() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
+    return BlocBuilder<TeacherStatisticBloc, TeacherStatisticState>(
+      builder: (context, state) {
+        String currentSemester = '...';
+        String totalClasses = '...';
+        String totalPeriods = '...';
+
+        if (state is TeacherStatisticLoadSuccess) {
+          final stats = state.statistic;
+          currentSemester = stats.currentSemesterLabel ?? '...';
+          totalClasses = '${stats.classDetails?.length ?? 0} Lớp';
+          totalPeriods = '${stats.totalPeriods ?? 0} Tiết';
+        }
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Colors.white.withOpacity(0.2), width: 1.5),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: _buildStatItem(currentSemester, 'Học kỳ', Icons.school_rounded)),
+                  _buildDivider(),
+                  Expanded(child: _buildStatItem(totalClasses, 'Phụ trách', Icons.groups_rounded)),
+                  _buildDivider(),
+                  Expanded(child: _buildStatItem(totalPeriods, 'Tổng số', Icons.timer_rounded)),
+                ],
+              ),
+            ),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(child: _buildStatItem('HK2 25-26', 'Học kỳ', Icons.school_rounded)),
-              _buildDivider(),
-              Expanded(child: _buildStatItem('5 Lớp', 'Phụ trách', Icons.groups_rounded)),
-              _buildDivider(),
-              Expanded(child: _buildStatItem('120 Tiết', 'Tổng số', Icons.timer_rounded)),
-            ],
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 

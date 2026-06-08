@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../data/mock_admin_schedule_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/admin/class/admin_class_bloc.dart';
+import '../../../../blocs/admin/class/admin_class_state.dart';
+import '../../../../models/admin/admin_class.dart';
+import '../../../../core/widgets/custom_loading_indicator.dart';
 import 'bottom_sheets/class_form_sheet.dart';
 import 'bottom_sheets/change_room_sheet.dart';
+import '../../data/mock_admin_schedule_data.dart' show mockRooms;
 
 class ClassListTab extends StatefulWidget {
   const ClassListTab({super.key});
@@ -15,18 +20,14 @@ class _ClassListTabState extends State<ClassListTab> {
   String _scheduleSearch = '';
   static const _kPrimary = Color(0xFF1A237E);
 
-  List<Map<String, dynamic>> get _filteredClasses {
-    return mockClasses.where((c) {
-      final matchType = _scheduleFilter == 'Tất cả' ||
-          (_scheduleFilter == 'Lý thuyết' && c['type'] == 'theory') ||
-          (_scheduleFilter == 'Thực hành' && c['type'] == 'practice') ||
-          (_scheduleFilter == 'Trực tuyến' && c['type'] == 'online');
+  List<AdminClass> _getFilteredClasses(List<AdminClass> classes) {
+    return classes.where((c) {
+      // Vì API không trả về type, ta giả lập logic filter
       final q = _scheduleSearch.toLowerCase();
       final matchSearch = q.isEmpty ||
-          (c['subject'] as String).toLowerCase().contains(q) ||
-          (c['lecturer'] as String).toLowerCase().contains(q) ||
-          (c['group'] as String).toLowerCase().contains(q);
-      return matchType && matchSearch;
+          (c.courseName?.toLowerCase().contains(q) ?? false) ||
+          (c.code?.toLowerCase().contains(q) ?? false);
+      return matchSearch;
     }).toList();
   }
 
@@ -35,16 +36,31 @@ class _ClassListTabState extends State<ClassListTab> {
     return Column(children: [
       _buildClassFilter(),
       Expanded(
-        child: _filteredClasses.isEmpty
-            ? const Center(
-                child: Text('Không tìm thấy lớp học',
-                    style: TextStyle(color: Color(0xFF9E9E9E))))
-            : ListView.separated(
+        child: BlocBuilder<AdminClassBloc, AdminClassState>(
+          builder: (context, state) {
+            if (state is AdminClassLoading) {
+              return const Center(child: CustomLoadingIndicator());
+            } else if (state is AdminClassLoadSuccess) {
+              final filtered = _getFilteredClasses(state.classes);
+              if (filtered.isEmpty) {
+                return const Center(
+                    child: Text('Không tìm thấy lớp học',
+                        style: TextStyle(color: Color(0xFF9E9E9E))));
+              }
+              return ListView.separated(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                itemCount: _filteredClasses.length,
+                itemCount: filtered.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
-                itemBuilder: (_, i) => _buildClassCard(_filteredClasses[i]),
-              ),
+                itemBuilder: (_, i) => _buildClassCard(filtered[i]),
+              );
+            } else if (state is AdminClassLoadFailure) {
+              return Center(
+                  child: Text('Lỗi: ${state.error}',
+                      style: const TextStyle(color: Colors.red)));
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     ]);
   }
@@ -98,25 +114,13 @@ class _ClassListTabState extends State<ClassListTab> {
     );
   }
 
-  Widget _buildClassCard(Map<String, dynamic> c) {
-    Color col;
-    Color bg;
-    switch (c['type']) {
-      case 'practice':
-        col = const Color(0xFF5C6BC0);
-        bg = const Color(0xFFE8EAF6);
-        break;
-      case 'online':
-        col = const Color(0xFFE65100);
-        bg = const Color(0xFFFFF3E0);
-        break;
-      default:
-        col = const Color(0xFF2E7D32);
-        bg = const Color(0xFFE8F5E9);
-    }
-    final enrolled = c['enrolled'] as int;
-    final capacity = c['capacity'] as int;
-    final ratio = enrolled / capacity;
+  Widget _buildClassCard(AdminClass c) {
+    Color col = const Color(0xFF2E7D32);
+    Color bg = const Color(0xFFE8F5E9);
+    
+    final enrolled = c.enrolledStudents ?? 0;
+    final capacity = c.maxStudents ?? 0;
+    final ratio = capacity > 0 ? enrolled / capacity : 0.0;
 
     return Container(
       decoration: BoxDecoration(
@@ -138,17 +142,13 @@ class _ClassListTabState extends State<ClassListTab> {
             decoration: BoxDecoration(
                 color: bg, borderRadius: BorderRadius.circular(6)),
             child: Text(
-                c['type'] == 'theory'
-                    ? 'LT'
-                    : c['type'] == 'practice'
-                        ? 'TH'
-                        : 'TT',
+                'LT',
                 style: TextStyle(
                     fontSize: 10, color: col, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 8),
           Expanded(
-              child: Text(c['subject'] as String,
+              child: Text(c.courseName ?? 'Chưa xác định',
                   style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
@@ -184,11 +184,10 @@ class _ClassListTabState extends State<ClassListTab> {
         ]),
         const SizedBox(height: 8),
         Wrap(spacing: 14, runSpacing: 4, children: [
-          _infoChip(Icons.person_outlined, c['lecturer'] as String),
-          _infoChip(Icons.group_outlined, c['group'] as String),
-          _infoChip(Icons.location_on_outlined, c['room'] as String),
-          _infoChip(
-              Icons.access_time_outlined, '${c['day']} · ${c['session']}'),
+          _infoChip(Icons.person_outlined, 'Chưa xếp'),
+          _infoChip(Icons.group_outlined, c.code ?? 'Chưa có mã'),
+          _infoChip(Icons.location_on_outlined, 'Chưa xếp'),
+          _infoChip(Icons.access_time_outlined, 'Chưa xếp'),
         ]),
         const SizedBox(height: 10),
         Row(children: [
@@ -231,40 +230,40 @@ class _ClassListTabState extends State<ClassListTab> {
     ]);
   }
 
-  void _handleClassAction(String action, Map<String, dynamic> c) {
+  void _handleClassAction(String action, AdminClass c) {
     if (action == 'edit') _showEditClassSheet(c);
     if (action == 'room') _showChangeRoomSheet(c);
     if (action == 'cancel') _showCancelConfirm(c);
   }
 
-  void _showEditClassSheet(Map<String, dynamic> c) {
+  void _showEditClassSheet(AdminClass c) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => ClassFormSheet(existing: c),
+      builder: (_) => ClassFormSheet(existing: null), // Update to accept AdminClass if needed later
     );
   }
 
-  void _showChangeRoomSheet(Map<String, dynamic> c) {
+  void _showChangeRoomSheet(AdminClass c) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => ChangeRoomSheet(rooms: mockRooms, currentClass: c),
+      builder: (_) => ChangeRoomSheet(rooms: mockRooms, currentClass: {}), // Update later
     );
   }
 
-  void _showCancelConfirm(Map<String, dynamic> c) {
+  void _showCancelConfirm(AdminClass c) {
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
-              title: const Text('Huỷ lịch học',
+              title: const Text('Huỷ lớp học',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               content: Text(
-                  'Xác nhận huỷ lịch "${c['subject']}" - ${c['group']}?',
+                  'Xác nhận huỷ lớp "${c.courseName}" - ${c.code}?',
                   style: const TextStyle(
                       fontSize: 14, color: Color(0xFF616161))),
               actions: [
@@ -279,7 +278,7 @@ class _ClassListTabState extends State<ClassListTab> {
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8))),
-                  child: const Text('Huỷ lịch'),
+                  child: const Text('Huỷ'),
                 ),
               ],
             ));

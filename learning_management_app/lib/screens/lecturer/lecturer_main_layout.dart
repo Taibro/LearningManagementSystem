@@ -11,6 +11,8 @@ import '../../core/widgets/mascot_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../blocs/lecturer/profile/teacher_profile_bloc.dart';
 import '../../blocs/lecturer/profile/teacher_profile_event.dart';
+import '../../blocs/lecturer/statistic/teacher_statistic_bloc.dart';
+import '../../blocs/lecturer/statistic/teacher_statistic_event.dart';
 
 class LecturerMainLayout extends StatefulWidget {
   const LecturerMainLayout({super.key});
@@ -28,6 +30,7 @@ class _LecturerMainLayoutState extends State<LecturerMainLayout> {
     super.initState();
     _pageController = PageController(initialPage: _selectedIndex);
     context.read<TeacherProfileBloc>().add(TeacherProfileFetchRequested());
+    context.read<TeacherStatisticBloc>().add(TeacherStatisticFetchRequested());
   }
 
   @override

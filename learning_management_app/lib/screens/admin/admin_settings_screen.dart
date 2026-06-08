@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/admin/settings/admin_semester_bloc.dart';
+import '../../blocs/admin/settings/admin_semester_event.dart';
 import 'backup_screen.dart';
 import 'manage_semester_screen.dart';
 import 'widgets/settings/admin_profile_card.dart';
@@ -16,7 +19,12 @@ class AdminSettingsScreen extends StatefulWidget {
 
 class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
   static const _kPrimary = Color(0xFF3F51B5);
-  static const _kBg = Color(0xFFF4F7FB);
+
+  @override
+  void initState() {
+    super.initState();
+    context.read<AdminSemesterBloc>().add(const AdminSemesterFetchRequested());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +87,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: _kPrimary.withOpacity(0.1),
+              color: _kPrimary.withAlpha(26),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.settings_rounded, color: _kPrimary, size: 24),

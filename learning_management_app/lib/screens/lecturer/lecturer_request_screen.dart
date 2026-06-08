@@ -3,6 +3,14 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'widgets/shared/lecturer_custom_app_bar.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/lecturer/request/teacher_request_bloc.dart';
+import '../../blocs/lecturer/request/teacher_request_event.dart';
+import '../../blocs/lecturer/request/teacher_request_state.dart';
+import '../../models/lecturer/teacher_request.dart';
+import '../../core/widgets/custom_loading_indicator.dart';
+import 'package:intl/intl.dart';
+
 const Color _kPrimary = Color(0xFF6B4FA0);
 const Color _kBg = Color(0xFFF8F9FA);
 
@@ -18,24 +26,11 @@ class _LecturerRequestScreenState extends State<LecturerRequestScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  final List<Map<String, dynamic>> _pauseHistory = [
-    {'class': '14DHTH04', 'date': '15/03/2026', 'reason': 'Tham dự hội thảo khoa học', 'status': 'approved'},
-    {'class': '14DHTH03', 'date': '22/02/2026', 'reason': 'Ốm, có giấy tờ y tế', 'status': 'pending'},
-  ];
-
-  final List<Map<String, dynamic>> _makeupHistory = [
-    {'class': '16DHTH10', 'date': '28/03/2026', 'reason': 'Bù tiết ngày 15/03', 'status': 'approved'},
-    {'class': '14DHTH04', 'date': '02/04/2026', 'reason': 'Bù tiết ngày 22/02', 'status': 'pending'},
-  ];
-
-  final List<Map<String, dynamic>> _substituteHistory = [
-    {'class': '16DHTH07', 'date': '10/01/2026', 'reason': 'Dạy thay GV Trần Văn B', 'status': 'rejected'},
-  ];
-
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this, initialIndex: widget.initialTabIndex);
+    context.read<TeacherRequestBloc>().add(TeacherRequestFetchRequested());
   }
 
   @override
@@ -46,35 +41,56 @@ class _LecturerRequestScreenState extends State<LecturerRequestScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _kBg,
-      body: Column(
-        children: [
-          const LecturerCustomAppBar(title: 'Đề xuất lịch dạy'),
-          _buildTabBar(),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _RequestTab(
-                  type: 'tamNgung',
-                  history: _pauseHistory,
-                  title: 'Tạm ngừng',
-                ),
-                _RequestTab(
-                  type: 'dayBu',
-                  history: _makeupHistory,
-                  title: 'Dạy bù',
-                ),
-                _RequestTab(
-                  type: 'dayThay',
-                  history: _substituteHistory,
-                  title: 'Dạy thay',
-                ),
-              ],
+    return BlocListener<TeacherRequestBloc, TeacherRequestState>(
+      listener: (context, state) {
+        if (state is TeacherRequestCreateSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+        } else if (state is TeacherRequestCreateFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: ${state.message}'), backgroundColor: Colors.red));
+        }
+      },
+      child: Scaffold(
+        backgroundColor: _kBg,
+        body: Column(
+          children: [
+            const LecturerCustomAppBar(title: 'Đề xuất lịch dạy'),
+            _buildTabBar(),
+            Expanded(
+              child: BlocBuilder<TeacherRequestBloc, TeacherRequestState>(
+                builder: (context, state) {
+                  if (state is TeacherRequestLoading || state is TeacherRequestInitial) {
+                    return const Center(child: CustomLoadingIndicator());
+                  } else if (state is TeacherRequestLoadFailure) {
+                    return Center(child: Text('Lỗi: ${state.message}', style: const TextStyle(color: Colors.red)));
+                  } else if (state is TeacherRequestLoadSuccess) {
+                    final requests = state.requests;
+                    return TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _RequestTab(
+                          type: 'tamNgung',
+                          history: requests.where((r) => r.type == 'tamNgung').toList(),
+                          title: 'Tạm ngừng',
+                        ),
+                        _RequestTab(
+                          type: 'dayBu',
+                          history: requests.where((r) => r.type == 'dayBu').toList(),
+                          title: 'Dạy bù',
+                        ),
+                        _RequestTab(
+                          type: 'dayThay',
+                          history: requests.where((r) => r.type == 'dayThay').toList(),
+                          title: 'Dạy thay',
+                        ),
+                      ],
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -126,7 +142,7 @@ class _LecturerRequestScreenState extends State<LecturerRequestScreen>
 
 class _RequestTab extends StatelessWidget {
   final String type;
-  final List<Map<String, dynamic>> history;
+  final List<TeacherRequest> history;
   final String title;
 
   const _RequestTab({
@@ -221,13 +237,13 @@ class _RequestTab extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryCard(Map<String, dynamic> item) {
+  Widget _buildHistoryCard(TeacherRequest item) {
     Color statusColor;
     String statusLabel;
     IconData statusIcon;
     Color bgColor;
 
-    switch (item['status']) {
+    switch (item.status) {
       case 'approved':
         statusColor = const Color(0xFF10B981);
         statusLabel = 'Đã duyệt';
@@ -284,7 +300,7 @@ class _RequestTab extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        item['class'],
+                        item.classInfo ?? 'Không rõ',
                         style: GoogleFonts.inter(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
@@ -292,13 +308,14 @@ class _RequestTab extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        item['date'],
+                        item.date ?? '',
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: const Color(0xFF64748B),
                         ),
                       ),
+
                     ],
                   ),
                 ],
@@ -341,7 +358,7 @@ class _RequestTab extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    item['reason'],
+                    item.reason ?? '',
                     style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF475569), height: 1.4),
                   ),
                 ),
@@ -363,11 +380,78 @@ class _RequestTab extends StatelessWidget {
   }
 }
 
-class _CreateRequestSheet extends StatelessWidget {
+class _CreateRequestSheet extends StatefulWidget {
   final String type;
   final String title;
 
   const _CreateRequestSheet({required this.type, required this.title});
+
+  @override
+  State<_CreateRequestSheet> createState() => _CreateRequestSheetState();
+}
+
+class _CreateRequestSheetState extends State<_CreateRequestSheet> {
+  final _reasonController = TextEditingController();
+  final _roomController = TextEditingController();
+  
+  String? _selectedClass;
+  String? _selectedShift;
+  String? _selectedSubstitute;
+  
+  DateTime? _selectedDate;
+  DateTime? _selectedMakeupDate;
+
+  @override
+  void dispose() {
+    _reasonController.dispose();
+    _roomController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickDate(bool isMakeup) async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (date != null) {
+      setState(() {
+        if (isMakeup) {
+          _selectedMakeupDate = date;
+        } else {
+          _selectedDate = date;
+        }
+      });
+    }
+  }
+
+  void _submitRequest() {
+    if (_selectedClass == null || _selectedDate == null || _reasonController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng nhập đầy đủ thông tin bắt buộc')));
+      return;
+    }
+
+    final data = {
+      'type': widget.type,
+      'classInfo': _selectedClass,
+      'date': DateFormat('dd/MM/yyyy').format(_selectedDate!),
+      'reason': _reasonController.text.trim(),
+      'shift': _selectedShift,
+    };
+
+    if (widget.type == 'dayBu') {
+      if (_selectedMakeupDate != null) {
+        data['makeupDate'] = DateFormat('dd/MM/yyyy').format(_selectedMakeupDate!);
+      }
+      data['room'] = _roomController.text.trim();
+    } else if (widget.type == 'dayThay') {
+      data['substitute'] = _selectedSubstitute;
+    }
+
+    context.read<TeacherRequestBloc>().add(TeacherRequestCreateRequested(data: data));
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -410,12 +494,13 @@ class _CreateRequestSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Tạo đề xuất $title',
+                      'Tạo đề xuất ${widget.title}',
                       style: GoogleFonts.plusJakartaSans(
                         fontWeight: FontWeight.w800,
                         fontSize: 18,
                         color: const Color(0xFF1E293B),
                       ),
+
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -434,41 +519,51 @@ class _CreateRequestSheet extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildFormField('Lớp học phần', 'Chọn lớp học phần', isDropdown: true),
+                  _buildDropdownField('Lớp học phần', 'Chọn lớp học phần', ['14DHTH04', '14DHTH03', '16DHTH10'], _selectedClass, (v) {
+                    setState(() => _selectedClass = v);
+                  }),
                   const SizedBox(height: 20),
-                  _buildFormField('Ngày', 'DD/MM/YYYY', isDate: true),
+                  _buildDateField('Ngày', _selectedDate, false),
                   const SizedBox(height: 20),
-                  _buildFormField('Ca học', 'Chọn ca học', isDropdown: true),
+                  _buildDropdownField('Ca học', 'Chọn ca học', ['Ca 1', 'Ca 2', 'Ca 3', 'Ca 4'], _selectedShift, (v) {
+                    setState(() => _selectedShift = v);
+                  }),
                   const SizedBox(height: 20),
-                  if (type == 'dayBu') ...[
-                    _buildFormField('Ngày dạy bù', 'DD/MM/YYYY', isDate: true),
+                  if (widget.type == 'dayBu') ...[
+                    _buildDateField('Ngày dạy bù', _selectedMakeupDate, true),
                     const SizedBox(height: 20),
-                    _buildFormField('Phòng học', 'VD: A401'),
+                    _buildTextField('Phòng học', 'VD: A401', _roomController),
                     const SizedBox(height: 20),
                   ],
-                  if (type == 'dayThay') ...[
-                    _buildFormField('Giảng viên dạy thay', 'Chọn giảng viên', isDropdown: true),
+                  if (widget.type == 'dayThay') ...[
+                    _buildDropdownField('Giảng viên dạy thay', 'Chọn giảng viên', ['Trần Văn B', 'Nguyễn Thị C'], _selectedSubstitute, (v) {
+                      setState(() => _selectedSubstitute = v);
+                    }),
                     const SizedBox(height: 20),
                   ],
                   Text('Lý do', style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF475569))),
                   const SizedBox(height: 8),
                   Container(
                     height: 100,
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF8FAFC),
                       border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Text('Nhập lý do chi tiết...',
-                          style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8))),
+                    child: TextField(
+                      controller: _reasonController,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: 'Nhập lý do chi tiết...',
+                        hintStyle: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8)),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 32),
                   GestureDetector(
-                    onTap: () => Navigator.pop(context),
+                    onTap: _submitRequest,
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 18),
@@ -513,8 +608,7 @@ class _CreateRequestSheet extends StatelessWidget {
     ).animate().slideY(begin: 1, duration: 400.ms, curve: Curves.easeOutCubic);
   }
 
-  Widget _buildFormField(String label, String hint,
-      {bool isDropdown = false, bool isDate = false}) {
+  Widget _buildDropdownField(String label, String hint, List<String> items, String? value, Function(String?) onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -522,21 +616,80 @@ class _CreateRequestSheet extends StatelessWidget {
         const SizedBox(height: 8),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           decoration: BoxDecoration(
             color: const Color(0xFFF8FAFC),
             border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(hint, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8))),
-              if (isDropdown)
-                const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF64748B), size: 22)
-              else if (isDate)
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              isExpanded: true,
+              value: value,
+              hint: Text(hint, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8))),
+              icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF64748B), size: 22),
+              items: items.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
+              onChanged: onChanged,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateField(String label, DateTime? date, bool isMakeup) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF475569))),
+        const SizedBox(height: 8),
+        GestureDetector(
+          onTap: () => _pickDate(isMakeup),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  date != null ? DateFormat('dd/MM/yyyy').format(date) : 'DD/MM/YYYY',
+                  style: GoogleFonts.inter(fontSize: 14, color: date != null ? const Color(0xFF1E293B) : const Color(0xFF94A3B8)),
+                ),
                 const Icon(Icons.calendar_month_rounded, color: Color(0xFF64748B), size: 20),
-            ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField(String label, String hint, TextEditingController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF475569))),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF8FAFC),
+            border: Border.all(color: const Color(0xFFE2E8F0), width: 1.5),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: hint,
+              hintStyle: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8)),
+            ),
           ),
         ),
       ],

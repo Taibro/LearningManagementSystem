@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../data/mock_schedule_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../repositories/teacher_repository.dart';
+import '../../../../models/lecturer/teacher_schedule.dart';
+import 'package:intl/intl.dart';
 
 class WeeklyTab extends StatefulWidget {
   const WeeklyTab({super.key});
@@ -11,6 +14,50 @@ class WeeklyTab extends StatefulWidget {
 
 class _WeeklyTabState extends State<WeeklyTab> {
   int _weekOffset = 0;
+  List<TeacherSchedule> _schedules = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchSchedule();
+  }
+
+  Future<void> _fetchSchedule() async {
+    setState(() => _isLoading = true);
+    try {
+      final repo = context.read<TeacherRepository>();
+      final targetDate = DateTime.now().add(Duration(days: _weekOffset * 7));
+      final dateStr = DateFormat('yyyy-MM-dd').format(targetDate);
+      
+      final schedules = await repo.getWeeklySchedule(date: dateStr);
+      
+      if (mounted) {
+        setState(() {
+          _schedules = schedules;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _changeWeek(int offset) {
+    setState(() {
+      _weekOffset += offset;
+    });
+    _fetchSchedule();
+  }
+
+  void _resetWeek() {
+    setState(() {
+      _weekOffset = 0;
+    });
+    _fetchSchedule();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,18 +66,21 @@ class _WeeklyTabState extends State<WeeklyTab> {
         _buildWeekNavigator(),
         _buildLegend(),
         Expanded(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 140),
-            child: Column(
-              children: List.generate(7, (dayIndex) {
-                final classes = kWeekSchedule[dayIndex] ?? [];
-                return _buildDayRow(dayIndex, classes)
-                    .animate()
-                    .fadeIn(duration: 400.ms, delay: (50 * dayIndex).ms)
-                    .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart);
-              }),
-            ),
-          ),
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator(color: Color(0xFF6B4FA0)))
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 140),
+                  child: Column(
+                    children: List.generate(7, (dayIndex) {
+                      final targetDayOfWeek = dayIndex + 2; // 0 (Mon) -> 2, 6 (Sun) -> 8
+                      final classes = _schedules.where((s) => s.dayOfWeek == targetDayOfWeek).toList();
+                      return _buildDayRow(dayIndex, classes)
+                          .animate()
+                          .fadeIn(duration: 400.ms, delay: (50 * dayIndex).ms)
+                          .slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuart);
+                    }),
+                  ),
+                ),
         ),
       ],
     );
@@ -45,7 +95,7 @@ class _WeeklyTabState extends State<WeeklyTab> {
           Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => setState(() => _weekOffset--),
+              onTap: () => _changeWeek(-1),
               borderRadius: BorderRadius.circular(12),
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -58,21 +108,29 @@ class _WeeklyTabState extends State<WeeklyTab> {
             ),
           ),
           Expanded(
-            child: Text(
-              'Tuần ${20 + _weekOffset}/04 – ${26 + _weekOffset}/04/2026',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
+            child: Builder(
+              builder: (context) {
+                final targetDate = DateTime.now().add(Duration(days: _weekOffset * 7));
+                final weekStart = targetDate.subtract(Duration(days: targetDate.weekday - 1));
+                final weekEnd = targetDate.add(Duration(days: 7 - targetDate.weekday));
+                final df = DateFormat('dd/MM/yyyy');
+                return Text(
+                  'Tuần ${DateFormat('dd/MM').format(weekStart)} – ${df.format(weekEnd)}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
                 fontWeight: FontWeight.w700,
                 fontSize: 15,
                 color: Color(0xFF1E293B),
-                letterSpacing: -0.2,
-              ),
+                    letterSpacing: -0.2,
+                  ),
+                );
+              },
             ),
           ),
           Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () => setState(() => _weekOffset++),
+              onTap: () => _changeWeek(1),
               borderRadius: BorderRadius.circular(12),
               child: Container(
                 padding: const EdgeInsets.all(8),
@@ -89,7 +147,7 @@ class _WeeklyTabState extends State<WeeklyTab> {
             color: const Color(0xFF6B4FA0).withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
             child: InkWell(
-              onTap: () => setState(() => _weekOffset = 0),
+              onTap: _resetWeek,
               borderRadius: BorderRadius.circular(12),
               child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -149,8 +207,13 @@ class _WeeklyTabState extends State<WeeklyTab> {
     );
   }
 
-  Widget _buildDayRow(int dayIndex, List<Map<String, dynamic>> classes) {
-    final isToday = dayIndex == 0; // Monday = today (demo)
+  Widget _buildDayRow(int dayIndex, List<TeacherSchedule> classes) {
+    final now = DateTime.now();
+    final targetDate = DateTime.now().add(Duration(days: _weekOffset * 7));
+    final weekStart = targetDate.subtract(Duration(days: targetDate.weekday - 1));
+    final dayDate = weekStart.add(Duration(days: dayIndex));
+    final isToday = now.year == dayDate.year && now.month == dayDate.month && now.day == dayDate.day;
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -188,7 +251,7 @@ class _WeeklyTabState extends State<WeeklyTab> {
             child: Row(
               children: [
                 Text(
-                  kWeekDays[dayIndex],
+                  ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'][dayIndex],
                   style: TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 15,
@@ -197,13 +260,20 @@ class _WeeklyTabState extends State<WeeklyTab> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Text(
-                  kWeekDates[dayIndex],
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: isToday ? const Color(0xFF6B4FA0).withOpacity(0.8) : const Color(0xFF64748B),
-                  ),
+                Builder(
+                  builder: (context) {
+                    final targetDate = DateTime.now().add(Duration(days: _weekOffset * 7));
+                    final weekStart = targetDate.subtract(Duration(days: targetDate.weekday - 1));
+                    final dayDate = weekStart.add(Duration(days: dayIndex));
+                    return Text(
+                      DateFormat('dd/MM').format(dayDate),
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: isToday ? const Color(0xFF6B4FA0).withOpacity(0.8) : const Color(0xFF64748B),
+                      ),
+                    );
+                  }
                 ),
                 if (isToday) ...[
                   const SizedBox(width: 12),
@@ -265,21 +335,21 @@ class _WeeklyTabState extends State<WeeklyTab> {
     );
   }
 
-  Widget _buildScheduleChip(Map<String, dynamic> cls) {
+  Widget _buildScheduleChip(TeacherSchedule cls) {
     Color color;
     Color bgColor;
-    switch (cls['type']) {
-      case 'practice':
-        color = const Color(0xFF3B82F6);
-        bgColor = const Color(0xFF3B82F6).withOpacity(0.08);
-        break;
-      case 'online':
-        color = const Color(0xFFF59E0B);
-        bgColor = const Color(0xFFF59E0B).withOpacity(0.08);
-        break;
-      default:
-        color = const Color(0xFF10B981);
-        bgColor = const Color(0xFF10B981).withOpacity(0.08);
+    // Map sessionType to color
+    // "Lý thuyết" -> green, "Thực hành" -> blue, "Trực tuyến" -> yellow
+    final sessionType = (cls.sessionType ?? '').toLowerCase();
+    if (sessionType.contains('thực hành')) {
+      color = const Color(0xFF3B82F6);
+      bgColor = const Color(0xFF3B82F6).withOpacity(0.08);
+    } else if (sessionType.contains('trực tuyến')) {
+      color = const Color(0xFFF59E0B);
+      bgColor = const Color(0xFFF59E0B).withOpacity(0.08);
+    } else {
+      color = const Color(0xFF10B981);
+      bgColor = const Color(0xFF10B981).withOpacity(0.08);
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -304,7 +374,7 @@ class _WeeklyTabState extends State<WeeklyTab> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    cls['subject'],
+                    cls.courseName ?? 'Môn học',
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 15,
@@ -314,7 +384,7 @@ class _WeeklyTabState extends State<WeeklyTab> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    cls['code'],
+                    cls.classCode ?? 'Mã lớp',
                     style: TextStyle(
                       fontSize: 12,
                       color: color.withOpacity(0.7),
@@ -328,7 +398,7 @@ class _WeeklyTabState extends State<WeeklyTab> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          cls['room'],
+                          cls.roomName ?? 'Phòng học',
                           style: TextStyle(
                             fontSize: 12,
                             color: color.withOpacity(0.9),
@@ -349,7 +419,7 @@ class _WeeklyTabState extends State<WeeklyTab> {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                cls['session'],
+                'Tiết ${cls.startPeriod}-${cls.endPeriod}',
                 style: TextStyle(
                   fontSize: 12,
                   color: color,

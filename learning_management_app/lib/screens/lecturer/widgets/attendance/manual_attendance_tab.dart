@@ -7,6 +7,9 @@ import '../../../../core/widgets/custom_loading_indicator.dart';
 import '../../../../blocs/lecturer/attendance/teacher_attendance_event.dart';
 import '../../../../blocs/lecturer/attendance/teacher_attendance_state.dart';
 import '../../../../models/lecturer/teacher_attendance.dart';
+import '../../../../repositories/teacher_repository.dart';
+import '../../../../models/lecturer/active_class_schedule.dart';
+import 'package:intl/intl.dart';
 
 const Color _kPrimary = Color(0xFF6B4FA0);
 
@@ -18,21 +21,57 @@ class ManualAttendanceTab extends StatefulWidget {
 }
 
 class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
-  String _selectedSemester = 'HK2 - 2025-2026';
-  String _selectedClass = '010110195604 - 14DHTH04';
   String _searchQuery = '';
   final TextEditingController _commentController =
       TextEditingController(text: 'Lớp học nghiêm túc, đúng giờ.');
 
+  List<ActiveClassSchedule>? _activeClasses;
+  ActiveClassSchedule? _selectedClass;
+  ScheduleDetail? _selectedSchedule;
+  String _selectedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  bool _isLoading = true;
+  String? _errorMsg;
+
   @override
   void initState() {
     super.initState();
-    // Fetch initial attendance data (mocking IDs)
+    _fetchActiveClasses();
+  }
+
+  Future<void> _fetchActiveClasses() async {
+    try {
+      final repo = context.read<TeacherRepository>();
+      final classes = await repo.getActiveClasses();
+      if (mounted) {
+        setState(() {
+          _activeClasses = classes;
+          _isLoading = false;
+          if (classes.isNotEmpty) {
+            _selectedClass = classes.first;
+            if (_selectedClass!.schedules != null && _selectedClass!.schedules!.isNotEmpty) {
+              _selectedSchedule = _selectedClass!.schedules!.first;
+            }
+          }
+        });
+        _fetchAttendance();
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _errorMsg = e.toString();
+        });
+      }
+    }
+  }
+
+  void _fetchAttendance() {
+    if (_selectedClass == null || _selectedSchedule == null) return;
     context.read<TeacherAttendanceBloc>().add(
-          const TeacherAttendanceFetchRequested(
-            classId: 1,
-            scheduleId: 1,
-            date: '2026-03-01',
+          TeacherAttendanceFetchRequested(
+            classId: _selectedClass!.classId!,
+            scheduleId: _selectedSchedule!.scheduleId!,
+            date: _selectedDate,
           ),
         );
   }
@@ -45,6 +84,30 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Center(child: CustomLoadingIndicator());
+    }
+    if (_errorMsg != null) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline_rounded, size: 64, color: Colors.red.shade300),
+            const SizedBox(height: 16),
+            Text(
+              'Lỗi: $_errorMsg',
+              style: GoogleFonts.inter(color: const Color(0xFFEF4444)),
+            ),
+          ],
+        ).animate().fadeIn().slideY(begin: 0.1),
+      );
+    }
+    if (_activeClasses == null || _activeClasses!.isEmpty) {
+      return Center(
+        child: Text('Không có lớp học nào.', style: GoogleFonts.inter(color: const Color(0xFF64748B))),
+      );
+    }
+
     return BlocBuilder<TeacherAttendanceBloc, TeacherAttendanceState>(
       builder: (context, state) {
         if (state is TeacherAttendanceLoading) {
@@ -60,25 +123,15 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
                   'Lỗi: ${state.message}',
                   style: GoogleFonts.inter(color: const Color(0xFFEF4444)),
                 ),
+                const SizedBox(height: 16),
+                ElevatedButton(onPressed: _fetchAttendance, child: const Text('Thử lại')),
               ],
             ).animate().fadeIn().slideY(begin: 0.1),
           );
         } else if (state is TeacherAttendanceLoadSuccess) {
           return _buildContent(state.attendanceList);
         }
-        return Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.checklist_rtl_rounded, size: 64, color: Colors.grey.shade400),
-              const SizedBox(height: 16),
-              Text(
-                'Vui lòng chọn lớp để xem điểm danh',
-                style: GoogleFonts.inter(color: const Color(0xFF64748B)),
-              ),
-            ],
-          ).animate().fadeIn().slideY(begin: 0.1),
-        );
+        return _buildContent(TeacherAttendanceList(students: [])); // show empty state with filters
       },
     );
   }
@@ -134,12 +187,6 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
   }
 
   Widget _buildFilterCard() {
-    final semesters = ['HK2 - 2025-2026', 'HK1 - 2025-2026'];
-    final classes = [
-      '010110195604 - 14DHTH04',
-      '010110195603 - 14DHTH03',
-      '010110195602 - 14DHTH02',
-    ];
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -159,16 +206,46 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
           Row(
             children: [
               Expanded(
-                child: _buildDropdown('Học kỳ', semesters, _selectedSemester,
-                    (v) => setState(() => _selectedSemester = v!)),
+                flex: 3,
+                child: _buildDropdown<ActiveClassSchedule>(
+                  'Lớp học phần',
+                  _activeClasses!,
+                  _selectedClass,
+                  (c) => '${c.classCode} - ${c.courseName}',
+                  (v) {
+                    setState(() {
+                      _selectedClass = v;
+                      if (v != null && v.schedules != null && v.schedules!.isNotEmpty) {
+                        _selectedSchedule = v.schedules!.first;
+                      } else {
+                        _selectedSchedule = null;
+                      }
+                    });
+                    _fetchAttendance();
+                  },
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(
-                child: _buildDropdown('Lớp học phần', classes, _selectedClass,
-                    (v) => setState(() => _selectedClass = v!)),
+                flex: 2,
+                child: _buildDatePicker(),
               ),
             ],
           ),
+          const SizedBox(height: 16),
+          if (_selectedClass != null && _selectedClass!.schedules != null && _selectedClass!.schedules!.isNotEmpty)
+            _buildDropdown<ScheduleDetail>(
+              'Buổi học (Lịch cố định)',
+              _selectedClass!.schedules!,
+              _selectedSchedule,
+              (s) => 'Thứ ${s.dayOfWeek}: Tiết ${s.startPeriod}-${s.endPeriod} (${s.roomName})',
+              (v) {
+                setState(() {
+                  _selectedSchedule = v;
+                });
+                _fetchAttendance();
+              },
+            ),
           const SizedBox(height: 16),
           TextField(
             decoration: InputDecoration(
@@ -199,8 +276,71 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
     );
   }
 
-  Widget _buildDropdown(String label, List<String> items, String value,
-      ValueChanged<String?> onChanged) {
+  Widget _buildDatePicker() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Ngày học',
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            color: const Color(0xFF64748B),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 6),
+        InkWell(
+          onTap: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: DateTime.parse(_selectedDate),
+              firstDate: DateTime(2020),
+              lastDate: DateTime(2100),
+              builder: (context, child) {
+                return Theme(
+                  data: Theme.of(context).copyWith(
+                    colorScheme: const ColorScheme.light(
+                      primary: Color(0xFF6B4FA0),
+                      onPrimary: Colors.white,
+                      onSurface: Color(0xFF1E293B),
+                    ),
+                  ),
+                  child: child!,
+                );
+              },
+            );
+            if (date != null) {
+              setState(() {
+                _selectedDate = DateFormat('yyyy-MM-dd').format(date);
+              });
+              _fetchAttendance();
+            }
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  DateFormat('dd/MM/yyyy').format(DateTime.parse(_selectedDate)),
+                  style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1E293B)),
+                ),
+                const Icon(Icons.calendar_today_rounded, color: Color(0xFF64748B), size: 18),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown<T>(String label, List<T> items, T? value,
+      String Function(T) labelBuilder, ValueChanged<T?> onChanged) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -213,12 +353,12 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
           ),
         ),
         const SizedBox(height: 6),
-        DropdownButtonFormField<String>(
+        DropdownButtonFormField<T>(
           value: value,
           items: items
               .map((e) => DropdownMenuItem(
                     value: e,
-                    child: Text(e,
+                    child: Text(labelBuilder(e),
                         style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1E293B)),
                         overflow: TextOverflow.ellipsis),
                   ))
@@ -335,13 +475,14 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
             child: Row(
               children: [
                 _buildActionBtn('Lưu điểm danh', const Color(0xFF6B4FA0), Icons.save_rounded, () async {
+                  if (_selectedClass == null || _selectedSchedule == null) return;
                   final bloc = context.read<TeacherAttendanceBloc>();
                   int successCount = 0;
                   for (final s in (data.students ?? [])) {
                     bloc.add(TeacherAttendanceSaveRequested(
-                      classId: data.classId ?? 1,
-                      scheduleId: data.scheduleId ?? 1,
-                      sessionDate: data.sessionDate ?? '2026-03-01',
+                      classId: _selectedClass!.classId!,
+                      scheduleId: _selectedSchedule!.scheduleId!,
+                      sessionDate: _selectedDate,
                       studentCode: s.studentCode ?? '',
                       status: s.attendanceStatus ?? 'PRESENT',
                       notes: _commentController.text,

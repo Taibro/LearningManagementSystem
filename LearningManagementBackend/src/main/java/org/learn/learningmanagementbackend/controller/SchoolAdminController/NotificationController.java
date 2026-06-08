@@ -1,6 +1,7 @@
 package org.learn.learningmanagementbackend.controller.SchoolAdminController;
 
 import lombok.RequiredArgsConstructor;
+import org.learn.learningmanagementbackend.dto.request.BroadcastNotificationRequest;
 import org.learn.learningmanagementbackend.dto.request.NotificationRequest;
 import org.learn.learningmanagementbackend.dto.response.NotificationResponse;
 import org.learn.learningmanagementbackend.service.SchoolAdminService.NotificationService;
@@ -25,6 +26,12 @@ public class NotificationController {
     @PostMapping
     public ResponseEntity<NotificationResponse> createNotification(@RequestBody NotificationRequest request) {
         return ResponseEntity.ok(notificationService.createNotification(request));
+    }
+
+    @PostMapping("/broadcast")
+    public ResponseEntity<Void> broadcastNotification(@RequestBody BroadcastNotificationRequest request) {
+        notificationService.broadcastNotification(request);
+        return ResponseEntity.ok().build();
     }
 
     @PutMapping("/{id}/read")

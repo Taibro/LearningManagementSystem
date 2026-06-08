@@ -189,10 +189,15 @@ class _AnnouncementScreenState extends State<AnnouncementScreen> {
         GestureDetector(
           onTap: () {
             if (_titleCtrl.text.isEmpty || _contentCtrl.text.isEmpty) return;
+            
+            String apiType = 'SYSTEM';
+            if (_selectedAudience == 'Sinh viên') apiType = 'STUDENT';
+            if (_selectedAudience == 'Giảng viên') apiType = 'TEACHER';
+
             context.read<AdminNotificationBloc>().add(AdminNotificationCreate({
               'title': _titleCtrl.text,
               'body': _contentCtrl.text,
-              'type': 'SYSTEM', // or map audience
+              'type': apiType,
             }));
           },
           child: Container(

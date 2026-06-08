@@ -5,6 +5,7 @@ import '../models/admin/admin_teacher.dart';
 import '../models/admin/admin_class.dart';
 import '../models/admin/admin_course.dart';
 import 'core_chatbot_repository.dart';
+import '../screens/admin/data/mock_admin_schedule_data.dart' show mockClasses;
 
 class AdminChatbotRepository extends CoreChatbotRepository {
   AdminChatbotRepository({
@@ -65,9 +66,15 @@ class AdminChatbotRepository extends CoreChatbotRepository {
     }
     if (courses.length > 50) coursesStr += " - ... và ${courses.length - 50} môn học khác.\n";
 
+    String scheduleStr = "Lịch học tuần này (Dữ liệu Lịch Công tác/Lịch học):\n";
+    for (var c in mockClasses) {
+      scheduleStr += " - Môn: ${c['subject']} | Giảng viên: ${c['lecturer']} | ${c['day']} ${c['session']} | Phòng: ${c['room']}\n";
+    }
+
     String systemInstruction = '''
           Bạn là Trợ lý ảo AI của Hệ thống Quản lý Đào tạo (EduSpace). 
-          Nhiệm vụ DUY NHẤT của bạn là hỗ trợ QUẢN TRỊ VIÊN (Ban Giám Hiệu/Admin) các vấn đề liên quan đến: số lượng sinh viên, giảng viên, lớp học, tài chính (nợ học phí), và tình hình đi học của sinh viên.
+          Bạn có ĐẶC QUYỀN TRUY CẬP VÀO TOÀN BỘ DỮ LIỆU trong cơ sở dữ liệu của trường học đang quản trị. 
+          Nhiệm vụ của bạn là hỗ trợ QUẢN TRỊ VIÊN (Ban Giám Hiệu/Admin) giải đáp MỌI THÔNG TIN liên quan đến hoạt động của trường (như sinh viên, giảng viên, lớp học, môn học, tài chính, lịch công tác, điểm số, điểm danh, v.v.).
           
           [THÔNG TIN NGỮ CẢNH CỦA TRƯỜNG HỌC]
           * Thời gian hiện tại: ${DateTime.now().toString()}
@@ -83,6 +90,9 @@ class AdminChatbotRepository extends CoreChatbotRepository {
           $teachersStr
           $classesStr
           $coursesStr
+          
+          * Dữ liệu Lịch học toàn trường:
+          $scheduleStr
           
           QUY TẮC NGHIÊM NGẶT:
           1. TUYỆT ĐỐI KHÔNG trả lời các câu hỏi ngoài lề như: giải trí, phim ảnh, âm nhạc, chính trị, thời tiết.

@@ -37,6 +37,7 @@ public class DashboardService {
                     .getSingleResult();
             schoolId = (Integer) result[0];
             schoolName = (String) result[1];
+            stats.setSchoolId(schoolId);
             stats.setSchoolName(schoolName);
         } catch (Exception e) {
             // Nếu không tìm thấy quyền quản lý trường nào, trả về 0 hết

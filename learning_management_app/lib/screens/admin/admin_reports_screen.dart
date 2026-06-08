@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/admin/reports/admin_reports_bloc.dart';
+import '../../blocs/admin/reports/admin_reports_event.dart';
 import 'widgets/reports/reports_header_and_filter.dart';
 import 'widgets/reports/attendance_tab.dart';
 import 'widgets/reports/grades_tab.dart';
@@ -21,6 +24,7 @@ class _AdminReportsScreenState extends State<AdminReportsScreen>
   void initState() {
     super.initState();
     _tab = TabController(length: 4, vsync: this);
+    context.read<AdminReportsBloc>().add(const AdminReportsFetchRequested());
   }
 
   @override

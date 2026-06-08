@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../data/mock_admin_users_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/admin/users/admin_users_bloc.dart';
+import '../../../../blocs/admin/users/admin_users_state.dart';
+import '../../../../models/admin/admin_teacher.dart';
+import '../../../../core/widgets/custom_loading_indicator.dart';
 import 'users_helpers.dart';
 import 'bottom_sheets/user_detail_sheet.dart';
 import 'bottom_sheets/user_form_sheet.dart';
@@ -16,16 +20,20 @@ class _LecturersTabState extends State<LecturersTab> {
   String _lecturerFilter = 'Tất cả';
   static const _kPrimary = Color(0xFF1A237E);
 
-  List<Map<String, dynamic>> get _filteredLecturers => mockLecturers.where((l) {
-        final q = _lecturerSearch.toLowerCase();
-        final matchSearch = q.isEmpty ||
-            (l['name'] as String).toLowerCase().contains(q) ||
-            (l['code'] as String).toLowerCase().contains(q);
-        final matchFilter = _lecturerFilter == 'Tất cả' ||
-            (_lecturerFilter == 'Hoạt động' && l['status'] == 'active') ||
-            (_lecturerFilter == 'Nghỉ' && l['status'] == 'inactive');
-        return matchSearch && matchFilter;
-      }).toList();
+  List<AdminTeacher> _getFilteredLecturers(List<AdminTeacher> teachers) {
+    return teachers.where((l) {
+      final q = _lecturerSearch.toLowerCase();
+      final matchSearch = q.isEmpty ||
+          (l.fullName?.toLowerCase().contains(q) ?? false) ||
+          (l.teacherCode?.toLowerCase().contains(q) ?? false);
+      
+      final mockStatus = 'active'; // Mặc định vì API chưa có
+      final matchFilter = _lecturerFilter == 'Tất cả' ||
+          (_lecturerFilter == 'Hoạt động' && mockStatus == 'active') ||
+          (_lecturerFilter == 'Nghỉ' && mockStatus == 'inactive');
+      return matchSearch && matchFilter;
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,22 +44,37 @@ class _LecturersTabState extends State<LecturersTab> {
       buildFilterRow(
           filters, _lecturerFilter, (f) => setState(() => _lecturerFilter = f)),
       Expanded(
-        child: _filteredLecturers.isEmpty
-            ? const Center(
-                child: Text('Không tìm thấy giảng viên',
-                    style: TextStyle(color: Color(0xFF9E9E9E))))
-            : ListView.separated(
+        child: BlocBuilder<AdminUsersBloc, AdminUsersState>(
+          builder: (context, state) {
+            if (state is AdminUsersLoading) {
+              return const Center(child: CustomLoadingIndicator());
+            } else if (state is AdminUsersLoadSuccess) {
+              final filtered = _getFilteredLecturers(state.teachers);
+              if (filtered.isEmpty) {
+                return const Center(
+                    child: Text('Không tìm thấy giảng viên',
+                        style: TextStyle(color: Color(0xFF9E9E9E))));
+              }
+              return ListView.separated(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                itemCount: _filteredLecturers.length,
+                itemCount: filtered.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
-                itemBuilder: (_, i) => _lecturerCard(_filteredLecturers[i]),
-              ),
+                itemBuilder: (_, i) => _lecturerCard(filtered[i]),
+              );
+            } else if (state is AdminUsersLoadFailure) {
+              return Center(
+                  child: Text('Lỗi: ${state.error}',
+                      style: const TextStyle(color: Colors.red)));
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     ]);
   }
 
-  Widget _lecturerCard(Map<String, dynamic> l) {
-    final isActive = l['status'] == 'active';
+  Widget _lecturerCard(AdminTeacher l) {
+    final isActive = true; // API chưa trả về status, mặc định active
     final statusColor = isActive ? const Color(0xFF4CAF50) : const Color(0xFF9E9E9E);
     return GestureDetector(
       onTap: () => _showUserDetailSheet(l),
@@ -69,7 +92,7 @@ class _LecturersTabState extends State<LecturersTab> {
         ),
         child: Row(children: [
           buildAvatarWidget(
-              (l['name'] as String).split(' ').last.substring(0, 1),
+              (l.fullName ?? 'U').split(' ').last.substring(0, 1),
               [const Color(0xFF00695C), const Color(0xFF2E7D32)]),
           const SizedBox(width: 12),
           Expanded(
@@ -77,16 +100,16 @@ class _LecturersTabState extends State<LecturersTab> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                 Row(children: [
-                  Text(l['name'] as String,
+                  Text(l.fullName ?? 'Không tên',
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(width: 6),
-                  Text(l['code'] as String,
+                  Text(l.teacherCode ?? '',
                       style: const TextStyle(
                           fontSize: 11, color: Color(0xFF9E9E9E))),
                 ]),
                 const SizedBox(height: 2),
-                Text('${l['degree']}  ·  ${l['rank']}  ·  ${l['department']}',
+                Text('Chưa rõ học vị  ·  Chưa rõ ngạch  ·  ${l.departmentName ?? 'Khoa chưa phân'}',
                     style: const TextStyle(
                         fontSize: 11, color: Color(0xFF9E9E9E))),
                 const SizedBox(height: 6),
@@ -95,8 +118,8 @@ class _LecturersTabState extends State<LecturersTab> {
                   const SizedBox(width: 8),
                   Icon(Icons.class_outlined, size: 12, color: Colors.grey[500]),
                   const SizedBox(width: 3),
-                  Text('${l['classes']} lớp',
-                      style: const TextStyle(
+                  const Text('0 lớp',
+                      style: TextStyle(
                           fontSize: 11, color: Color(0xFF9E9E9E))),
                 ]),
               ])),
@@ -116,31 +139,31 @@ class _LecturersTabState extends State<LecturersTab> {
     );
   }
 
-  void _handleAction(String action, Map<String, dynamic> user) {
+  void _handleAction(String action, AdminTeacher user) {
     if (action == 'detail') {
       _showUserDetailSheet(user);
     } else if (action == 'edit') {
       _showUserFormSheet(user);
     } else {
-      _snack('$action: ${user['name']}');
+      _snack('$action: ${user.fullName}');
     }
   }
 
-  void _showUserDetailSheet(Map<String, dynamic> user) {
+  void _showUserDetailSheet(AdminTeacher user) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => UserDetailSheet(user: user, type: 'lecturer'),
+      builder: (_) => UserDetailSheet(user: {'name': user.fullName, 'code': user.teacherCode, 'status': 'active'}, type: 'lecturer'),
     );
   }
 
-  void _showUserFormSheet(Map<String, dynamic> user) {
+  void _showUserFormSheet(AdminTeacher user) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => UserFormSheet(user: user, type: 'lecturer'),
+      builder: (_) => UserFormSheet(user: {'name': user.fullName, 'code': user.teacherCode}, type: 'lecturer'),
     );
   }
 

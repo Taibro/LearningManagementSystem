@@ -1,6 +1,7 @@
 package org.learn.learningmanagementbackend.service.SchoolAdminService;
 
 import lombok.RequiredArgsConstructor;
+import org.learn.learningmanagementbackend.dto.request.BroadcastNotificationRequest;
 import org.learn.learningmanagementbackend.dto.request.NotificationRequest;
 import org.learn.learningmanagementbackend.dto.response.NotificationResponse;
 import org.learn.learningmanagementbackend.model.Notification;
@@ -57,6 +58,33 @@ public class NotificationService {
         notification.setIsRead(false);
 
         return mapToResponse(notificationRepository.save(notification));
+    }
+
+    public void broadcastNotification(BroadcastNotificationRequest request) {
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!(principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails)) {
+            throw new RuntimeException("Unauthorized");
+        }
+        Integer currentUserId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+
+        Integer schoolId = entityManager.createQuery("SELECT u.school.id FROM Users u WHERE u.id = :userId", Integer.class)
+                .setParameter("userId", currentUserId).setMaxResults(1).getSingleResult();
+
+        List<Users> users = entityManager.createQuery(
+                "SELECT u FROM Users u WHERE u.school.id = :schoolId AND (u.role.name = 'ROLE_STUDENT' OR u.role.name = 'ROLE_LECTURER')", Users.class)
+                .setParameter("schoolId", schoolId).getResultList();
+
+        List<Notification> notifications = users.stream().map(user -> {
+            Notification notification = new Notification();
+            notification.setUser(user);
+            notification.setTitle(request.getTitle());
+            notification.setBody(request.getBody());
+            notification.setType(request.getType() != null ? request.getType() : org.learn.learningmanagementbackend.enums.NotificationType.SYSTEM);
+            notification.setIsRead(false);
+            return notification;
+        }).collect(Collectors.toList());
+
+        notificationRepository.saveAll(notifications);
     }
 
     public NotificationResponse markAsRead(Integer id) {

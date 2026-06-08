@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../shared/shared_notifications_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import '../../../../blocs/admin/dashboard/admin_dashboard_bloc.dart';
+import '../../../../blocs/admin/dashboard/admin_dashboard_state.dart';
+import '../../../../blocs/admin/request/admin_request_bloc.dart';
+import '../../../../blocs/admin/request/admin_request_state.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key});
@@ -41,13 +47,21 @@ class HomeHeader extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Xin chào, Admin', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
-                    SizedBox(height: 2),
-                    Text('Quản trị hệ thống · HUIT', style: TextStyle(color: Colors.white60, fontSize: 12)),
+                    const Text('Xin chào, Admin', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 2),
+                    BlocBuilder<AdminDashboardBloc, AdminDashboardState>(
+                      builder: (context, state) {
+                        String schoolName = 'Trường chưa cập nhật';
+                        if (state is AdminDashboardLoadSuccess) {
+                          schoolName = state.stats.schoolName ?? 'HUIT';
+                        }
+                        return Text('Quản trị hệ thống · $schoolName', style: const TextStyle(color: Colors.white60, fontSize: 12));
+                      },
+                    ),
                   ],
                 ),
               ),
@@ -84,9 +98,20 @@ class HomeHeader extends StatelessWidget {
               children: [
                 _hStat('HK2 2025-2026', 'Học kỳ'),
                 _hDiv(),
-                _hStat('3 chờ duyệt', 'Đề xuất'),
+                BlocBuilder<AdminRequestBloc, AdminRequestState>(
+                  builder: (context, state) {
+                    int count = 0;
+                    if (state is AdminRequestLoadSuccess) {
+                      count = state.pendingRequests.length;
+                    }
+                    return _hStat('$count chờ duyệt', 'Đề xuất');
+                  },
+                ),
                 _hDiv(),
-                _hStat('Thứ 2, 28/04', 'Hôm nay'),
+                _hStat(
+                  DateFormat('EEEE, dd/MM', 'vi_VN').format(DateTime.now()),
+                  'Hôm nay'
+                ),
               ],
             ),
           ),

@@ -1,23 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/stats_detail_screen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/lecturer/statistic/teacher_statistic_bloc.dart';
+import '../../../../blocs/lecturer/statistic/teacher_statistic_state.dart';
 
 class StatsRow extends StatelessWidget {
   const StatsRow({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _buildStatCard(context, 'Hôm nay', '2 lớp', Icons.class_outlined, const Color(0xFF6B4FA0), 0)
-            .animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1, end: 0),
-        const SizedBox(width: 12),
-        _buildStatCard(context, 'Tuần này', '8 buổi', Icons.calendar_view_week_outlined, const Color(0xFF4CAF50), 1)
-            .animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.1, end: 0),
-        const SizedBox(width: 12),
-        _buildStatCard(context, 'Chờ duyệt', '1 đề xuất', Icons.pending_outlined, const Color(0xFFE85D75), 2)
-            .animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.1, end: 0),
-      ],
+    return BlocBuilder<TeacherStatisticBloc, TeacherStatisticState>(
+      builder: (context, state) {
+        String examShifts = '0';
+        String reminders = '0';
+        String progress = '0%';
+
+        if (state is TeacherStatisticLoadSuccess) {
+          final stats = state.statistic;
+          examShifts = '${stats.examShifts ?? 0}';
+          reminders = '${stats.reminders?.length ?? 0}';
+          progress = '${stats.overallProgress ?? 0}%';
+        }
+
+        return Row(
+          children: [
+            _buildStatCard(context, 'Gác thi', examShifts, Icons.assignment_outlined, const Color(0xFF6B4FA0), 0)
+                .animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1, end: 0),
+            const SizedBox(width: 12),
+            _buildStatCard(context, 'Nhắc nhở', reminders, Icons.notifications_active_outlined, const Color(0xFF4CAF50), 1)
+                .animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.1, end: 0),
+            const SizedBox(width: 12),
+            _buildStatCard(context, 'Tiến độ', progress, Icons.trending_up_rounded, const Color(0xFFE85D75), 2)
+                .animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.1, end: 0),
+          ],
+        );
+      },
     );
   }
 

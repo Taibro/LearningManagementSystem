@@ -28,9 +28,9 @@ class _LecturerSalaryScreenState extends State<LecturerSalaryScreen> {
   @override
   void initState() {
     super.initState();
-    // Demo: force year 2026, month 3 since we only have test data for this period
-    _selectedYear = 2026;
-    _selectedMonth = 3;
+    final now = DateTime.now();
+    _selectedYear = now.year;
+    _selectedMonth = now.month;
     _fetchSalary();
   }
 
@@ -176,7 +176,58 @@ class _LecturerSalaryScreenState extends State<LecturerSalaryScreen> {
   Widget _buildMonthSelector() {
     return GestureDetector(
       onTap: () {
-        // Implement month picker logic if needed
+        showDialog(
+          context: context,
+          builder: (ctx) {
+            int tempMonth = _selectedMonth;
+            int tempYear = _selectedYear;
+            return StatefulBuilder(
+              builder: (ctx, setDialogState) {
+                return AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  title: const Text('Chọn kỳ lương', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  content: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      DropdownButton<int>(
+                        value: tempMonth,
+                        items: List.generate(12, (index) => DropdownMenuItem(value: index + 1, child: Text('Tháng ${index + 1}'))),
+                        onChanged: (val) => setDialogState(() => tempMonth = val!),
+                      ),
+                      const SizedBox(width: 16),
+                      DropdownButton<int>(
+                        value: tempYear,
+                        items: List.generate(5, (index) => DropdownMenuItem(value: 2024 + index, child: Text('${2024 + index}'))),
+                        onChanged: (val) => setDialogState(() => tempYear = val!),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('Hủy', style: TextStyle(color: Colors.grey)),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _selectedMonth = tempMonth;
+                          _selectedYear = tempYear;
+                        });
+                        _fetchSalary();
+                        Navigator.pop(ctx);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF6B4FA0),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      child: const Text('Chọn', style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                );
+              },
+            );
+          },
+        );
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),

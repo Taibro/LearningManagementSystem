@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../auth/school_code_screen.dart';
+import '../../../../blocs/auth/auth_bloc.dart';
+import '../../../../blocs/auth/auth_event.dart';
 import '../../lecturer_change_password_screen.dart';
 import '../../features/terms_screen.dart';
 import '../../features/feedback_screen.dart';
@@ -42,6 +45,7 @@ class _SettingsCardState extends State<SettingsCard> {
           ),
           ElevatedButton(
             onPressed: () {
+              context.read<AuthBloc>().add(AuthLogoutRequested());
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (_) => const SchoolCodeScreen()),

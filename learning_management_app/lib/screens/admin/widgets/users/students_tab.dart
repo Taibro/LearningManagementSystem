@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../data/mock_admin_users_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../blocs/admin/users/admin_users_bloc.dart';
+import '../../../../blocs/admin/users/admin_users_state.dart';
+import '../../../../models/admin/admin_student.dart';
+import '../../../../core/widgets/custom_loading_indicator.dart';
 import 'users_helpers.dart';
 import 'bottom_sheets/user_detail_sheet.dart';
 import 'bottom_sheets/user_form_sheet.dart';
@@ -16,17 +20,23 @@ class _StudentsTabState extends State<StudentsTab> {
   String _studentFilter = 'Tất cả';
   static const _kPrimary = Color(0xFF1A237E);
 
-  List<Map<String, dynamic>> get _filteredStudents => mockStudents.where((s) {
-        final q = _studentSearch.toLowerCase();
-        final matchSearch = q.isEmpty ||
-            (s['name'] as String).toLowerCase().contains(q) ||
-            (s['mssv'] as String).contains(q);
-        final matchFilter = _studentFilter == 'Tất cả' ||
-            (_studentFilter == 'Hoạt động' && s['status'] == 'active') ||
-            (_studentFilter == 'Cảnh báo' && s['status'] == 'warning') ||
-            (_studentFilter == 'Khoá' && s['status'] == 'locked');
-        return matchSearch && matchFilter;
-      }).toList();
+  List<AdminStudent> _getFilteredStudents(List<AdminStudent> students) {
+    return students.where((s) {
+      final q = _studentSearch.toLowerCase();
+      final matchSearch = q.isEmpty ||
+          (s.fullName?.toLowerCase().contains(q) ?? false) ||
+          (s.studentCode?.contains(q) ?? false);
+      
+      // Giả lập filter trạng thái vì API chưa có
+      final mockStatus = 'active'; // Mặc định là active
+      final matchFilter = _studentFilter == 'Tất cả' ||
+          (_studentFilter == 'Hoạt động' && mockStatus == 'active') ||
+          (_studentFilter == 'Cảnh báo' && mockStatus == 'warning') ||
+          (_studentFilter == 'Khoá' && mockStatus == 'locked');
+      
+      return matchSearch && matchFilter;
+    }).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,42 +47,41 @@ class _StudentsTabState extends State<StudentsTab> {
       buildFilterRow(
           filters, _studentFilter, (f) => setState(() => _studentFilter = f)),
       Expanded(
-        child: _filteredStudents.isEmpty
-            ? const Center(
-                child: Text('Không tìm thấy sinh viên',
-                    style: TextStyle(color: Color(0xFF9E9E9E))))
-            : ListView.separated(
+        child: BlocBuilder<AdminUsersBloc, AdminUsersState>(
+          builder: (context, state) {
+            if (state is AdminUsersLoading) {
+              return const Center(child: CustomLoadingIndicator());
+            } else if (state is AdminUsersLoadSuccess) {
+              final filtered = _getFilteredStudents(state.students);
+              if (filtered.isEmpty) {
+                return const Center(
+                    child: Text('Không tìm thấy sinh viên',
+                        style: TextStyle(color: Color(0xFF9E9E9E))));
+              }
+              return ListView.separated(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
-                itemCount: _filteredStudents.length,
+                itemCount: filtered.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 10),
-                itemBuilder: (_, i) => _studentCard(_filteredStudents[i]),
-              ),
+                itemBuilder: (_, i) => _studentCard(filtered[i]),
+              );
+            } else if (state is AdminUsersLoadFailure) {
+              return Center(
+                  child: Text('Lỗi: ${state.error}',
+                      style: const TextStyle(color: Colors.red)));
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     ]);
   }
 
-  Widget _studentCard(Map<String, dynamic> s) {
-    Color statusColor;
-    String statusLabel;
-    switch (s['status']) {
-      case 'warning':
-        statusColor = const Color(0xFFE65100);
-        statusLabel = 'Cảnh báo';
-        break;
-      case 'locked':
-        statusColor = const Color(0xFFC62828);
-        statusLabel = 'Bị khoá';
-        break;
-      default:
-        statusColor = const Color(0xFF4CAF50);
-        statusLabel = 'Hoạt động';
-    }
-    final gpa = s['gpa'] as double;
-    final gpaColor = gpa >= 3.2
-        ? const Color(0xFF2E7D32)
-        : gpa >= 2.0
-            ? const Color(0xFFE65100)
-            : const Color(0xFFC62828);
+  Widget _studentCard(AdminStudent s) {
+    Color statusColor = const Color(0xFF4CAF50);
+    String statusLabel = 'Hoạt động';
+    
+    final gpa = 0.0; // Giả lập GPA
+    final gpaColor = const Color(0xFFC62828);
 
     return GestureDetector(
       onTap: () => _showUserDetailSheet(s),
@@ -90,18 +99,18 @@ class _StudentsTabState extends State<StudentsTab> {
         ),
         child: Row(children: [
           buildAvatarWidget(
-              (s['name'] as String).split(' ').last.substring(0, 1),
+              (s.fullName ?? 'U').split(' ').last.substring(0, 1),
               [_kPrimary.withOpacity(0.7), _kPrimary]),
           const SizedBox(width: 12),
           Expanded(
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                Text(s['name'] as String,
+                Text(s.fullName ?? 'Không tên',
                     style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 2),
-                Text('${s['mssv']}  ·  ${s['class']}  ·  ${s['major']}',
+                Text('${s.studentCode ?? 'Không MSSV'}  ·  ${s.className ?? 'Chưa xếp lớp'}  ·  ${s.major ?? 'Chưa xếp ngành'}',
                     style: const TextStyle(
                         fontSize: 11, color: Color(0xFF9E9E9E))),
                 const SizedBox(height: 6),
@@ -127,31 +136,31 @@ class _StudentsTabState extends State<StudentsTab> {
     );
   }
 
-  void _handleAction(String action, Map<String, dynamic> user) {
+  void _handleAction(String action, AdminStudent user) {
     if (action == 'detail') {
       _showUserDetailSheet(user);
     } else if (action == 'edit') {
       _showUserFormSheet(user);
     } else {
-      _snack('$action: ${user['name']}');
+      _snack('$action: ${user.fullName}');
     }
   }
 
-  void _showUserDetailSheet(Map<String, dynamic> user) {
+  void _showUserDetailSheet(AdminStudent user) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => UserDetailSheet(user: user, type: 'student'),
+      builder: (_) => UserDetailSheet(user: {'name': user.fullName, 'mssv': user.studentCode, 'status': 'active', 'gpa': 0.0}, type: 'student'),
     );
   }
 
-  void _showUserFormSheet(Map<String, dynamic> user) {
+  void _showUserFormSheet(AdminStudent user) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => UserFormSheet(user: user, type: 'student'),
+      builder: (_) => UserFormSheet(user: {'name': user.fullName, 'mssv': user.studentCode}, type: 'student'),
     );
   }
 

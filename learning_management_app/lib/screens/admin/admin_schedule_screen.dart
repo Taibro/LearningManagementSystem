@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/admin/class/admin_class_bloc.dart';
+import '../../blocs/admin/class/admin_class_event.dart';
+import '../../blocs/admin/class/admin_class_state.dart';
 import 'data/mock_admin_schedule_data.dart';
 import 'widgets/schedule/class_list_tab.dart';
 import 'widgets/schedule/weekly_view_tab.dart';
@@ -21,6 +25,7 @@ class _AdminScheduleScreenState extends State<AdminScheduleScreen>
   void initState() {
     super.initState();
     _tab = TabController(length: 3, vsync: this);
+    context.read<AdminClassBloc>().add(const AdminClassFetchRequested());
   }
 
   @override
@@ -101,16 +106,24 @@ class _AdminScheduleScreenState extends State<AdminScheduleScreen>
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-                color: _kPrimary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20)),
-            child: Text('${mockClasses.length} lớp',
-                style: const TextStyle(
-                    color: _kPrimary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700)),
+          BlocBuilder<AdminClassBloc, AdminClassState>(
+            builder: (context, state) {
+              int count = 0;
+              if (state is AdminClassLoadSuccess) {
+                count = state.classes.length;
+              }
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                    color: _kPrimary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20)),
+                child: Text('$count lớp',
+                    style: const TextStyle(
+                        color: _kPrimary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700)),
+              );
+            },
           ),
         ],
       ),

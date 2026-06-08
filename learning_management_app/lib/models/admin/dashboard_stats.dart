@@ -5,6 +5,7 @@ class DashboardStats {
   final int? todayAbsences;
   final double? totalTuitionDebt;
   final String? schoolName;
+  final int? schoolId;
 
   DashboardStats({
     this.totalStudents,
@@ -13,6 +14,7 @@ class DashboardStats {
     this.todayAbsences,
     this.totalTuitionDebt,
     this.schoolName,
+    this.schoolId,
   });
 
   factory DashboardStats.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class DashboardStats {
       todayAbsences: json['todayAbsences'],
       totalTuitionDebt: json['totalTuitionDebt'] != null ? (json['totalTuitionDebt'] as num).toDouble() : null,
       schoolName: json['schoolName'],
+      schoolId: json['schoolId'],
     );
   }
 }

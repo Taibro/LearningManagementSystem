@@ -9,6 +9,7 @@ class AdminUserManagementBloc extends Bloc<AdminUserManagementEvent, AdminUserMa
   AdminUserManagementBloc(this._repository) : super(AdminUserManagementInitial()) {
     on<AdminUserManagementCreateStudent>(_onCreateStudent);
     on<AdminUserManagementCreateTeacher>(_onCreateTeacher);
+    on<AdminUserManagementCreateClass>(_onCreateClass);
   }
 
   Future<void> _onCreateStudent(
@@ -28,6 +29,17 @@ class AdminUserManagementBloc extends Bloc<AdminUserManagementEvent, AdminUserMa
     try {
       await _repository.createTeacher(event.request);
       emit(const AdminUserManagementSuccess('Tạo giảng viên thành công'));
+    } catch (e) {
+      emit(AdminUserManagementFailure(e.toString()));
+    }
+  }
+
+  Future<void> _onCreateClass(
+      AdminUserManagementCreateClass event, Emitter<AdminUserManagementState> emit) async {
+    emit(AdminUserManagementLoading());
+    try {
+      await _repository.createClass(event.request);
+      emit(const AdminUserManagementSuccess('Tạo lớp học thành công'));
     } catch (e) {
       emit(AdminUserManagementFailure(e.toString()));
     }

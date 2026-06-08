@@ -6,13 +6,13 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:learning_management_app/core/network/fcm_service.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:learning_management_app/repositories/admin_repository.dart';
 
 import 'package:learning_management_app/screens/auth/school_code_screen.dart';
 import 'package:learning_management_app/screens/student/attendance_screen.dart';
 import 'package:learning_management_app/screens/student/home_screen.dart';
 import 'package:learning_management_app/screens/student/profile_screen.dart';
 import 'package:learning_management_app/screens/student/schedule_screen.dart';
-import 'package:learning_management_app/screens/admin/admin_main_layout.dart';
 import 'package:learning_management_app/core/globals.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,13 +29,20 @@ import 'package:learning_management_app/repositories/teacher_repository.dart';
 import 'package:learning_management_app/blocs/lecturer/profile/teacher_profile_bloc.dart';
 import 'package:learning_management_app/blocs/lecturer/salary/teacher_salary_bloc.dart';
 import 'package:learning_management_app/blocs/lecturer/statistic/teacher_statistic_bloc.dart';
+import 'package:learning_management_app/blocs/lecturer/material/teacher_material_bloc.dart';
 import 'package:learning_management_app/blocs/lecturer/attendance/teacher_attendance_bloc.dart';
+import 'package:learning_management_app/blocs/lecturer/request/teacher_request_bloc.dart';
 
 import 'package:learning_management_app/repositories/school_admin_repository.dart';
 import 'package:learning_management_app/blocs/admin/dashboard/admin_dashboard_bloc.dart';
 import 'package:learning_management_app/blocs/admin/request/admin_request_bloc.dart';
 import 'package:learning_management_app/blocs/admin/notification/admin_notification_bloc.dart';
 import 'package:learning_management_app/blocs/admin/user_management/admin_user_management_bloc.dart';
+import 'package:learning_management_app/blocs/admin/class/admin_class_bloc.dart';
+import 'package:learning_management_app/blocs/admin/users/admin_users_bloc.dart';
+import 'package:learning_management_app/blocs/admin/reports/admin_reports_bloc.dart';
+import 'package:learning_management_app/blocs/admin/settings/admin_semester_bloc.dart';
+import 'package:learning_management_app/blocs/admin/settings/room/admin_room_bloc.dart';
 
 import 'package:learning_management_app/core/utils/feature_manager.dart';
 
@@ -76,12 +83,19 @@ class MyApp extends StatelessWidget {
           BlocProvider(create: (context) => TeacherProfileBloc(context.read<TeacherRepository>())),
           BlocProvider(create: (context) => TeacherSalaryBloc(context.read<TeacherRepository>())),
           BlocProvider(create: (context) => TeacherStatisticBloc(context.read<TeacherRepository>())),
+          BlocProvider(create: (context) => TeacherMaterialBloc(repository: context.read<TeacherRepository>())),
           BlocProvider(create: (context) => TeacherAttendanceBloc(context.read<TeacherRepository>())),
+          BlocProvider(create: (context) => TeacherRequestBloc(repository: context.read<TeacherRepository>())),
           // Admin Blocs
           BlocProvider(create: (context) => AdminDashboardBloc(context.read<SchoolAdminRepository>())),
           BlocProvider(create: (context) => AdminRequestBloc(context.read<SchoolAdminRepository>())),
           BlocProvider(create: (context) => AdminNotificationBloc(context.read<SchoolAdminRepository>())),
           BlocProvider(create: (context) => AdminUserManagementBloc(context.read<SchoolAdminRepository>())),
+          BlocProvider(create: (context) => AdminClassBloc(context.read<AdminRepository>())),
+          BlocProvider(create: (context) => AdminUsersBloc(context.read<AdminRepository>())),
+          BlocProvider(create: (context) => AdminReportsBloc(context.read<AdminRepository>())),
+          BlocProvider(create: (context) => AdminSemesterBloc(context.read<SchoolAdminRepository>())),
+          BlocProvider(create: (context) => AdminRoomBloc(context.read<SchoolAdminRepository>())),
         ],
         child: MaterialApp(
           navigatorKey: navigatorKey,
@@ -158,12 +172,12 @@ class _MainLayoutState extends State<MainLayout> {
         margin: const EdgeInsets.fromLTRB(24, 0, 24, 16),
         height: 72,
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.85),
+          color: Colors.white.withAlpha(216), // 0.85 * 255 = ~216
           borderRadius: BorderRadius.circular(36),
           border: Border.all(color: Colors.white, width: 1.5),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF4F46E5).withOpacity(0.15),
+              color: const Color(0xFF4F46E5).withAlpha(38), // 0.15 * 255 = ~38
               blurRadius: 24,
               offset: const Offset(0, 10),
             ),
@@ -204,7 +218,7 @@ class _MainLayoutState extends State<MainLayout> {
                           curve: Curves.easeOutBack,
                           padding: EdgeInsets.all(isSelected ? 6 : 2),
                           decoration: BoxDecoration(
-                            color: isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
+                            color: isSelected ? primaryColor.withAlpha(25) : Colors.transparent, // 0.1 * 255 = 25
                             shape: BoxShape.circle,
                           ),
                           child: Icon(

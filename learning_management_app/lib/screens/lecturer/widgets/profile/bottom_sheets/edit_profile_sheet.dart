@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../blocs/lecturer/profile/teacher_profile_bloc.dart';
+import '../../../../../blocs/lecturer/profile/teacher_profile_state.dart';
 import 'shared_sheet_helpers.dart';
 
 class EditProfileSheet extends StatelessWidget {
@@ -18,20 +21,33 @@ class EditProfileSheet extends StatelessWidget {
           buildSheetHeader(
               'Thông tin giảng viên', 'Chỉ đọc', const Color(0xFF6B4FA0)),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  _buildProfileRow('Họ và tên', 'Nguyễn Văn A'),
-                  _buildProfileRow('Mã giảng viên', 'GV001'),
-                  _buildProfileRow('Khoa / Bộ môn', 'Công nghệ thông tin'),
-                  _buildProfileRow('Học hàm / Học vị', 'Tiến sĩ'),
-                  _buildProfileRow('Chức danh', 'Giảng viên chính'),
-                  _buildProfileRow('Email công vụ', 'gv001@huit.edu.vn'),
-                  _buildProfileRow('Điện thoại', '0901 234 567'),
-                  _buildProfileRow('Ngày vào trường', '15/08/2015'),
-                ],
-              ),
+            child: BlocBuilder<TeacherProfileBloc, TeacherProfileState>(
+              builder: (context, state) {
+                if (state is TeacherProfileLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is TeacherProfileLoadSuccess) {
+                  final profile = state.profile;
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        _buildProfileRow('Họ và tên', profile.fullName ?? 'Chưa cập nhật'),
+                        _buildProfileRow('Mã giảng viên', profile.teacherCode ?? 'Chưa cập nhật'),
+                        _buildProfileRow('Khoa / Bộ môn', profile.departmentName ?? 'Chưa cập nhật'),
+                        _buildProfileRow('Học hàm / Học vị', profile.degree ?? 'Chưa cập nhật'),
+                        _buildProfileRow('Email công vụ', profile.email ?? 'Chưa cập nhật'),
+                        _buildProfileRow('Điện thoại', profile.phone ?? 'Chưa cập nhật'),
+                        _buildProfileRow('Chuyên ngành', profile.specialization ?? 'Chưa cập nhật'),
+                      ],
+                    ),
+                  );
+                } else if (state is TeacherProfileLoadFailure) {
+                  return Center(
+                    child: Text('Lỗi: ${state.message}', style: const TextStyle(color: Colors.red)),
+                  );
+                }
+                return const Center(child: Text('Không có dữ liệu'));
+              },
             ),
           ),
         ],

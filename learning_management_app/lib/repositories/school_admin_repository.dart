@@ -2,6 +2,9 @@ import 'package:dio/dio.dart';
 import '../models/admin/dashboard_stats.dart';
 import '../models/admin/schedule_exception_response.dart';
 import '../models/admin/notification_response.dart';
+import '../models/admin/semester.dart';
+import '../models/admin/academic_year.dart';
+import '../models/admin/room.dart';
 
 class SchoolAdminRepository {
   final Dio _dio;
@@ -64,6 +67,14 @@ class SchoolAdminRepository {
     }
   }
 
+  Future<void> broadcastNotification(Map<String, dynamic> request) async {
+    try {
+      await _dio.post('/school-admin/notifications/broadcast', data: request);
+    } catch (e) {
+      throw Exception('Lỗi khi gửi thông báo hàng loạt: $e');
+    }
+  }
+
   Future<Map<String, dynamic>> createStudent(Map<String, dynamic> request) async {
     try {
       final response = await _dio.post('/school-admin/students', data: request);
@@ -79,6 +90,81 @@ class SchoolAdminRepository {
       return response.data;
     } catch (e) {
       throw Exception('Lỗi khi tạo giảng viên: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> createClass(Map<String, dynamic> request) async {
+    try {
+      final response = await _dio.post('/school-admin/classes', data: request);
+      return response.data;
+    } catch (e) {
+      throw Exception('Lỗi khi tạo lớp học: $e');
+    }
+  }
+
+  Future<List<Room>> getAllRooms() async {
+    try {
+      final response = await _dio.get('/school-admin/rooms/get-all');
+      final data = response.data as List;
+      return data.map((e) => Room.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception('Lỗi khi tải danh sách phòng học: $e');
+    }
+  }
+
+  Future<Room> createRoom(Map<String, dynamic> request) async {
+    try {
+      final response = await _dio.post('/school-admin/rooms', data: request);
+      return Room.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Lỗi khi tạo phòng học: $e');
+    }
+  }
+
+  Future<List<Semester>> getAllSemesters() async {
+    try {
+      final response = await _dio.get('/school-admin/semesters/get-all');
+      final data = response.data as List;
+      return data.map((e) => Semester.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception('Lỗi khi tải danh sách học kỳ: $e');
+    }
+  }
+
+  Future<Semester> createSemester(Map<String, dynamic> request) async {
+    try {
+      final response = await _dio.post('/school-admin/semesters', data: request);
+      return Semester.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Lỗi khi tạo học kỳ: $e');
+    }
+  }
+
+  Future<Semester> updateSemester(int id, Map<String, dynamic> request) async {
+    try {
+      final response = await _dio.put('/school-admin/semesters/$id', data: request);
+      return Semester.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Lỗi khi cập nhật học kỳ: $e');
+    }
+  }
+
+  Future<List<AcademicYear>> getAllAcademicYears(int schoolId) async {
+    try {
+      final response = await _dio.get('/school-admin/academic-years/school/$schoolId');
+      final data = response.data as List;
+      return data.map((e) => AcademicYear.fromJson(e)).toList();
+    } catch (e) {
+      throw Exception('Lỗi khi tải danh sách năm học: $e');
+    }
+  }
+
+  Future<AcademicYear> createAcademicYear(Map<String, dynamic> request) async {
+    try {
+      final response = await _dio.post('/school-admin/academic-years', data: request);
+      return AcademicYear.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Lỗi khi tạo năm học: $e');
     }
   }
 }

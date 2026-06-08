@@ -1,9 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../data/mock_home_data.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../repositories/teacher_repository.dart';
+import '../../../../models/admin/notification_response.dart';
+import 'package:intl/intl.dart';
 
-class RecentNotifications extends StatelessWidget {
+class RecentNotifications extends StatefulWidget {
   const RecentNotifications({super.key});
+
+  @override
+  State<RecentNotifications> createState() => _RecentNotificationsState();
+}
+
+class _RecentNotificationsState extends State<RecentNotifications> {
+  List<NotificationResponse> _notifications = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchNotifications();
+  }
+
+  Future<void> _fetchNotifications() async {
+    try {
+      final repo = context.read<TeacherRepository>();
+      final notifs = await repo.getMyNotifications();
+      if (mounted) {
+        setState(() {
+          // Take top 3 most recent
+          _notifications = notifs.take(3).toList();
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,18 +91,44 @@ class RecentNotifications extends StatelessWidget {
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(20),
-            child: Column(
-              children: kNotifications.asMap().entries.map((entry) {
+            child: _isLoading 
+                ? const Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Center(child: CircularProgressIndicator(color: Color(0xFF6B4FA0))),
+                  )
+                : _notifications.isEmpty 
+                    ? const Padding(
+                        padding: EdgeInsets.all(24),
+                        child: Center(child: Text('Không có thông báo nào', style: TextStyle(color: Colors.grey))),
+                      )
+                    : Column(
+              children: _notifications.asMap().entries.map((entry) {
                 final i = entry.key;
                 final n = entry.value;
+
+                IconData iconData = Icons.notifications;
+                Color color = const Color(0xFF6B4FA0);
+                if (n.type == 'SYSTEM') {
+                  iconData = Icons.info_outline_rounded;
+                  color = const Color(0xFF0EA5E9);
+                } else if (n.type == 'REQUEST_APPROVED') {
+                  iconData = Icons.check_circle_outline_rounded;
+                  color = const Color(0xFF22C55E);
+                }
+
+                String timeStr = '';
+                if (n.createdAt != null) {
+                  final dt = DateTime.parse(n.createdAt!).toLocal();
+                  timeStr = DateFormat('dd/MM/yyyy HH:mm').format(dt);
+                }
                 return Column(
                   children: [
                     Material(
                       color: Colors.transparent,
                       child: InkWell(
                         onTap: () {},
-                        highlightColor: (n['color'] as Color).withOpacity(0.05),
-                        splashColor: (n['color'] as Color).withOpacity(0.1),
+                        highlightColor: color.withOpacity(0.05),
+                        splashColor: color.withOpacity(0.1),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                           child: Row(
@@ -76,12 +137,12 @@ class RecentNotifications extends StatelessWidget {
                                 width: 44,
                                 height: 44,
                                 decoration: BoxDecoration(
-                                  color: (n['color'] as Color).withOpacity(0.08),
+                                  color: color.withOpacity(0.08),
                                   borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: (n['color'] as Color).withOpacity(0.1), width: 1),
+                                  border: Border.all(color: color.withOpacity(0.1), width: 1),
                                 ),
-                                child: Icon(n['icon'] as IconData,
-                                    color: n['color'] as Color, size: 22),
+                                child: Icon(iconData,
+                                    color: color, size: 22),
                               ),
                               const SizedBox(width: 16),
                               Expanded(
@@ -89,7 +150,7 @@ class RecentNotifications extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      n['title'],
+                                      n.title ?? '',
                                       style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w600,
@@ -99,7 +160,7 @@ class RecentNotifications extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      n['time'],
+                                      timeStr,
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: Color(0xFF64748B),
@@ -117,7 +178,7 @@ class RecentNotifications extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (i < kNotifications.length - 1)
+                    if (i < _notifications.length - 1)
                       const Divider(
                         height: 1,
                         thickness: 1,

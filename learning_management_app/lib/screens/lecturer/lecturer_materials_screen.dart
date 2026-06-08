@@ -3,6 +3,12 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'widgets/shared/lecturer_custom_app_bar.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../blocs/lecturer/material/teacher_material_bloc.dart';
+import '../../blocs/lecturer/material/teacher_material_event.dart';
+import '../../blocs/lecturer/material/teacher_material_state.dart';
+import '../../models/lecturer/teacher_material.dart';
+
 const Color _kPrimary = Color(0xFF6B4FA0);
 const Color _kBg = Color(0xFFF8F9FA);
 
@@ -14,111 +20,100 @@ class LecturerMaterialsScreen extends StatefulWidget {
       _LecturerMaterialsScreenState();
 }
 
-class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-
-  final List<Map<String, dynamic>> _materials = [
-    {
-      'name': 'Slide Chương 1 - Tổng quan',
-      'subject': 'Kiến trúc máy tính',
-      'type': 'slide',
-      'size': '2.4 MB',
-      'date': '12/03/2026',
-      'status': 'approved',
-    },
-    {
-      'name': 'Bài tập thực hành Lab 1',
-      'subject': 'TH Quản trị HT Mạng',
-      'type': 'doc',
-      'size': '1.1 MB',
-      'date': '15/03/2026',
-      'status': 'approved',
-    },
-    {
-      'name': 'Slide Chương 2 - Bộ xử lý',
-      'subject': 'Kiến trúc máy tính',
-      'type': 'slide',
-      'size': '3.8 MB',
-      'date': '20/03/2026',
-      'status': 'pending',
-    },
-    {
-      'name': 'Đề cương môn học HK2',
-      'subject': 'Lập trình mạng',
-      'type': 'doc',
-      'size': '580 KB',
-      'date': '01/02/2026',
-      'status': 'approved',
-    },
-    {
-      'name': 'Video bài giảng - Chương 3',
-      'subject': 'An ninh mạng',
-      'type': 'video',
-      'size': '85 MB',
-      'date': '25/03/2026',
-      'status': 'pending',
-    },
-  ];
+class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen> {
+  String? _selectedClassInfo;
+  
+  // Controllers for upload dialog
+  final _titleController = TextEditingController();
+  String? _uploadSelectedClass;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    context.read<TeacherMaterialBloc>().add(const TeacherMaterialFetchRequested(teacherId: 0));
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _titleController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _kBg,
-      body: Column(
-        children: [
-          const LecturerCustomAppBar(title: 'Tài liệu bài giảng'),
-          _buildTabBar(),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildMaterialList(null),
-                _buildMaterialList('approved'),
-                _buildMaterialList('pending'),
-              ],
+    return BlocListener<TeacherMaterialBloc, TeacherMaterialState>(
+      listener: (context, state) {
+        if (state is TeacherMaterialUploadSuccess) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.message)));
+        } else if (state is TeacherMaterialUploadFailure) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi tải lên: ${state.message}'), backgroundColor: Colors.red));
+        }
+      },
+      child: Scaffold(
+        backgroundColor: _kBg,
+        body: Column(
+          children: [
+            const LecturerCustomAppBar(title: 'Tài liệu bài giảng'),
+            Expanded(
+              child: BlocBuilder<TeacherMaterialBloc, TeacherMaterialState>(
+                builder: (context, state) {
+                  if (state is TeacherMaterialLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is TeacherMaterialLoadFailure) {
+                    return Center(child: Text('Lỗi: ${state.message}', style: const TextStyle(color: Colors.red)));
+                  } else if (state is TeacherMaterialLoadSuccess) {
+                    final materials = state.materials;
+                    final uniqueClasses = materials.map((m) => m.classInfo).whereType<String>().toSet().toList();
+                    if (_selectedClassInfo != null && !uniqueClasses.contains(_selectedClassInfo)) {
+                      _selectedClassInfo = null;
+                    }
+                    
+                    return Column(
+                      children: [
+                        if (uniqueClasses.isNotEmpty) _buildClassFilter(uniqueClasses),
+                        Expanded(child: _buildMaterialList(materials)),
+                      ],
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: () {
+            final state = context.read<TeacherMaterialBloc>().state;
+            if (state is TeacherMaterialLoadSuccess) {
+               final uniqueClasses = state.materials.map((m) => m.classInfo).whereType<String>().toSet().toList();
+               _showUploadDialog(context, uniqueClasses);
+            }
+          },
+          backgroundColor: _kPrimary,
+          elevation: 4,
+          highlightElevation: 8,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          icon: const Icon(Icons.upload_file_rounded, color: Colors.white, size: 20),
+          label: Text(
+            'Tải lên',
+            style: GoogleFonts.inter(
+              color: Colors.white,
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
             ),
           ),
-        ],
+        ).animate().scale(curve: Curves.easeOutBack, delay: 500.ms),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showUploadDialog(context),
-        backgroundColor: _kPrimary,
-        elevation: 4,
-        highlightElevation: 8,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        icon: const Icon(Icons.upload_file_rounded, color: Colors.white, size: 20),
-        label: Text(
-          'Tải lên',
-          style: GoogleFonts.inter(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontSize: 14,
-          ),
-        ),
-      ).animate().scale(curve: Curves.easeOutBack, delay: 500.ms),
     );
   }
 
-  Widget _buildTabBar() {
+  Widget _buildClassFilter(List<String> classes) {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-      height: 48,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFF1F5F9), width: 1.5),
         boxShadow: [
           BoxShadow(
@@ -128,38 +123,36 @@ class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen>
           ),
         ],
       ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: BoxDecoration(
-          color: _kPrimary,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: _kPrimary.withOpacity(0.3),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          isExpanded: true,
+          value: _selectedClassInfo,
+          hint: Text('Tất cả các lớp', style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF64748B))),
+          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF64748B)),
+          items: [
+            DropdownMenuItem<String>(
+              value: null,
+              child: Text('Tất cả các lớp', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
             ),
+            ...classes.map((c) => DropdownMenuItem(
+                  value: c,
+                  child: Text(c, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
+                ))
           ],
+          onChanged: (val) {
+            setState(() {
+              _selectedClassInfo = val;
+            });
+          },
         ),
-        indicatorSize: TabBarIndicatorSize.tab,
-        dividerColor: Colors.transparent,
-        labelColor: Colors.white,
-        unselectedLabelColor: const Color(0xFF64748B),
-        labelStyle: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 13),
-        unselectedLabelStyle: GoogleFonts.inter(fontWeight: FontWeight.w500, fontSize: 13),
-        tabs: const [
-          Tab(text: 'Tất cả'),
-          Tab(text: 'Đã duyệt'),
-          Tab(text: 'Chờ duyệt'),
-        ],
       ),
     ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0);
   }
 
-  Widget _buildMaterialList(String? statusFilter) {
-    final filtered = statusFilter == null
-        ? _materials
-        : _materials.where((m) => m['status'] == statusFilter).toList();
+  Widget _buildMaterialList(List<TeacherMaterial> allMaterials) {
+    final filtered = _selectedClassInfo == null
+        ? allMaterials
+        : allMaterials.where((m) => m.classInfo == _selectedClassInfo).toList();
 
     if (filtered.isEmpty) {
       return Center(
@@ -188,24 +181,20 @@ class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen>
     );
   }
 
-  Widget _buildMaterialCard(Map<String, dynamic> material) {
+  Widget _buildMaterialCard(TeacherMaterial material) {
     IconData typeIcon;
     Color typeColor;
-    switch (material['type']) {
-      case 'slide':
-        typeIcon = Icons.slideshow_rounded;
-        typeColor = const Color(0xFFF59E0B);
-        break;
-      case 'video':
-        typeIcon = Icons.play_circle_fill_rounded;
-        typeColor = const Color(0xFFEF4444);
-        break;
-      default:
-        typeIcon = Icons.description_rounded;
-        typeColor = const Color(0xFF3B82F6);
+    final typeLower = (material.docType ?? '').toLowerCase();
+    if (typeLower.contains('slide') || typeLower.contains('ppt')) {
+      typeIcon = Icons.slideshow_rounded;
+      typeColor = const Color(0xFFF59E0B);
+    } else if (typeLower.contains('video') || typeLower.contains('mp4')) {
+      typeIcon = Icons.play_circle_fill_rounded;
+      typeColor = const Color(0xFFEF4444);
+    } else {
+      typeIcon = Icons.description_rounded;
+      typeColor = const Color(0xFF3B82F6);
     }
-
-    final isApproved = material['status'] == 'approved';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -239,7 +228,7 @@ class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  material['name'],
+                  material.title ?? 'Không có tiêu đề',
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
@@ -248,35 +237,15 @@ class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen>
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  '${material['subject']}  ·  ${material['size']}',
+                  '${material.classInfo ?? '?'}  ·  ${material.fileSize ?? '?'}',
                   style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF64748B), fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  material['date'],
+                  material.uploadDate ?? '',
                   style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF94A3B8), fontWeight: FontWeight.w500),
                 ),
               ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            decoration: BoxDecoration(
-              color: isApproved
-                  ? const Color(0xFFECFDF5)
-                  : const Color(0xFFFFFBEB),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              isApproved ? 'Đã duyệt' : 'Chờ duyệt',
-              style: GoogleFonts.inter(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: isApproved
-                    ? const Color(0xFF10B981)
-                    : const Color(0xFFF59E0B),
-              ),
             ),
           ),
         ],
@@ -284,49 +253,120 @@ class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen>
     );
   }
 
-  void _showUploadDialog(BuildContext context) {
+  void _showUploadDialog(BuildContext context, List<String> availableClasses) {
+    if (availableClasses.isNotEmpty && _uploadSelectedClass == null) {
+      _uploadSelectedClass = availableClasses.first;
+    }
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: _kPrimary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          return AlertDialog(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: _kPrimary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(Icons.cloud_upload_rounded, color: _kPrimary, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Tải lên tài liệu',
+                  style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800, fontSize: 18, color: const Color(0xFF1E293B)),
+                ),
+              ],
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _titleController,
+                    decoration: InputDecoration(
+                      labelText: 'Tên tài liệu',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  if (availableClasses.isNotEmpty)
+                    DropdownButtonFormField<String>(
+                      decoration: InputDecoration(
+                        labelText: 'Chọn lớp',
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                      value: _uploadSelectedClass,
+                      items: availableClasses.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                      onChanged: (val) {
+                        setDialogState(() {
+                          _uploadSelectedClass = val;
+                        });
+                      },
+                    ),
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.grey.shade50,
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(Icons.upload_file, size: 32, color: Colors.grey.shade400),
+                        const SizedBox(height: 8),
+                        Text('Nhấn để chọn tệp', style: GoogleFonts.inter(color: Colors.grey.shade600)),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              child: const Icon(Icons.cloud_upload_rounded, color: _kPrimary, size: 20),
             ),
-            const SizedBox(width: 12),
-            Text(
-              'Tải lên tài liệu',
-              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800, fontSize: 18, color: const Color(0xFF1E293B)),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Chức năng tải lên tài liệu sẽ được cập nhật trong phiên bản tiếp theo.',
-              style: GoogleFonts.inter(fontSize: 14, height: 1.5, color: const Color(0xFF475569)),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            style: TextButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: Text('Đóng', style: GoogleFonts.inter(color: _kPrimary, fontWeight: FontWeight.w700)),
-          ),
-        ],
-      ).animate().scale(curve: Curves.easeOutBack, duration: 300.ms),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _titleController.clear();
+                },
+                child: Text('Hủy', style: GoogleFonts.inter(color: Colors.grey, fontWeight: FontWeight.w600)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (_titleController.text.trim().isEmpty || _uploadSelectedClass == null) {
+                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng nhập đủ thông tin')));
+                     return;
+                  }
+                  
+                  final request = {
+                    'title': _titleController.text.trim(),
+                    'classInfo': _uploadSelectedClass,
+                    'fileSize': 'Mock Size', // Thực tế sẽ lấy từ File picker
+                  };
+                  
+                  this.context.read<TeacherMaterialBloc>().add(TeacherMaterialUploadRequested(request: request, teacherId: 0));
+                  
+                  Navigator.pop(ctx);
+                  _titleController.clear();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: _kPrimary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text('Tải lên', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w700)),
+              ),
+            ],
+          ).animate().scale(curve: Curves.easeOutBack, duration: 300.ms);
+        }
+      ),
     );
   }
 }

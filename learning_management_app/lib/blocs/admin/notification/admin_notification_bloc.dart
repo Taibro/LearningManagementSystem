@@ -9,6 +9,7 @@ class AdminNotificationBloc extends Bloc<AdminNotificationEvent, AdminNotificati
   AdminNotificationBloc(this._repository) : super(AdminNotificationInitial()) {
     on<AdminNotificationFetchAll>(_onFetchAll);
     on<AdminNotificationCreate>(_onCreate);
+    on<AdminNotificationBroadcast>(_onBroadcast);
   }
 
   Future<void> _onFetchAll(
@@ -27,6 +28,17 @@ class AdminNotificationBloc extends Bloc<AdminNotificationEvent, AdminNotificati
     try {
       await _repository.createNotification(event.request);
       emit(const AdminNotificationActionSuccess('Đã gửi thông báo thành công'));
+      add(const AdminNotificationFetchAll()); // Reload
+    } catch (e) {
+      emit(AdminNotificationActionFailure(e.toString()));
+    }
+  }
+
+  Future<void> _onBroadcast(
+      AdminNotificationBroadcast event, Emitter<AdminNotificationState> emit) async {
+    try {
+      await _repository.broadcastNotification(event.request);
+      emit(const AdminNotificationActionSuccess('Đã gửi thông báo hàng loạt thành công'));
       add(const AdminNotificationFetchAll()); // Reload
     } catch (e) {
       emit(AdminNotificationActionFailure(e.toString()));
