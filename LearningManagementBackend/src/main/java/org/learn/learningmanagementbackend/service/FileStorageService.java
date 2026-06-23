@@ -91,10 +91,12 @@ public class FileStorageService {
                     detectedType.equals("application/x-rar-compressed") ||
                     detectedType.equals("application/vnd.rar") ||
                     detectedType.equals("image/jpeg") ||
-                    detectedType.equals("image/png");
+                    detectedType.equals("image/png") ||
+                    detectedType.equals("video/mp4") ||
+                    detectedType.equals("text/plain");
 
             if (!isValid) {
-                throw new RuntimeException("Định dạng file không hợp lệ! Chỉ cho phép tải lên file học thuật (PDF, Word, Excel, PPT), file nén (ZIP, RAR) hoặc hình ảnh (JPG, PNG).");
+                throw new RuntimeException("Định dạng file không hợp lệ! Chỉ cho phép tải lên file học thuật (PDF, Word, Excel, PPT, TXT), file nén (ZIP, RAR), hình ảnh (JPG, PNG) hoặc video (MP4).");
             }
         } catch (IOException e) {
             throw new RuntimeException("Không thể phân tích định dạng file: " + e.getMessage());

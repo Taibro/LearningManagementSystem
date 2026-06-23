@@ -351,24 +351,6 @@ class _LoginScreenState extends State<LoginScreen> {
             isPassword: true,
           ).animate().fade(delay: 400.ms).slideX(begin: 0.1, end: 0),
 
-          const SizedBox(height: 12),
-
-          // Forgot password
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {},
-              child: Text(
-                'Quên mật khẩu?',
-                style: GoogleFonts.inter(
-                  color: _accentColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ).animate().fade(delay: 500.ms),
-
           const SizedBox(height: 24),
 
           // Login button
@@ -413,64 +395,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ).animate().fade(delay: 600.ms).scale(curve: Curves.easeOutBack);
             },
-          ),
-
-          const SizedBox(height: 32),
-
-          // Divider
-          Row(
-            children: [
-              Expanded(child: Divider(color: const Color(0xFFE2E8F0), thickness: 1.5)),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  'hoặc',
-                  style: GoogleFonts.inter(
-                    color: const Color(0xFF94A3B8),
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-              Expanded(child: Divider(color: const Color(0xFFE2E8F0), thickness: 1.5)),
-            ],
-          ).animate().fade(delay: 700.ms),
-
-          const SizedBox(height: 24),
-
-          // Biometric login
-          Center(
-            child: Column(
-              children: [
-                GestureDetector(
-                  onTap: _showBiometricDialog,
-                  child: Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: _accentColor.withOpacity(0.1),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: _accentColor.withOpacity(0.3), width: 2),
-                    ),
-                    child: Icon(
-                      Icons.fingerprint_rounded,
-                      size: 40,
-                      color: _accentColor,
-                    ),
-                  ).animate(onPlay: (AnimationController c) => c.repeat(reverse: true))
-                   .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 2000.ms, curve: Curves.easeInOut),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  'Đăng nhập bằng sinh trắc học',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: const Color(0xFF64748B),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ).animate().fade(delay: 800.ms).slideY(begin: 0.2, end: 0),
           ),
         ],
       ),
@@ -525,48 +449,6 @@ class _LoginScreenState extends State<LoginScreen> {
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           border: InputBorder.none,
         ),
-      ),
-    );
-  }
-
-  void _showBiometricDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: Colors.white,
-        title: Text(
-          'Xác thực sinh trắc học',
-          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w800, fontSize: 20, color: const Color(0xFF0F172A)),
-        ),
-        content: Text(
-          'Xác thực sinh trắc học chưa được thiết lập trên thiết bị của bạn. '
-          'Vào Cài đặt > Bảo mật để thêm xác thực sinh trắc học.',
-          style: GoogleFonts.inter(fontSize: 15, height: 1.5, color: const Color(0xFF475569)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
-            child: Text(
-              'HUỶ',
-              style: GoogleFonts.inter(color: const Color(0xFF64748B), fontWeight: FontWeight.w700, fontSize: 14),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: _accentColor,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: Text(
-              'ĐẾN CÀI ĐẶT',
-              style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 14),
-            ),
-          ),
-        ],
       ),
     );
   }

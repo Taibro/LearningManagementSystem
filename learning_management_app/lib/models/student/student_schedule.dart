@@ -22,6 +22,7 @@ class StudentSchedule {
   final int? replacementStartPeriod;
   final int? replacementEndPeriod;
   final String? replacementRoomName;
+  final String? attendanceStatus;
 
   StudentSchedule({
     this.courseName,
@@ -47,6 +48,7 @@ class StudentSchedule {
     this.replacementStartPeriod,
     this.replacementEndPeriod,
     this.replacementRoomName,
+    this.attendanceStatus,
   });
 
   factory StudentSchedule.fromJson(Map<String, dynamic> json) {
@@ -80,6 +82,7 @@ class StudentSchedule {
       replacementStartPeriod: json['replacementStartPeriod'],
       replacementEndPeriod: json['replacementEndPeriod'],
       replacementRoomName: json['replacementRoomName'],
+      attendanceStatus: json['attendanceStatus'],
     );
   }
 }

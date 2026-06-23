@@ -8,6 +8,13 @@ import '../../blocs/lecturer/material/teacher_material_bloc.dart';
 import '../../blocs/lecturer/material/teacher_material_event.dart';
 import '../../blocs/lecturer/material/teacher_material_state.dart';
 import '../../models/lecturer/teacher_material.dart';
+import '../../blocs/auth/auth_bloc.dart';
+import '../../blocs/auth/auth_state.dart';
+import '../../repositories/teacher_repository.dart';
+import '../../models/lecturer/active_class_schedule.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:dio/dio.dart';
+import 'dart:io';
 
 const Color _kPrimary = Color(0xFF6B4FA0);
 const Color _kBg = Color(0xFFF8F9FA);
@@ -23,14 +30,38 @@ class LecturerMaterialsScreen extends StatefulWidget {
 class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen> {
   String? _selectedClassInfo;
   
+  int _teacherId = 0;
+  List<ActiveClassSchedule>? _activeClasses;
+  
   // Controllers for upload dialog
   final _titleController = TextEditingController();
-  String? _uploadSelectedClass;
+  ActiveClassSchedule? _uploadSelectedClass;
+  PlatformFile? _selectedFile;
 
   @override
   void initState() {
     super.initState();
-    context.read<TeacherMaterialBloc>().add(const TeacherMaterialFetchRequested(teacherId: 0));
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    final authState = context.read<AuthBloc>().state;
+    if (authState is AuthSuccess) {
+      _teacherId = authState.user.id ?? 0;
+    }
+    context.read<TeacherMaterialBloc>().add(TeacherMaterialFetchRequested(teacherId: _teacherId));
+    
+    try {
+      final repo = context.read<TeacherRepository>();
+      final classes = await repo.getActiveClasses();
+      if (mounted) {
+        setState(() {
+          _activeClasses = classes;
+        });
+      }
+    } catch (e) {
+      debugPrint('Lỗi tải danh sách lớp: $e');
+    }
   }
 
   @override
@@ -83,11 +114,7 @@ class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen> {
         ),
         floatingActionButton: FloatingActionButton.extended(
           onPressed: () {
-            final state = context.read<TeacherMaterialBloc>().state;
-            if (state is TeacherMaterialLoadSuccess) {
-               final uniqueClasses = state.materials.map((m) => m.classInfo).whereType<String>().toSet().toList();
-               _showUploadDialog(context, uniqueClasses);
-            }
+            _showUploadDialog(context);
           },
           backgroundColor: _kPrimary,
           elevation: 4,
@@ -253,15 +280,22 @@ class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen> {
     );
   }
 
-  void _showUploadDialog(BuildContext context, List<String> availableClasses) {
-    if (availableClasses.isNotEmpty && _uploadSelectedClass == null) {
-      _uploadSelectedClass = availableClasses.first;
+  void _showUploadDialog(BuildContext context) {
+    if (_activeClasses == null || _activeClasses!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Không có lớp học nào khả dụng để tải lên.')),
+      );
+      return;
+    }
+
+    if (_uploadSelectedClass == null) {
+      _uploadSelectedClass = _activeClasses!.first;
     }
 
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) {
+        builder: (innerContext, setDialogState) {
           return AlertDialog(
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
@@ -296,36 +330,75 @@ class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  if (availableClasses.isNotEmpty)
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: 'Chọn lớp',
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      ),
-                      value: _uploadSelectedClass,
-                      items: availableClasses.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                      onChanged: (val) {
-                        setDialogState(() {
-                          _uploadSelectedClass = val;
-                        });
-                      },
+                  DropdownButtonFormField<ActiveClassSchedule>(
+                    decoration: InputDecoration(
+                      labelText: 'Chọn lớp',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
+                    value: _uploadSelectedClass,
+                    isExpanded: true,
+                    items: _activeClasses!.map((c) => DropdownMenuItem(
+                      value: c, 
+                      child: Text('${c.classCode} - ${c.courseName}', overflow: TextOverflow.ellipsis),
+                    )).toList(),
+                    onChanged: (val) {
+                      setDialogState(() {
+                        _uploadSelectedClass = val;
+                      });
+                    },
+                  ),
                   const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+                  Material(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    child: InkWell(
+                      onTap: () async {
+                        try {
+                          final result = await FilePicker.pickFiles(
+                            type: FileType.custom,
+                            allowedExtensions: ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'txt', 'zip', 'rar', 'mp4'],
+                          );
+                          if (result != null && result.files.isNotEmpty) {
+                            setDialogState(() {
+                              _selectedFile = result.files.single;
+                            });
+                          }
+                        } catch (e) {
+                          if (innerContext.mounted) {
+                            ScaffoldMessenger.of(innerContext).showSnackBar(
+                              SnackBar(content: Text('Lỗi chọn tệp: $e')),
+                            );
+                          }
+                        }
+                      },
                       borderRadius: BorderRadius.circular(12),
-                      color: Colors.grey.shade50,
-                    ),
-                    child: Column(
-                      children: [
-                        Icon(Icons.upload_file, size: 32, color: Colors.grey.shade400),
-                        const SizedBox(height: 8),
-                        Text('Nhấn để chọn tệp', style: GoogleFonts.inter(color: Colors.grey.shade600)),
-                      ],
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          children: [
+                            Icon(
+                              _selectedFile != null ? Icons.check_circle_rounded : Icons.upload_file, 
+                              size: 32, 
+                              color: _selectedFile != null ? Colors.green : Colors.grey.shade400
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _selectedFile != null ? _selectedFile!.name : 'Nhấn để chọn tệp', 
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.inter(
+                                color: _selectedFile != null ? Colors.green.shade700 : Colors.grey.shade600,
+                                fontWeight: _selectedFile != null ? FontWeight.w600 : FontWeight.w500,
+                              )
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -336,26 +409,39 @@ class _LecturerMaterialsScreenState extends State<LecturerMaterialsScreen> {
                 onPressed: () {
                   Navigator.pop(ctx);
                   _titleController.clear();
+                  _selectedFile = null;
                 },
                 child: Text('Hủy', style: GoogleFonts.inter(color: Colors.grey, fontWeight: FontWeight.w600)),
               ),
               ElevatedButton(
-                onPressed: () {
-                  if (_titleController.text.trim().isEmpty || _uploadSelectedClass == null) {
-                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Vui lòng nhập đủ thông tin')));
+                onPressed: () async {
+                  if (_titleController.text.trim().isEmpty || _uploadSelectedClass == null || _selectedFile == null) {
+                     ScaffoldMessenger.of(this.context).showSnackBar(const SnackBar(content: Text('Vui lòng nhập đủ thông tin và chọn tệp')));
                      return;
                   }
                   
-                  final request = {
-                    'title': _titleController.text.trim(),
-                    'classInfo': _uploadSelectedClass,
-                    'fileSize': 'Mock Size', // Thực tế sẽ lấy từ File picker
-                  };
+                  final ext = _selectedFile!.extension?.toLowerCase() ?? '';
+                  String docType = 'Tài liệu tham khảo';
+                  if (['ppt', 'pptx'].contains(ext)) docType = 'Bài giảng (Slide)';
+                  else if (['mp4'].contains(ext)) docType = 'Video bài giảng';
+                  else if (['doc', 'docx', 'pdf'].contains(ext)) docType = 'Đề cương/Giáo trình';
                   
-                  this.context.read<TeacherMaterialBloc>().add(TeacherMaterialUploadRequested(request: request, teacherId: 0));
+                  final formData = FormData.fromMap({
+                    'classId': _uploadSelectedClass!.classId,
+                    'teacherId': _teacherId,
+                    'title': _titleController.text.trim(),
+                    'docType': docType,
+                    'uploadDate': DateTime.now().toIso8601String().split('T')[0],
+                    'file': await MultipartFile.fromFile(_selectedFile!.path!, filename: _selectedFile!.name),
+                  });
+                  
+                  if (!mounted) return;
+                  
+                  this.context.read<TeacherMaterialBloc>().add(TeacherMaterialUploadRequested(request: formData, teacherId: _teacherId));
                   
                   Navigator.pop(ctx);
                   _titleController.clear();
+                  _selectedFile = null;
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _kPrimary,

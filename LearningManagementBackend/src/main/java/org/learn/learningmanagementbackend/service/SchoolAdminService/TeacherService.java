@@ -64,6 +64,16 @@ public class TeacherService {
 
         // Tạo User account
         Users user = new Users();
+
+        Object principal = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof org.learn.learningmanagementbackend.security.CustomUserDetails) {
+            Integer currentUserId = ((org.learn.learningmanagementbackend.security.CustomUserDetails) principal).getUserId();
+            org.learn.learningmanagementbackend.model.School currentSchool = entityManager.createQuery("SELECT u.school FROM Users u WHERE u.id = :userId", org.learn.learningmanagementbackend.model.School.class)
+                    .setParameter("userId", currentUserId).setMaxResults(1).getSingleResult();
+            user.setSchool(currentSchool);
+        }
+
+        user.setCode(request.getCitizenIdNumber());
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPhone(request.getPhone());

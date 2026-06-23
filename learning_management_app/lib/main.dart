@@ -14,6 +14,7 @@ import 'package:learning_management_app/screens/student/home_screen.dart';
 import 'package:learning_management_app/screens/student/profile_screen.dart';
 import 'package:learning_management_app/screens/student/schedule_screen.dart';
 import 'package:learning_management_app/core/globals.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:learning_management_app/core/network/dio_client.dart';
@@ -49,6 +50,7 @@ import 'package:learning_management_app/core/utils/feature_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('vi', null);
   await dotenv.load(fileName: ".env");
   try {
     await Firebase.initializeApp();
@@ -71,6 +73,7 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(create: (context) => StudentRepository(context.read<DioClient>())),
         RepositoryProvider(create: (context) => TeacherRepository(context.read<DioClient>().dio)),
         RepositoryProvider(create: (context) => SchoolAdminRepository(context.read<DioClient>().dio)),
+        RepositoryProvider(create: (context) => AdminRepository(context.read<DioClient>().dio)),
       ],
       child: MultiBlocProvider(
         providers: [

@@ -77,18 +77,73 @@ class SchoolAdminRepository {
 
   Future<Map<String, dynamic>> createStudent(Map<String, dynamic> request) async {
     try {
-      final response = await _dio.post('/school-admin/students', data: request);
-      return response.data;
+      // 1. Create User first
+      final userResp = await _dio.post('/school-admin/users', data: {
+        'fullName': request['fullName'],
+        'email': request['email'],
+        'phone': request['phoneNumber'],
+        'citizenIdNumber': request['studentCode'] ?? 'SV${DateTime.now().millisecondsSinceEpoch}', // Dummy CCCD if missing
+        'isActive': true
+      });
+      final userId = userResp.data['id'];
+
+      // 2. Map faculty to departmentId
+      int deptId = 1;
+      if (request['faculty'] == 'Kế toán') deptId = 2;
+      else if (request['faculty'] == 'Quản trị kinh doanh') deptId = 3;
+      else if (request['faculty'] == 'Cơ khí') deptId = 4;
+      else if (request['faculty'] == 'Ngoại ngữ') deptId = 5;
+
+      int enrollmentYear = DateTime.now().year;
+      if (request['academicYear'] != null) {
+         final yearStr = request['academicYear'].toString().split('-').first;
+         enrollmentYear = int.tryParse(yearStr) ?? enrollmentYear;
+      }
+
+      // 3. Create Student
+      final studentResp = await _dio.post('/school-admin/students', data: {
+        'userId': userId,
+        'studentCode': request['studentCode'],
+        'className': request['className'],
+        'departmentId': deptId,
+        'enrollmentYear': enrollmentYear,
+        'major': request['faculty'],
+      });
+      
+      return studentResp.data;
     } catch (e) {
+      if (e is DioException && e.response != null) {
+        throw Exception('Lỗi khi tạo sinh viên: ${e.response?.data}');
+      }
       throw Exception('Lỗi khi tạo sinh viên: $e');
     }
   }
 
   Future<Map<String, dynamic>> createTeacher(Map<String, dynamic> request) async {
     try {
-      final response = await _dio.post('/school-admin/teachers', data: request);
+      int deptId = 1;
+      if (request['faculty'] == 'Kế toán') deptId = 2;
+      else if (request['faculty'] == 'Quản trị kinh doanh') deptId = 3;
+      else if (request['faculty'] == 'Cơ khí') deptId = 4;
+      else if (request['faculty'] == 'Ngoại ngữ') deptId = 5;
+
+      final mappedRequest = {
+        'fullName': request['fullName'],
+        'email': request['email'],
+        'phone': request['phoneNumber'],
+        'citizenIdNumber': request['teacherCode'] ?? 'GV${DateTime.now().millisecondsSinceEpoch}',
+        'teacherCode': request['teacherCode'],
+        'degree': request['degree'],
+        'specialization': request['position'] ?? request['faculty'],
+        'departmentId': deptId,
+      };
+
+      final response = await _dio.post('/school-admin/teachers', data: mappedRequest);
       return response.data;
     } catch (e) {
+      if (e is DioException && e.response != null) {
+        throw Exception('Lỗi khi tạo giảng viên: ${e.response?.data}');
+      }
       throw Exception('Lỗi khi tạo giảng viên: $e');
     }
   }
@@ -98,6 +153,9 @@ class SchoolAdminRepository {
       final response = await _dio.post('/school-admin/classes', data: request);
       return response.data;
     } catch (e) {
+      if (e is DioException && e.response != null) {
+        throw Exception('Lỗi khi tạo lớp học: ${e.response?.data}');
+      }
       throw Exception('Lỗi khi tạo lớp học: $e');
     }
   }

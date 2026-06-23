@@ -136,10 +136,13 @@ class TeacherRepository {
     }
   }
 
-  Future<void> uploadMaterial(Map<String, dynamic> request) async {
+  Future<void> uploadMaterial(dynamic request) async {
     try {
       await _dio.post('/lecturer/materials/upload', data: request);
     } catch (e) {
+      if (e is DioException && e.response != null) {
+        throw Exception('Lỗi khi tải lên tài liệu (Mã lỗi: ${e.response?.statusCode}): ${e.response?.data}');
+      }
       throw Exception('Lỗi khi tải lên tài liệu: $e');
     }
   }

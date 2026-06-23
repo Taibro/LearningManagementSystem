@@ -17,7 +17,7 @@ class TeacherMaterialFetchRequested extends TeacherMaterialEvent {
 }
 
 class TeacherMaterialUploadRequested extends TeacherMaterialEvent {
-  final Map<String, dynamic> request;
+  final dynamic request;
   final int teacherId;
 
   const TeacherMaterialUploadRequested({required this.request, required this.teacherId});

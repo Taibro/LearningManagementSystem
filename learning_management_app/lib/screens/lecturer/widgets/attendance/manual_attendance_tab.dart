@@ -206,7 +206,7 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
           Row(
             children: [
               Expanded(
-                flex: 3,
+                flex: 5,
                 child: _buildDropdown<ActiveClassSchedule>(
                   'Lớp học phần',
                   _activeClasses!,
@@ -227,7 +227,7 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
               ),
               const SizedBox(width: 16),
               Expanded(
-                flex: 2,
+                flex: 4,
                 child: _buildDatePicker(),
               ),
             ],
@@ -318,7 +318,7 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
           },
           borderRadius: BorderRadius.circular(12),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 14),
             decoration: BoxDecoration(
               color: const Color(0xFFF8FAFC),
               borderRadius: BorderRadius.circular(12),
@@ -326,10 +326,14 @@ class _ManualAttendanceTabState extends State<ManualAttendanceTab> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  DateFormat('dd/MM/yyyy').format(DateTime.parse(_selectedDate)),
-                  style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1E293B)),
+                Flexible(
+                  child: Text(
+                    DateFormat('dd/MM/yyyy').format(DateTime.parse(_selectedDate)),
+                    style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1E293B)),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
+                const SizedBox(width: 4),
                 const Icon(Icons.calendar_today_rounded, color: Color(0xFF64748B), size: 18),
               ],
             ),

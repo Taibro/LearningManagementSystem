@@ -36,15 +36,28 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
 
       final todaySchedules = schedules.where((s) => s.dayOfWeek == targetDay).toList();
 
+      final uniqueClasses = <String, dynamic>{};
+      for (var s in todaySchedules) {
+        uniqueClasses['${s.classCode}_${s.startPeriod}'] = s;
+      }
+
       if (mounted) {
         setState(() {
-          _items = todaySchedules.map((s) => Attendance(
-            subjectName: s.courseName ?? '',
-            tiet: '${s.startPeriod}→${s.endPeriod}',
-            lop: s.classCode ?? '',
-            phong: s.roomName ?? '',
-            status: AttendanceStatus.chuaDiemDanh,
-          )).toList();
+          _items = uniqueClasses.values.map((s) {
+            AttendanceStatus st = AttendanceStatus.chuaDiemDanh;
+            if (s.attendanceStatus == 'PRESENT' || s.attendanceStatus == 'EXCUSED' || s.attendanceStatus == 'LATE') {
+              st = AttendanceStatus.daDiemDanh;
+            } else if (s.attendanceStatus == 'ABSENT') {
+              st = AttendanceStatus.vang;
+            }
+            return Attendance(
+              subjectName: s.courseName ?? '',
+              tiet: '${s.startPeriod}→${s.endPeriod}',
+              lop: s.classCode ?? '',
+              phong: s.roomName ?? '',
+              status: st,
+            );
+          }).toList();
           _isLoading = false;
         });
       }

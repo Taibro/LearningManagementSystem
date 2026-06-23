@@ -62,10 +62,10 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
                 (SELECT su.full_name FROM teachers st JOIN users su ON st.user_id = su.id WHERE st.id = se.substitute_teacher_id) AS substituteTeacherName,
                 se.makeup_status AS makeupStatus,
                 se.exception_date AS exceptionDate,
-                se.replacement_date AS replacementDate,
                 se.replacement_start_period AS replacementStartPeriod,
                 se.replacement_end_period AS replacementEndPeriod,
-                (SELECT CONCAT(rr.building, '-', rr.room_number) FROM rooms rr WHERE rr.id = se.replacement_room_id) AS replacementRoomName
+                (SELECT CONCAT(rr.building, '-', rr.room_number) FROM rooms rr WHERE rr.id = se.replacement_room_id) AS replacementRoomName,
+                ar.status       AS attendanceStatus
             FROM enrollments e
             JOIN classes c        ON e.class_id = c.id
             JOIN courses co      ON c.course_id = co.id
@@ -75,6 +75,7 @@ public interface StudentRepository extends JpaRepository<Student, Integer> {
             LEFT JOIN teachers t ON t.id = ct.teacher_id
             LEFT JOIN users u   ON u.id = t.user_id
             LEFT JOIN schedule_exceptions se ON se.schedule_id = sch.id AND se.approval_status = 'APPROVED' AND ((se.exception_date >= :startDate AND se.exception_date <= :endDate) OR (se.replacement_date >= :startDate AND se.replacement_date <= :endDate))
+            LEFT JOIN attendance_records ar ON ar.schedule_id = sch.id AND ar.student_id = e.student_id AND ar.attendance_date >= :startDate AND ar.attendance_date <= :endDate
             WHERE e.student_id = (SELECT id FROM students WHERE student_code = :studentCode)
               AND e.status = 'ENROLLED'
               AND sch.start_date <= :endDate

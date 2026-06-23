@@ -28,4 +28,5 @@ public interface StudentScheduleDto {
     Integer getReplacementStartPeriod();
     Integer getReplacementEndPeriod();
     String getReplacementRoomName();
+    String getAttendanceStatus();
 }
